@@ -1,0 +1,5 @@
+bin/
+lib/
+tmp/
+.DS_Store
+*.swp
