@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb;
+package ca.ubc.ece.salt.sdjsb.checker;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -71,15 +71,14 @@ public class SpecialTypeMap {
 	
 	/**
 	 * The list of special types that a variable could be assigned to. Note
-	 * that the FALSEY type indicates that a variable is one of {undefined,
-	 * NaN, blank, zero} while, TRUTHY type indicates it is not one of those
-	 * types (i.e. the variable has a value).
+	 * that the FALSEY type indicates that a variable could be one of 
+	 * {undefined, NaN, blank, zero} (i.e. the variable evaluates to false in
+	 * a condition expression).
 	 * 
 	 * @author qhanam
 	 */
-	enum SpecialType {
+	public enum SpecialType {
 		FALSEY,
-		TRUTHY,
 		UNDEFINED,
 		NULL,
 		NAN,
