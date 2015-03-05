@@ -186,37 +186,64 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
 		}
 		
 		public boolean visit(AstNode node) {
+			/* If this node is part of a change operation, investigate its
+			 * children to see if a variableIdenfifier is used. */
 
-			if (node instanceof PropertyGet) {
-				return visit((PropertyGet) node);
-			}
-
-			return true;
-		}
-		
-		/**
-		 * Check if we are getting a property from the variable that was checked.
-		 * @param node The node representing the property access.
-		 * @return True (visit the subtree of this node).
-		 */
-		public boolean visit(PropertyGet node) {
 			ChangeType changeType = context.getDstChangeOp(node);
 			
 			if(changeType == null) return true;
 			
 			if(changeType != ChangeType.UNCHANGED) {
-				String variableIdentifier = ((Name)node.getLeft()).getIdentifier();
-                if(node.getLeft() instanceof Name && this.variableIdentifiers.containsKey(variableIdentifier)) {
-                	
-                	/* We have found an instance of a variable use. */
-                	this.variableIdentifiers.remove(variableIdentifier);
-                }
+				/* Find and remove variable identifiers that have been used in this node. */
+				SubUseTreeVisitor subUseTreeVisitor = new SubUseTreeVisitor(this.variableIdentifiers);
+				node.visit(subUseTreeVisitor);
 			}
 
 			return true;
 		}
 		
 	}
+	
+	/**
+	 * Once we have a tree that has been modified, this visitor finds if any of
+	 * the variable identifiers have been used.
+	 * @author qhanam
+	 *
+	 */
+	private class SubUseTreeVisitor implements NodeVisitor {
+
+		private Map<String, SpecialType> variableIdentifiers;
+		
+		public SubUseTreeVisitor(Map<String, SpecialType> variableIdentifier) {
+			this.variableIdentifiers = variableIdentifier;
+		}
+
+		public boolean visit(AstNode node) {
+			if (node instanceof PropertyGet) {
+				return visit((PropertyGet) node);
+			}
+
+			return true;
+		}
+
+		/**
+		 * Check if we are getting a property from the variable that was checked.
+		 * @param node The node representing the property access.
+		 * @return True (visit the subtree of this node).
+		 */
+		public boolean visit(PropertyGet node) {
+            String variableIdentifier = ((Name)node.getLeft()).getIdentifier();
+            if(node.getLeft() instanceof Name && this.variableIdentifiers.containsKey(variableIdentifier)) {
+                
+                /* We have found an instance of a variable use. */
+                this.variableIdentifiers.remove(variableIdentifier);
+            }
+
+			return true;
+		}
+		
+	}
+
 	
 	/**
 	 * A visitor for finding special type assignments.

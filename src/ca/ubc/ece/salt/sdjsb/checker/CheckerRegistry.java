@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.mozilla.javascript.ast.AstNode;
 
+import ca.ubc.ece.salt.sdjsb.checker.alert.Alert;
 import fr.labri.gumtree.actions.TreeClassifier;
 import fr.labri.gumtree.tree.Tree;
 
