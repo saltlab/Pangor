@@ -25,10 +25,18 @@ public abstract class AbstractChecker {
 	private List<Alert> alerts;
 	
 	/**
+	 * Provides a link for checkers to access the CheckerRegistry. The
+	 * CheckerRegistry provides services for the checkers like AstNode to Tree
+	 * node mapping.
+	 */
+	protected CheckerContext context;
+	
+	/**
 	 * Create a new AbstractChecker.
 	 */
-	public AbstractChecker() {
+	public AbstractChecker(CheckerContext context) {
 		this.alerts = new LinkedList<Alert>();
+		this.context = context;
 	}
 	
 	/**
@@ -99,8 +107,7 @@ public abstract class AbstractChecker {
 	 * Registers an alert to be reported to the user.
 	 * @param alert
 	 */
-	protected void registerAlert(String subtype, String description) {
-		Alert alert = new Alert(this, subtype, description);
+	protected void registerAlert(Alert alert) {
 		this.alerts.add(alert);
 	}
 

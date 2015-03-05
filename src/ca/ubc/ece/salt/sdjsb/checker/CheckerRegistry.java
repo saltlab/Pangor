@@ -2,8 +2,12 @@ package ca.ubc.ece.salt.sdjsb.checker;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.mozilla.javascript.ast.AstNode;
+
+import fr.labri.gumtree.actions.TreeClassifier;
+import fr.labri.gumtree.tree.Tree;
 
 /**
  * All implemented checkers should be registered here. When a modified Tree node
@@ -14,16 +18,35 @@ import org.mozilla.javascript.ast.AstNode;
  */
 public class CheckerRegistry {
 	
-	List<AbstractChecker> activeCheckers;
+	/**
+	 * The list of checkers that should be initialized and receive events from
+	 * the event bus.
+	 */
+	private List<AbstractChecker> activeCheckers;
+	
+	/**
+	 * Provides checkers with access to GumTree information.
+	 */
+	private CheckerContext checkerContext;
 
 	/**
 	 * Creates and registers all the default checkers.
+	 * 
+	 * @param srcTreeNodeMap A map of AstNodes to Tree nodes in the source
+	 * 		  file. 
+	 * @param dstTreeNodeMap A map of AstNodes to Tree nodes in the destination
+	 * 		  file. 
+	 * @param threeClassifier The GumTree structure that provides access to the
+	 * 		  Tree node classifications (inserted, deleted, updated, modified).
 	 */
-	public CheckerRegistry() {
+	public CheckerRegistry(Map<AstNode, Tree> srcTreeNodeMap, Map<AstNode, Tree> dstTreeNodeMap, TreeClassifier treeClassifier) {
+
+		this.checkerContext = new CheckerContext(srcTreeNodeMap, dstTreeNodeMap, treeClassifier);
+		
 		this.activeCheckers = new LinkedList<AbstractChecker>();
 
 		/* Create and add the default checkers. */
-		this.activeCheckers.add(new SpecialTypeHandlingChecker());
+		this.activeCheckers.add(new SpecialTypeHandlingChecker(this.checkerContext));
 	}
 	
 	/**

@@ -3,6 +3,7 @@ package ca.ubc.ece.salt.sdjsb;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 import org.mozilla.javascript.ast.AstNode;
 
@@ -11,6 +12,7 @@ import fr.labri.gumtree.actions.TreeClassifier;
 import fr.labri.gumtree.client.DiffClient;
 import fr.labri.gumtree.client.DiffOptions;
 import fr.labri.gumtree.client.TreeGeneratorRegistry;
+import fr.labri.gumtree.gen.js.RhinoTreeGenerator;
 import fr.labri.gumtree.io.ParserASTNode;
 import fr.labri.gumtree.matchers.MappingStore;
 import fr.labri.gumtree.matchers.Matcher;
@@ -25,9 +27,6 @@ public class RepairDiff extends DiffClient {
 
 	public RepairDiff(DiffOptions diffOptions) {
 		super(diffOptions);
-
-		/* Create the 'event bus' for the repair checkers. */
-		this.checkerRegistry = new CheckerRegistry();
 	}
 
 	@Override
@@ -36,12 +35,23 @@ public class RepairDiff extends DiffClient {
 		File fSrc = new File(diffOptions.getSrc());
 		File fDst = new File(diffOptions.getDst());
 
-        /* Create the abstract GumTree representations of the ASTs. */
+        /* Create the abstract GumTree representations of the ASTs.
+         * 
+         * Note: GumTree would use TreeGeneratorRegistry here to build the src
+         * and dst trees. However, we're working with the JavaScript AstNodes
+         * from the Rhino parser, so we need some language specific info from
+         * RhinoTreeGenerator. */
         Tree src;
         Tree dst;
+        Map<AstNode, Tree> srcTreeNodeMap;
+        Map<AstNode, Tree> dstTreeNodeMap;
+        RhinoTreeGenerator srcRhinoTreeGenerator = new RhinoTreeGenerator();
+        RhinoTreeGenerator dstRhinoTreeGenerator = new RhinoTreeGenerator();
         try{
-            src = TreeGeneratorRegistry.getInstance().getTree(fSrc.getAbsolutePath());
-            dst = TreeGeneratorRegistry.getInstance().getTree(fDst.getAbsolutePath());
+            src = srcRhinoTreeGenerator.fromFile(fSrc.getAbsolutePath());
+            srcTreeNodeMap = srcRhinoTreeGenerator.getTreeNodeMap();
+            dst = dstRhinoTreeGenerator.fromFile(fDst.getAbsolutePath());
+            dstTreeNodeMap = dstRhinoTreeGenerator.getTreeNodeMap();
         } catch (IOException e) {
         	System.err.println(e.getMessage());
         	return;
@@ -55,7 +65,7 @@ public class RepairDiff extends DiffClient {
 		/* Produce the diff object that we will use to infer properties of
 		 * repairs. */
 		try{
-            this.produce(src, dst, matcher);
+            this.produce(src, dst, srcTreeNodeMap, dstTreeNodeMap, matcher);
 		} catch (IOException e) {
         	System.err.println(e.getMessage());
         	return;
@@ -65,7 +75,7 @@ public class RepairDiff extends DiffClient {
 		List<Alert> alerts = this.checkerRegistry.getAlerts();
 		System.out.println("Alerts:");
 		for(Alert alert : alerts){
-			System.out.println("\t" + alert);
+			System.out.println("\t" + alert.getLongDescription());
 		}
 	}
 	
@@ -77,7 +87,7 @@ public class RepairDiff extends DiffClient {
 	 * @param matcher The set of source nodes matched to destination nodes.
 	 * @throws IOException
 	 */
-	private void produce(Tree src, Tree dst, Matcher matcher) throws IOException {
+	private void produce(Tree src, Tree dst, Map<AstNode, Tree> srcTreeNodeMap, Map<AstNode, Tree> dstTreeNodeMap, Matcher matcher) throws IOException {
 		
 		/* Classify parts of each tree as deleted, added, moved or updated. The
 		 * source tree nodes can be deleted or updated, while the destination
@@ -94,6 +104,9 @@ public class RepairDiff extends DiffClient {
 		/* We use mapping ids to keep track of mapping changes from the source
 		 * to the destination. */
 		MappingStore mappings = matcher.getMappings();
+
+		/* Create the 'event bus' for the repair checkers. */
+		this.checkerRegistry = new CheckerRegistry(srcTreeNodeMap, dstTreeNodeMap, c);
 		
 		/* Iterate the source tree. Call the CheckerRegistry to trigger events. */
 		for (Tree t: src.getTrees()) {

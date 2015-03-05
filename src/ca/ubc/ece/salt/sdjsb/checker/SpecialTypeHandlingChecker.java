@@ -1,6 +1,11 @@
 package ca.ubc.ece.salt.sdjsb.checker;
 
 import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
@@ -9,11 +14,16 @@ import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NodeVisitor;
 import org.mozilla.javascript.ast.NumberLiteral;
+import org.mozilla.javascript.ast.PropertyGet;
 import org.mozilla.javascript.ast.StringLiteral;
 import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.VariableInitializer;
 
+import ca.ubc.ece.salt.sdjsb.checker.CheckerContext.ChangeType;
 import ca.ubc.ece.salt.sdjsb.checker.SpecialTypeMap.SpecialType;
+import ca.ubc.ece.salt.sdjsb.checker.alert.SpecialTypeAlert;
+import fr.labri.gumtree.tree.Tree;
+import fr.labri.utils.collections.Pair;
 
 /**
  * Detects repairs that fix special type handling bugs. These include bugs
@@ -44,64 +54,101 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
 	 */
 	private SpecialTypeMap comparisons;
 	
-	public SpecialTypeHandlingChecker() {
+	public SpecialTypeHandlingChecker(CheckerContext context) {
+		super(context);
 		this.assignments = new SpecialTypeMap();
 		this.comparisons = new SpecialTypeMap();
 	}
 
 	@Override
-	public void sourceDelete(AstNode node) {
-		// TODO Auto-generated method stub
-
-	}
+	public void sourceDelete(AstNode node) { return; }
 
 	@Override
-	public void sourceUpdate(AstNode node) {
-		// TODO Auto-generated method stub
-
-	}
+	public void sourceUpdate(AstNode node) { return; }
 
 	@Override
-	public void sourceMove(AstNode node) {
-		// TODO Auto-generated method stub
-
-	}
+	public void sourceMove(AstNode node) { return; }
 
 	@Override
-	public void destinationUpdate(AstNode node) {
-		// TODO Auto-generated method stub
-
-	}
+	public void destinationUpdate(AstNode node) { 
+		return; 
+    }
 
 	@Override
-	public void destinationMove(AstNode node) {
-		// TODO Auto-generated method stub
-
+	public void destinationMove(AstNode node) { 
+		return; 
 	}
 
 	@Override
 	public void destinationInsert(AstNode node) {
 
-        AstNode assignment = null;
-        AstNode condition = null;
-
         if (node instanceof IfStatement) {
-            IfStatement ifStatement = (IfStatement) node;
-            condition = ifStatement.getCondition();
+        	destinationBranchInsert(node);
         } else if(node instanceof VariableDeclaration) {
+            destinationAssignmentInsert(node);
+        } else if(node instanceof VariableInitializer) {
+            destinationAssignmentInsert(node);
+        } else if(node instanceof InfixExpression) {
+            destinationAssignmentInsert(node);
+        }
+	}
+	
+	/**
+	 * Handles the case where an assignment statement (i.e. a = b) is inserted
+	 * into the AST.
+	 * 
+	 * TODO: This should be a visitor in case assignments occur in a child node.
+	 * 
+	 * @param node A statement with an assignment.
+	 */
+	private void destinationAssignmentInsert(AstNode node) {
+        AstNode assignment = null;
+
+		if(node instanceof VariableDeclaration) {
             assignment = node;
         } else if(node instanceof VariableInitializer) {
         	assignment = node;
         } else if(node instanceof InfixExpression) {
         	assignment = node;
         }
-					
+
 		if(assignment != null) {
             AssignmentTreeVisitor visitor = new AssignmentTreeVisitor();
             assignment.visit(visitor);
-		} else if(condition != null) {
+		}	
+	}
+	
+	/**
+	 * Handles the case where a branching statement (e.g., if, while, for) is
+	 * inserted into the AST.
+	 * @param node A statement with a condition and branch.
+	 */
+	private void destinationBranchInsert(AstNode node) {
+		Map<String, SpecialType> variableIdentifiers;
+        AstNode condition = null;
+
+        if (node instanceof IfStatement) {
+            IfStatement ifStatement = (IfStatement) node;
+            condition = ifStatement.getCondition();
+        }
+		
+		if(condition != null) {
             ConditionalTreeVisitor visitor = new ConditionalTreeVisitor();
             condition.visit(visitor);
+            variableIdentifiers = visitor.variableIdentifiers;
+
+            if(variableIdentifiers.size() > 0) {
+            	
+            	/* Remove any variable identifiers from the map that have uses
+            	 * added inside one of the branches. */
+                UseTreeVisitor useVisitor = new UseTreeVisitor(variableIdentifiers);
+                node.visit(useVisitor);
+                
+                /* Add the remaining variable identifiers to the comparison map. */
+                for(String variableIdentifier : variableIdentifiers.keySet()){
+                    this.comparisons.add(variableIdentifier, variableIdentifiers.get(variableIdentifier));
+                }
+            }
         }
 	}
 
@@ -113,7 +160,7 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
 			EnumSet<SpecialType> types = this.comparisons.getSet(name);
 			for(SpecialType type : types) {
 				if(!this.assignments.setContains(name, type)){
-					this.registerAlert("TYPE_ERROR_UNDEFINED", "A conditional branch was inserted that checks if a variable is or is not undefined. This could indicate a TypeError is possible in the original code.");
+					this.registerAlert(new SpecialTypeAlert(this, name, type));
 				}
 			}
 		}
@@ -124,6 +171,52 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
 		return TYPE;
 	}
 	
+	/**
+	 * A visitor for finding variable uses.
+	 * 
+	 * @author qhanam
+	 */
+	private class UseTreeVisitor implements NodeVisitor {
+		
+		private CheckerContext context = SpecialTypeHandlingChecker.this.context;
+		private Map<String, SpecialType> variableIdentifiers;
+		
+		public UseTreeVisitor(Map<String, SpecialType> variableIdentifier) {
+			this.variableIdentifiers = variableIdentifier;
+		}
+		
+		public boolean visit(AstNode node) {
+
+			if (node instanceof PropertyGet) {
+				return visit((PropertyGet) node);
+			}
+
+			return true;
+		}
+		
+		/**
+		 * Check if we are getting a property from the variable that was checked.
+		 * @param node The node representing the property access.
+		 * @return True (visit the subtree of this node).
+		 */
+		public boolean visit(PropertyGet node) {
+			ChangeType changeType = context.getDstChangeOp(node);
+			
+			if(changeType == null) return true;
+			
+			if(changeType != ChangeType.UNCHANGED) {
+				String variableIdentifier = ((Name)node.getLeft()).getIdentifier();
+                if(node.getLeft() instanceof Name && this.variableIdentifiers.containsKey(variableIdentifier)) {
+                	
+                	/* We have found an instance of a variable use. */
+                	this.variableIdentifiers.remove(variableIdentifier);
+                }
+			}
+
+			return true;
+		}
+		
+	}
 	
 	/**
 	 * A visitor for finding special type assignments.
@@ -204,15 +297,16 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
 
 	/**
 	 * A visitor for finding special type comparisons in the condition part of
-	 * conditional statements.
+	 * conditional statements. The variable identifiers that are compared are
+	 * stored in the member variable {@code variableIdentifiers}.
 	 * @author qhanam
 	 */
     private class ConditionalTreeVisitor implements NodeVisitor {
     	
-    	SpecialTypeMap comparisons;
+    	public Map<String, SpecialType> variableIdentifiers;
     	
     	public ConditionalTreeVisitor () {
-    		this.comparisons = SpecialTypeHandlingChecker.this.comparisons;
+    		this.variableIdentifiers = new TreeMap<String, SpecialType>();
     	}
     	
     	/**
@@ -233,10 +327,12 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
         				String right = ((Name) ie.getRight()).getIdentifier();
         				
         				if(left.equals("undefined")) { 
-        					this.comparisons.add(right, SpecialType.UNDEFINED);
+        					this.variableIdentifiers.put(right, SpecialType.UNDEFINED);
+        					//this.comparisons.add(right, SpecialType.UNDEFINED);
                         }
         				else if(right.equals("undefined")) { 
-        					this.comparisons.add(left, SpecialType.UNDEFINED);
+        					this.variableIdentifiers.put(left, SpecialType.UNDEFINED);
+        					//this.comparisons.add(left, SpecialType.UNDEFINED);
                         }
         			}         			
         		}

@@ -7,22 +7,19 @@ package ca.ubc.ece.salt.sdjsb.checker;
  * 
  * @author qhanam
  */
-public class Alert {
+public abstract class Alert {
 	
 	private AbstractChecker checker;
 	private String subtype;
-	private String description;
 	
 	/**
 	 * An alert is always associated a concrete Checker.
 	 * @param checker The checker which generated the alert.
 	 * @param subtype A checker may detect more than one repair subtype.
-	 * @param description The description of the repair detected by the checker.
 	 */
-	public Alert(AbstractChecker checker, String subtype, String description) {
+	public Alert(AbstractChecker checker, String subtype) {
 		this.checker = checker;
 		this.subtype = subtype;
-		this.description = description;
 	}
 	
 	/**
@@ -35,12 +32,25 @@ public class Alert {
 	
 	/**
 	 * The long description of the repair alert including the identifier (type
-	 * and subtype) and the alert description.
+	 * and subtype) and specific details about the alert (e.g. variable names,
+	 * locations, etc.).
 	 * @return The repair type, subtype and description.
 	 */
 	public String getLongDescription() {
-		return checker.getCheckerType() + "_" + this.subtype + "\n\n" + this.description;
+		return checker.getCheckerType() + "_" + this.subtype + ": " + this.getAlertDescription();
 	}
+	
+	/**
+	 * Returns specific details about the alert (e.g., variable names,
+	 * locations, etc.).
+	 * @return The long description of the alert.
+	 */
+	protected abstract String getAlertDescription();
+	
+	/** 
+	 * Returns a description of the repair detected by the checker.
+	 */
+	protected abstract String getAlertExplanation();
 	
 	@Override
 	public String toString() {
