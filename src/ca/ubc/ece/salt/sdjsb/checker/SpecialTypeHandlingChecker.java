@@ -160,7 +160,7 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
 			EnumSet<SpecialType> types = this.comparisons.getSet(name);
 			for(SpecialType type : types) {
 				if(!this.assignments.setContains(name, type)){
-					this.registerAlert(new SpecialTypeAlert(this, name, type));
+					this.registerAlert(new SpecialTypeAlert(this.getCheckerType(), name, type));
 				}
 			}
 		}

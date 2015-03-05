@@ -11,7 +11,7 @@ import ca.ubc.ece.salt.sdjsb.checker.AbstractChecker;
  */
 public abstract class Alert {
 	
-	private AbstractChecker checker;
+	private String type;
 	private String subtype;
 	
 	/**
@@ -19,8 +19,8 @@ public abstract class Alert {
 	 * @param checker The checker which generated the alert.
 	 * @param subtype A checker may detect more than one repair subtype.
 	 */
-	public Alert(AbstractChecker checker, String subtype) {
-		this.checker = checker;
+	public Alert(String type, String subtype) {
+		this.type = type;
 		this.subtype = subtype;
 	}
 	
@@ -29,7 +29,7 @@ public abstract class Alert {
 	 * @return The alert type and subtype.
 	 */
 	public String getShortDescription() {
-		return checker.getCheckerType() + "_" + this.subtype;
+		return this.type + "_" + this.subtype;
 	}
 	
 	/**
@@ -39,7 +39,7 @@ public abstract class Alert {
 	 * @return The repair type, subtype and description.
 	 */
 	public String getLongDescription() {
-		return checker.getCheckerType() + "_" + this.subtype + ": " + this.getAlertDescription();
+		return this.type + "_" + this.subtype + ": " + this.getAlertDescription();
 	}
 	
 	/**
@@ -55,8 +55,17 @@ public abstract class Alert {
 	protected abstract String getAlertExplanation();
 	
 	@Override
+	public boolean equals(Object o) {
+		if(o instanceof Alert) {
+			Alert a = (Alert) o;
+			return this.type.equals(a.type) && this.subtype.equals(a.subtype);
+		}
+		return false;
+	}
+	
+	@Override
 	public String toString() {
-		return checker.getCheckerType() + "_" + this.subtype;
+		return this.type + "_" + this.subtype;
 	}
 
 }

@@ -5,13 +5,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
 import org.mozilla.javascript.ast.AstNode;
 
 import fr.labri.gumtree.actions.RootAndLeavesClassifier;
 import fr.labri.gumtree.actions.TreeClassifier;
-import fr.labri.gumtree.client.DiffClient;
 import fr.labri.gumtree.client.DiffOptions;
-import fr.labri.gumtree.client.TreeGeneratorRegistry;
 import fr.labri.gumtree.gen.js.RhinoTreeGenerator;
 import fr.labri.gumtree.io.ParserASTNode;
 import fr.labri.gumtree.matchers.MappingStore;
@@ -21,16 +21,41 @@ import fr.labri.gumtree.tree.Tree;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerRegistry;
 import ca.ubc.ece.salt.sdjsb.checker.alert.Alert;
 
-public class RepairDiff extends DiffClient {
+public class SDJSB  {
 	
 	private CheckerRegistry checkerRegistry;
+	private DiffOptions diffOptions;
 
-	public RepairDiff(DiffOptions diffOptions) {
-		super(diffOptions);
+	/**
+	 * The main entry point for command line executions of SDJSB.
+	 * @param args SDJSB /path/to/src /path/to/dst
+	 */
+	public static void main(String[] args) {
+		DiffOptions options = new DiffOptions();
+		CmdLineParser parser = new CmdLineParser(options);
+
+		try {
+			parser.parseArgument(args);
+		} catch (CmdLineException e) {
+			System.err.println("Usage:\nSDJSB /path/to/src /path/to/dst");
+			e.printStackTrace();
+			return;
+		}
+
+        SDJSB client = new SDJSB(options);
+        List<Alert> alerts = client.start();
+
+        System.out.println("Alerts:");
+        for(Alert alert : alerts){
+            System.out.println("\t" + alert.getLongDescription());
+        }
 	}
 
-	@Override
-	public void start() {
+	public SDJSB(DiffOptions diffOptions) {
+		this.diffOptions = diffOptions;
+	}
+
+	public List<Alert> start() {
 		/* Get the files we are comparing from the command line arguments. */
 		File fSrc = new File(diffOptions.getSrc());
 		File fDst = new File(diffOptions.getDst());
@@ -54,7 +79,7 @@ public class RepairDiff extends DiffClient {
             dstTreeNodeMap = dstRhinoTreeGenerator.getTreeNodeMap();
         } catch (IOException e) {
         	System.err.println(e.getMessage());
-        	return;
+        	return null;
         }
 		
 		/* Match the source AST nodes to the destination AST nodes. The default
@@ -68,15 +93,13 @@ public class RepairDiff extends DiffClient {
             this.produce(src, dst, srcTreeNodeMap, dstTreeNodeMap, matcher);
 		} catch (IOException e) {
         	System.err.println(e.getMessage());
-        	return;
+        	return null;
 		}
 		
 		/* Get and print the alerts. */
 		List<Alert> alerts = this.checkerRegistry.getAlerts();
-		System.out.println("Alerts:");
-		for(Alert alert : alerts){
-			System.out.println("\t" + alert.getLongDescription());
-		}
+		
+		return alerts;
 	}
 	
 	/**
