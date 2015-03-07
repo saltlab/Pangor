@@ -8,7 +8,11 @@ import java.util.TreeMap;
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.Assignment;
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.AstRoot;
+import org.mozilla.javascript.ast.ConditionalExpression;
+import org.mozilla.javascript.ast.DoLoop;
 import org.mozilla.javascript.ast.ExpressionStatement;
+import org.mozilla.javascript.ast.ForLoop;
 import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.IfStatement;
 import org.mozilla.javascript.ast.InfixExpression;
@@ -19,6 +23,7 @@ import org.mozilla.javascript.ast.PropertyGet;
 import org.mozilla.javascript.ast.StringLiteral;
 import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.VariableInitializer;
+import org.mozilla.javascript.ast.WhileLoop;
 
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext.ChangeType;
 import ca.ubc.ece.salt.sdjsb.checker.SpecialTypeMap.SpecialType;
@@ -81,78 +86,59 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
 	@Override
 	public void destinationInsert(AstNode node) {
 
-        if (node instanceof IfStatement) {
-        	destinationBranchInsert(node);
-        } else if(node instanceof VariableDeclaration) {
-            destinationAssignmentInsert(node);
-        } else if(node instanceof VariableInitializer) {
-            destinationAssignmentInsert(node);
-        } else if(node instanceof InfixExpression) {
-            destinationAssignmentInsert(node);
-        }
-	}
-	
-	/**
-	 * Handles the case where an assignment statement (i.e. a = b) is inserted
-	 * into the AST.
-	 * 
-	 * TODO: This should be a visitor in case assignments occur in a child node.
-	 * 
-	 * @param node A statement with an assignment.
-	 */
-	private void destinationAssignmentInsert(AstNode node) {
-        AstNode assignment = null;
+        /* If the node is a name, we need to handle two cases:
+         * 	1. A special type node is inserted in an assignment. 
+         *  2. A special type node is inserted in a branch condition. */
 
-		if(node instanceof VariableDeclaration) {
-            assignment = node;
-        } else if(node instanceof VariableInitializer) {
-        	assignment = node;
-        } else if(node instanceof InfixExpression) {
-        	assignment = node;
-        }
-
-		if(assignment != null) {
-            AssignmentTreeVisitor visitor = new AssignmentTreeVisitor();
-            assignment.visit(visitor);
-		}	
-	}
-	
-	/**
-	 * Handles the case where a branching statement (e.g., if, while, for) is
-	 * inserted into the AST.
-	 * @param node A statement with a condition and branch.
-	 */
-	private void destinationBranchInsert(AstNode node) {
-		Map<String, SpecialType> variableIdentifiers;
-        AstNode condition = null;
-        AstNode block = null;
-
-        if (node instanceof IfStatement) {
-            IfStatement ifStatement = (IfStatement) node;
-            condition = ifStatement.getCondition();
-            block = ifStatement.getThenPart();
-        }
+		SpecialType type = SpecialTypeHandlingChecker.getSpecialType(node);
 		
-		if(condition != null) {
-            ConditionalTreeVisitor visitor = new ConditionalTreeVisitor();
-            condition.visit(visitor);
-            variableIdentifiers = visitor.variableIdentifiers;
+		if(type == null) return;
+		
+		AstNode parent = node.getParent();
 
-            if(variableIdentifiers.size() > 0) {
-            	
-            	/* Remove any variable identifiers from the map that have uses
-            	 * added inside one of the branches. */
-                UseTreeVisitor useVisitor = new UseTreeVisitor(variableIdentifiers);
-                node.visit(useVisitor);
-                
-                /* Add the remaining variable identifiers to the comparison map. */
-                for(String variableIdentifier : variableIdentifiers.keySet()){
-                    this.comparisons.add(variableIdentifier, variableIdentifiers.get(variableIdentifier));
-                }
-            }
-        }
+		/* Handle assignments to a special type. */
+		if(parent instanceof Assignment || parent instanceof VariableInitializer) {
+            AssignmentTreeVisitor visitor = new AssignmentTreeVisitor();
+            parent.visit(visitor);
+		}
+		/* Handle comparisons to a special type. */
+		else if(parent instanceof InfixExpression) {
+			InfixExpression ie = (InfixExpression) parent;
+			if(Utilities.isEquivalenceOperator(ie.getOperator())){
+				
+				String identifier = Utilities.getIdentifier(ie.getLeft());
+				
+				if(identifier != null) {
+
+                    Map<String, SpecialType> variableIdentifiers = new TreeMap<String, SpecialType>();
+                    variableIdentifiers.put(identifier, type); 
+                    
+                    /* Walk up the tree until we get to the branch statement. */
+                    while(true) {
+                    	if(parent instanceof IfStatement) { break; }
+                    	if(parent instanceof DoLoop) { break; }
+                    	if(parent instanceof ForLoop) { break; }
+                    	if(parent instanceof WhileLoop) { break; }
+                    	if(parent instanceof ConditionalExpression) { break; }
+                    	if(parent instanceof AstRoot) return; // The branch statement was not found.
+                    	parent = parent.getParent();
+                    }
+
+                    /* Remove any variable identifiers from the map that have uses
+                     * added inside one of the branches. */
+                    UseTreeVisitor useVisitor = new UseTreeVisitor(variableIdentifiers);
+                    parent.visit(useVisitor);
+                    
+                    /* Add the remaining variable identifiers to the comparison map. */
+                    for(String variableIdentifier : variableIdentifiers.keySet()){
+                        this.comparisons.add(variableIdentifier, variableIdentifiers.get(variableIdentifier));
+                    }
+					
+				}
+			}
+		}
 	}
-
+	
 	@Override
 	public void finished() {
 		/* Compare the assignments sets to the comparisons sets and generate
@@ -170,6 +156,43 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
 	@Override
 	public String getCheckerType() {
 		return TYPE;
+	}
+	
+	/**
+	 * Returns the special type of the AstNode.
+	 * @param node The AstNode to check.
+	 * @return The SpecialType of the AstNode, or null if the node is not
+	 * 		   a Name node that holds a special type keyword or value.
+	 */
+	private static SpecialType getSpecialType(AstNode node) {
+		
+            String name = Utilities.getIdentifier(node);
+            
+            if(name != null) {
+
+            	if(name.equals("undefined")) return SpecialType.UNDEFINED;
+            	else if(name.equals("null")) return SpecialType.NULL;
+            	else if(name.equals("NaN")) return SpecialType.NAN;
+            	else return null;
+            	
+            }
+            else if (node instanceof StringLiteral) {
+
+                String literal = ((StringLiteral) node).getValue();
+                if(literal.isEmpty()) return SpecialType.BLANK;
+                else return null;
+
+            } 
+            else if (node instanceof NumberLiteral) {
+
+            	double literal = ((NumberLiteral) node).getNumber();
+            	if(literal == 0.0) return SpecialType.ZERO;
+            	else return null;
+
+            }
+            else {
+            	return null;
+            }
 	}
 	
 	/**
@@ -305,18 +328,18 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
 				return true; // Get the variable initializers.
 			} else if (node instanceof VariableInitializer) {
 				return this.visit((VariableInitializer) node);
-			} else if (node instanceof InfixExpression) {
-				return this.visit((InfixExpression) node);
+			} else if (node instanceof Assignment) {
+				return this.visit((Assignment) node);
 			}
 			return false;
 		}
 		
 		private boolean visit(VariableInitializer node) {
 			this.storeAssignment(node.getTarget(), node.getInitializer());
-			return false;
+			return true;
 		}
 		
-		private boolean visit(InfixExpression node) {
+		private boolean visit(Assignment node) {
 			if(node.getOperator() == Token.ASSIGN) {
 				this.storeAssignment(node.getLeft(), node.getRight());
 			}
@@ -326,93 +349,19 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
         /**
          * Check the assignment in a variable initializer. If the assignment
          * assigns the value to a special type, store it in the assignment map.
-         * @param vi The VariableInitializer node.
+         * @param leftNode The node on the left hand of the assignment.
+         * @param rightNode The node on the right hand of the assignment.
          */
-        private void storeAssignment(AstNode lhs, AstNode rhs) {
+        private void storeAssignment(AstNode leftNode, AstNode rightNode) {
 
-        	String variable = null;
-        	SpecialType value = null;
+            String identifier = Utilities.getIdentifier(leftNode);
+            SpecialType value = SpecialTypeHandlingChecker.getSpecialType(rightNode);
             
-        	/* Get the identifier from the left hand side. */
-            if (lhs instanceof Name) {
-                variable = ((Name) lhs).getIdentifier();
-            } else {
-                return; // TODO: Handle fields and expressions.
-            }
-                    
-            /* Get the special type from the right hand side (if it is special). */
-            if (rhs instanceof Name) {
-                String token = ((Name) rhs).getIdentifier();
-                if(token.equals("undefined")) value = SpecialType.UNDEFINED;
-                else if(token.equals("NaN")) value = SpecialType.NAN;
-                else if(token.equals("null")) value = SpecialType.NULL;
-                else return;
-            } else if (rhs instanceof StringLiteral) {
-                String literal = ((StringLiteral) rhs).getValue();
-                if(literal.isEmpty()) value = SpecialType.BLANK;
-                else return;
-            } else if (rhs instanceof NumberLiteral) {
-            	double literal = ((NumberLiteral) rhs).getNumber();
-            	if(literal == 0) value = SpecialType.ZERO;
-            	else return;
-            } else {
-                return; // TODO: Handle expressions (e.g., ConditionalExpression)
-            }
-                    
+            if(identifier == null || value == null) return;
+            
             /* Store the assignment in the map. */
-            if(variable != null && value != null) {
-            	this.assignments.add(variable, value);
-            }
+            this.assignments.add(identifier, value);
         }
 	}
-
-	/**
-	 * A visitor for finding special type comparisons in the condition part of
-	 * conditional statements. The variable identifiers that are compared are
-	 * stored in the member variable {@code variableIdentifiers}.
-	 * @author qhanam
-	 */
-    private class ConditionalTreeVisitor implements NodeVisitor {
-    	
-    	public Map<String, SpecialType> variableIdentifiers;
-    	
-    	public ConditionalTreeVisitor () {
-    		this.variableIdentifiers = new TreeMap<String, SpecialType>();
-    	}
-    	
-    	/**
-    	 * Visits the condition part of a conditional statement and looks for nodes
-         * of type InfixExpression (i.e. a boolean operator expression) that use an
-         * equivalence operator (i.e., ===, !==, ==, !=).
-    	 */
-        public boolean visit(AstNode node) {
-        	
-        	if(node instanceof InfixExpression) {
-        		InfixExpression ie = (InfixExpression) node;
-
-        		if(Utilities.isEquivalenceOperator(ie.getOperator())) {
-        			
-        			String left = Utilities.getIdentifier(ie.getLeft());
-        			String right = Utilities.getIdentifier(ie.getRight());
-
-        			if(left != null && right != null) {
-                        System.out.println("left = " + left);
-                        System.out.println("right = " + right);
-        				if(left.equals("undefined")) { 
-        					this.variableIdentifiers.put(right, SpecialType.UNDEFINED);
-                        }
-        				else if(right.equals("undefined")) { 
-        					this.variableIdentifiers.put(left, SpecialType.UNDEFINED);
-                        }
-        			}         			
-        		}
-        	}
-
-        	return true;
-        }
-        
-
-    }
-    
 	
 }

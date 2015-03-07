@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.NodeVisitor;
 
+import ca.ubc.ece.salt.sdjsb.checker.CheckerContext.ChangeType;
 import ca.ubc.ece.salt.sdjsb.checker.alert.Alert;
 import fr.labri.gumtree.actions.TreeClassifier;
 import fr.labri.gumtree.tree.Tree;
@@ -125,9 +127,8 @@ public class CheckerRegistry {
 	 * @param node The Rhino AstNode that was deleted.
 	 */
 	public void destinationInsert(AstNode node) { 
-		for (AbstractChecker checker : activeCheckers) {
-			checker.destinationInsert(node);
-		}
+		DestinationInsertVisitor div = new DestinationInsertVisitor();
+		node.visit(div);
 	}
 	
 	/**
@@ -138,6 +139,32 @@ public class CheckerRegistry {
 		for (AbstractChecker checker : activeCheckers) {
 			checker.finished();
 		}
+	}
+	
+	/**
+	 * Walks the tree of the inserted node and triggers the destinationInsert
+	 * event for each child that was inserted.
+	 */
+	private class DestinationInsertVisitor implements NodeVisitor {
+		
+		private CheckerContext context;
+		private List<AbstractChecker> activeCheckers;
+		
+		public DestinationInsertVisitor() {
+			this.context = CheckerRegistry.this.checkerContext;
+			this.activeCheckers = CheckerRegistry.this.activeCheckers;
+		}
+		
+		public boolean visit(AstNode node) {
+			if(this.context.getDstChangeOp(node) == ChangeType.MOVE) return false;
+			
+            for (AbstractChecker checker : activeCheckers) {
+                checker.destinationInsert(node);
+            }
+                
+			return true;
+		}
+		
 	}
 	
 }

@@ -71,4 +71,12 @@ public class TestSpecialTypeHandling extends TestSDJSB {
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 
+	@Test
+	public void testAssignedField(){
+		String src = "./test/input/sth_assigned_field_old.js";
+		String dst = "./test/input/sth_assigned_field_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
 }
