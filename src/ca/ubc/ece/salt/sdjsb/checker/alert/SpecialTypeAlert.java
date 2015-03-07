@@ -1,6 +1,5 @@
 package ca.ubc.ece.salt.sdjsb.checker.alert;
 
-import ca.ubc.ece.salt.sdjsb.checker.AbstractChecker;
 import ca.ubc.ece.salt.sdjsb.checker.SpecialTypeMap.SpecialType;
 
 public class SpecialTypeAlert extends Alert {

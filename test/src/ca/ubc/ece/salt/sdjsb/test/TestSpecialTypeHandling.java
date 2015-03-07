@@ -12,13 +12,63 @@ import ca.ubc.ece.salt.sdjsb.checker.alert.SpecialTypeAlert;
 public class TestSpecialTypeHandling extends TestSDJSB {
 	
 	@Test
-	public void testSample(){
-		String src = "./test/input/sample-conf-old.js";
-		String dst = "./test/input/sample-conf-new.js";
+	public void testUndefined(){
+		String src = "./test/input/sth_undefined_old.js";
+		String dst = "./test/input/sth_undefined_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
 		expectedAlerts.add(new SpecialTypeAlert("STH", "a", SpecialType.UNDEFINED));
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
 
-		this.runTest(new String[] {src, dst}, expectedAlerts);
+	@Test
+	public void testUndefinedField(){
+		String src = "./test/input/sth_undefined_field_old.js";
+		String dst = "./test/input/sth_undefined_field_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		expectedAlerts.add(new SpecialTypeAlert("STH", "a.field.value", SpecialType.UNDEFINED));
+		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+	}
+
+	@Test
+	public void testUndefinedRealWorld(){
+		String src = "./test/input/tv-functions-old.js";
+		String dst = "./test/input/tv-functions-new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		expectedAlerts.add(new SpecialTypeAlert("STH", "tvShowTitle", SpecialType.UNDEFINED));
+		expectedAlerts.add(new SpecialTypeAlert("STH", "progression", SpecialType.UNDEFINED));
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	@Test
+	public void testUsedDereferenced(){
+		String src = "./test/input/sth_used_dereferenced_old.js";
+		String dst = "./test/input/sth_used_dereferenced_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	@Test
+	public void testUsedArgument(){
+		String src = "./test/input/sth_used_argument_old.js";
+		String dst = "./test/input/sth_used_argument_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	@Test
+	public void testUsedFieldArgument(){
+		String src = "./test/input/sth_used_field_argument_old.js";
+		String dst = "./test/input/sth_used_field_argument_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	@Test
+	public void testUsedFieldDereferenced(){
+		String src = "./test/input/sth_used_field_dereferenced_old.js";
+		String dst = "./test/input/sth_used_field_dereferenced_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 
 }

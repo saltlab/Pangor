@@ -112,5 +112,5 @@ public abstract class AbstractChecker {
 	protected void registerAlert(Alert alert) {
 		this.alerts.add(alert);
 	}
-
+	
 }

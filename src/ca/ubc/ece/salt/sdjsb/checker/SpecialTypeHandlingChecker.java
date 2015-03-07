@@ -1,14 +1,15 @@
 package ca.ubc.ece.salt.sdjsb.checker;
 
 import java.util.EnumSet;
-import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
 import org.mozilla.javascript.Token;
+import org.mozilla.javascript.ast.Assignment;
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.ExpressionStatement;
+import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.IfStatement;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.Name;
@@ -22,8 +23,6 @@ import org.mozilla.javascript.ast.VariableInitializer;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext.ChangeType;
 import ca.ubc.ece.salt.sdjsb.checker.SpecialTypeMap.SpecialType;
 import ca.ubc.ece.salt.sdjsb.checker.alert.SpecialTypeAlert;
-import fr.labri.gumtree.tree.Tree;
-import fr.labri.utils.collections.Pair;
 
 /**
  * Detects repairs that fix special type handling bugs. These include bugs
@@ -126,10 +125,12 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
 	private void destinationBranchInsert(AstNode node) {
 		Map<String, SpecialType> variableIdentifiers;
         AstNode condition = null;
+        AstNode block = null;
 
         if (node instanceof IfStatement) {
             IfStatement ifStatement = (IfStatement) node;
             condition = ifStatement.getCondition();
+            block = ifStatement.getThenPart();
         }
 		
 		if(condition != null) {
@@ -193,7 +194,7 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
 			
 			if(changeType == null) return true;
 			
-			if(changeType != ChangeType.UNCHANGED) {
+			if(changeType == ChangeType.INSERT || changeType == ChangeType.UPDATE) {
 				/* Find and remove variable identifiers that have been used in this node. */
 				SubUseTreeVisitor subUseTreeVisitor = new SubUseTreeVisitor(this.variableIdentifiers);
 				node.visit(subUseTreeVisitor);
@@ -219,32 +220,73 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
 		}
 
 		public boolean visit(AstNode node) {
-			if (node instanceof PropertyGet) {
-				return visit((PropertyGet) node);
+
+			/* One of node's ancestors was inserted or updated. Since nodes
+			 * inherit the class of their parent (if they themselves aren't
+			 * classified), this means:
+			 * 	- If the node has not been classified, it has been inserted or
+			 * 	  updated so we inspect it.
+			 *  - If the node is classified as inserted or updated, we inspect
+			 *    it.
+			 *  - If the node is classified as moved, we do not inspect it
+			 *    because it was present in the original program. */
+			ChangeType changeType = context.getDstChangeOp(node);
+
+			if(changeType == ChangeType.MOVE) {
+				return false;
 			}
+			else {
+				/* Check if this node is an identifier. */
+				check(node);
 
-			return true;
-		}
+				/* Investigate the subtrees. */
+                if (node instanceof Assignment) {
+                    visit(((Assignment)node).getRight());
+                    return false;
+                } else if (node instanceof InfixExpression) {
+                	InfixExpression ie = (InfixExpression) node;
+                	
+                	/* If this is not a use operator, check that neither side
+                	 * is an identifier. */
+                	if(!Utilities.isUseOperator(ie.getOperator())) {
 
-		/**
-		 * Check if we are getting a property from the variable that was checked.
-		 * @param node The node representing the property access.
-		 * @return True (visit the subtree of this node).
-		 */
-		public boolean visit(PropertyGet node) {
-            String variableIdentifier = ((Name)node.getLeft()).getIdentifier();
-            if(node.getLeft() instanceof Name && this.variableIdentifiers.containsKey(variableIdentifier)) {
+                		String left = Utilities.getIdentifier(ie.getLeft());
+                		String right = Utilities.getIdentifier(ie.getRight());
+                        if(left == null || !this.variableIdentifiers.containsKey(left)) visit(ie.getLeft());
+                        if(right == null || !this.variableIdentifiers.containsKey(right)) visit(ie.getRight());
+                        
+                        return false;
+                	}
+                	else {
+                		/* FIXME: For some reason return true doens't work here. */
+                        visit(ie.getLeft());
+                        visit(ie.getRight());
+                	}
+                }
                 
-                /* We have found an instance of a variable use. */
-                this.variableIdentifiers.remove(variableIdentifier);
-            }
+                /* Anything else check the subtree. */
+                return true;
+			}
+		}
+		
+		/**
+		 * Checks if the AstNode is an identifier that is in the list of
+		 * identifiers that were checked in the parent. If they match,
+		 * the identifier has been used, so remove it from the list of
+		 * checked identifiers.
+		 * @param node
+		 */
+		public void check(AstNode node) {
+            String identifier = Utilities.getIdentifier(node);
 
-			return true;
+            if(identifier != null && this.variableIdentifiers.containsKey(identifier)) {
+                /* We have found an instance of a variable use. */
+                this.variableIdentifiers.remove(identifier);
+            }
 		}
 		
 	}
 
-	
 	/**
 	 * A visitor for finding special type assignments.
 	 * @author qhanam
@@ -302,7 +344,9 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
             if (rhs instanceof Name) {
                 String token = ((Name) rhs).getIdentifier();
                 if(token.equals("undefined")) value = SpecialType.UNDEFINED;
-                else return; // TODO: Handle other special types.
+                else if(token.equals("NaN")) value = SpecialType.NAN;
+                else if(token.equals("null")) value = SpecialType.NULL;
+                else return;
             } else if (rhs instanceof StringLiteral) {
                 String literal = ((StringLiteral) rhs).getValue();
                 if(literal.isEmpty()) value = SpecialType.BLANK;
@@ -346,20 +390,19 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
         	if(node instanceof InfixExpression) {
         		InfixExpression ie = (InfixExpression) node;
 
-        		if(isEquivalenceOperator(ie.getOperator())) {
+        		if(Utilities.isEquivalenceOperator(ie.getOperator())) {
+        			
+        			String left = Utilities.getIdentifier(ie.getLeft());
+        			String right = Utilities.getIdentifier(ie.getRight());
 
-        			if(ie.getLeft() instanceof Name && ie.getRight() instanceof Name) {
-
-        				String left = ((Name) ie.getLeft()).getIdentifier();
-        				String right = ((Name) ie.getRight()).getIdentifier();
-        				
+        			if(left != null && right != null) {
+                        System.out.println("left = " + left);
+                        System.out.println("right = " + right);
         				if(left.equals("undefined")) { 
         					this.variableIdentifiers.put(right, SpecialType.UNDEFINED);
-        					//this.comparisons.add(right, SpecialType.UNDEFINED);
                         }
         				else if(right.equals("undefined")) { 
         					this.variableIdentifiers.put(left, SpecialType.UNDEFINED);
-        					//this.comparisons.add(left, SpecialType.UNDEFINED);
                         }
         			}         			
         		}
@@ -368,14 +411,8 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
         	return true;
         }
         
-        private boolean isEquivalenceOperator(int tokenType) {
-            if(tokenType == Token.SHEQ || tokenType == Token.SHNE
-            	|| tokenType == Token.EQ || tokenType == Token.NE) {
-            	return true;
-            }
-            return false;
-        }
 
     }
+    
 	
 }

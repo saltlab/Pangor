@@ -12,7 +12,7 @@ import junit.framework.TestCase;
 
 public abstract class TestSDJSB extends TestCase {
 	
-	public void runTest(String[] args, List<Alert> expectedAlerts) {
+	public void runTest(String[] args, List<Alert> expectedAlerts, boolean printAlerts) {
 
 		/* Parse the options. */
 		DiffOptions options = new DiffOptions();
@@ -29,6 +29,13 @@ public abstract class TestSDJSB extends TestCase {
 		/* Run SDJSB. */
         SDJSB client = new SDJSB(options);
         List<Alert> actualAlerts = client.start();
+        
+        /* Output if needed. */
+        if(printAlerts) {
+        	for(Alert alert : actualAlerts) {
+        		System.out.println(alert.getLongDescription());
+        	}
+        }
 
 		/* Check the output. */
         this.check(actualAlerts, expectedAlerts);
