@@ -21,6 +21,19 @@ public class TestSpecialTypeHandling extends TestSDJSB {
 	}
 
 	@Test
+	public void testAllSpecialTypes(){
+		String src = "./test/input/sth_all_types_old.js";
+		String dst = "./test/input/sth_all_types_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		expectedAlerts.add(new SpecialTypeAlert("STH", "a", SpecialType.UNDEFINED));
+		expectedAlerts.add(new SpecialTypeAlert("STH", "b", SpecialType.NULL));
+		expectedAlerts.add(new SpecialTypeAlert("STH", "c", SpecialType.NAN));
+		expectedAlerts.add(new SpecialTypeAlert("STH", "d", SpecialType.ZERO));
+		expectedAlerts.add(new SpecialTypeAlert("STH", "e", SpecialType.BLANK));
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	@Test
 	public void testUndefinedField(){
 		String src = "./test/input/sth_undefined_field_old.js";
 		String dst = "./test/input/sth_undefined_field_new.js";

@@ -16,6 +16,7 @@ import org.mozilla.javascript.ast.ForLoop;
 import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.IfStatement;
 import org.mozilla.javascript.ast.InfixExpression;
+import org.mozilla.javascript.ast.KeywordLiteral;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NodeVisitor;
 import org.mozilla.javascript.ast.NumberLiteral;
@@ -86,7 +87,7 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
 	@Override
 	public void destinationInsert(AstNode node) {
 
-        /* If the node is a name, we need to handle two cases:
+        /* If the node is a special type, we need to handle two cases:
          * 	1. A special type node is inserted in an assignment. 
          *  2. A special type node is inserted in a branch condition. */
 
@@ -171,10 +172,15 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
             if(name != null) {
 
             	if(name.equals("undefined")) return SpecialType.UNDEFINED;
-            	else if(name.equals("null")) return SpecialType.NULL;
             	else if(name.equals("NaN")) return SpecialType.NAN;
             	else return null;
             	
+            }
+            else if (node instanceof KeywordLiteral) {
+            			
+            	if(node.getType() == Token.NULL) return SpecialType.NULL;
+            	else return null;
+
             }
             else if (node instanceof StringLiteral) {
 
@@ -182,7 +188,7 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
                 if(literal.isEmpty()) return SpecialType.BLANK;
                 else return null;
 
-            } 
+            }
             else if (node instanceof NumberLiteral) {
 
             	double literal = ((NumberLiteral) node).getNumber();
