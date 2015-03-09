@@ -2,8 +2,11 @@ package ca.ubc.ece.salt.sdjsb.checker;
 
 import java.util.Set;
 
+import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.Assignment;
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.ConditionalExpression;
+import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.NodeVisitor;
 
@@ -33,36 +36,49 @@ public class UseTreeVisitor implements NodeVisitor {
         ChangeType changeType = context.getDstChangeOp(node);
         
         if(changeType == ChangeType.INSERT || changeType == ChangeType.UPDATE) {
-            /* Check if this node is an identifier. */
-            check(node);
 
             /* Investigate the subtrees. */
             if (node instanceof Assignment) {
-                visit(((Assignment)node).getRight());
-                return false;
-            } else if (node instanceof InfixExpression) {
+
+                AstNode right = ((Assignment)node).getRight();
+            	this.check(right);
+
+            } 
+            else if (node instanceof InfixExpression) {
                 InfixExpression ie = (InfixExpression) node;
                 
                 /* If this is not a use operator, check that neither side
                  * is an identifier. */
-                if(!Utilities.isUseOperator(ie.getOperator())) {
+                if(Utilities.isUseOperator(ie.getOperator())) {
+                    AstNode left = ie.getLeft();
+                    this.check(left);
 
-                    String left = Utilities.getIdentifier(ie.getLeft());
-                    String right = Utilities.getIdentifier(ie.getRight());
-                    if(left == null || !this.variableIdentifiers.contains(left)) visit(ie.getLeft());
-                    if(right == null || !this.variableIdentifiers.contains(right)) visit(ie.getRight());
-                    
-                    return false;
+                    if(ie.getOperator() != Token.DOT 
+                       && ie.getOperator() != Token.GETPROP 
+                       && ie.getOperator() != Token.GETPROPNOWARN)
+                    {
+                        AstNode right = ie.getRight();
+                        this.check(right);
+                    }
                 }
-                else {
-                    /* FIXME: For some reason return true doens't work here. */
-                    visit(ie.getLeft());
-                    visit(ie.getRight());
-                }
+            } 
+            else if (node instanceof FunctionCall) {
+
+            	FunctionCall call = (FunctionCall) node;
+            	for(AstNode argument : call.getArguments()) {
+            		this.check(argument);
+            	}
+            	this.check(call.getTarget());
+
+            }
+            else if (node instanceof ConditionalExpression) {
+            	
+            	ConditionalExpression ce = (ConditionalExpression) node;
+            	this.check(ce.getTrueExpression());
+            	this.check(ce.getFalseExpression());
+            	
             }
             
-            /* Anything else check the subtree. */
-            return true;
         }
 
         return true;

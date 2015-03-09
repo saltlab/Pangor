@@ -93,17 +93,50 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
 
 		SpecialType type = SpecialTypeHandlingChecker.getSpecialType(node);
 		
-		if(type == null) return;
-		
-		AstNode parent = node.getParent();
-
-		/* Handle assignments to a special type. */
-		if(parent instanceof Assignment || parent instanceof VariableInitializer) {
-            AssignmentTreeVisitor visitor = new AssignmentTreeVisitor();
-            parent.visit(visitor);
+		/* This could be a falsey check. */
+		if(type == null) {
+			this.storeFalsey(node);
 		}
+		/* This could be an assignment or a comparison involving a special type. */
+		else {
+            this.storeAssignment(node);
+            this.storeComparison(node, type);
+		}
+		
+	}
+	
+	/**
+	 * If the node:
+	 * 	1. Is an identifier that evaluates to true or false.
+	 *  2. Is part of a branch statement's condition.
+	 *  3. Is not used inside the branch.
+	 * Then store the comparison. 
+	 * @param node
+	 */
+	private void storeFalsey(AstNode node) {
+		String identifier = Utilities.getIdentifier(node);
+		
+		if(identifier != null && this.isFalsey(node)) {
+
+            AstNode branchStatement = Utilities.getBranchStatement(node);
+            
+            if(branchStatement != null && !Utilities.isUsed(this.context, branchStatement, identifier)) {
+                this.comparisons.add(identifier, SpecialType.FALSEY);
+            }
+			
+		}
+	}
+	
+	/**
+	 * If the node is part of a comparison, store the comparison.
+	 * @param node The special type node. 
+	 * @param type The special type being compared.
+	 */
+	private void storeComparison(AstNode node, SpecialType type) {
+		AstNode parent = node.getParent();
+		
 		/* Handle comparisons to a special type. */
-		else if(parent instanceof InfixExpression) {
+		if(parent instanceof InfixExpression) {
 			InfixExpression ie = (InfixExpression) parent;
 			
 			/* The comparison must be an equivalence comparison
@@ -117,13 +150,25 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
                     AstNode branchStatement = Utilities.getBranchStatement(node);
                     
                     if(branchStatement != null && !Utilities.isUsed(this.context, branchStatement, identifier)) {
-                    	
                         this.comparisons.add(identifier, type);
-
                     }
 					
 				}
 			}
+		}
+	}
+	
+	/**
+	 * If the node is part of an assignment, store the assignment.
+	 * @param node The special type node.
+	 */
+	private void storeAssignment(AstNode node) {
+		AstNode parent = node.getParent();
+		
+		/* Handle assignments to a special type. */
+		if(parent instanceof Assignment || parent instanceof VariableInitializer) {
+            AssignmentTreeVisitor visitor = new AssignmentTreeVisitor();
+            parent.visit(visitor);
 		}
 	}
 	
@@ -158,8 +203,19 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
 		
 		if(identifier == null) return false;
 		
-		if(parent instanceof IfStatement) return true;
+		/* If this is a direct child of a branch statement's condition, it is a
+		 * truthy/falsey identifier. */
+		if(parent instanceof IfStatement
+		   || parent instanceof DoLoop
+		   || parent instanceof ForLoop
+		   || parent instanceof WhileLoop
+		   || parent instanceof ConditionalExpression) {
+			
+			return true;
+		}
 		
+		/* If this is a direct child of an AND or OR operator, it is a
+		 * truthy/falsey identifier. */
 		if(parent instanceof InfixExpression) {
 			InfixExpression ie = (InfixExpression) parent;
 			if(ie.getOperator() == Token.OR || ie.getOperator() == Token.AND) return true;

@@ -21,6 +21,17 @@ public class TestSpecialTypeHandling extends TestSDJSB {
 	}
 
 	@Test
+	public void testFalsey(){
+		String src = "./test/input/sth_falsey_old.js";
+		String dst = "./test/input/sth_falsey_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		expectedAlerts.add(new SpecialTypeAlert("STH", "a", SpecialType.FALSEY));
+		expectedAlerts.add(new SpecialTypeAlert("STH", "b", SpecialType.FALSEY));
+		expectedAlerts.add(new SpecialTypeAlert("STH", "c", SpecialType.FALSEY));
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	@Test
 	public void testAllSpecialTypes(){
 		String src = "./test/input/sth_all_types_old.js";
 		String dst = "./test/input/sth_all_types_new.js";
