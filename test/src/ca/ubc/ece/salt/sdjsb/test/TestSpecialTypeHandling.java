@@ -92,4 +92,48 @@ public class TestSpecialTypeHandling extends TestSDJSB {
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 
+	@Test
+	public void testUndefinedWhile(){
+		String src = "./test/input/sth_undefined_while_old.js";
+		String dst = "./test/input/sth_undefined_while_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		expectedAlerts.add(new SpecialTypeAlert("STH", "a", SpecialType.UNDEFINED));
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	@Test
+	public void testUndefinedFor(){
+		String src = "./test/input/sth_undefined_for_old.js";
+		String dst = "./test/input/sth_undefined_for_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		expectedAlerts.add(new SpecialTypeAlert("STH", "a", SpecialType.UNDEFINED));
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	@Test
+	public void testUndefinedDo(){
+		String src = "./test/input/sth_undefined_do_old.js";
+		String dst = "./test/input/sth_undefined_do_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		expectedAlerts.add(new SpecialTypeAlert("STH", "a", SpecialType.UNDEFINED));
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	@Test
+	public void testUndefinedConditional(){
+		String src = "./test/input/sth_undefined_conditional_old.js";
+		String dst = "./test/input/sth_undefined_conditional_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		expectedAlerts.add(new SpecialTypeAlert("STH", "a", SpecialType.UNDEFINED));
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	@Test
+	public void testBooleanAssignment(){
+		String src = "./test/input/sth_boolean_assignment_old.js";
+		String dst = "./test/input/sth_boolean_assignment_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
 }

@@ -156,7 +156,7 @@ public class CheckerRegistry {
 		}
 		
 		public boolean visit(AstNode node) {
-			if(this.context.getDstChangeOp(node) == ChangeType.MOVE) return false;
+			if(this.context.getDstChangeFlag(node) == ChangeType.MOVE) return false;
 			
             for (AbstractChecker checker : activeCheckers) {
                 checker.destinationInsert(node);

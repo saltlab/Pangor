@@ -1,9 +1,9 @@
 /* Special Type Handling: Variable {Undefined,Null,NaN,Zero,Blank}
  * Output: STH_TYPE_ERROR_UNDEFINED (a) 
- * Output: STH_TYPE_ERROR_NULL (b) 
- * Output: STH_TYPE_ERROR_NAN (c) 
- * Output: STH_TYPE_ERROR_ZERO (c) 
- * Output: STH_TYPE_ERROR_BLANK (e) */
+ * 		   STH_TYPE_ERROR_NULL (b) 
+ * 		   STH_TYPE_ERROR_NAN (c) 
+ * 		   STH_TYPE_ERROR_ZERO (c) 
+ * 		   STH_TYPE_ERROR_BLANK (e) */
 var a = undefined, b = null, c = NaN, d = 0, e = '';
 console.log(a);
 console.log(b);

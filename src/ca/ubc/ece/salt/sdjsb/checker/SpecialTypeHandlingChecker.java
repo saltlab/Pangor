@@ -105,34 +105,21 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
 		/* Handle comparisons to a special type. */
 		else if(parent instanceof InfixExpression) {
 			InfixExpression ie = (InfixExpression) parent;
-			if(Utilities.isEquivalenceOperator(ie.getOperator())){
+			
+			/* The comparison must be an equivalence comparison
+			 * TODO: Also handle the case where we are checking if the node is 'falsey'. */
+			if(Utilities.isEquivalenceOperator(ie.getOperator())) {
 				
 				String identifier = Utilities.getIdentifier(ie.getLeft());
 				
 				if(identifier != null) {
 
-                    Map<String, SpecialType> variableIdentifiers = new TreeMap<String, SpecialType>();
-                    variableIdentifiers.put(identifier, type); 
+                    AstNode branchStatement = Utilities.getBranchStatement(node);
                     
-                    /* Walk up the tree until we get to the branch statement. */
-                    while(true) {
-                    	if(parent instanceof IfStatement) { break; }
-                    	if(parent instanceof DoLoop) { break; }
-                    	if(parent instanceof ForLoop) { break; }
-                    	if(parent instanceof WhileLoop) { break; }
-                    	if(parent instanceof ConditionalExpression) { break; }
-                    	if(parent instanceof AstRoot) return; // The branch statement was not found.
-                    	parent = parent.getParent();
-                    }
+                    if(branchStatement != null && !Utilities.isUsed(this.context, branchStatement, identifier)) {
+                    	
+                        this.comparisons.add(identifier, type);
 
-                    /* Remove any variable identifiers from the map that have uses
-                     * added inside one of the branches. */
-                    UseTreeVisitor useVisitor = new UseTreeVisitor(variableIdentifiers);
-                    parent.visit(useVisitor);
-                    
-                    /* Add the remaining variable identifiers to the comparison map. */
-                    for(String variableIdentifier : variableIdentifiers.keySet()){
-                        this.comparisons.add(variableIdentifier, variableIdentifiers.get(variableIdentifier));
                     }
 					
 				}
@@ -157,6 +144,28 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
 	@Override
 	public String getCheckerType() {
 		return TYPE;
+	}
+	
+	/**
+	 * Check if the node is part of a conditional expression and is being
+	 * checked if it is truthy or falsey.
+	 * @param node
+	 */
+	private boolean isFalsey(AstNode node) {
+
+		AstNode parent = node.getParent();
+		String identifier = Utilities.getIdentifier(node);
+		
+		if(identifier == null) return false;
+		
+		if(parent instanceof IfStatement) return true;
+		
+		if(parent instanceof InfixExpression) {
+			InfixExpression ie = (InfixExpression) parent;
+			if(ie.getOperator() == Token.OR || ie.getOperator() == Token.AND) return true;
+		}
+		
+		return false;
 	}
 	
 	/**
@@ -201,121 +210,6 @@ public class SpecialTypeHandlingChecker extends AbstractChecker {
             }
 	}
 	
-	/**
-	 * A visitor for finding variable uses.
-	 * 
-	 * @author qhanam
-	 */
-	private class UseTreeVisitor implements NodeVisitor {
-		
-		private CheckerContext context = SpecialTypeHandlingChecker.this.context;
-		private Map<String, SpecialType> variableIdentifiers;
-		
-		public UseTreeVisitor(Map<String, SpecialType> variableIdentifier) {
-			this.variableIdentifiers = variableIdentifier;
-		}
-		
-		public boolean visit(AstNode node) {
-			/* If this node is part of a change operation, investigate its
-			 * children to see if a variableIdenfifier is used. */
-
-			ChangeType changeType = context.getDstChangeOp(node);
-			
-			if(changeType == null) return true;
-			
-			if(changeType == ChangeType.INSERT || changeType == ChangeType.UPDATE) {
-				/* Find and remove variable identifiers that have been used in this node. */
-				SubUseTreeVisitor subUseTreeVisitor = new SubUseTreeVisitor(this.variableIdentifiers);
-				node.visit(subUseTreeVisitor);
-			}
-
-			return true;
-		}
-		
-	}
-	
-	/**
-	 * Once we have a tree that has been modified, this visitor finds if any of
-	 * the variable identifiers have been used.
-	 * @author qhanam
-	 *
-	 */
-	private class SubUseTreeVisitor implements NodeVisitor {
-
-		private Map<String, SpecialType> variableIdentifiers;
-		
-		public SubUseTreeVisitor(Map<String, SpecialType> variableIdentifier) {
-			this.variableIdentifiers = variableIdentifier;
-		}
-
-		public boolean visit(AstNode node) {
-
-			/* One of node's ancestors was inserted or updated. Since nodes
-			 * inherit the class of their parent (if they themselves aren't
-			 * classified), this means:
-			 * 	- If the node has not been classified, it has been inserted or
-			 * 	  updated so we inspect it.
-			 *  - If the node is classified as inserted or updated, we inspect
-			 *    it.
-			 *  - If the node is classified as moved, we do not inspect it
-			 *    because it was present in the original program. */
-			ChangeType changeType = context.getDstChangeOp(node);
-
-			if(changeType == ChangeType.MOVE) {
-				return false;
-			}
-			else {
-				/* Check if this node is an identifier. */
-				check(node);
-
-				/* Investigate the subtrees. */
-                if (node instanceof Assignment) {
-                    visit(((Assignment)node).getRight());
-                    return false;
-                } else if (node instanceof InfixExpression) {
-                	InfixExpression ie = (InfixExpression) node;
-                	
-                	/* If this is not a use operator, check that neither side
-                	 * is an identifier. */
-                	if(!Utilities.isUseOperator(ie.getOperator())) {
-
-                		String left = Utilities.getIdentifier(ie.getLeft());
-                		String right = Utilities.getIdentifier(ie.getRight());
-                        if(left == null || !this.variableIdentifiers.containsKey(left)) visit(ie.getLeft());
-                        if(right == null || !this.variableIdentifiers.containsKey(right)) visit(ie.getRight());
-                        
-                        return false;
-                	}
-                	else {
-                		/* FIXME: For some reason return true doens't work here. */
-                        visit(ie.getLeft());
-                        visit(ie.getRight());
-                	}
-                }
-                
-                /* Anything else check the subtree. */
-                return true;
-			}
-		}
-		
-		/**
-		 * Checks if the AstNode is an identifier that is in the list of
-		 * identifiers that were checked in the parent. If they match,
-		 * the identifier has been used, so remove it from the list of
-		 * checked identifiers.
-		 * @param node
-		 */
-		public void check(AstNode node) {
-            String identifier = Utilities.getIdentifier(node);
-
-            if(identifier != null && this.variableIdentifiers.containsKey(identifier)) {
-                /* We have found an instance of a variable use. */
-                this.variableIdentifiers.remove(identifier);
-            }
-		}
-		
-	}
-
 	/**
 	 * A visitor for finding special type assignments.
 	 * @author qhanam

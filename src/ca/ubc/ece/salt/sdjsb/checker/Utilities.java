@@ -1,14 +1,93 @@
 package ca.ubc.ece.salt.sdjsb.checker;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.AstRoot;
+import org.mozilla.javascript.ast.ConditionalExpression;
+import org.mozilla.javascript.ast.DoLoop;
+import org.mozilla.javascript.ast.ForLoop;
 import org.mozilla.javascript.ast.FunctionCall;
+import org.mozilla.javascript.ast.IfStatement;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ParenthesizedExpression;
+import org.mozilla.javascript.ast.WhileLoop;
 
 public class Utilities {
+
+	/**
+	 * Checks if the identifier is used in the branch. 
+	 * @param node The branch statement to look for uses in.
+	 * @param identifier The variable/field/function identifier that is being
+	 * 					 checked.
+	 * @return true if the identifier is used, false otherwise.
+	 */
+	public static boolean isUsed(CheckerContext context, AstNode node, String identifier) {
+
+        /* Remove any variable identifiers from the map that have uses
+         * added inside one of the branches. */
+		Set<String> identifiers = new TreeSet<String>();
+		identifiers.add(identifier);
+
+        UseTreeVisitor useVisitor = new UseTreeVisitor(context, identifiers);
+        node.visit(useVisitor);
+        
+        if(identifiers.contains(identifier)) return false;
+        
+        return true;
+	}
+
+	/**
+	 * Gets the branch statement who's condition contains the given node.
+	 * @param node The node that has been inserted into the destination tree.
+	 * @return The branch statement (i.e. if, do, while, for, condition) or
+	 * 		   null if the node is not part of a branch condition statement.
+	 */
+	public static AstNode getBranchStatement(AstNode node) {
+		AstNode parent = node.getParent();
+        
+        /* Walk up the tree until we get to the branch statement. */
+        while(true) {
+            if(parent instanceof IfStatement) { 
+                if(Utilities.contains(((IfStatement) parent).getCondition(), node)) return parent; 
+                else return null;
+            }
+            if(parent instanceof DoLoop) { 
+                if(Utilities.contains(((DoLoop) parent).getCondition(), node)) return parent; 
+                else return null;
+            }
+            if(parent instanceof ForLoop) {
+                if(Utilities.contains(((ForLoop) parent).getCondition(), node)) return parent;
+                else return null;
+            }
+            if(parent instanceof WhileLoop) {
+                if(Utilities.contains(((WhileLoop) parent).getCondition(), node)) return parent;
+                else return null;
+            }
+            if(parent instanceof ConditionalExpression) { 
+                if(Utilities.contains(((ConditionalExpression) parent).getTestExpression(), node)) return parent; 
+                else return null;
+            }
+            if(parent instanceof AstRoot) return null; // The branch statement was not found.
+            parent = parent.getParent();
+        }
+	}
+	
+	/**
+	 * Checks if one AstNode is a child of another AstNode.
+	 * @param parent The parent AstNode to check.
+	 * @param child The child AstNode to look for.
+	 * @return True if {@code parent} contains {@code child}.
+	 */
+	public static boolean contains(AstNode parent, AstNode child) {
+		ContainsVisitor visitor = new ContainsVisitor(child);
+		parent.visit(visitor);
+		return visitor.contains;
+	}
 
 	/**
 	 * Returns the variable, field or function identifier for the AstNode. If

@@ -3,6 +3,7 @@ package ca.ubc.ece.salt.sdjsb.checker;
 import java.util.Map;
 
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.AstRoot;
 
 import fr.labri.gumtree.actions.TreeClassifier;
 import fr.labri.gumtree.tree.Tree;
@@ -69,14 +70,38 @@ public class CheckerContext {
 	 * 
 	 * @return null if there is no corresponding Tree node for the given 
 	 * 		   AstNode. ChangeType.UNCHANGED if the Tree node is not classified
-	 * 		   (it is the same in both the source and destination ASTs).
+	 * 		   (it does not have a change flag, but could still be part of a
+	 * 		   node that was added/deleted/moved/updated).
 	 */
-	public ChangeType getDstChangeOp(AstNode node) {
+	public ChangeType getDstChangeFlag(AstNode node) {
         Tree tree = this.getDstTree(node);
         if(tree == null) return null;
         if(this.treeClassifier.getDstAddTrees().contains(tree)) return ChangeType.INSERT;
         if(this.treeClassifier.getDstMvTrees().contains(tree)) return ChangeType.MOVE;
         if(this.treeClassifier.getDstUpdTrees().contains(tree)) return ChangeType.UPDATE;
+        return ChangeType.UNCHANGED;
+	}
+
+	/**
+	 * Returns the change operation for the node. This method differs from
+	 * getDstChangeFlag in that this method will climb the tree until it
+	 * can determine the operation that was performed.
+	 * @param node The node to classify.
+	 * @return The exact change type of the node.
+	 */
+	public ChangeType getDstChangeOp(AstNode node) {
+        do {
+            Tree tree = this.getDstTree(node);
+
+            if(tree != null) {
+                if(this.treeClassifier.getDstAddTrees().contains(tree)) return ChangeType.INSERT;
+                if(this.treeClassifier.getDstMvTrees().contains(tree)) return ChangeType.MOVE;
+                if(this.treeClassifier.getDstUpdTrees().contains(tree)) return ChangeType.UPDATE;
+            }
+        	
+        	node = node.getParent();
+        } while(!(node instanceof AstRoot));
+
         return ChangeType.UNCHANGED;
 	}
 
@@ -87,12 +112,35 @@ public class CheckerContext {
 	 * 		   AstNode. ChangeType.UNCHANGED if the Tree node is not classified
 	 * 		   (it is the same in both the source and destination ASTs).
 	 */
-	public ChangeType getSrcChangeOp(AstNode node) {
+	public ChangeType getSrcChangeFlag(AstNode node) {
         Tree tree = this.getSrcTree(node);
         if(tree == null) return null;
         if(this.treeClassifier.getSrcDelTrees().contains(tree)) return ChangeType.DELETE;
         if(this.treeClassifier.getSrcMvTrees().contains(tree)) return ChangeType.MOVE;
         if(this.treeClassifier.getSrcUpdTrees().contains(tree)) return ChangeType.UPDATE;
+        return ChangeType.UNCHANGED;
+	}
+
+	/**
+	 * Returns the change operation for the node. This method differs from
+	 * getSrcChangeFlag in that this method will climb the tree until it
+	 * can determine the operation that was performed.
+	 * @param node The node to classify.
+	 * @return The exact change type of the node.
+	 */
+	public ChangeType getSrcChangeOp(AstNode node) {
+        do {
+            Tree tree = this.getSrcTree(node);
+
+            if(tree != null) {
+                if(this.treeClassifier.getSrcDelTrees().contains(tree)) return ChangeType.INSERT;
+                if(this.treeClassifier.getSrcMvTrees().contains(tree)) return ChangeType.MOVE;
+                if(this.treeClassifier.getSrcUpdTrees().contains(tree)) return ChangeType.UPDATE;
+            }
+        	
+        	node = node.getParent();
+        } while(!(node instanceof AstRoot));
+
         return ChangeType.UNCHANGED;
 	}
 	
