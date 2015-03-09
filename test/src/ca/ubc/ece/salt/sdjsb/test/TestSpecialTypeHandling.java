@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.junit.Test;
 
-import ca.ubc.ece.salt.sdjsb.checker.SpecialTypeMap.SpecialType;
-import ca.ubc.ece.salt.sdjsb.checker.alert.Alert;
-import ca.ubc.ece.salt.sdjsb.checker.alert.SpecialTypeAlert;
+import ca.ubc.ece.salt.sdjsb.checker.Alert;
+import ca.ubc.ece.salt.sdjsb.checker.specialtype.SpecialTypeAlert;
+import ca.ubc.ece.salt.sdjsb.checker.specialtype.SpecialTypeMap.SpecialType;
 
 public class TestSpecialTypeHandling extends TestSDJSB {
 	

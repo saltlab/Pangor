@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.checker;
+package ca.ubc.ece.salt.sdjsb.checker.specialtype;
 
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.NodeVisitor;
@@ -7,12 +7,12 @@ import org.mozilla.javascript.ast.NodeVisitor;
  * Checks if a child AstNode is present in the tree.
  * @author qhanam
  */
-public class ContainsVisitor implements NodeVisitor {
+public class ContainsTreeVisitor implements NodeVisitor {
 	
 	AstNode child;
 	boolean contains;
 	
-	public ContainsVisitor(AstNode child) {
+	public ContainsTreeVisitor(AstNode child) {
 		this.child = child;
 		this.contains = false;
 	}

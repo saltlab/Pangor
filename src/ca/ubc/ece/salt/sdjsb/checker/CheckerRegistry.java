@@ -8,7 +8,7 @@ import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.NodeVisitor;
 
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext.ChangeType;
-import ca.ubc.ece.salt.sdjsb.checker.alert.Alert;
+import ca.ubc.ece.salt.sdjsb.checker.specialtype.SpecialTypeChecker;
 import fr.labri.gumtree.actions.TreeClassifier;
 import fr.labri.gumtree.tree.Tree;
 
@@ -49,7 +49,7 @@ public class CheckerRegistry {
 		this.activeCheckers = new LinkedList<AbstractChecker>();
 
 		/* Create and add the default checkers. */
-		this.activeCheckers.add(new SpecialTypeHandlingChecker(this.checkerContext));
+		this.activeCheckers.add(new SpecialTypeChecker(this.checkerContext));
 	}
 	
 	/**

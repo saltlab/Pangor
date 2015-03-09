@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.checker;
+package ca.ubc.ece.salt.sdjsb.checker.specialtype;
 
 import java.util.Set;
 
@@ -10,6 +10,7 @@ import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.NodeVisitor;
 
+import ca.ubc.ece.salt.sdjsb.checker.CheckerContext;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext.ChangeType;
 
 /**
@@ -49,7 +50,7 @@ public class UseTreeVisitor implements NodeVisitor {
                 
                 /* If this is not a use operator, check that neither side
                  * is an identifier. */
-                if(Utilities.isUseOperator(ie.getOperator())) {
+                if(SpecialTypeCheckerUtilities.isUseOperator(ie.getOperator())) {
                     AstNode left = ie.getLeft();
                     this.check(left);
 
@@ -92,7 +93,7 @@ public class UseTreeVisitor implements NodeVisitor {
      * @param node
      */
     public void check(AstNode node) {
-        String identifier = Utilities.getIdentifier(node);
+        String identifier = SpecialTypeCheckerUtilities.getIdentifier(node);
 
         if(identifier != null && this.variableIdentifiers.contains(identifier)) {
             /* We have found an instance of a variable use. */

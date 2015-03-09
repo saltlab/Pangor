@@ -1,7 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.checker.alert;
-
-import ca.ubc.ece.salt.sdjsb.checker.AbstractChecker;
-
+package ca.ubc.ece.salt.sdjsb.checker;
 
 /**
  * Stores an alert that notifies the user about a repair that has been found

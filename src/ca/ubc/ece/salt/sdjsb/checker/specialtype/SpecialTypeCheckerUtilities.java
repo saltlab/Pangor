@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.checker;
+package ca.ubc.ece.salt.sdjsb.checker.specialtype;
 
 import java.util.Set;
 import java.util.TreeSet;
@@ -13,11 +13,92 @@ import org.mozilla.javascript.ast.ForLoop;
 import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.IfStatement;
 import org.mozilla.javascript.ast.InfixExpression;
+import org.mozilla.javascript.ast.KeywordLiteral;
 import org.mozilla.javascript.ast.Name;
+import org.mozilla.javascript.ast.NumberLiteral;
 import org.mozilla.javascript.ast.ParenthesizedExpression;
+import org.mozilla.javascript.ast.StringLiteral;
 import org.mozilla.javascript.ast.WhileLoop;
 
-public class Utilities {
+import ca.ubc.ece.salt.sdjsb.checker.CheckerContext;
+import ca.ubc.ece.salt.sdjsb.checker.specialtype.SpecialTypeMap.SpecialType;
+
+public class SpecialTypeCheckerUtilities {
+
+	/**
+	 * Returns the special type of the AstNode.
+	 * @param node The AstNode to check.
+	 * @return The SpecialType of the AstNode, or null if the node is not
+	 * 		   a Name node that holds a special type keyword or value.
+	 */
+	public static SpecialType getSpecialType(AstNode node) {
+		
+        String name = SpecialTypeCheckerUtilities.getIdentifier(node);
+        
+        if(name != null) {
+
+            if(name.equals("undefined")) return SpecialType.UNDEFINED;
+            else if(name.equals("NaN")) return SpecialType.NAN;
+            else return null;
+            
+        }
+        else if (node instanceof KeywordLiteral) {
+                    
+            if(node.getType() == Token.NULL) return SpecialType.NULL;
+            else return null;
+
+        }
+        else if (node instanceof StringLiteral) {
+
+            String literal = ((StringLiteral) node).getValue();
+            if(literal.isEmpty()) return SpecialType.BLANK;
+            else return null;
+
+        }
+        else if (node instanceof NumberLiteral) {
+
+            double literal = ((NumberLiteral) node).getNumber();
+            if(literal == 0.0) return SpecialType.ZERO;
+            else return null;
+
+        }
+        else {
+            return null;
+        }
+	}
+
+	/**
+	 * Check if the node is part of a conditional expression and is being
+	 * checked if it is truthy or falsey.
+	 * @param node
+	 */
+	public static boolean isFalsey(AstNode node) {
+
+		AstNode parent = node.getParent();
+		String identifier = SpecialTypeCheckerUtilities.getIdentifier(node);
+		
+		if(identifier == null) return false;
+		
+		/* If this is a direct child of a branch statement's condition, it is a
+		 * truthy/falsey identifier. */
+		if(parent instanceof IfStatement
+		   || parent instanceof DoLoop
+		   || parent instanceof ForLoop
+		   || parent instanceof WhileLoop
+		   || parent instanceof ConditionalExpression) {
+			
+			return true;
+		}
+		
+		/* If this is a direct child of an AND or OR operator, it is a
+		 * truthy/falsey identifier. */
+		if(parent instanceof InfixExpression) {
+			InfixExpression ie = (InfixExpression) parent;
+			if(ie.getOperator() == Token.OR || ie.getOperator() == Token.AND) return true;
+		}
+		
+		return false;
+	}
 
 	/**
 	 * Checks if the identifier is used in the branch. 
@@ -53,23 +134,23 @@ public class Utilities {
         /* Walk up the tree until we get to the branch statement. */
         while(true) {
             if(parent instanceof IfStatement) { 
-                if(Utilities.contains(((IfStatement) parent).getCondition(), node)) return parent; 
+                if(SpecialTypeCheckerUtilities.contains(((IfStatement) parent).getCondition(), node)) return parent; 
                 else return null;
             }
             if(parent instanceof DoLoop) { 
-                if(Utilities.contains(((DoLoop) parent).getCondition(), node)) return parent; 
+                if(SpecialTypeCheckerUtilities.contains(((DoLoop) parent).getCondition(), node)) return parent; 
                 else return null;
             }
             if(parent instanceof ForLoop) {
-                if(Utilities.contains(((ForLoop) parent).getCondition(), node)) return parent;
+                if(SpecialTypeCheckerUtilities.contains(((ForLoop) parent).getCondition(), node)) return parent;
                 else return null;
             }
             if(parent instanceof WhileLoop) {
-                if(Utilities.contains(((WhileLoop) parent).getCondition(), node)) return parent;
+                if(SpecialTypeCheckerUtilities.contains(((WhileLoop) parent).getCondition(), node)) return parent;
                 else return null;
             }
             if(parent instanceof ConditionalExpression) { 
-                if(Utilities.contains(((ConditionalExpression) parent).getTestExpression(), node)) return parent; 
+                if(SpecialTypeCheckerUtilities.contains(((ConditionalExpression) parent).getTestExpression(), node)) return parent; 
                 else return null;
             }
             if(parent instanceof AstRoot) return null; // The branch statement was not found.
@@ -84,7 +165,7 @@ public class Utilities {
 	 * @return True if {@code parent} contains {@code child}.
 	 */
 	public static boolean contains(AstNode parent, AstNode child) {
-		ContainsVisitor visitor = new ContainsVisitor(child);
+		ContainsTreeVisitor visitor = new ContainsTreeVisitor(child);
 		parent.visit(visitor);
 		return visitor.contains;
 	}
@@ -104,7 +185,7 @@ public class Utilities {
         }
         else if (node instanceof InfixExpression) {
             InfixExpression ie = (InfixExpression) node;
-            if(Utilities.isIdentifierOperator(ie.getOperator())) {
+            if(SpecialTypeCheckerUtilities.isIdentifierOperator(ie.getOperator())) {
             	String left = getIdentifier(ie.getLeft());
             	String right = getIdentifier(ie.getRight());
             	if(left == null || right == null) return null;

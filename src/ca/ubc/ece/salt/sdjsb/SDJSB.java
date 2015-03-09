@@ -18,8 +18,8 @@ import fr.labri.gumtree.matchers.MappingStore;
 import fr.labri.gumtree.matchers.Matcher;
 import fr.labri.gumtree.matchers.MatcherFactories;
 import fr.labri.gumtree.tree.Tree;
+import ca.ubc.ece.salt.sdjsb.checker.Alert;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerRegistry;
-import ca.ubc.ece.salt.sdjsb.checker.alert.Alert;
 
 public class SDJSB  {
 	

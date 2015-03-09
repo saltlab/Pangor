@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.checker;
+package ca.ubc.ece.salt.sdjsb.checker.specialtype;
 
 import java.util.Map;
 import java.util.HashMap;

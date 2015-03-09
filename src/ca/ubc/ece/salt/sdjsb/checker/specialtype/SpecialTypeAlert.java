@@ -1,6 +1,7 @@
-package ca.ubc.ece.salt.sdjsb.checker.alert;
+package ca.ubc.ece.salt.sdjsb.checker.specialtype;
 
-import ca.ubc.ece.salt.sdjsb.checker.SpecialTypeMap.SpecialType;
+import ca.ubc.ece.salt.sdjsb.checker.Alert;
+import ca.ubc.ece.salt.sdjsb.checker.specialtype.SpecialTypeMap.SpecialType;
 
 public class SpecialTypeAlert extends Alert {
 	

@@ -6,7 +6,7 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
 import ca.ubc.ece.salt.sdjsb.SDJSB;
-import ca.ubc.ece.salt.sdjsb.checker.alert.Alert;
+import ca.ubc.ece.salt.sdjsb.checker.Alert;
 import fr.labri.gumtree.client.DiffOptions;
 import junit.framework.TestCase;
 
