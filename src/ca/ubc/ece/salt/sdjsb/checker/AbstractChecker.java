@@ -90,12 +90,18 @@ public abstract class AbstractChecker {
 	 * @param node The Rhino AstNode that was inserted.
 	 */
 	public abstract void destinationInsert(AstNode node);
+
+	/**
+	 * Handles the event before we begin iterating through the AST. Any special
+	 * setup not done in the constructor can be done here. 
+	 */
+	public abstract void pre();
 	
 	/**
 	 * Handles the event where we are finished iterating through the AST. If
 	 * the checker is not flow sensitive, alerts should be generated here.
 	 */
-	public abstract void finished();
+	public abstract void post();
 	
 	/**
 	 * Each checker detects one type of repair.

@@ -6,6 +6,7 @@ import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
 
 import fr.labri.gumtree.actions.TreeClassifier;
+import fr.labri.gumtree.matchers.MappingStore;
 import fr.labri.gumtree.tree.Tree;
 
 /**
@@ -17,8 +18,13 @@ import fr.labri.gumtree.tree.Tree;
  */
 public class CheckerContext {
 	
-	private Map<AstNode, Tree> srcTreeNodeMap;
-	private Map<AstNode, Tree> dstTreeNodeMap;
+	public Tree srcTree;
+	public Tree dstTree;
+	
+	public Map<AstNode, Tree> srcTreeNodeMap;
+	public Map<AstNode, Tree> dstTreeNodeMap;
+
+	public MappingStore mappings;
 	
 	/**
 	 * Allows checkers to lookup the differencing class of Tree nodes.
@@ -28,21 +34,29 @@ public class CheckerContext {
 	/**
 	 * All the parameters are computed by GumTree.
 	 * 
+	 * @param srcTree The source AST Tree root. 
+	 * @param dstTree The destination AST Tree root. 
 	 * @param srcTreeNodeMap A map of AstNodes to Tree nodes in the source
 	 * 		  file. CheckerContext provides an AstNode resolution service to 
 	 * 		  the checkers.
 	 * @param dstTreeNodeMap A map of AstNodes to Tree nodes in the destination
 	 * 		  file. CheckerContext provides an AstNode resolution service to
 	 * 		  the checkers.
-	 * @param threeClassifier The GumTree structure that provides access to the
+	 * @param treeClassifier The GumTree structure that provides access to the
 	 * 		  Tree node classifications (inserted, deleted, updated, modified).
 	 * 		  This structure is provided to checkers.
+	 * @param mappings The source to destination Tree node mappings. 
 	 */
-	public CheckerContext(Map<AstNode, Tree> srcTreeNodeMap, Map<AstNode, Tree> dstTreeNodeMap, TreeClassifier treeClassifier) {
+	public CheckerContext(Tree srcTree, Tree dstTree, Map<AstNode, Tree> srcTreeNodeMap, Map<AstNode, Tree> dstTreeNodeMap, TreeClassifier treeClassifier, MappingStore mappings) {
+		this.srcTree = srcTree;
+		this.dstTree = dstTree;
+		
 		this.srcTreeNodeMap = srcTreeNodeMap;
 		this.dstTreeNodeMap = dstTreeNodeMap;
 		
 		this.treeClassifier = treeClassifier;
+		
+		this.mappings = mappings;
 	}
 	
 	/**

@@ -19,7 +19,9 @@ import fr.labri.gumtree.matchers.Matcher;
 import fr.labri.gumtree.matchers.MatcherFactories;
 import fr.labri.gumtree.tree.Tree;
 import ca.ubc.ece.salt.sdjsb.checker.Alert;
+import ca.ubc.ece.salt.sdjsb.checker.CheckerContext;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerRegistry;
+import ca.ubc.ece.salt.sdjsb.checker.PreProcessor;
 
 public class SDJSB  {
 	
@@ -129,38 +131,11 @@ public class SDJSB  {
 		MappingStore mappings = matcher.getMappings();
 
 		/* Create the 'event bus' for the repair checkers. */
-		this.checkerRegistry = new CheckerRegistry(srcTreeNodeMap, dstTreeNodeMap, c);
+		CheckerContext checkerContext = new CheckerContext(src, dst, srcTreeNodeMap, dstTreeNodeMap, c, mappings);
+		this.checkerRegistry = new CheckerRegistry(checkerContext);
 		
-		/* Iterate the source tree. Call the CheckerRegistry to trigger events. */
-		for (Tree t: src.getTrees()) {
-			if (c.getSrcMvTrees().contains(t)) {
-				ParserASTNode<AstNode> parserNode = t.getASTNode(); // TODO: We should pass the source AND destination nodes.
-				this.checkerRegistry.sourceMove(parserNode.getASTNode());
-			} if (c.getSrcUpdTrees().contains(t)) {
-				ParserASTNode<AstNode> parserNode = t.getASTNode();
-				this.checkerRegistry.sourceUpdate(parserNode.getASTNode());
-			} if (c.getSrcDelTrees().contains(t)) {
-				ParserASTNode<AstNode> parserNode = t.getASTNode();
-				this.checkerRegistry.sourceDelete(parserNode.getASTNode());
-			}
-		}
-
-		/* Iterate the destination tree. Call the CheckerRegistry to trigger events. */
-		for (Tree t: dst.getTrees()) {
-			if (c.getDstMvTrees().contains(t)) {
-				ParserASTNode<AstNode> parserNode = t.getASTNode();
-				this.checkerRegistry.destinationMove(parserNode.getASTNode());
-			} if (c.getDstUpdTrees().contains(t)) {
-				ParserASTNode<AstNode> parserNode = t.getASTNode();
-				this.checkerRegistry.destinationUpdate(parserNode.getASTNode());
-			} if (c.getDstAddTrees().contains(t)) {
-				ParserASTNode<AstNode> parserNode = t.getASTNode();
-				this.checkerRegistry.destinationInsert(parserNode.getASTNode());
-			}
-		}
-		
-		/* Trigger the finished event. */
-		this.checkerRegistry.finished();
+		/* Run the analysis. */
+		this.checkerRegistry.runAnalysis();
 		
 	}
 

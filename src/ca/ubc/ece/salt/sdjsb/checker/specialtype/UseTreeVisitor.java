@@ -12,6 +12,7 @@ import org.mozilla.javascript.ast.NodeVisitor;
 
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext.ChangeType;
+import ca.ubc.ece.salt.sdjsb.checker.CheckerUtilities;
 
 /**
  * A visitor for finding identifier uses.
@@ -93,11 +94,16 @@ public class UseTreeVisitor implements NodeVisitor {
      * @param node
      */
     public void check(AstNode node) {
-        String identifier = SpecialTypeCheckerUtilities.getIdentifier(node);
+        ChangeType changeType = context.getDstChangeOp(node);
+       
+        if(changeType == ChangeType.INSERT || changeType == ChangeType.UPDATE) {
+            String identifier = CheckerUtilities.getIdentifier(node);
 
-        if(identifier != null && this.variableIdentifiers.contains(identifier)) {
-            /* We have found an instance of a variable use. */
-            this.variableIdentifiers.remove(identifier);
+            if(identifier != null && this.variableIdentifiers.contains(identifier)) {
+                /* We have found an instance of a variable use. */
+                this.variableIdentifiers.remove(identifier);
+            }
+        	
         }
     }
     

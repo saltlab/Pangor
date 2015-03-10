@@ -10,6 +10,8 @@ import org.mozilla.javascript.ast.NodeVisitor;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext.ChangeType;
 import ca.ubc.ece.salt.sdjsb.checker.specialtype.SpecialTypeChecker;
 import fr.labri.gumtree.actions.TreeClassifier;
+import fr.labri.gumtree.io.ParserASTNode;
+import fr.labri.gumtree.matchers.MappingStore;
 import fr.labri.gumtree.tree.Tree;
 
 /**
@@ -35,21 +37,59 @@ public class CheckerRegistry {
 	/**
 	 * Creates and registers all the default checkers.
 	 * 
-	 * @param srcTreeNodeMap A map of AstNodes to Tree nodes in the source
-	 * 		  file. 
-	 * @param dstTreeNodeMap A map of AstNodes to Tree nodes in the destination
-	 * 		  file. 
-	 * @param threeClassifier The GumTree structure that provides access to the
-	 * 		  Tree node classifications (inserted, deleted, updated, modified).
+	 * @param context The source and destination AST nodes, mappings and change
+	 * 				  classifications. Provides context for the checkers to run
+	 * 				  their analysis.
 	 */
-	public CheckerRegistry(Map<AstNode, Tree> srcTreeNodeMap, Map<AstNode, Tree> dstTreeNodeMap, TreeClassifier treeClassifier) {
-
-		this.checkerContext = new CheckerContext(srcTreeNodeMap, dstTreeNodeMap, treeClassifier);
+	public CheckerRegistry(CheckerContext context) {
+		
+		this.checkerContext = context;
 		
 		this.activeCheckers = new LinkedList<AbstractChecker>();
 
 		/* Create and add the default checkers. */
 		this.activeCheckers.add(new SpecialTypeChecker(this.checkerContext));
+	}
+	
+	/**
+	 * Runs the analysis by iterating through the source and destination tree
+	 * pre-order and raising events that are handled by individual checkers.
+	 */
+	public void runAnalysis() { 
+		
+		/* Trigger pre-processing events. */
+		this.pre();
+
+		/* Iterate the source tree. Call the CheckerRegistry to trigger events. */
+		for (Tree t: this.checkerContext.srcTree.getTrees()) {
+			if (this.checkerContext.treeClassifier.getSrcMvTrees().contains(t)) {
+				ParserASTNode<AstNode> parserNode = t.getASTNode(); // TODO: We should pass the source AND destination nodes.
+				this.sourceMove(parserNode.getASTNode());
+			} if (this.checkerContext.treeClassifier.getSrcUpdTrees().contains(t)) {
+				ParserASTNode<AstNode> parserNode = t.getASTNode();
+				this.sourceUpdate(parserNode.getASTNode());
+			} if (this.checkerContext.treeClassifier.getSrcDelTrees().contains(t)) {
+				ParserASTNode<AstNode> parserNode = t.getASTNode();
+				this.sourceDelete(parserNode.getASTNode());
+			}
+		}
+
+		/* Iterate the destination tree. Call the CheckerRegistry to trigger events. */
+		for (Tree t: this.checkerContext.dstTree.getTrees()) {
+			if (this.checkerContext.treeClassifier.getDstMvTrees().contains(t)) {
+				ParserASTNode<AstNode> parserNode = t.getASTNode();
+				this.destinationMove(parserNode.getASTNode());
+			} if (this.checkerContext.treeClassifier.getDstUpdTrees().contains(t)) {
+				ParserASTNode<AstNode> parserNode = t.getASTNode();
+				this.destinationUpdate(parserNode.getASTNode());
+			} if (this.checkerContext.treeClassifier.getDstAddTrees().contains(t)) {
+				ParserASTNode<AstNode> parserNode = t.getASTNode();
+				this.destinationInsert(parserNode.getASTNode());
+			}
+		}
+		
+		/* Trigger post-processing events. */
+		this.post();
 	}
 	
 	/**
@@ -76,7 +116,7 @@ public class CheckerRegistry {
 	 * Notifies the checkers of a source delete event.
 	 * @param node The Rhino AstNode that was deleted.
 	 */
-	public void sourceDelete(AstNode node) { 
+	private void sourceDelete(AstNode node) { 
 		for (AbstractChecker checker : activeCheckers) {
 			checker.sourceDelete(node);
 		}
@@ -86,7 +126,7 @@ public class CheckerRegistry {
 	 * Notifies the checkers of a source update event.
 	 * @param node The Rhino AstNode that was deleted.
 	 */
-	public void sourceUpdate(AstNode node) { 
+	private void sourceUpdate(AstNode node) { 
 		for (AbstractChecker checker : activeCheckers) {
 			checker.sourceUpdate(node);
 		}
@@ -96,7 +136,7 @@ public class CheckerRegistry {
 	 * Notifies the checers of a source move event.
 	 * @param node The Rhino AstNode that was deleted.
 	 */
-	public void sourceMove(AstNode node) { 
+	private void sourceMove(AstNode node) { 
 		for (AbstractChecker checker : activeCheckers) {
 			checker.sourceMove(node);
 		}
@@ -106,7 +146,7 @@ public class CheckerRegistry {
 	 * Notifies the checkers of a destination update event.
 	 * @param node The Rhino AstNode that was deleted.
 	 */
-	public void destinationUpdate(AstNode node) { 
+	private void destinationUpdate(AstNode node) { 
 		for (AbstractChecker checker : activeCheckers) {
 			checker.destinationUpdate(node);
 		}
@@ -116,7 +156,7 @@ public class CheckerRegistry {
 	 * Notifies the checkers of a destination move event.
 	 * @param node The Rhino AstNode that was deleted.
 	 */
-	public void destinationMove(AstNode node) { 
+	private void destinationMove(AstNode node) { 
 		for (AbstractChecker checker : activeCheckers) {
 			checker.destinationMove(node);
 		}
@@ -126,18 +166,30 @@ public class CheckerRegistry {
 	 * Notifies the checkers of a destination insert event.
 	 * @param node The Rhino AstNode that was deleted.
 	 */
-	public void destinationInsert(AstNode node) { 
+	private void destinationInsert(AstNode node) { 
 		DestinationInsertVisitor div = new DestinationInsertVisitor();
 		node.visit(div);
 	}
+
+	/**
+	 * Called before the modification operation events begin.
+	 */
+	private void pre() {
+		/* Perform preprocessing operations on the Tree node maps (i.e. fix 
+		 * mistakes). */
+		PreProcessor preProcessor = new PreProcessor(this.checkerContext);
+		preProcessor.process();
+		for (AbstractChecker checker : activeCheckers) {
+			checker.pre();
+		}
+	}
 	
 	/**
-	 * Notifies the checkers that the source and detination iterations have
-	 * finished.
+	 * Called after the modification operation events are complete.
 	 */
-	public void finished() {
+	private void post() {
 		for (AbstractChecker checker : activeCheckers) {
-			checker.finished();
+			checker.post();
 		}
 	}
 	

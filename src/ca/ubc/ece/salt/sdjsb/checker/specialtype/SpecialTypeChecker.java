@@ -9,6 +9,7 @@ import org.mozilla.javascript.ast.VariableInitializer;
 
 import ca.ubc.ece.salt.sdjsb.checker.AbstractChecker;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext;
+import ca.ubc.ece.salt.sdjsb.checker.CheckerUtilities;
 import ca.ubc.ece.salt.sdjsb.checker.specialtype.SpecialTypeMap.SpecialType;
 
 /**
@@ -95,7 +96,7 @@ public class SpecialTypeChecker extends AbstractChecker {
 	 * @param node
 	 */
 	private void storeFalsey(AstNode node) {
-		String identifier = SpecialTypeCheckerUtilities.getIdentifier(node);
+		String identifier = CheckerUtilities.getIdentifier(node);
 		
 		if(identifier != null && SpecialTypeCheckerUtilities.isFalsey(node)) {
 
@@ -120,11 +121,10 @@ public class SpecialTypeChecker extends AbstractChecker {
 		if(parent instanceof InfixExpression) {
 			InfixExpression ie = (InfixExpression) parent;
 			
-			/* The comparison must be an equivalence comparison
-			 * TODO: Also handle the case where we are checking if the node is 'falsey'. */
+			/* The comparison must be an equivalence comparison */
 			if(SpecialTypeCheckerUtilities.isEquivalenceOperator(ie.getOperator())) {
 				
-				String identifier = SpecialTypeCheckerUtilities.getIdentifier(ie.getLeft());
+				String identifier = CheckerUtilities.getIdentifier(ie.getLeft());
 				
 				if(identifier != null) {
 
@@ -165,7 +165,7 @@ public class SpecialTypeChecker extends AbstractChecker {
      */
     private void storeAssignment(AstNode leftNode, AstNode rightNode) {
 
-        String identifier = SpecialTypeCheckerUtilities.getIdentifier(leftNode);
+        String identifier = CheckerUtilities.getIdentifier(leftNode);
         SpecialType value = SpecialTypeCheckerUtilities.getSpecialType(rightNode);
         
         if(identifier == null || value == null) return;
@@ -173,9 +173,14 @@ public class SpecialTypeChecker extends AbstractChecker {
         /* Store the assignment in the map. */
         this.assignments.add(identifier, value);
     }
+    
+	@Override
+	public void pre() { 
+		return; 
+	}
 	
 	@Override
-	public void finished() {
+	public void post() {
 		/* Compare the assignments sets to the comparisons sets and generate
 		 * alerts. */
 		for(String name : this.comparisons.getNames()) {

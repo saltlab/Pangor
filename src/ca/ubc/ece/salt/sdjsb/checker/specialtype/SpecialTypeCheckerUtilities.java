@@ -10,17 +10,15 @@ import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.ConditionalExpression;
 import org.mozilla.javascript.ast.DoLoop;
 import org.mozilla.javascript.ast.ForLoop;
-import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.IfStatement;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.KeywordLiteral;
-import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NumberLiteral;
-import org.mozilla.javascript.ast.ParenthesizedExpression;
 import org.mozilla.javascript.ast.StringLiteral;
 import org.mozilla.javascript.ast.WhileLoop;
 
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext;
+import ca.ubc.ece.salt.sdjsb.checker.CheckerUtilities;
 import ca.ubc.ece.salt.sdjsb.checker.specialtype.SpecialTypeMap.SpecialType;
 
 public class SpecialTypeCheckerUtilities {
@@ -33,7 +31,7 @@ public class SpecialTypeCheckerUtilities {
 	 */
 	public static SpecialType getSpecialType(AstNode node) {
 		
-        String name = SpecialTypeCheckerUtilities.getIdentifier(node);
+        String name = CheckerUtilities.getIdentifier(node);
         
         if(name != null) {
 
@@ -75,7 +73,7 @@ public class SpecialTypeCheckerUtilities {
 	public static boolean isFalsey(AstNode node) {
 
 		AstNode parent = node.getParent();
-		String identifier = SpecialTypeCheckerUtilities.getIdentifier(node);
+		String identifier = CheckerUtilities.getIdentifier(node);
 		
 		if(identifier == null) return false;
 		
@@ -169,59 +167,6 @@ public class SpecialTypeCheckerUtilities {
 		parent.visit(visitor);
 		return visitor.contains;
 	}
-
-	/**
-	 * Returns the variable, field or function identifier for the AstNode. If
-	 * the node is not a Name, InfixEpxression or FunctionCall, or if the
-	 * operator of an InfixExpression is not a field access (GETPROP), then it 
-	 * can't build an identifier and it returns null.
-	 * @param node The node that represents an identifier.
-	 * @return The variable, field or function identifier or null if an
-	 * 		   identifier can't be built.
-	 */
-	public static String getIdentifier(AstNode node) throws IllegalArgumentException {
-        if (node instanceof Name) {
-            return ((Name)node).getIdentifier();
-        }
-        else if (node instanceof InfixExpression) {
-            InfixExpression ie = (InfixExpression) node;
-            if(SpecialTypeCheckerUtilities.isIdentifierOperator(ie.getOperator())) {
-            	String left = getIdentifier(ie.getLeft());
-            	String right = getIdentifier(ie.getRight());
-            	if(left == null || right == null) return null;
-                return left + "." + right;
-            }
-            return null; // Indicates we can't build an identifier for this expression.
-        }
-        else if (node instanceof FunctionCall) {
-            FunctionCall fc = (FunctionCall) node;
-            String identifier = getIdentifier(fc.getTarget());
-            if(identifier == null) return null;
-            return identifier + "()";
-        }
-        else if (node instanceof ParenthesizedExpression) {
-        	ParenthesizedExpression pe = (ParenthesizedExpression) node;
-        	String identifier = getIdentifier(pe.getExpression());
-            if(identifier == null) return null;
-            return identifier;
-        }
-        
-        return null;
-	}
-
-	/**
-	 * Returns true if the operator for the binary expression is an identifier
-	 * operator (i.e. whatever is to the left should be included in the
-	 * identity of the expression).
-	 * @param tokenType The operator type.
-	 * @return
-	 */
-    public static boolean isIdentifierOperator(int tokenType) {
-        if(tokenType == Token.GETPROP || tokenType == Token.GETPROPNOWARN) {
-            return true;
-        }
-        return false;
-    }
 
 	/**
 	 * Returns true if the operator for the binary expression is an equivalence
