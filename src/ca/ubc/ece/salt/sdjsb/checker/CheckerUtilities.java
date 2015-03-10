@@ -1,5 +1,7 @@
 package ca.ubc.ece.salt.sdjsb.checker;
 
+import java.util.List;
+
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionCall;
@@ -46,6 +48,20 @@ public class CheckerUtilities {
         }
         
         return null;
+	}
+	
+	/**
+	 * Returns the list of variable, field or function identifiers contained
+	 * in an OR separated list. Use for getting all the identifiers on the
+	 * right hand side of an assignment. 
+	 * @param node The node that represents the right hand side of an assignment.
+	 * @return The list of variable, field or function identifiers.	 
+	 */
+	public static List<String> getRHSIdentifiers(AstNode node) {
+		IdentifiersTreeVisitor visitor = new IdentifiersTreeVisitor();
+		node.visit(visitor);
+		return visitor.variableIdentifiers;
+		
 	}
 
 	/**

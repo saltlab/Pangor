@@ -1,5 +1,7 @@
 package ca.ubc.ece.salt.sdjsb.checker;
 
+import java.util.List;
+
 import org.mozilla.javascript.ast.Assignment;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.ConditionalExpression;
@@ -31,6 +33,8 @@ public class PreProcessor {
 	 * the true path of the conditional statement. This method fixes that by
 	 * adding a MOVE operation if the RHS of the old assignment is the same as
 	 * the TRUE path of the new conditional statement.
+	 * 
+	 * TODO: Make PreProcessor an abstract class and move everything to its own package.
 	 */
 	private void processConditionalStatements() {
 		
@@ -60,7 +64,8 @@ public class PreProcessor {
 					if(srcParentTree != null && dstParentNode == node.getParent()) {
 
                         AstNode srcRHS = null;
-                        AstNode dstRHS = conditionalExpression.getTrueExpression();
+                        AstNode dstTrue = conditionalExpression.getTrueExpression();
+                        AstNode dstFalse = conditionalExpression.getFalseExpression();
 
                         /* The parent should be some sort of assignment node. */
                         if(srcParentNode instanceof VariableInitializer) {
@@ -73,13 +78,28 @@ public class PreProcessor {
                         }
                         
                         /* If the RHS identifiers match, add the node to the 'MOVE' list. */
-                        if(srcRHS != null && dstRHS != null) {
-                            String srcIdentifier = CheckerUtilities.getIdentifier(srcRHS);
-                            String dstIdentifier = CheckerUtilities.getIdentifier(dstRHS);
+                        if(srcRHS != null && dstTrue != null) {
+                            List<String> srcIdentifiers = CheckerUtilities.getRHSIdentifiers(srcRHS);
+                            
+                            if(dstTrue != null) {
+                                String dstIdentifier = CheckerUtilities.getIdentifier(dstTrue);
 
-                            if(srcIdentifier != null && dstIdentifier != null && srcIdentifier.equals(dstIdentifier)) {
-                                Tree dstRHSTree = this.context.dstTreeNodeMap.get(dstRHS);
-                                this.context.treeClassifier.getDstMvTrees().add(dstRHSTree);
+                                for(String srcIdentifier : srcIdentifiers) {
+                                    if(srcIdentifier != null && dstIdentifier != null && srcIdentifier.equals(dstIdentifier)) {
+                                        Tree dstRHSTree = this.context.dstTreeNodeMap.get(dstTrue);
+                                        this.context.treeClassifier.getDstMvTrees().add(dstRHSTree);
+                                    }
+                                }
+                            }
+                            if(dstFalse != null) {
+                                String dstIdentifier = CheckerUtilities.getIdentifier(dstFalse);
+
+                                for(String srcIdentifier : srcIdentifiers) {
+                                    if(srcIdentifier != null && dstIdentifier != null && srcIdentifier.equals(dstIdentifier)) {
+                                        Tree dstRHSTree = this.context.dstTreeNodeMap.get(dstTrue);
+                                        this.context.treeClassifier.getDstMvTrees().add(dstRHSTree);
+                                    }
+                                }
                             }
                         }
 						

@@ -140,6 +140,15 @@ public class TestSpecialTypeHandling extends TestSDJSB {
 	}
 
 	@Test
+	public void testRealWorldConditional(){
+		String src = "./test/input/sample-conf_old.js";
+		String dst = "./test/input/sample-conf_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		expectedAlerts.add(new SpecialTypeAlert("STH", "process.env.PM2_LOG_DATE_FORMAT", SpecialType.UNDEFINED));
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	@Test
 	public void testBooleanAssignment(){
 		String src = "./test/input/sth_boolean_assignment_old.js";
 		String dst = "./test/input/sth_boolean_assignment_new.js";
