@@ -25,9 +25,6 @@ import ca.ubc.ece.salt.sdjsb.checker.PreProcessor;
 
 public class SDJSB  {
 	
-	private CheckerRegistry checkerRegistry;
-	private DiffOptions diffOptions;
-
 	/**
 	 * The main entry point for command line executions of SDJSB.
 	 * @param args SDJSB /path/to/src /path/to/dst
@@ -44,8 +41,7 @@ public class SDJSB  {
 			return;
 		}
 
-        SDJSB client = new SDJSB(options);
-        List<Alert> alerts = client.start();
+        List<Alert> alerts = SDJSB.analyze(options);
 
         System.out.println("Alerts:");
         for(Alert alert : alerts){
@@ -53,14 +49,11 @@ public class SDJSB  {
         }
 	}
 
-	public SDJSB(DiffOptions diffOptions) {
-		this.diffOptions = diffOptions;
+	public static List<Alert> analyze(DiffOptions options) {
+		return SDJSB.analyze(options, null, null);
 	}
 
-	public List<Alert> start() {
-		/* Get the files we are comparing from the command line arguments. */
-		File fSrc = new File(diffOptions.getSrc());
-		File fDst = new File(diffOptions.getDst());
+	public static List<Alert> analyze(DiffOptions options, String sourceFile, String destinationFile) {
 
         /* Create the abstract GumTree representations of the ASTs.
          * 
@@ -74,11 +67,29 @@ public class SDJSB  {
         Map<AstNode, Tree> dstTreeNodeMap;
         RhinoTreeGenerator srcRhinoTreeGenerator = new RhinoTreeGenerator();
         RhinoTreeGenerator dstRhinoTreeGenerator = new RhinoTreeGenerator();
+
         try{
-            src = srcRhinoTreeGenerator.fromFile(fSrc.getAbsolutePath());
+        	
+        	/* If we are given the files as a string, use them. Otherwise, get
+        	 * the files from the file system. */
+
+        	if(sourceFile == null) {
+                File fSrc = new File(options.getSrc());
+                src = srcRhinoTreeGenerator.fromFile(fSrc.getAbsolutePath());
+        	} else {
+                src = srcRhinoTreeGenerator.fromSource(sourceFile, options.getSrc());
+        	}
+
+        	if(destinationFile == null) {
+                File fDst = new File(options.getDst());
+                dst = dstRhinoTreeGenerator.fromFile(fDst.getAbsolutePath());
+        	} else {
+                dst = dstRhinoTreeGenerator.fromSource(destinationFile, options.getDst());
+        	}
+
             srcTreeNodeMap = srcRhinoTreeGenerator.getTreeNodeMap();
-            dst = dstRhinoTreeGenerator.fromFile(fDst.getAbsolutePath());
             dstTreeNodeMap = dstRhinoTreeGenerator.getTreeNodeMap();
+
         } catch (IOException e) {
         	System.err.println(e.getMessage());
         	return null;
@@ -92,16 +103,12 @@ public class SDJSB  {
 		/* Produce the diff object that we will use to infer properties of
 		 * repairs. */
 		try{
-            this.produce(src, dst, srcTreeNodeMap, dstTreeNodeMap, matcher);
+            return SDJSB.produce(src, dst, srcTreeNodeMap, dstTreeNodeMap, matcher);
 		} catch (IOException e) {
         	System.err.println(e.getMessage());
         	return null;
 		}
-		
-		/* Get and print the alerts. */
-		List<Alert> alerts = this.checkerRegistry.getAlerts();
-		
-		return alerts;
+
 	}
 	
 	/**
@@ -112,7 +119,7 @@ public class SDJSB  {
 	 * @param matcher The set of source nodes matched to destination nodes.
 	 * @throws IOException
 	 */
-	private void produce(Tree src, Tree dst, Map<AstNode, Tree> srcTreeNodeMap, Map<AstNode, Tree> dstTreeNodeMap, Matcher matcher) throws IOException {
+	private static List<Alert> produce(Tree src, Tree dst, Map<AstNode, Tree> srcTreeNodeMap, Map<AstNode, Tree> dstTreeNodeMap, Matcher matcher) throws IOException {
 		
 		/* Classify parts of each tree as deleted, added, moved or updated. The
 		 * source tree nodes can be deleted or updated, while the destination
@@ -132,10 +139,13 @@ public class SDJSB  {
 
 		/* Create the 'event bus' for the repair checkers. */
 		CheckerContext checkerContext = new CheckerContext(src, dst, srcTreeNodeMap, dstTreeNodeMap, c, mappings);
-		this.checkerRegistry = new CheckerRegistry(checkerContext);
+		CheckerRegistry checkerRegistry = new CheckerRegistry(checkerContext);
 		
 		/* Run the analysis. */
-		this.checkerRegistry.runAnalysis();
+		checkerRegistry.runAnalysis();
+
+		/* Return the alerts. */
+		return checkerRegistry.getAlerts();
 		
 	}
 

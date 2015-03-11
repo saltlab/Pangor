@@ -2,16 +2,13 @@ package ca.ubc.ece.salt.sdjsb.checker;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.NodeVisitor;
 
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext.ChangeType;
 import ca.ubc.ece.salt.sdjsb.checker.specialtype.SpecialTypeChecker;
-import fr.labri.gumtree.actions.TreeClassifier;
 import fr.labri.gumtree.io.ParserASTNode;
-import fr.labri.gumtree.matchers.MappingStore;
 import fr.labri.gumtree.tree.Tree;
 
 /**

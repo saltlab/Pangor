@@ -27,8 +27,7 @@ public abstract class TestSDJSB extends TestCase {
 		}
 
 		/* Run SDJSB. */
-        SDJSB client = new SDJSB(options);
-        List<Alert> actualAlerts = client.start();
+        List<Alert> actualAlerts = SDJSB.analyze(options);
         
         /* Output if needed. */
         if(printAlerts) {
