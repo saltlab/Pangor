@@ -52,7 +52,7 @@ public class CheckerRegistry {
 	 * Runs the analysis by iterating through the source and destination tree
 	 * pre-order and raising events that are handled by individual checkers.
 	 */
-	public void runAnalysis() { 
+	public void analyze() { 
 		
 		/* Trigger pre-processing events. */
 		this.pre();

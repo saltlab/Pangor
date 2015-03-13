@@ -13,7 +13,6 @@ import fr.labri.gumtree.actions.RootAndLeavesClassifier;
 import fr.labri.gumtree.actions.TreeClassifier;
 import fr.labri.gumtree.client.DiffOptions;
 import fr.labri.gumtree.gen.js.RhinoTreeGenerator;
-import fr.labri.gumtree.io.ParserASTNode;
 import fr.labri.gumtree.matchers.MappingStore;
 import fr.labri.gumtree.matchers.Matcher;
 import fr.labri.gumtree.matchers.MatcherFactories;
@@ -21,7 +20,6 @@ import fr.labri.gumtree.tree.Tree;
 import ca.ubc.ece.salt.sdjsb.checker.Alert;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerRegistry;
-import ca.ubc.ece.salt.sdjsb.checker.PreProcessor;
 
 public class SDJSB  {
 	
@@ -142,7 +140,7 @@ public class SDJSB  {
 		CheckerRegistry checkerRegistry = new CheckerRegistry(checkerContext);
 		
 		/* Run the analysis. */
-		checkerRegistry.runAnalysis();
+		checkerRegistry.analyze();
 
 		/* Return the alerts. */
 		return checkerRegistry.getAlerts();

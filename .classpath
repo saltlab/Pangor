@@ -17,5 +17,6 @@
 	<classpathentry kind="lib" path="lib/org.eclipse.jgit-3.7.0.201502260915-r.jar"/>
 	<classpathentry kind="lib" path="lib/log4j-over-slf4j-1.7.10.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.7.10.jar"/>
+	<classpathentry kind="lib" path="lib/jsch-0.1.51.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
