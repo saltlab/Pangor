@@ -54,6 +54,15 @@ public class TestSpecialTypeHandling extends TestSDJSB {
 	}
 
 	@Test
+	public void testUndefinedElementGet(){
+		String src = "./test/input/sth_undefined_elementget_old.js";
+		String dst = "./test/input/sth_undefined_elementget_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		expectedAlerts.add(new SpecialTypeAlert("STH", "a", SpecialType.UNDEFINED));
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	@Test
 	public void testUndefinedRealWorld(){
 		String src = "./test/input/tv-functions-old.js";
 		String dst = "./test/input/tv-functions-new.js";
@@ -152,6 +161,22 @@ public class TestSpecialTypeHandling extends TestSDJSB {
 	public void testBooleanAssignment(){
 		String src = "./test/input/sth_boolean_assignment_old.js";
 		String dst = "./test/input/sth_boolean_assignment_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	@Test
+	public void testDeleteUpdate(){
+		String src = "./test/input/sth_deleted_old.js";
+		String dst = "./test/input/sth_deleted_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	@Test
+	public void testUnused(){
+		String src = "./test/input/sth_not_used_old.js";
+		String dst = "./test/input/sth_not_used_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}

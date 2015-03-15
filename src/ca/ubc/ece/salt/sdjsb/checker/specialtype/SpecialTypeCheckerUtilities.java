@@ -99,7 +99,7 @@ public class SpecialTypeCheckerUtilities {
 	}
 
 	/**
-	 * Checks if the identifier is used in the branch. 
+	 * Checks if the identifier was used in the branch before modifications.
 	 * @param node The branch statement to look for uses in.
 	 * @param identifier The variable/field/function identifier that is being
 	 * 					 checked.

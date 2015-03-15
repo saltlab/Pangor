@@ -242,7 +242,14 @@ public class CheckerRegistry {
 		}
 		
 		public boolean visit(AstNode node) {
-			ChangeType changeType = this.context.getDstChangeFlag(node);
+			ChangeType changeType;
+			
+			/* If this is a delete operation, we need to look in the source
+			 * change list because deletes are not present in the destination
+			 * change list. */
+			if(this.changeType == ChangeType.DELETE) changeType = this.context.getSrcChangeFlag(node);
+			else changeType = this.context.getDstChangeFlag(node);
+
 			if(changeType != this.changeType && changeType != ChangeType.UNCHANGED) {
 				return false;
 			}

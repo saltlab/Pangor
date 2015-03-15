@@ -39,17 +39,38 @@ public class SpecialTypeChecker extends AbstractChecker {
 	 * Keeps track of comparisons between a variable and a special type that
 	 * have been introduced in the repair.
 	 */
-	private SpecialTypeMap comparisons;
+	private SpecialTypeMap insertedComparisons;
+	
+	/**
+	 * Keeps track of comparisons between a variable and a special type that
+	 * have been deleted in the repair.
+	 */
+	private SpecialTypeMap deletedComparisons;
 	
 	public SpecialTypeChecker(CheckerContext context) {
 		super(context);
 		this.assignments = new SpecialTypeMap();
-		this.comparisons = new SpecialTypeMap();
+		this.insertedComparisons = new SpecialTypeMap();
+		this.deletedComparisons = new SpecialTypeMap();
 	}
 
 	@Override
 	public void sourceDelete(AstNode node) { 
-		return; 
+        /* If the node is a special type, we need to handle two cases:
+         * 	1. A special type node is inserted in an assignment. 
+         *  2. A special type node is inserted in a branch condition. */
+
+		SpecialType type = SpecialTypeCheckerUtilities.getSpecialType(node);
+		
+		/* This could be a falsey check. */
+		if(type == null) {
+			this.storeFalsey(this.deletedComparisons, node);
+		}
+		/* This could be an assignment or a comparison involving a special type. */
+		else {
+            this.storeAssignment(node);
+            this.storeComparison(this.deletedComparisons, node, type);
+		}
 	}
 
 	@Override
@@ -79,12 +100,12 @@ public class SpecialTypeChecker extends AbstractChecker {
 		
 		/* This could be a falsey check. */
 		if(type == null) {
-			this.storeFalsey(node);
+			this.storeFalsey(this.insertedComparisons, node);
 		}
 		/* This could be an assignment or a comparison involving a special type. */
 		else {
             this.storeAssignment(node);
-            this.storeComparison(node, type);
+            this.storeComparison(this.insertedComparisons, node, type);
 		}
 		
 	}
@@ -95,17 +116,18 @@ public class SpecialTypeChecker extends AbstractChecker {
 	 *  2. Is part of a branch statement's condition.
 	 *  3. Is not used inside the branch.
 	 * Then store the comparison. 
-	 * @param node
+	 * @param specialTypeMap the map in which to store the comparison.
+	 * @param node The special type node.
 	 */
-	private void storeFalsey(AstNode node) {
+	private void storeFalsey(SpecialTypeMap specialTypeMap, AstNode node) {
 		String identifier = CheckerUtilities.getIdentifier(node);
 		
 		if(identifier != null && SpecialTypeCheckerUtilities.isFalsey(node)) {
 
             AstNode branchStatement = SpecialTypeCheckerUtilities.getBranchStatement(node);
             
-            if(branchStatement != null && !SpecialTypeCheckerUtilities.isUsed(this.context, branchStatement, identifier)) {
-                this.comparisons.add(identifier, SpecialType.FALSEY);
+            if(branchStatement != null && SpecialTypeCheckerUtilities.isUsed(this.context, branchStatement, identifier)) {
+                specialTypeMap.add(identifier, SpecialType.FALSEY);
             }
 			
 		}
@@ -113,10 +135,11 @@ public class SpecialTypeChecker extends AbstractChecker {
 	
 	/**
 	 * If the node is part of a comparison, store the comparison.
+	 * @param specialTypeMap the map in which to store the comparison.
 	 * @param node The special type node. 
 	 * @param type The special type being compared.
 	 */
-	private void storeComparison(AstNode node, SpecialType type) {
+	private void storeComparison(SpecialTypeMap specialTypeMap, AstNode node, SpecialType type) {
 		AstNode parent = node.getParent();
 		
 		/* Handle comparisons to a special type. */
@@ -132,8 +155,8 @@ public class SpecialTypeChecker extends AbstractChecker {
 
                     AstNode branchStatement = SpecialTypeCheckerUtilities.getBranchStatement(node);
                     
-                    if(branchStatement != null && !SpecialTypeCheckerUtilities.isUsed(this.context, branchStatement, identifier)) {
-                        this.comparisons.add(identifier, type);
+                    if(branchStatement != null && SpecialTypeCheckerUtilities.isUsed(this.context, branchStatement, identifier)) {
+                        specialTypeMap.add(identifier, type);
                     }
 					
 				}
@@ -185,10 +208,10 @@ public class SpecialTypeChecker extends AbstractChecker {
 	public void post() {
 		/* Compare the assignments sets to the comparisons sets and generate
 		 * alerts. */
-		for(String name : this.comparisons.getNames()) {
-			EnumSet<SpecialType> types = this.comparisons.getSet(name);
+		for(String name : this.insertedComparisons.getNames()) {
+			EnumSet<SpecialType> types = this.insertedComparisons.getSet(name);
 			for(SpecialType type : types) {
-				if(!this.assignments.setContains(name, type)){
+				if(!this.assignments.setContains(name, type) && !this.deletedComparisons.setContains(name, type)){
 					this.registerAlert(new SpecialTypeAlert(this.getCheckerType(), name, type));
 				}
 			}
