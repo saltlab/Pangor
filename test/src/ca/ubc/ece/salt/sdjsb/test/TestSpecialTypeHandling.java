@@ -181,4 +181,12 @@ public class TestSpecialTypeHandling extends TestSDJSB {
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 
+	@Test
+	public void testUsedInCondition(){ // This fails, but it's atually GumTree's fault and there isn't really anything we can do.
+		String src = "./test/input/CLI_old.js";
+		String dst = "./test/input/CLI_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
 }
