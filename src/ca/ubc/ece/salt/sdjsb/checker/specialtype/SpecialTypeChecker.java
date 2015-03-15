@@ -48,7 +48,9 @@ public class SpecialTypeChecker extends AbstractChecker {
 	}
 
 	@Override
-	public void sourceDelete(AstNode node) { return; }
+	public void sourceDelete(AstNode node) { 
+		return; 
+	}
 
 	@Override
 	public void sourceUpdate(AstNode node) { return; }

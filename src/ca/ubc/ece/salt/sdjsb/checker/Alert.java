@@ -22,6 +22,22 @@ public abstract class Alert {
 	}
 	
 	/**
+	 * The type of the alert.
+	 * @return
+	 */
+	public String getType() {
+		return this.type;
+	}
+
+	/**
+	 * The subtype of the alert.
+	 * @return
+	 */
+	public String getSubType() {
+		return this.subtype;
+	}
+	
+	/**
 	 * A short description of the repair alert.
 	 * @return The alert type and subtype.
 	 */

@@ -16,6 +16,10 @@ import fr.labri.gumtree.tree.Tree;
  * is reached in the iteration, the CheckerRegistry is notified, which then
  * notifies all the registered checkers.
  * 
+ * CheckerRegistry also raises events for subtree nodes. Since GumTree only 
+ * classifies the parent tree, we visit the subtree and give unclassified 
+ * nodes the same class as the parent.
+ * 
  * @author qhanam
  */
 public class CheckerRegistry {
@@ -114,9 +118,14 @@ public class CheckerRegistry {
 	 * @param node The Rhino AstNode that was deleted.
 	 */
 	private void sourceDelete(AstNode node) { 
-		for (AbstractChecker checker : activeCheckers) {
-			checker.sourceDelete(node);
-		}
+		CheckerEventNotifier notifier = new CheckerEventNotifier(this.activeCheckers) {
+			@Override
+			public void notify(AbstractChecker checker, AstNode node) {
+                checker.sourceDelete(node);
+			}
+		};
+		NodeChangeVisitor div = new NodeChangeVisitor(notifier, ChangeType.DELETE);
+		node.visit(div);
 	}
 
 	/**
@@ -124,9 +133,14 @@ public class CheckerRegistry {
 	 * @param node The Rhino AstNode that was deleted.
 	 */
 	private void sourceUpdate(AstNode node) { 
-		for (AbstractChecker checker : activeCheckers) {
-			checker.sourceUpdate(node);
-		}
+		CheckerEventNotifier notifier = new CheckerEventNotifier(this.activeCheckers) {
+			@Override
+			public void notify(AbstractChecker checker, AstNode node) {
+                checker.sourceUpdate(node);
+			}
+		};
+		NodeChangeVisitor div = new NodeChangeVisitor(notifier, ChangeType.UPDATE);
+		node.visit(div);
     }
 	
 	/**
@@ -134,9 +148,14 @@ public class CheckerRegistry {
 	 * @param node The Rhino AstNode that was deleted.
 	 */
 	private void sourceMove(AstNode node) { 
-		for (AbstractChecker checker : activeCheckers) {
-			checker.sourceMove(node);
-		}
+		CheckerEventNotifier notifier = new CheckerEventNotifier(this.activeCheckers) {
+			@Override
+			public void notify(AbstractChecker checker, AstNode node) {
+                checker.sourceMove(node);
+			}
+		};
+		NodeChangeVisitor div = new NodeChangeVisitor(notifier, ChangeType.MOVE);
+		node.visit(div);
     }
 
 	/**
@@ -144,9 +163,14 @@ public class CheckerRegistry {
 	 * @param node The Rhino AstNode that was deleted.
 	 */
 	private void destinationUpdate(AstNode node) { 
-		for (AbstractChecker checker : activeCheckers) {
-			checker.destinationUpdate(node);
-		}
+		CheckerEventNotifier notifier = new CheckerEventNotifier(this.activeCheckers) {
+			@Override
+			public void notify(AbstractChecker checker, AstNode node) {
+                checker.destinationUpdate(node);
+			}
+		};
+		NodeChangeVisitor div = new NodeChangeVisitor(notifier, ChangeType.UPDATE);
+		node.visit(div);
     }
 	
 	/**
@@ -154,9 +178,14 @@ public class CheckerRegistry {
 	 * @param node The Rhino AstNode that was deleted.
 	 */
 	private void destinationMove(AstNode node) { 
-		for (AbstractChecker checker : activeCheckers) {
-			checker.destinationMove(node);
-		}
+		CheckerEventNotifier notifier = new CheckerEventNotifier(this.activeCheckers) {
+			@Override
+			public void notify(AbstractChecker checker, AstNode node) {
+                checker.destinationMove(node);
+			}
+		};
+		NodeChangeVisitor div = new NodeChangeVisitor(notifier, ChangeType.MOVE);
+		node.visit(div);
 	}
 	
 	/**
@@ -164,7 +193,13 @@ public class CheckerRegistry {
 	 * @param node The Rhino AstNode that was deleted.
 	 */
 	private void destinationInsert(AstNode node) { 
-		DestinationInsertVisitor div = new DestinationInsertVisitor();
+		CheckerEventNotifier notifier = new CheckerEventNotifier(this.activeCheckers) {
+			@Override
+			public void notify(AbstractChecker checker, AstNode node) {
+                checker.destinationInsert(node);
+			}
+		};
+		NodeChangeVisitor div = new NodeChangeVisitor(notifier, ChangeType.INSERT);
 		node.visit(div);
 	}
 
@@ -194,25 +229,56 @@ public class CheckerRegistry {
 	 * Walks the tree of the inserted node and triggers the destinationInsert
 	 * event for each child that was inserted.
 	 */
-	private class DestinationInsertVisitor implements NodeVisitor {
+	private class NodeChangeVisitor implements NodeVisitor {
 		
 		private CheckerContext context;
-		private List<AbstractChecker> activeCheckers;
+		private CheckerEventNotifier checkerEventNotifier;
+		private ChangeType changeType;
 		
-		public DestinationInsertVisitor() {
+		public NodeChangeVisitor(CheckerEventNotifier checkerEventNotifier, ChangeType changeType) {
 			this.context = CheckerRegistry.this.checkerContext;
-			this.activeCheckers = CheckerRegistry.this.activeCheckers;
+			this.checkerEventNotifier = checkerEventNotifier;
+			this.changeType = changeType;
 		}
 		
 		public boolean visit(AstNode node) {
-			if(this.context.getDstChangeFlag(node) == ChangeType.MOVE) return false;
-			
-            for (AbstractChecker checker : activeCheckers) {
-                checker.destinationInsert(node);
-            }
-                
+			ChangeType changeType = this.context.getDstChangeFlag(node);
+			if(changeType != this.changeType && changeType != ChangeType.UNCHANGED) {
+				return false;
+			}
+            this.checkerEventNotifier.notifyAll(node);
 			return true;
 		}
+		
+	}
+	
+	/**
+	 * Notifies the subscribed checkers of an event. An event could be the
+	 * insertion, deletion, update of moving of an ASTNode.
+	 */
+	private abstract class CheckerEventNotifier {
+		
+		private List<AbstractChecker> subscribers;
+		
+		public CheckerEventNotifier(List<AbstractChecker> subscribers) {
+			this.subscribers = subscribers;
+		}
+
+		/**
+		 * Notifies all subscribers that an event has occurred.
+		 * @param node The node that was changed.
+		 */
+		public void notifyAll(AstNode node) {
+            for (AbstractChecker checker : subscribers) {
+                this.notify(checker, node);
+            }
+		}
+		
+		/**
+		 * Notifies a subscriber that an event has occurred.
+		 * @param node The node that was changed.
+		 */
+		public abstract void notify(AbstractChecker checker, AstNode node);
 		
 	}
 	

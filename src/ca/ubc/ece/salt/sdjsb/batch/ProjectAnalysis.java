@@ -42,7 +42,7 @@ public class ProjectAnalysis {
 		if(options.getGitDirectory() != null) {
 
 			try {
-                gitProjectAnalysis = GitProjectAnalysis.fromDirectory(options.getGitDirectory());
+                gitProjectAnalysis = GitProjectAnalysis.fromDirectory(options.getGitDirectory(), "Unknown");
 			} 
 			catch(GitProjectAnalysisException e) {
                 ProjectAnalysis.printUsage(e.getMessage(), parser);
@@ -77,7 +77,7 @@ public class ProjectAnalysis {
 		System.out.print("There were " + gitProjectAnalysis.getBugFixingCommits() + " bug fixing commits analyzed out of " + gitProjectAnalysis.getTotalCommits() + " total commits.");
 		System.out.println("Alerts (" + alerts.size() + "):");
 		for(Alert alert : alerts) {
-			System.out.println("\t" + alert.getShortDescription());
+			System.out.println("\t" + alert.getLongDescription());
 		}
 		
 	}

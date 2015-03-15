@@ -41,14 +41,16 @@ public class GitProjectAnalysis {
 	
 	Git git;
 	Repository repository;
+	String projectName;
 	
 	private List<Alert> alerts;
 	private Integer bugFixingCommits;
 	private Integer totalCommits;
 	
-	GitProjectAnalysis(Git git, Repository repository) {
+	GitProjectAnalysis(Git git, Repository repository, String name) {
 		this.git = git;
 		this.repository = repository;
+		this.projectName = name;
 		
 		this.alerts = null;
 		this.bugFixingCommits = null;
@@ -98,7 +100,7 @@ public class GitProjectAnalysis {
 	 */
 	public void analyze() throws GitAPIException, IOException {
 		
-		alerts = new LinkedList<Alert>();
+		this.alerts = new LinkedList<Alert>();
 
 		/* Get the list of bug fixing commits from version history. */
 		List<Pair<String, String>> bugFixingCommits = this.getBugFixingCommitPairs();
@@ -106,7 +108,7 @@ public class GitProjectAnalysis {
 		/* Analyze the changes made in each bug fixing commit. */
 		for(Pair<String, String> bugFixingCommit : bugFixingCommits) {
 
-            alerts.addAll(this.analyzeDiff(bugFixingCommit.getLeft(), bugFixingCommit.getRight()));
+            this.alerts.addAll(this.analyzeDiff(bugFixingCommit.getLeft(), bugFixingCommit.getRight()));
 			
 		}
 
@@ -146,7 +148,10 @@ public class GitProjectAnalysis {
                 String newFile = this.fetchBlob(bugFixingRevision, diff.getOldPath());
                 
                 try {
-                	alerts.addAll(GitProjectAnalysis.runSDJSB(oldFile, newFile));
+                	List<Alert> alertsFromAnalysis = GitProjectAnalysis.runSDJSB(oldFile, newFile);
+                	for(Alert alertFromAnalysis : alertsFromAnalysis) {
+                		this.alerts.add(new BatchAlert(alertFromAnalysis, this.projectName, bugFixingRevision, buggyRevision, diff.getOldPath(), diff.getNewPath()));
+                	}
                 }
                 catch(Exception ignore) { 
                 	System.err.println("Ignoring exception in ProjectAnalysis.runSDJSB.");
@@ -230,7 +235,7 @@ public class GitProjectAnalysis {
 	 * @return An instance of GitProjectAnalysis.
 	 * @throws GitProjectAnalysisException
 	 */
-	public static GitProjectAnalysis fromDirectory(String directory) throws GitProjectAnalysisException {
+	public static GitProjectAnalysis fromDirectory(String directory, String name) throws GitProjectAnalysisException {
         Git git;
         Repository repository;
 
@@ -240,8 +245,8 @@ public class GitProjectAnalysis {
 		} catch (IOException e) {
 			throw new GitProjectAnalysisException("The git project was not found in the directory " + directory + ".");
 		}
-        
-        return new GitProjectAnalysis(git, repository);
+
+        return new GitProjectAnalysis(git, repository, getGitProjectName(repository.getConfig().getString("remote", "origin", "url")));
 	}
 	
 	/**
@@ -290,7 +295,7 @@ public class GitProjectAnalysis {
             repository = git.getRepository();
         }
         
-        return new GitProjectAnalysis(git, repository);
+        return new GitProjectAnalysis(git, repository, getGitProjectName(uri));
 	}
 	
 	/**
@@ -302,7 +307,15 @@ public class GitProjectAnalysis {
 	 * @throws GitProjectAnalysisException
 	 */
 	private static File getGitDirectory(String uri, String directory) throws GitProjectAnalysisException {
-
+        return new File(directory, getGitProjectName(uri));
+	}
+	
+	/**
+	 * Extracts the git project name from the URI.
+	 * @param uri The uri (e.g., https://github.com/karma-runner/karma.git)
+	 * @return The project name.
+	 */
+	private static String getGitProjectName(String uri) throws GitProjectAnalysisException {
         /* Get the name of the project. */
         Pattern namePattern = Pattern.compile("([^/]+)\\.git");
         Matcher matcher = namePattern.matcher(uri);
@@ -311,7 +324,7 @@ public class GitProjectAnalysis {
         	throw new GitProjectAnalysisException("Could not find the .git name in the URI.");
         }
         
-        return new File(directory, matcher.group(1));
+        return matcher.group(1);
 	}
 
 	/**
