@@ -30,23 +30,24 @@ public class CFGFactory {
 	 * @param root
 	 * @return
 	 */
-	public static List<CFGNode> createCFGs(AstRoot root) {
+	public static List<CFG> createCFGs(AstRoot root) {
 		
-		List<CFGNode> cfgs = new LinkedList<CFGNode>();
-        List<LinearCFGNode> exitNodes;
+		/* Store the CFGs from all the functions. */
+		List<CFG> cfgs = new LinkedList<CFG>();
 		
-		/* First analyze the script. */
-        LinearCFGNode scriptEntry = new ScriptEntryCFGNode(root);
-        cfgs.add(scriptEntry);
+		/* Start by getting the CFG for the script. */
+		CFGNode entry = new ScriptEntryCFGNode(root);
+		CFGNode exit = new ScriptExitCFGNode(root);
+		
+        /* There is one entry point and one exit point for a script and function. */
+        CFG cfg = new CFG(entry);
+        cfg.addExitNode(exit);
         
-        /* Build the CFG for the function get back a list of exit nodes to link. */
-        exitNodes = CFGFactory.buildCFG(scriptEntry, root);
-        
-        /* For now, all exit nodes should point to the FunctionExitCFGNode. */
-        ScriptExitCFGNode scriptExitNode = new ScriptExitCFGNode(root);
-        for(LinearCFGNode exitNode : exitNodes) {
-            exitNode.setNext(scriptExitNode);
-        }
+        /* Build the CFG for the script. */
+        CFG subGraph = CFGFactory.build(root);
+        entry.mergeInto(subGraph.getEntryNode());
+        subGraph.mergeInto(exit);
+        cfgs.add(cfg);
 		
 		/* Get the list of functions in the script. */
 		List<FunctionNode> functions = FunctionNodeVisitor.getFunctions(root);
@@ -54,18 +55,20 @@ public class CFGFactory {
 		/* For each function, generate its CFG. */
 		for (FunctionNode function : functions) {
 			
-			/* Create an entry node for this function and add it to our CFG list. */
-			LinearCFGNode entry = new FunctionEntryCFGNode(function);
-			cfgs.add(entry);
+            /* Start by getting the CFG for the script. */
+            entry = new FunctionEntryCFGNode(function);
+            exit = new FunctionExitCFGNode(function);
+            
+            /* There is one entry point and one exit point for a script and function. */
+            cfg = new CFG(entry);
+            cfg.addExitNode(exit);
+            
+            /* Build the CFG for the script. */
+            subGraph = CFGFactory.build(function);
+            entry.mergeInto(subGraph.getEntryNode());
+            subGraph.mergeInto(exit);
+            cfgs.add(cfg);
 
-			/* Build the CFG for the function get back a list of exit nodes to link. */
-			exitNodes = CFGFactory.buildCFG(entry, function.getBody());
-			
-			/* For now, all exit nodes should point to the FunctionExitCFGNode. */
-			FunctionExitCFGNode functionExitNode = new FunctionExitCFGNode(function);
-			for(LinearCFGNode exitNode : exitNodes) {
-				exitNode.setNext(functionExitNode);
-			}
 		}
 		
 		return cfgs;
@@ -87,57 +90,90 @@ public class CFGFactory {
 		return "UNKNOWN";
 		
 	}
+	
+	/**
+	 * Builds a CFG for a block.
+	 * @param block The block statement.
+	 */
+	private static CFG build(Block block) {
+		return CFGFactory.buildBlock(block);
+	}
+	
+	/**
+	 * Builds a CFG for a script.
+	 * @param block The block statement.
+	 */
+	private static CFG build(AstRoot script) {
+		return CFGFactory.buildBlock(script);
+	}
 
 	/**
-	 * Builds a control flow subgraph.
+	 * Builds a CFG for a function or script.
+	 * @param block The block statement.
+	 */
+	private static CFG build(FunctionNode function) {
+		return CFGFactory.buildSwitch(function.getBody());
+	}
+
+	/**
+	 * Builds a CFG for a block, function or script.
+	 * @param block
+	 * @return The CFG for the block.
+	 */
+	private static CFG buildBlock(AstNode block) {
+		/* Special cases:
+		 * 	- First statement in block (set entry point for the CFG and won't need to merge previous into it).
+		 * 	- Last statement: The exit nodes for the block will be the same as the exit nodes for this statement.
+		 */
+		
+		AstNode firstChild = (AstNode) block.getFirstChild();
+		CFG subGraph = CFGFactory.buildSwitch(firstChild);
+		CFG cfg = new CFG(subGraph.getEntryNode());
+		CFG previous = subGraph;
+		
+		for(Node statement : block) {
+			
+			assert(statement instanceof AstNode);
+
+			if(statement == block || statement == block.getFirstChild()) continue;
+
+			subGraph = CFGFactory.buildSwitch((AstNode)statement);
+			previous.mergeInto(subGraph.getEntryNode());
+			previous = subGraph;
+			
+		}
+		
+		cfg.setExitNodes(subGraph.getExitNodes());
+		
+		return cfg;
+	}
+
+	/**
+	 * Builds a control flow subgraph for a statement.
 	 * @param entry The entry point for the subgraph.
 	 * @param exit The exit point for the subgraph.
 	 * @return A list of exit nodes for the subgraph.
 	 */
-	private static List<LinearCFGNode> buildCFG(LinearCFGNode entry, AstNode block) {
-		List<LinearCFGNode> exitNodes = new LinkedList<LinearCFGNode>();
-		Queue<AstNode> statements = CFGFactory.getStatementList(block);
-		LinearCFGNode current = entry;
+	private static CFG build(AstNode statement) {
 		
-		/* Iterate through the statements and build the graph. */
-		while(!statements.isEmpty()) {
-			AstNode statement = statements.remove();
-			LinearCFGNode node = new LinearCFGNode(statement);
-			current.setNext(node);
-			current = node;
-		}
-		
-		/* We only have one exit node right now. */
-		exitNodes.add(current);
+		CFGNode node = new LinearCFGNode(statement);
+		CFG cfg = new CFG(node);
+		cfg.addExitNode(node);
+		return cfg;
 
-		return exitNodes;
 	}
-
+	
 	/**
-	 * Get a list of statements for a block without exploring the subtrees of
-	 * branch statements.
-	 * @param astNode A statement or block.
-	 * @return A queue of statements in the block or a queue containing the
-	 * 		   single statement if astNode is not a block.
+	 * Calls the appropriate build method for the node type.
 	 */
-	private static Queue<AstNode> getStatementList(AstNode astNode) {
-		Queue<AstNode> statements = new LinkedList<AstNode>();
-		
-		if(astNode instanceof Block || astNode instanceof AstRoot) {
-			/* Get the block's children. They should all be statements. */
-			for(Node node : astNode) {
-				
-                assert(CFGFactory.isStatement(node));
-                statements.add((AstNode) node);
-				
-			}
+	private static CFG buildSwitch(AstNode node) {
+
+		if (node instanceof Block) {
+			return CFGFactory.build((Block) node);
+		} else {
+			return CFGFactory.build(node);
 		}
-		else {
-            assert(CFGFactory.isStatement(astNode));
-            statements.add(astNode);
-		}
-		
-		return statements;
+
 	}
 	
 	/**

@@ -19,8 +19,9 @@ public class LinearCFGNode extends CFGNode {
 		super(statement);
 	}
 	
-	public void setNext(CFGNode next) {
-		this.next = next;
+	@Override
+	public void mergeInto(CFGNode node) {
+		this.next = node;
 	}
 	
 	public CFGNode getNext() {

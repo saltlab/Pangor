@@ -14,4 +14,9 @@ public class FunctionExitCFGNode extends CFGNode {
 		return Token.typeToName(this.statement.getType()) + " EXIT";
 	}
 
+	@Override
+	public void mergeInto(CFGNode node) {
+		/* Nothing to do yet. */
+	}
+
 }

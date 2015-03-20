@@ -8,8 +8,8 @@ import org.junit.Test;
 import org.mozilla.javascript.Parser;
 import org.mozilla.javascript.ast.AstRoot;
 
+import ca.ubc.ece.salt.sdjsb.cfg.CFG;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGFactory;
-import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
 import junit.framework.TestCase;
 
 public class TestCFG extends TestCase {
@@ -23,12 +23,12 @@ public class TestCFG extends TestCase {
 		AstRoot root = parser.parse(new FileReader(file), file, 1);
 		
 		/* Create the CFG. */
-		List<CFGNode> cfgs = CFGFactory.createCFGs(root);
+		List<CFG> cfgs = CFGFactory.createCFGs(root);
 		
 		/* Print the CFG. */
 		int n = 1;
-		for(CFGNode cfg : cfgs) {
-			System.out.println("CFG" + n + ": " + CFGFactory.printCFG(cfg));
+		for(CFG cfg : cfgs) {
+			System.out.println("CFG" + n + ": " + CFGFactory.printCFG(cfg.getEntryNode()));
 			n++;
 		}
 
