@@ -12,6 +12,8 @@ import org.mozilla.javascript.ast.ContinueStatement;
 import org.mozilla.javascript.ast.ExpressionStatement;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.IfStatement;
+import org.mozilla.javascript.ast.Loop;
+import org.mozilla.javascript.ast.Scope;
 import org.mozilla.javascript.ast.SwitchStatement;
 import org.mozilla.javascript.ast.TryStatement;
 import org.mozilla.javascript.ast.VariableDeclaration;
@@ -84,6 +86,9 @@ public class CFGFactory {
 		else if(node instanceof LinearCFGNode) {
 			return node.toString() + "->" + CFGFactory.printCFG(((LinearCFGNode) node).getNext());
 		}
+		else if(node instanceof IfCFGNode) {
+			return node.toString() + "?{" + CFGFactory.printCFG(((IfCFGNode) node).getTrueBranch()) + ":" + CFGFactory.printCFG(((IfCFGNode) node).getFalseBranch()) + "}";
+		}
 		
 		return "UNKNOWN";
 		
@@ -95,6 +100,14 @@ public class CFGFactory {
 	 */
 	private static CFG build(Block block) {
 		return CFGFactory.buildBlock(block);
+	}
+
+	/**
+	 * Builds a CFG for a block.
+	 * @param block The block statement.
+	 */
+	private static CFG build(Scope scope) {
+		return CFGFactory.buildBlock(scope);
 	}
 	
 	/**
@@ -150,13 +163,41 @@ public class CFGFactory {
 		}
 		
 		if(previous != null) {
-            cfg.setExitNodes(previous.getExitNodes());
+            cfg.addAllExitNodes(previous.getExitNodes());
 		}
 		else {
 			assert(cfg == null);
 		}
 		
 		return cfg;
+	}
+	
+	/**
+	 * Builds a control flow subgraph for an if statement.
+	 * @param ifStatement
+	 * @return
+	 */
+	private static CFG build(IfStatement ifStatement) {
+		
+		IfCFGNode node = new IfCFGNode(ifStatement);
+		CFG cfg = new CFG(node);
+        cfg.addExitNode(node);
+		
+		CFG trueBranch = CFGFactory.buildSwitch(ifStatement.getThenPart());
+		CFG falseBranch = CFGFactory.buildSwitch(ifStatement.getElsePart());
+		
+		if(trueBranch != null) {
+			node.setTrueBranch(trueBranch.getEntryNode());
+			cfg.addAllExitNodes(trueBranch.getExitNodes());
+		} 		
+
+		if(falseBranch != null) {
+			node.setFalseBranch(falseBranch.getEntryNode());
+			cfg.addAllExitNodes(falseBranch.getExitNodes());
+		}
+		
+		return cfg;
+		
 	}
 
 	/**
@@ -178,11 +219,17 @@ public class CFGFactory {
 	 * Calls the appropriate build method for the node type.
 	 */
 	private static CFG buildSwitch(AstNode node) {
+		
+		if(node == null) return null;
 
 		if (node instanceof Block) {
 			return CFGFactory.build((Block) node);
+		} else if (node instanceof IfStatement) {
+			return CFGFactory.build((IfStatement) node);
 		} else if (node instanceof FunctionNode) {
 			return null; // Function declarations shouldn't be part of the CFG.
+		} else if (node instanceof Scope) {
+			return CFGFactory.build((Scope) node);
 		} else {
 			return CFGFactory.build(node);
 		}

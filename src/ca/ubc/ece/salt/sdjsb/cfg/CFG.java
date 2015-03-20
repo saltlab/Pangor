@@ -30,11 +30,11 @@ public class CFG {
 	}
 	
 	/**
-	 * Set the exit nodes. This overwrites any previously added exit nodes.
+	 * Adds all the exit nodes in the list.
 	 * @param nodes
 	 */
-	public void setExitNodes(List<CFGNode> nodes) {
-		this.exitNodes = nodes;
+	public void addAllExitNodes(List<CFGNode> nodes) {
+		this.exitNodes.addAll(nodes);
 	}
 	
 	/**

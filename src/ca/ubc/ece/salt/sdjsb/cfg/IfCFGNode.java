@@ -9,20 +9,23 @@ import org.mozilla.javascript.ast.AstNode;
  */
 public class IfCFGNode extends CFGNode {
 	
-	private CFG trueCFG;
-	private CFG falseCFG;
-	
 	private CFGNode trueBranch;
 	private CFGNode falseBranch;
 	
-	public IfCFGNode(AstNode statement, CFG trueCFG, CFG falseCFG) {
+	public IfCFGNode(AstNode statement) {
 		super(statement);
-		this.trueCFG = trueCFG;
-		this.falseCFG = falseCFG;
+	}
+	
+	public void setTrueBranch(CFGNode trueBranch) {
+		this.trueBranch = trueBranch;
 	}
 	
 	public CFGNode getTrueBranch() {
 		return this.trueBranch;
+	}
+
+	public void setFalseBranch(CFGNode falseBranch) {
+		this.falseBranch = falseBranch;
 	}
 	
 	public CFGNode getFalseBranch() {
@@ -32,19 +35,16 @@ public class IfCFGNode extends CFGNode {
 	@Override
 	public void mergeInto(CFGNode nextNode) {
 		
-//		if(trueCFG != null) {
-//			CFGFactory.merge(this.trueCFG.exitNodes, nextNode);
-//		}
-//		else {
-//			this.trueBranch = nextNode;
-//		}
-//
-//		if(falseCFG != null) {
-//			CFGFactory.merge(this.falseCFG.exitNodes, nextNode);
-//		}
-//		else {
-//			this.falseBranch = nextNode;
-//		}
+		/* If either of the branches is null, there is no subgraph for that
+		 * path, so we merge this node directly into the next node. */
+		
+		if(this.trueBranch == null) {
+			this.trueBranch = nextNode;
+		}
+
+		if(this.falseBranch == null) {
+			this.falseBranch = nextNode;
+		}
 		
 	}
 
