@@ -2,7 +2,6 @@ package ca.ubc.ece.salt.sdjsb.cfg;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import org.mozilla.javascript.Node;
 import org.mozilla.javascript.ast.AstNode;
@@ -13,7 +12,6 @@ import org.mozilla.javascript.ast.ContinueStatement;
 import org.mozilla.javascript.ast.ExpressionStatement;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.IfStatement;
-import org.mozilla.javascript.ast.ScriptNode;
 import org.mozilla.javascript.ast.SwitchStatement;
 import org.mozilla.javascript.ast.TryStatement;
 import org.mozilla.javascript.ast.VariableDeclaration;
@@ -126,24 +124,37 @@ public class CFGFactory {
 		 * 	- Last statement: The exit nodes for the block will be the same as the exit nodes for this statement.
 		 */
 		
-		AstNode firstChild = (AstNode) block.getFirstChild();
-		CFG subGraph = CFGFactory.buildSwitch(firstChild);
-		CFG cfg = new CFG(subGraph.getEntryNode());
-		CFG previous = subGraph;
+		CFG cfg = null;
+		CFG previous = null;
 		
 		for(Node statement : block) {
 			
 			assert(statement instanceof AstNode);
 
-			if(statement == block || statement == block.getFirstChild()) continue;
+			CFG subGraph = CFGFactory.buildSwitch((AstNode)statement);
+			
+			if(subGraph != null) {
 
-			subGraph = CFGFactory.buildSwitch((AstNode)statement);
-			previous.mergeInto(subGraph.getEntryNode());
-			previous = subGraph;
+				if(previous == null) {
+					/* The first subgraph we find is the entry point to this graph. */
+                    cfg = new CFG(subGraph.getEntryNode());
+				}
+				else {
+					/* Merge the previous subgraph into the entry point of this subgraph. */
+                    previous.mergeInto(subGraph.getEntryNode());
+				}
+
+                previous = subGraph;
+			}
 			
 		}
 		
-		cfg.setExitNodes(subGraph.getExitNodes());
+		if(previous != null) {
+            cfg.setExitNodes(previous.getExitNodes());
+		}
+		else {
+			assert(cfg == null);
+		}
 		
 		return cfg;
 	}
@@ -170,6 +181,8 @@ public class CFGFactory {
 
 		if (node instanceof Block) {
 			return CFGFactory.build((Block) node);
+		} else if (node instanceof FunctionNode) {
+			return null; // Function declarations shouldn't be part of the CFG.
 		} else {
 			return CFGFactory.build(node);
 		}
