@@ -11,6 +11,7 @@ public class IfCFGNode extends CFGNode {
 	
 	private CFGNode trueBranch;
 	private CFGNode falseBranch;
+	public CFGNode mergeNode;
 	
 	public IfCFGNode(AstNode statement) {
 		super(statement);
@@ -37,6 +38,8 @@ public class IfCFGNode extends CFGNode {
 		
 		/* If either of the branches is null, there is no subgraph for that
 		 * path, so we merge this node directly into the next node. */
+		
+		this.mergeNode = nextNode;
 		
 		if(this.trueBranch == null) {
 			this.trueBranch = nextNode;

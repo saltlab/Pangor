@@ -84,10 +84,13 @@ public class CFGFactory {
 			return node.toString();
 		}
 		else if(node instanceof LinearCFGNode) {
+			if(((LinearCFGNode) node).getNext().mergePoint) {
+                return node.toString();
+			}
 			return node.toString() + "->" + CFGFactory.printCFG(((LinearCFGNode) node).getNext());
 		}
 		else if(node instanceof IfCFGNode) {
-			return node.toString() + "?{" + CFGFactory.printCFG(((IfCFGNode) node).getTrueBranch()) + ":" + CFGFactory.printCFG(((IfCFGNode) node).getFalseBranch()) + "}";
+			return node.toString() + "?{" + CFGFactory.printCFG(((IfCFGNode) node).getTrueBranch()) + ":" + CFGFactory.printCFG(((IfCFGNode) node).getFalseBranch()) + "}" + "->" + CFGFactory.printCFG(((IfCFGNode) node).mergeNode);
 		}
 		
 		return "UNKNOWN";
