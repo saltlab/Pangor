@@ -11,6 +11,12 @@ import ca.ubc.ece.salt.sdjsb.checker.specialtype.SpecialTypeMap.SpecialType;
 
 public class TestSpecialTypeHandling extends TestSDJSB {
 	
+	private void runTest(String[] args, List<Alert> expectedAlerts, boolean printAlerts) {
+		List<String> checkers = new LinkedList<String>();
+		checkers.add("ca.ubc.ece.salt.sdjsb.checker.specialtype.SpecialTypeChecker");
+		super.runTest(args, checkers, expectedAlerts, printAlerts);
+	}
+	
 	@Test
 	public void testUndefined(){
 		String src = "./test/input/special_type_handling/sth_undefined_old.js";

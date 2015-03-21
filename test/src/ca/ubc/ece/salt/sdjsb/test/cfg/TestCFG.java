@@ -10,6 +10,7 @@ import org.mozilla.javascript.ast.AstRoot;
 
 import ca.ubc.ece.salt.sdjsb.cfg.CFG;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGFactory;
+import ca.ubc.ece.salt.sdjsb.cfg.CFGPrinter;
 import junit.framework.TestCase;
 
 public class TestCFG extends TestCase {
@@ -28,7 +29,8 @@ public class TestCFG extends TestCase {
 		/* Print the CFG. */
 		int n = 1;
 		for(CFG cfg : cfgs) {
-			System.out.println("CFG" + n + ": " + CFGFactory.printCFG(cfg.getEntryNode()));
+            CFGPrinter printer = new CFGPrinter(cfg);
+			System.out.println("CFG" + n + ": " + printer.print());
 			n++;
 		}
 

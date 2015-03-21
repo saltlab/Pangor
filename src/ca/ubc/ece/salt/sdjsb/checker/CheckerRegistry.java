@@ -1,5 +1,7 @@
 package ca.ubc.ece.salt.sdjsb.checker;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,13 +45,25 @@ public class CheckerRegistry {
 	 * 				  their analysis.
 	 */
 	public CheckerRegistry(CheckerContext context) {
-		
+
 		this.checkerContext = context;
-		
 		this.activeCheckers = new LinkedList<AbstractChecker>();
 
-		/* Create and add the default checkers. */
-		this.activeCheckers.add(new SpecialTypeChecker(this.checkerContext));
+	}
+
+	/**
+	 * Registers a checker to run. Be careful, a lot could go wrong here.
+	 * @param checker The checker class to instantiate.
+	 * @throws IllegalArgumentException 
+	 * @throws IllegalAccessException 
+	 * @throws InstantiationException 
+	 * @throws ClassNotFoundException 
+	 */
+	public void register(String checker) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException, IllegalArgumentException, ClassNotFoundException {
+		Class<?> c = Class.forName(checker);
+		Constructor<?> constructor = c.getConstructor(CheckerContext.class);
+		AbstractChecker concreteChecker = (AbstractChecker) constructor.newInstance(this.checkerContext);
+		this.activeCheckers.add(concreteChecker);
 	}
 	
 	/**
@@ -103,14 +117,6 @@ public class CheckerRegistry {
 			alerts.addAll(checker.getAlerts());
 		}
 		return alerts;
-	}
-	
-	/**
-	 * Register a third party checker.
-	 * @param checker
-	 */
-	public void register(AbstractChecker checker) {
-		this.activeCheckers.add(checker);
 	}
 	
 	/**

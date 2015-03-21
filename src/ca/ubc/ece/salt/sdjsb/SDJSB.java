@@ -2,6 +2,7 @@ package ca.ubc.ece.salt.sdjsb;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -38,7 +39,7 @@ public class SDJSB  {
 			e.printStackTrace();
 			return;
 		}
-
+		
         List<Alert> alerts = SDJSB.analyze(options);
 
         System.out.println("Alerts:");
@@ -47,11 +48,33 @@ public class SDJSB  {
         }
 	}
 
+	/**
+	 * Analyze the files given in the options and use the default checkers.
+	 */
 	public static List<Alert> analyze(DiffOptions options) {
 		return SDJSB.analyze(options, null, null);
 	}
 
+	/**
+	 * Analyze the files and use the default checkers.
+	 */
 	public static List<Alert> analyze(DiffOptions options, String sourceFile, String destinationFile) {
+		List<String> checkers = new LinkedList<String>();
+		checkers.add("ca.ubc.ece.salt.sdjsb.checker.specialtype.SpecialTypeChecker");
+		return SDJSB.analyze(options,  checkers, sourceFile, destinationFile);
+	}
+
+	/**
+	 * Analyze the files given in the options with the given checkers.
+	 */
+	public static List<Alert> analyze(DiffOptions options, List<String> checkers) {
+		return SDJSB.analyze(options,  checkers, null, null);
+	}
+
+	/**
+	 * Analyze the files with the given checkers.
+	 */
+	public static List<Alert> analyze(DiffOptions options, List<String> checkers, String sourceFile, String destinationFile) {
 
         /* Create the abstract GumTree representations of the ASTs.
          * 
@@ -101,7 +124,7 @@ public class SDJSB  {
 		/* Produce the diff object that we will use to infer properties of
 		 * repairs. */
 		try{
-            return SDJSB.produce(src, dst, srcTreeNodeMap, dstTreeNodeMap, matcher);
+            return SDJSB.produce(checkers, src, dst, srcTreeNodeMap, dstTreeNodeMap, matcher);
 		} catch (IOException e) {
         	System.err.println(e.getMessage());
         	return null;
@@ -117,7 +140,7 @@ public class SDJSB  {
 	 * @param matcher The set of source nodes matched to destination nodes.
 	 * @throws IOException
 	 */
-	private static List<Alert> produce(Tree src, Tree dst, Map<AstNode, Tree> srcTreeNodeMap, Map<AstNode, Tree> dstTreeNodeMap, Matcher matcher) throws IOException {
+	private static List<Alert> produce(List<String> checkers, Tree src, Tree dst, Map<AstNode, Tree> srcTreeNodeMap, Map<AstNode, Tree> dstTreeNodeMap, Matcher matcher) throws IOException {
 		
 		/* Classify parts of each tree as deleted, added, moved or updated. The
 		 * source tree nodes can be deleted or updated, while the destination
@@ -138,6 +161,15 @@ public class SDJSB  {
 		/* Create the 'event bus' for the repair checkers. */
 		CheckerContext checkerContext = new CheckerContext(src, dst, srcTreeNodeMap, dstTreeNodeMap, c, mappings);
 		CheckerRegistry checkerRegistry = new CheckerRegistry(checkerContext);
+		
+		/* Register the checkers. */
+		for(String checker : checkers) {
+			try {
+                checkerRegistry.register(checker);
+			} catch (Exception e) {
+				System.out.println("WARNING: Unable to register checker '" + checker + "'.");
+			}
+		}
 		
 		/* Run the analysis. */
 		checkerRegistry.analyze();

@@ -12,7 +12,7 @@ import junit.framework.TestCase;
 
 public abstract class TestSDJSB extends TestCase {
 	
-	public void runTest(String[] args, List<Alert> expectedAlerts, boolean printAlerts) {
+	protected void runTest(String[] args, List<String> checkers, List<Alert> expectedAlerts, boolean printAlerts) {
 
 		/* Parse the options. */
 		DiffOptions options = new DiffOptions();
@@ -27,7 +27,7 @@ public abstract class TestSDJSB extends TestCase {
 		}
 
 		/* Run SDJSB. */
-        List<Alert> actualAlerts = SDJSB.analyze(options);
+        List<Alert> actualAlerts = SDJSB.analyze(options, checkers);
         
         /* Output if needed. */
         if(printAlerts) {

@@ -12,7 +12,6 @@ import org.mozilla.javascript.ast.ContinueStatement;
 import org.mozilla.javascript.ast.ExpressionStatement;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.IfStatement;
-import org.mozilla.javascript.ast.Loop;
 import org.mozilla.javascript.ast.Scope;
 import org.mozilla.javascript.ast.SwitchStatement;
 import org.mozilla.javascript.ast.TryStatement;
@@ -72,29 +71,6 @@ public class CFGFactory {
 		}
 		
 		return cfgs;
-	}
-	
-	/**
-	 * Prints a serial representation of the CFG.
-	 * @param node
-	 */
-	public static String printCFG(CFGNode node) {
-		
-		if(node instanceof FunctionExitCFGNode || node instanceof ScriptExitCFGNode) {
-			return node.toString();
-		}
-		else if(node instanceof LinearCFGNode) {
-			if(((LinearCFGNode) node).getNext().mergePoint) {
-                return node.toString();
-			}
-			return node.toString() + "->" + CFGFactory.printCFG(((LinearCFGNode) node).getNext());
-		}
-		else if(node instanceof IfCFGNode) {
-			return node.toString() + "?{" + CFGFactory.printCFG(((IfCFGNode) node).getTrueBranch()) + ":" + CFGFactory.printCFG(((IfCFGNode) node).getFalseBranch()) + "}" + "->" + CFGFactory.printCFG(((IfCFGNode) node).mergeNode);
-		}
-		
-		return "UNKNOWN";
-		
 	}
 	
 	/**

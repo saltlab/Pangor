@@ -6,6 +6,7 @@ import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
 
 import fr.labri.gumtree.actions.TreeClassifier;
+import fr.labri.gumtree.io.ParserASTNode;
 import fr.labri.gumtree.matchers.MappingStore;
 import fr.labri.gumtree.tree.Tree;
 
@@ -80,6 +81,32 @@ public class CheckerContext {
 	}
 	
 	/**
+	 * Gets the destination node that maps to the given source node.
+	 * @param node The source node.
+	 * @return The destination node.
+	 */
+	public AstNode getDstNodeMapping(AstNode node) {
+		Tree src = this.getSrcTree(node);
+		Tree dst = this.mappings.getDst(src);
+		if(dst == null) return null;
+		ParserASTNode<AstNode> dstNode = dst.getASTNode();
+		return dstNode.getASTNode();
+	}
+
+	/**
+	 * Gets the source node that maps to the given destination node.
+	 * @param node The destination node.
+	 * @return The source node.
+	 */
+	public AstNode getSrcNodeMapping(AstNode node) {
+		Tree dst = this.getDstTree(node);
+		Tree src = this.mappings.getDst(dst);
+		if(src == null) return null;
+		ParserASTNode<AstNode> srcNode = src.getASTNode();
+		return srcNode.getASTNode();
+	}
+	
+	/**
 	 * Returns the change operation that produced the destination Tree node.
 	 * 
 	 * @return null if there is no corresponding Tree node for the given 
@@ -118,7 +145,7 @@ public class CheckerContext {
 
         return ChangeType.UNCHANGED;
 	}
-
+	
 	/**
 	 * Returns the change operation that produced the source Tree node.
 	 * 

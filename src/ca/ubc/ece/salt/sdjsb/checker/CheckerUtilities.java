@@ -10,6 +10,30 @@ import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ParenthesizedExpression;
 
 public class CheckerUtilities {
+	
+	/**
+	 * Returns the top level identifier for a node. If the node is a name, it will
+	 * check the parent nodes until it gets to the top of the identifier.
+	 * @param node A subnode of an identifier.
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
+	public static AstNode getTopLevelIdentifier(AstNode node) throws IllegalArgumentException {
+		
+		/* If this node is a field or method, get the parent. */
+		if(node.getParent() instanceof InfixExpression) {
+
+			InfixExpression ie = (InfixExpression) node.getParent();
+
+			if(CheckerUtilities.isIdentifierOperator(ie.getOperator())) {
+				return CheckerUtilities.getTopLevelIdentifier(ie);
+			}
+			
+		}
+		
+		return node;
+		
+	}
 
 	/**
 	 * Returns the variable, field or function identifier for the AstNode. If
