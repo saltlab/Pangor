@@ -174,7 +174,7 @@ public class CheckerContext {
             Tree tree = this.getSrcTree(node);
 
             if(tree != null) {
-                if(this.treeClassifier.getSrcDelTrees().contains(tree)) return ChangeType.INSERT;
+                if(this.treeClassifier.getSrcDelTrees().contains(tree)) return ChangeType.DELETE;
                 if(this.treeClassifier.getSrcMvTrees().contains(tree)) return ChangeType.MOVE;
                 if(this.treeClassifier.getSrcUpdTrees().contains(tree)) return ChangeType.UPDATE;
             }

@@ -9,7 +9,6 @@ import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.NodeVisitor;
 
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext.ChangeType;
-import ca.ubc.ece.salt.sdjsb.checker.specialtype.SpecialTypeChecker;
 import fr.labri.gumtree.io.ParserASTNode;
 import fr.labri.gumtree.tree.Tree;
 
@@ -248,13 +247,17 @@ public class CheckerRegistry {
 		}
 		
 		public boolean visit(AstNode node) {
-			ChangeType changeType;
+			ChangeType changeType = ChangeType.UNCHANGED;
 			
 			/* If this is a delete operation, we need to look in the source
 			 * change list because deletes are not present in the destination
 			 * change list. */
 			if(this.changeType == ChangeType.DELETE) changeType = this.context.getSrcChangeFlag(node);
-			else changeType = this.context.getDstChangeFlag(node);
+			else if(this.changeType == ChangeType.INSERT) changeType = this.context.getDstChangeFlag(node);
+			else if(this.changeType == ChangeType.UPDATE || this.changeType == ChangeType.MOVE) {
+				changeType = this.context.getSrcChangeFlag(node);
+				if(this.changeType == ChangeType.UNCHANGED) changeType = this.context.getDstChangeFlag(node);
+			}
 
 			if(changeType != this.changeType && changeType != ChangeType.UNCHANGED) {
 				return false;

@@ -60,7 +60,9 @@ public class SDJSB  {
 	 */
 	public static List<Alert> analyze(DiffOptions options, String sourceFile, String destinationFile) {
 		List<String> checkers = new LinkedList<String>();
-		checkers.add("ca.ubc.ece.salt.sdjsb.checker.specialtype.SpecialTypeChecker");
+		//checkers.add("ca.ubc.ece.salt.sdjsb.checker.specialtype.SpecialTypeChecker");
+		//checkers.add("ca.ubc.ece.salt.sdjsb.checker.doesnotexist.DoesNotExistChecker");
+		checkers.add("ca.ubc.ece.salt.sdjsb.checker.notdefined.NotDefinedChecker");
 		return SDJSB.analyze(options,  checkers, sourceFile, destinationFile);
 	}
 

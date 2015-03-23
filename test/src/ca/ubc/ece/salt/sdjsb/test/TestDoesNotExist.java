@@ -18,11 +18,27 @@ public class TestDoesNotExist extends TestSDJSB {
 	}
 	
 	@Test
-	public void testUndefined(){
-		String src = "./test/input/not_defined/ActionMethods_old.js";
-		String dst = "./test/input/not_defined/ActionMethods_new.js";
+	public void testDoesNotExist(){
+		String src = "./test/input/does_not_exist/ActionMethods_old.js";
+		String dst = "./test/input/does_not_exist/ActionMethods_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
 		expectedAlerts.add(new DoesNotExistAlert("DNE", "action.data.action_name", "action.action_name", NameType.FIELD));
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	@Test
+	public void testInsert(){
+		String src = "./test/input/does_not_exist/ProcessContainer_unknown_old.js";
+		String dst = "./test/input/does_not_exist/ProcessContainer_unknown_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+	}
+
+	@Test
+	public void testMove(){
+		String src = "./test/input/does_not_exist/ProcessContainer_old.js";
+		String dst = "./test/input/does_not_exist/ProcessContainer_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 

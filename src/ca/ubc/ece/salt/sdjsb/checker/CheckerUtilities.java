@@ -10,6 +10,31 @@ import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ParenthesizedExpression;
 
 public class CheckerUtilities {
+
+	/**
+	 * Returns the top level identifier for a node. If the node is a name, it will
+	 * check the parent nodes until it gets to the top of the identifier.
+	 * @param node A subnode of an identifier.
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
+	public static AstNode getTopLevelFieldIdentifier(AstNode node) throws IllegalArgumentException {
+		
+		/* If this node is a field or method, get the parent. */
+		if(node.getParent() instanceof InfixExpression) {
+
+			InfixExpression ie = (InfixExpression) node.getParent();
+
+			if(CheckerUtilities.isIdentifierOperator(ie.getOperator()) && 
+			   !(ie.getLeft() instanceof FunctionCall || ie.getRight() instanceof FunctionCall)) {
+				return CheckerUtilities.getTopLevelIdentifier(ie);
+			}
+			
+		}
+		
+		return node;
+		
+	}
 	
 	/**
 	 * Returns the top level identifier for a node. If the node is a name, it will
@@ -100,6 +125,13 @@ public class CheckerUtilities {
             return true;
         }
         return false;
+    }
+    
+    public static boolean isAssignmentOperator(int tokenType) {
+    	if(tokenType == Token.ASSIGN || tokenType == Token.COLON) {
+    		return true;
+    	}
+    	return false;
     }
 
 }
