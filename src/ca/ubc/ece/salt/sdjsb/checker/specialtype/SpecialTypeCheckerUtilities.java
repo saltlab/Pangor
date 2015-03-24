@@ -6,16 +6,9 @@ import java.util.TreeSet;
 import org.apache.commons.lang3.ArrayUtils;
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
-import org.mozilla.javascript.ast.AstRoot;
-import org.mozilla.javascript.ast.ConditionalExpression;
-import org.mozilla.javascript.ast.DoLoop;
-import org.mozilla.javascript.ast.ForLoop;
-import org.mozilla.javascript.ast.IfStatement;
-import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.KeywordLiteral;
 import org.mozilla.javascript.ast.NumberLiteral;
 import org.mozilla.javascript.ast.StringLiteral;
-import org.mozilla.javascript.ast.WhileLoop;
 
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerUtilities;
@@ -66,39 +59,6 @@ public class SpecialTypeCheckerUtilities {
 	}
 
 	/**
-	 * Check if the node is part of a conditional expression and is being
-	 * checked if it is truthy or falsey.
-	 * @param node
-	 */
-	public static boolean isFalsey(AstNode node) {
-
-		AstNode parent = node.getParent();
-		String identifier = CheckerUtilities.getIdentifier(node);
-		
-		if(identifier == null) return false;
-		
-		/* If this is a direct child of a branch statement's condition, it is a
-		 * truthy/falsey identifier. */
-		if(parent instanceof IfStatement
-		   || parent instanceof DoLoop
-		   || parent instanceof ForLoop
-		   || parent instanceof WhileLoop
-		   || parent instanceof ConditionalExpression) {
-			
-			return true;
-		}
-		
-		/* If this is a direct child of an AND or OR operator, it is a
-		 * truthy/falsey identifier. */
-		if(parent instanceof InfixExpression) {
-			InfixExpression ie = (InfixExpression) parent;
-			if(ie.getOperator() == Token.OR || ie.getOperator() == Token.AND) return true;
-		}
-		
-		return false;
-	}
-
-	/**
 	 * Checks if the identifier was used in the branch before modifications.
 	 * @param node The branch statement to look for uses in.
 	 * @param identifier The variable/field/function identifier that is being
@@ -119,68 +79,6 @@ public class SpecialTypeCheckerUtilities {
         
         return true;
 	}
-
-	/**
-	 * Gets the branch statement who's condition contains the given node.
-	 * @param node The node that has been inserted into the destination tree.
-	 * @return The branch statement (i.e. if, do, while, for, condition) or
-	 * 		   null if the node is not part of a branch condition statement.
-	 */
-	public static AstNode getBranchStatement(AstNode node) {
-		AstNode parent = node.getParent();
-        
-        /* Walk up the tree until we get to the branch statement. */
-        while(true) {
-            if(parent instanceof IfStatement) { 
-                if(SpecialTypeCheckerUtilities.contains(((IfStatement) parent).getCondition(), node)) return parent; 
-                else return null;
-            }
-            if(parent instanceof DoLoop) { 
-                if(SpecialTypeCheckerUtilities.contains(((DoLoop) parent).getCondition(), node)) return parent; 
-                else return null;
-            }
-            if(parent instanceof ForLoop) {
-                if(SpecialTypeCheckerUtilities.contains(((ForLoop) parent).getCondition(), node)) return parent;
-                else return null;
-            }
-            if(parent instanceof WhileLoop) {
-                if(SpecialTypeCheckerUtilities.contains(((WhileLoop) parent).getCondition(), node)) return parent;
-                else return null;
-            }
-            if(parent instanceof ConditionalExpression) { 
-                if(SpecialTypeCheckerUtilities.contains(((ConditionalExpression) parent).getTestExpression(), node)) return parent; 
-                else return null;
-            }
-            if(parent instanceof AstRoot) return null; // The branch statement was not found.
-            parent = parent.getParent();
-        }
-	}
-	
-	/**
-	 * Checks if one AstNode is a child of another AstNode.
-	 * @param parent The parent AstNode to check.
-	 * @param child The child AstNode to look for.
-	 * @return True if {@code parent} contains {@code child}.
-	 */
-	public static boolean contains(AstNode parent, AstNode child) {
-		ContainsTreeVisitor visitor = new ContainsTreeVisitor(child);
-		parent.visit(visitor);
-		return visitor.contains;
-	}
-
-	/**
-	 * Returns true if the operator for the binary expression is an equivalence
-	 * operator (i.e. ==, !=, ===, !==).
-	 * @param tokenType The operator type.
-	 * @return
-	 */
-    public static boolean isEquivalenceOperator(int tokenType) {
-        if(tokenType == Token.SHEQ || tokenType == Token.SHNE
-            || tokenType == Token.EQ || tokenType == Token.NE) {
-            return true;
-        }
-        return false;
-    }
     
     /**
      * Returns true if the operator represents an operation where the 

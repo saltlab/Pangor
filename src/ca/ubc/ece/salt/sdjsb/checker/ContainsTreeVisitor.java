@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.checker.specialtype;
+package ca.ubc.ece.salt.sdjsb.checker;
 
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.NodeVisitor;

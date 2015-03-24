@@ -1,20 +1,15 @@
 package ca.ubc.ece.salt.sdjsb.checker.callbackparam;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.Name;
-import org.mozilla.javascript.ast.NodeVisitor;
-import org.mozilla.javascript.ast.VariableDeclaration;
-import org.mozilla.javascript.ast.VariableInitializer;
 
 import ca.ubc.ece.salt.sdjsb.checker.AbstractChecker;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext.ChangeType;
-import fr.labri.gumtree.io.ParserASTNode;
+import ca.ubc.ece.salt.sdjsb.checker.CheckerUtilities;
 
 /**
  * Detects repairs that fix undefined variables.
@@ -28,7 +23,7 @@ import fr.labri.gumtree.io.ParserASTNode;
  */
 public class CallbackParameterChecker extends AbstractChecker {
 	
-	private static final String TYPE = "CBP";
+	private static final String TYPE = "CB";
 	
 	public CallbackParameterChecker(CheckerContext context) {
 		super(context);
@@ -70,17 +65,8 @@ public class CallbackParameterChecker extends AbstractChecker {
                     /* Is the function declaration unchanged? */
                     if(this.context.getDstChangeOp(function) != ChangeType.INSERT) {
                     	
-                    	/* Build the signature. */
-                    	String signature = "(";
-                    	for(AstNode param : params) {
-                    		if(param instanceof Name) {
-                    			if(!signature.equals("(")) signature += ",";
-                    			signature += ((Name)param).getIdentifier();
-                    		}
-                    		signature += ")";
-                    	}
-
                     	/* Register the alert. */
+                    	String signature = CheckerUtilities.getFunctionSignature(function);
                         this.registerAlert(new CallbackParameterAlert(this.getCheckerType(), function.getName(), signature, name.getIdentifier()));
                         
                     }

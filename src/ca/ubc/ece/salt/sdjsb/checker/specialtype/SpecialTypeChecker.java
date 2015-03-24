@@ -4,7 +4,6 @@ import java.util.EnumSet;
 
 import org.mozilla.javascript.ast.Assignment;
 import org.mozilla.javascript.ast.AstNode;
-import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.VariableInitializer;
 
 import ca.ubc.ece.salt.sdjsb.checker.AbstractChecker;
@@ -122,9 +121,9 @@ public class SpecialTypeChecker extends AbstractChecker {
 	private void storeFalsey(SpecialTypeMap specialTypeMap, AstNode node) {
 		String identifier = CheckerUtilities.getIdentifier(node);
 		
-		if(identifier != null && SpecialTypeCheckerUtilities.isFalsey(node)) {
+		if(identifier != null && CheckerUtilities.isFalsey(node)) {
 
-            AstNode branchStatement = SpecialTypeCheckerUtilities.getBranchStatement(node);
+            AstNode branchStatement = CheckerUtilities.getBranchStatement(node);
             
             if(branchStatement != null && SpecialTypeCheckerUtilities.isUsed(this.context, branchStatement, identifier)) {
                 specialTypeMap.add(identifier, SpecialType.FALSEY);
@@ -140,28 +139,20 @@ public class SpecialTypeChecker extends AbstractChecker {
 	 * @param type The special type being compared.
 	 */
 	private void storeComparison(SpecialTypeMap specialTypeMap, AstNode node, SpecialType type) {
-		AstNode parent = node.getParent();
 		
-		/* Handle comparisons to a special type. */
-		if(parent instanceof InfixExpression) {
-			InfixExpression ie = (InfixExpression) parent;
-			
-			/* The comparison must be an equivalence comparison */
-			if(SpecialTypeCheckerUtilities.isEquivalenceOperator(ie.getOperator())) {
-				
-				String identifier = CheckerUtilities.getIdentifier(ie.getLeft());
-				
-				if(identifier != null) {
+		AstNode comparedTo = CheckerUtilities.getComparison(node);
+		if(comparedTo == null) return;
+		String identifier = CheckerUtilities.getIdentifier(comparedTo);
+		
+        if(identifier != null) {
 
-                    AstNode branchStatement = SpecialTypeCheckerUtilities.getBranchStatement(node);
-                    
-                    if(branchStatement != null && SpecialTypeCheckerUtilities.isUsed(this.context, branchStatement, identifier)) {
-                        specialTypeMap.add(identifier, type);
-                    }
+            AstNode branchStatement = CheckerUtilities.getBranchStatement(node);
+            
+            if(branchStatement != null && SpecialTypeCheckerUtilities.isUsed(this.context, branchStatement, identifier)) {
+                specialTypeMap.add(identifier, type);
+            }
 					
-				}
-			}
-		}
+        }
 	}
 	
 	/**

@@ -17,11 +17,11 @@ public class TestCallbackParameter extends TestSDJSB {
 	}
 	
 	@Test
-	public void testNotDefined(){
+	public void testMissingErrorParameter(){
 		String src = "./test/input/callback_parameter/cbp_old.js";
 		String dst = "./test/input/callback_parameter/cbp_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
-		expectedAlerts.add(new CallbackParameterAlert("CBP", "donePrinting", "(err)", "err"));
+		expectedAlerts.add(new CallbackParameterAlert("CB", "donePrinting", "(err)", "err"));
 		this.runTest(new String[] {src, dst}, expectedAlerts, true);
 	}
 

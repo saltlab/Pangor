@@ -63,7 +63,8 @@ public class SDJSB  {
 		//checkers.add("ca.ubc.ece.salt.sdjsb.checker.specialtype.SpecialTypeChecker"); // OK (50%)
 		//checkers.add("ca.ubc.ece.salt.sdjsb.checker.doesnotexist.DoesNotExistChecker"); // DO NOT USE (0%)
 		//checkers.add("ca.ubc.ece.salt.sdjsb.checker.notdefined.NotDefinedChecker"); // OK (100%)
-		checkers.add("ca.ubc.ece.salt.sdjsb.checker.callbackparam.CallbackParameterChecker"); // UNDER TEST
+		//checkers.add("ca.ubc.ece.salt.sdjsb.checker.callbackparam.CallbackParameterChecker"); // OK (63%)
+		checkers.add("ca.ubc.ece.salt.sdjsb.checker.callbackerror.CallbackErrorChecker"); // OK (78%)
 		return SDJSB.analyze(options,  checkers, sourceFile, destinationFile);
 	}
 
