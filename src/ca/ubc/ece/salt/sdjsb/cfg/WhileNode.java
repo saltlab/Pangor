@@ -4,16 +4,16 @@ import org.mozilla.javascript.ast.AstNode;
 
 /**
  * A CFGNode that has two exit edges: one for the true condition and one for
- * the false condition.
- * @author qhanam
+ * the false condition. The WhileNode also contains a loop on exit from the
+ * true condition.
  */
-public class IfCFGNode extends CFGNode {
+public class WhileNode extends CFGNode {
 	
 	private CFGNode trueBranch;
 	private CFGNode falseBranch;
 	public CFGNode mergeNode;
 	
-	public IfCFGNode(AstNode statement) {
+	public WhileNode(AstNode statement) {
 		super(statement);
 	}
 	
@@ -24,10 +24,6 @@ public class IfCFGNode extends CFGNode {
 	public CFGNode getTrueBranch() {
 		return this.trueBranch;
 	}
-
-	public void setFalseBranch(CFGNode falseBranch) {
-		this.falseBranch = falseBranch;
-	}
 	
 	public CFGNode getFalseBranch() {
 		return this.falseBranch;
@@ -36,18 +32,19 @@ public class IfCFGNode extends CFGNode {
 	@Override
 	public void mergeInto(CFGNode nextNode) {
 		
-		/* If either of the branches is null, there is no subgraph for that
-		 * path, so we merge this node directly into the next node. */
-		
 		this.mergeNode = nextNode;
 		
+		/* The true branch is a loop. If there are no subgraphs, the statement
+		 * loops back into itself (which in JavaScript is an infinite loop). */
+		
 		if(this.trueBranch == null) {
-			this.trueBranch = nextNode;
+			this.trueBranch = this;
 		}
 
-		if(this.falseBranch == null) {
-			this.falseBranch = nextNode;
-		}
+		/* The false branch is merged directly into the next node after the 
+		 * statement. */
+
+        this.falseBranch = nextNode;
 		
 	}
 

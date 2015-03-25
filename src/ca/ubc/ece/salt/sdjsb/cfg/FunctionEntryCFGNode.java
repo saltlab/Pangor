@@ -6,7 +6,7 @@ import org.mozilla.javascript.ast.FunctionNode;
 /**
  * A function entry point for a CFG.
  */
-public class FunctionEntryCFGNode extends LinearCFGNode {
+public class FunctionEntryCFGNode extends StatementNode {
 
 	public FunctionEntryCFGNode(FunctionNode statement) {
 		super(statement);

@@ -11,11 +11,11 @@ import org.mozilla.javascript.ast.AstNode;
  * 
  * @author qhanam
  */
-public class LinearCFGNode extends CFGNode {
+public class StatementNode extends CFGNode {
 	
 	private CFGNode next;
 	
-	public LinearCFGNode(AstNode statement) {
+	public StatementNode(AstNode statement) {
 		super(statement);
 	}
 	

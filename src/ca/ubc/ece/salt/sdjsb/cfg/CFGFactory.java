@@ -16,6 +16,7 @@ import org.mozilla.javascript.ast.Scope;
 import org.mozilla.javascript.ast.SwitchStatement;
 import org.mozilla.javascript.ast.TryStatement;
 import org.mozilla.javascript.ast.VariableDeclaration;
+import org.mozilla.javascript.ast.WhileLoop;
 import org.mozilla.javascript.ast.WithStatement;
 
 /**
@@ -158,7 +159,7 @@ public class CFGFactory {
 	 */
 	private static CFG build(IfStatement ifStatement) {
 		
-		IfCFGNode node = new IfCFGNode(ifStatement);
+		IfNode node = new IfNode(ifStatement);
 		CFG cfg = new CFG(node);
         cfg.addExitNode(node);
 		
@@ -178,6 +179,38 @@ public class CFGFactory {
 		return cfg;
 		
 	}
+
+	/**
+	 * Builds a control flow subgraph for a while statement.
+	 * @param whileStatement
+	 * @return
+	 */
+	private static CFG build(WhileLoop whileLoop) {
+		
+		WhileNode node = new WhileNode(whileLoop);
+		CFG cfg = new CFG(node);
+        cfg.addExitNode(node);
+		
+		CFG trueBranch = CFGFactory.buildSwitch(whileLoop.getBody());
+		
+		if(trueBranch != null) {
+			node.setTrueBranch(trueBranch.getEntryNode());
+			
+			/* TODO: We need to differentiate between two types of exit nodes:
+			 * 		 body exit and loop exit. Loop exit nodes are break 
+			 *  	 statements. */
+			//cfg.addAllExitNodes(trueBranch.getLoopExitNodes());
+
+			/* We merge the exit nodes back into the while loop. */
+            for(CFGNode exitNode : trueBranch.getExitNodes()) {
+                exitNode.mergeInto(node);
+            }
+
+		} 		
+		
+		return cfg;
+		
+	}
 	
 	/**
 	 * Builds a control flow subgraph for a statement.
@@ -187,7 +220,7 @@ public class CFGFactory {
 	 */
 	private static CFG build(AstNode statement) {
 		
-		CFGNode node = new LinearCFGNode(statement);
+		CFGNode node = new StatementNode(statement);
 		CFG cfg = new CFG(node);
 		cfg.addExitNode(node);
 		return cfg;
@@ -205,6 +238,8 @@ public class CFGFactory {
 			return CFGFactory.build((Block) node);
 		} else if (node instanceof IfStatement) {
 			return CFGFactory.build((IfStatement) node);
+		} else if (node instanceof WhileLoop) {
+			return CFGFactory.build((WhileLoop) node);
 		} else if (node instanceof FunctionNode) {
 			return null; // Function declarations shouldn't be part of the CFG.
 		} else if (node instanceof Scope) {

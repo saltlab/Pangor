@@ -1,5 +1,4 @@
-/* Basic CFG test.
- * Output: ?  */
+/* Basic CFG test. */
 
 function helloWorld(name) {
     "use strict";

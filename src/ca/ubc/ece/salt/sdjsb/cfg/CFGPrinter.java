@@ -31,19 +31,19 @@ public class CFGPrinter {
 			return node.toString();
 		}
 
-		else if(node instanceof LinearCFGNode) {
-			LinearCFGNode linearNode = (LinearCFGNode) node;
+		else if(node instanceof StatementNode) {
+			StatementNode linearNode = (StatementNode) node;
 
             if(!this.mergeStack.isEmpty() && this.mergeStack.peek() == linearNode.getNext()) {
                 /* We are not at the bottom level of the merge. */
                 return node.toString();
             } 
 
-			return node.toString() + "->" + printCFG(((LinearCFGNode) node).getNext());
+			return node.toString() + "->" + printCFG(((StatementNode) node).getNext());
 		}
 
-		else if(node instanceof IfCFGNode) {
-			IfCFGNode ifNode = (IfCFGNode) node;
+		else if(node instanceof IfNode) {
+			IfNode ifNode = (IfNode) node;
 			String s;
 			
 			this.mergeStack.push(ifNode.mergeNode);
@@ -70,7 +70,18 @@ public class CFGPrinter {
             } 
 
             /* We are at the bottom level of the merge. */
-			return s + "->" + printCFG(((IfCFGNode) node).mergeNode);
+			return s + "->" + printCFG(ifNode.mergeNode);
+		}
+		
+		else if(node instanceof WhileNode) {
+			WhileNode whileNode = (WhileNode) node;
+			String s;
+			
+			this.mergeStack.push(whileNode);
+			s = node.toString() + "?{" + printCFG(whileNode.getTrueBranch()) + "}";
+			this.mergeStack.pop();
+			
+			return s + "->" + printCFG(whileNode.mergeNode);
 		}
 		
 		return "UNKNOWN";
