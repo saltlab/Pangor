@@ -32,9 +32,13 @@ public class CFGPrinter {
 		}
 
 		else if(node instanceof LinearCFGNode) {
-			if(((LinearCFGNode) node).getNext().mergePoint) {
+			LinearCFGNode linearNode = (LinearCFGNode) node;
+
+            if(!this.mergeStack.isEmpty() && this.mergeStack.peek() == linearNode.getNext()) {
+                /* We are not at the bottom level of the merge. */
                 return node.toString();
-			}
+            } 
+
 			return node.toString() + "->" + printCFG(((LinearCFGNode) node).getNext());
 		}
 
@@ -60,8 +64,6 @@ public class CFGPrinter {
 			}
             this.mergeStack.pop();
 
-			assert(ifNode.mergeNode.mergePoint);
-			
             if(!this.mergeStack.isEmpty() && this.mergeStack.peek() == ifNode.mergeNode) {
                 /* We are not at the bottom level of the merge. */
                 return s;

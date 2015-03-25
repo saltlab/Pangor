@@ -10,16 +10,13 @@ public abstract class CFGNode {
 	 */
 	protected AstNode statement;
 	
-	/**
-	 * If this node is a merge point for multiple other nodes.
-	 */
-	public boolean mergePoint;
-	
 	public CFGNode(AstNode statement) {
 		this.statement = statement;
-		this.mergePoint = false;
 	}
 	
+	/**
+	 * @return The statement associated with this node.
+	 */
 	public AstNode getStatement() {
 		return statement;
 	}

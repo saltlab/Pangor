@@ -50,8 +50,6 @@ public class CFG {
 	 */
 	public void mergeInto(CFGNode node) {
 		
-		if(this.exitNodes.size() > 1) node.mergePoint = true;
-		
 		for(CFGNode exitNode : this.exitNodes) {
 			exitNode.mergeInto(node);
 		}
