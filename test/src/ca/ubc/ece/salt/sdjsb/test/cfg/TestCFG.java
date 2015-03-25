@@ -96,4 +96,32 @@ public class TestCFG extends TestCase {
 
 	}
 
+	@Test
+	public void testWhileContinue() throws IOException {
+		
+		String file = "./test/input/cfg/whilecontinue.js";
+		
+		List<String> expectedCFGs = new LinkedList<String>();
+		expectedCFGs.add("SCRIPT ENTRY->VAR->EXPR_RESULT->SCRIPT EXIT");
+		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->VAR->WHILE?{EXPR_VOID->IF?{EXPR_VOID->CONTINUE(WHILE)}->EXPR_VOID->EXPR_VOID}->FUNCTION EXIT");
+		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->FUNCTION EXIT");
+		
+		this.runTest(file, expectedCFGs, true);
+
+	}
+
+	@Test
+	public void testReturn() throws IOException {
+		
+		String file = "./test/input/cfg/return.js";
+		
+		List<String> expectedCFGs = new LinkedList<String>();
+		expectedCFGs.add("SCRIPT ENTRY->VAR->EXPR_RESULT->SCRIPT EXIT");
+		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->VAR->WHILE?{EXPR_VOID->IF?{RETURN(FUNCTION EXIT)}->EXPR_VOID->EXPR_VOID}->FUNCTION EXIT");
+		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->FUNCTION EXIT");
+		
+		this.runTest(file, expectedCFGs, true);
+
+	}
+
 }
