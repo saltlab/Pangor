@@ -38,6 +38,14 @@ public abstract class Alert {
 	}
 	
 	/**
+	 * The type/subtype identifier.
+	 * @return
+	 */
+	public String getIdentifier() {
+		return this.type + "_" + this.subtype;
+	}
+	
+	/**
 	 * A short description of the repair alert.
 	 * @return The alert type and subtype.
 	 */

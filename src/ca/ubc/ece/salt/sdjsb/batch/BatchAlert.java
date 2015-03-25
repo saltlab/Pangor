@@ -6,16 +6,14 @@ public class BatchAlert extends Alert {
 	
 	private Alert alert;
 
-	public String project;
     public String bugFixingCommit;
     public String buggyCommit;
     public String oldFile;
     public String newFile;
 	
-	public BatchAlert(Alert alert, String project, String bugFixingCommit, String buggyCommit, String oldFile, String newFile) {
+	public BatchAlert(Alert alert, String bugFixingCommit, String buggyCommit, String oldFile, String newFile) {
 		super(alert.getType(), alert.getSubType());
 		this.alert = alert;
-		this.project = project;
 		this.bugFixingCommit = bugFixingCommit;
 		this.buggyCommit = buggyCommit;
 		this.oldFile = oldFile;
@@ -23,13 +21,18 @@ public class BatchAlert extends Alert {
 	}
 
 	@Override
+	public String getIdentifier() {
+		return alert.getType() + "_" + alert.getSubType();
+	}
+
+	@Override
 	public String getShortDescription() {
-		return this.project + ":" + alert.getShortDescription();
+		return alert.getShortDescription();
 	}
 	
 	@Override
 	public String getLongDescription() {
-		return this.project + ":" + this.buggyCommit + ":" + this.bugFixingCommit + ":" + this.newFile + ":" + alert.getLongDescription();
+		return this.buggyCommit + ":" + this.bugFixingCommit + ":" + this.newFile + ":" + alert.getLongDescription();
 	}
 
 	@Override

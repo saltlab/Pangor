@@ -1,12 +1,9 @@
 package ca.ubc.ece.salt.sdjsb.batch;
 
 import java.io.IOException;
-import java.util.List;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
-
-import ca.ubc.ece.salt.sdjsb.checker.Alert;
 
 public class ProjectAnalysis {
 	
@@ -71,14 +68,10 @@ public class ProjectAnalysis {
 		/* Perform the analysis (may take some time). */
 		gitProjectAnalysis.analyze();
 		
-		List<Alert> alerts = gitProjectAnalysis.getAlerts();
-		
-		/* Print the results. */
-		System.out.print("There were " + gitProjectAnalysis.getBugFixingCommits() + " bug fixing commits analyzed out of " + gitProjectAnalysis.getTotalCommits() + " total commits.");
-		System.out.println("Alerts (" + alerts.size() + "):");
-		for(Alert alert : alerts) {
-			System.out.println("\t" + alert.getLongDescription());
-		}
+		/* Print what we need. */
+		AlertPrinter printer = new AlertPrinter(gitProjectAnalysis.getAnalysisResult());
+		printer.printSummary(options.printAlerts());
+		if(options.printLatex()) printer.printLatexTable();
 		
 	}
 

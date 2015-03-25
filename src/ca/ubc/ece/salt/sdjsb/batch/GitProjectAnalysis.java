@@ -39,58 +39,23 @@ import fr.labri.gumtree.client.DiffOptions;
 
 public class GitProjectAnalysis {
 	
-	Git git;
-	Repository repository;
-	String projectName;
+	private Git git;
+	private Repository repository;
 	
-	private List<Alert> alerts;
-	private Integer bugFixingCommits;
-	private Integer totalCommits;
+	private ProjectAnalysisResult analysisResult;
 	
 	GitProjectAnalysis(Git git, Repository repository, String name) {
 		this.git = git;
 		this.repository = repository;
-		this.projectName = name;
 		
-		this.alerts = null;
-		this.bugFixingCommits = null;
-		this.totalCommits = null;
+		this.analysisResult = new ProjectAnalysisResult(name);
 	}
 	
 	/**
-	 * Get the alerts produced by the analysis.
-	 * @return The list of the alerts for this analysis.
-	 * @throws GitProjectAnalysisException
+	 * @return The results of the analysis.
 	 */
-	public List<Alert> getAlerts() throws GitProjectAnalysisException {
-		if(alerts == null) {
-			throw new GitProjectAnalysisException("The project has not been analyzed. No alerts are available.");
-		}
-		return this.alerts;
-	}
-
-	/**
-	 * Get the number of bug fixing commits analyzed.
-	 * @return
-	 * @throws GitProjectAnalysisException
-	 */
-	public Integer getBugFixingCommits() throws GitProjectAnalysisException {
-		if(this.bugFixingCommits == null) {
-			throw new GitProjectAnalysisException("The project has not been analyzed. No metrics available.");
-		}
-		return this.bugFixingCommits;
-	}
-	
-	/**
-	 * Get the total number of commits for the project.
-	 * @return
-	 * @throws GitProjectAnalysisException
-	 */
-	public Integer getTotalCommits() throws GitProjectAnalysisException {
-		if(this.totalCommits == null) {
-			throw new GitProjectAnalysisException("The project has not been analyzed. No metrics available.");
-		}
-		return this.totalCommits;
+	public ProjectAnalysisResult getAnalysisResult() {
+		return this.analysisResult;
 	}
 	
 	/**
@@ -100,15 +65,13 @@ public class GitProjectAnalysis {
 	 */
 	public void analyze() throws GitAPIException, IOException {
 		
-		this.alerts = new LinkedList<Alert>();
-
 		/* Get the list of bug fixing commits from version history. */
 		List<Pair<String, String>> bugFixingCommits = this.getBugFixingCommitPairs();
 		
 		/* Analyze the changes made in each bug fixing commit. */
 		for(Pair<String, String> bugFixingCommit : bugFixingCommits) {
 
-            this.alerts.addAll(this.analyzeDiff(bugFixingCommit.getLeft(), bugFixingCommit.getRight()));
+			this.analyzeDiff(bugFixingCommit.getLeft(), bugFixingCommit.getRight());
 			
 		}
 
@@ -123,9 +86,7 @@ public class GitProjectAnalysis {
 	 * @throws IOException
 	 * @throws GitAPIException
 	 */
-	private List<Alert> analyzeDiff(String buggyRevision, String bugFixingRevision) throws IOException, GitAPIException {
-		
-		List<Alert> alerts = new LinkedList<Alert>();
+	private void analyzeDiff(String buggyRevision, String bugFixingRevision) throws IOException, GitAPIException {
 
 		ObjectId buggy = this.repository.resolve(buggyRevision + "^{tree}");
 		ObjectId repaired = this.repository.resolve(bugFixingRevision + "^{tree}");
@@ -150,7 +111,7 @@ public class GitProjectAnalysis {
                 try {
                 	List<Alert> alertsFromAnalysis = GitProjectAnalysis.runSDJSB(oldFile, newFile);
                 	for(Alert alertFromAnalysis : alertsFromAnalysis) {
-                		this.alerts.add(new BatchAlert(alertFromAnalysis, this.projectName, bugFixingRevision, buggyRevision, diff.getOldPath(), diff.getNewPath()));
+                		this.analysisResult.insert(new BatchAlert(alertFromAnalysis, bugFixingRevision, buggyRevision, diff.getOldPath(), diff.getNewPath()));
                 	}
                 }
                 catch(Exception ignore) { 
@@ -159,7 +120,6 @@ public class GitProjectAnalysis {
 			}
 		}
 		
-		return alerts;
 	}
 
 	/**
@@ -202,8 +162,8 @@ public class GitProjectAnalysis {
 		}
 		
 		/* Keep track of the number of commits for metrics reporting. */
-		this.bugFixingCommits = bfcCnt;
-		this.totalCommits = cCnt;
+		this.analysisResult.setBugFixingCommits(bfcCnt);
+		this.analysisResult.setTotalCommits(cCnt);
 		
 		return bugFixingCommits;
 	}

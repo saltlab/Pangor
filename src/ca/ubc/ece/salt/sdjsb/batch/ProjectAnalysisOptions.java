@@ -12,6 +12,12 @@ public class ProjectAnalysisOptions {
 	
 	@Option(name="-h", aliases={"--help"}, usage="Display the help file.")
 	private boolean help = false;
+	
+	@Option(name="-t", aliases={"--latex"}, usage="Output summary to latex table.")
+	private boolean latex = false;
+	
+	@Option(name="-a", aliases={"--alerts"}, usage="Print individual alert descriptions.")
+	private boolean alerts = false;
 
 	public String getURI() {
 		return this.host;
@@ -23,6 +29,14 @@ public class ProjectAnalysisOptions {
 	
 	public boolean getHelp() {
 		return this.help;
+	}
+	
+	public boolean printLatex() {
+		return this.latex;
+	}
+	
+	public boolean printAlerts() {
+		return this.alerts;
 	}
 
 }
