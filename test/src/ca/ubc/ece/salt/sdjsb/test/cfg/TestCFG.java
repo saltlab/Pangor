@@ -82,4 +82,18 @@ public class TestCFG extends TestCase {
 
 	}
 
+	@Test
+	public void testWhileBreak() throws IOException {
+		
+		String file = "./test/input/cfg/whilebreak.js";
+		
+		List<String> expectedCFGs = new LinkedList<String>();
+		expectedCFGs.add("SCRIPT ENTRY->VAR->EXPR_RESULT->SCRIPT EXIT");
+		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->VAR->WHILE?{EXPR_VOID->IF?{BREAK(FUNCTION EXIT)}->EXPR_VOID->EXPR_VOID}->FUNCTION EXIT");
+		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->FUNCTION EXIT");
+		
+		this.runTest(file, expectedCFGs, true);
+
+	}
+
 }

@@ -12,6 +12,7 @@ import org.mozilla.javascript.ast.ContinueStatement;
 import org.mozilla.javascript.ast.ExpressionStatement;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.IfStatement;
+import org.mozilla.javascript.ast.ReturnStatement;
 import org.mozilla.javascript.ast.Scope;
 import org.mozilla.javascript.ast.SwitchStatement;
 import org.mozilla.javascript.ast.TryStatement;
@@ -67,6 +68,12 @@ public class CFGFactory {
             subGraph = CFGFactory.build(function);
             entry.mergeInto(subGraph.getEntryNode());
             subGraph.mergeInto(exit);
+            
+            /* Merge return nodes into function exit node. */
+            for(CFGNode node : subGraph.getReturnNodes()) {
+            	node.mergeInto(exit);
+            }
+            
             cfgs.add(cfg);
 
 		}
@@ -137,12 +144,19 @@ public class CFGFactory {
                     previous.mergeInto(subGraph.getEntryNode());
 				}
 
+                /* Propagate return, continue and break nodes. */
+                cfg.addAllReturnNodes(subGraph.getReturnNodes());
+                cfg.addAllBreakNodes(subGraph.getBreakNodes());
+                cfg.addAllContinueNodes(subGraph.getContinueNodes());
+
                 previous = subGraph;
 			}
 			
 		}
 		
 		if(previous != null) {
+
+            /* Propagate exit nodes from the last node in the block. */
             cfg.addAllExitNodes(previous.getExitNodes());
 		}
 		else {
@@ -168,12 +182,22 @@ public class CFGFactory {
 		
 		if(trueBranch != null) {
 			node.setTrueBranch(trueBranch.getEntryNode());
+
+            /* Propagate exit, return, continue and break nodes. */
 			cfg.addAllExitNodes(trueBranch.getExitNodes());
+            cfg.addAllReturnNodes(trueBranch.getReturnNodes());
+            cfg.addAllBreakNodes(trueBranch.getBreakNodes());
+            cfg.addAllContinueNodes(trueBranch.getContinueNodes());
 		} 		
 
 		if(falseBranch != null) {
 			node.setFalseBranch(falseBranch.getEntryNode());
+
+            /* Propagate exit, return, continue and break nodes. */
 			cfg.addAllExitNodes(falseBranch.getExitNodes());
+            cfg.addAllReturnNodes(falseBranch.getReturnNodes());
+            cfg.addAllBreakNodes(falseBranch.getBreakNodes());
+            cfg.addAllContinueNodes(falseBranch.getContinueNodes());
 		}
 		
 		return cfg;
@@ -196,20 +220,71 @@ public class CFGFactory {
 		if(trueBranch != null) {
 			node.setTrueBranch(trueBranch.getEntryNode());
 			
-			/* TODO: We need to differentiate between two types of exit nodes:
-			 * 		 body exit and loop exit. Loop exit nodes are break 
-			 *  	 statements. */
-			//cfg.addAllExitNodes(trueBranch.getLoopExitNodes());
+			/* Propagate return nodes. */
+			cfg.addAllReturnNodes(trueBranch.getReturnNodes());
+
+			/* The break nodes are exit nodes for this loop. */
+			cfg.addAllExitNodes(trueBranch.getBreakNodes());
 
 			/* We merge the exit nodes back into the while loop. */
             for(CFGNode exitNode : trueBranch.getExitNodes()) {
                 exitNode.mergeInto(node);
+            }
+            
+            /* We merge continue nodes back into the while loop. */
+            for(CFGNode continueNode : trueBranch.getContinueNodes()) {
+            	continueNode.mergeInto(node);
             }
 
 		} 		
 		
 		return cfg;
 		
+	}
+
+	/**
+	 * Builds a control flow subgraph for a break statement.
+	 * @param entry The entry point for the subgraph.
+	 * @param exit The exit point for the subgraph.
+	 * @return A list of exit nodes for the subgraph.
+	 */
+	private static CFG build(BreakStatement breakStatement) {
+		
+		CFGNode node = new JumpNode(breakStatement);
+		CFG cfg = new CFG(node);
+		cfg.addBreakNode(node);
+		return cfg;
+
+	}
+
+	/**
+	 * Builds a control flow subgraph for a continue statement.
+	 * @param entry The entry point for the subgraph.
+	 * @param exit The exit point for the subgraph.
+	 * @return A list of exit nodes for the subgraph.
+	 */
+	private static CFG build(ContinueStatement continueStatement) {
+		
+		CFGNode node = new JumpNode(continueStatement);
+		CFG cfg = new CFG(node);
+		cfg.addContinueNode(node);
+		return cfg;
+
+	}
+
+	/**
+	 * Builds a control flow subgraph for a return statement.
+	 * @param entry The entry point for the subgraph.
+	 * @param exit The exit point for the subgraph.
+	 * @return A list of exit nodes for the subgraph.
+	 */
+	private static CFG build(ReturnStatement returnStatement) {
+		
+		CFGNode node = new JumpNode(returnStatement);
+		CFG cfg = new CFG(node);
+		cfg.addReturnNode(node);
+		return cfg;
+
 	}
 	
 	/**
@@ -240,6 +315,12 @@ public class CFGFactory {
 			return CFGFactory.build((IfStatement) node);
 		} else if (node instanceof WhileLoop) {
 			return CFGFactory.build((WhileLoop) node);
+		} else if (node instanceof BreakStatement) {
+			return CFGFactory.build((BreakStatement) node);
+		} else if (node instanceof ContinueStatement) {
+			return CFGFactory.build((ContinueStatement) node);
+		} else if (node instanceof ReturnStatement) {
+			return CFGFactory.build((ReturnStatement) node);
 		} else if (node instanceof FunctionNode) {
 			return null; // Function declarations shouldn't be part of the CFG.
 		} else if (node instanceof Scope) {

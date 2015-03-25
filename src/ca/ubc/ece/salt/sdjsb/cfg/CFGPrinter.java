@@ -30,10 +30,17 @@ public class CFGPrinter {
 		if(node instanceof FunctionExitCFGNode || node instanceof ScriptExitCFGNode) {
 			return node.toString();
 		}
+		
+		else if(node instanceof JumpNode) {
+			JumpNode jumpNode = (JumpNode) node;
+			
+			return node.toString() + "(" + jumpNode.getNext().toString() + ")";
+			
+		}
 
 		else if(node instanceof StatementNode) {
 			StatementNode linearNode = (StatementNode) node;
-
+			
             if(!this.mergeStack.isEmpty() && this.mergeStack.peek() == linearNode.getNext()) {
                 /* We are not at the bottom level of the merge. */
                 return node.toString();
