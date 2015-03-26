@@ -61,7 +61,7 @@ public class TestCFG extends TestCase {
 		
 		List<String> expectedCFGs = new LinkedList<String>();
 		expectedCFGs.add("SCRIPT ENTRY->VAR->EXPR_RESULT->SCRIPT EXIT");
-		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->IF?{EXPR_VOID:EXPR_VOID->IF?{EXPR_VOID}}->FUNCTION EXIT");
+		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->NAME?{EXPR_VOID:EXPR_VOID->TRUE?{EXPR_VOID}}->FUNCTION EXIT");
 		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->FUNCTION EXIT");
 		
 		this.runTest(file, expectedCFGs, true);
@@ -75,7 +75,7 @@ public class TestCFG extends TestCase {
 		
 		List<String> expectedCFGs = new LinkedList<String>();
 		expectedCFGs.add("SCRIPT ENTRY->VAR->EXPR_RESULT->SCRIPT EXIT");
-		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->VAR->WHILE?{EXPR_VOID->EXPR_VOID->EXPR_VOID}->FUNCTION EXIT");
+		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->VAR->LT?{EXPR_VOID->EXPR_VOID->EXPR_VOID}->FUNCTION EXIT");
 		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->FUNCTION EXIT");
 		
 		this.runTest(file, expectedCFGs, true);
@@ -89,7 +89,7 @@ public class TestCFG extends TestCase {
 		
 		List<String> expectedCFGs = new LinkedList<String>();
 		expectedCFGs.add("SCRIPT ENTRY->VAR->EXPR_RESULT->SCRIPT EXIT");
-		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->VAR->WHILE?{EXPR_VOID->IF?{BREAK(FUNCTION EXIT)}->EXPR_VOID->EXPR_VOID}->FUNCTION EXIT");
+		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->VAR->LT?{EXPR_VOID->SHEQ?{BREAK(FUNCTION EXIT)}->EXPR_VOID->EXPR_VOID}->FUNCTION EXIT");
 		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->FUNCTION EXIT");
 		
 		this.runTest(file, expectedCFGs, true);
@@ -103,7 +103,7 @@ public class TestCFG extends TestCase {
 		
 		List<String> expectedCFGs = new LinkedList<String>();
 		expectedCFGs.add("SCRIPT ENTRY->VAR->EXPR_RESULT->SCRIPT EXIT");
-		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->VAR->WHILE?{EXPR_VOID->IF?{EXPR_VOID->CONTINUE(WHILE)}->EXPR_VOID->EXPR_VOID}->FUNCTION EXIT");
+		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->VAR->LT?{EXPR_VOID->SHEQ?{EXPR_VOID->CONTINUE(LT)}->EXPR_VOID->EXPR_VOID}->FUNCTION EXIT");
 		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->FUNCTION EXIT");
 		
 		this.runTest(file, expectedCFGs, true);
@@ -117,7 +117,21 @@ public class TestCFG extends TestCase {
 		
 		List<String> expectedCFGs = new LinkedList<String>();
 		expectedCFGs.add("SCRIPT ENTRY->VAR->EXPR_RESULT->SCRIPT EXIT");
-		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->VAR->WHILE?{EXPR_VOID->IF?{RETURN(FUNCTION EXIT)}->EXPR_VOID->EXPR_VOID}->FUNCTION EXIT");
+		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->VAR->LT?{EXPR_VOID->SHEQ?{RETURN(FUNCTION EXIT)}->EXPR_VOID->EXPR_VOID}->FUNCTION EXIT");
+		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->FUNCTION EXIT");
+		
+		this.runTest(file, expectedCFGs, true);
+
+	}
+
+	@Test
+	public void testFor() throws IOException {
+		
+		String file = "./test/input/cfg/forloop.js";
+		
+		List<String> expectedCFGs = new LinkedList<String>();
+		expectedCFGs.add("SCRIPT ENTRY->VAR->EXPR_RESULT->SCRIPT EXIT");
+		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->VAR->VAR->LT?{EXPR_VOID->EXPR_VOID->EXPR_VOID->INC}->FUNCTION EXIT");
 		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->FUNCTION EXIT");
 		
 		this.runTest(file, expectedCFGs, true);

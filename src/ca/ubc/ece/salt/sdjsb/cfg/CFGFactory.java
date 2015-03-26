@@ -10,6 +10,7 @@ import org.mozilla.javascript.ast.Block;
 import org.mozilla.javascript.ast.BreakStatement;
 import org.mozilla.javascript.ast.ContinueStatement;
 import org.mozilla.javascript.ast.ExpressionStatement;
+import org.mozilla.javascript.ast.ForLoop;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.IfStatement;
 import org.mozilla.javascript.ast.ReturnStatement;
@@ -173,7 +174,7 @@ public class CFGFactory {
 	 */
 	private static CFG build(IfStatement ifStatement) {
 		
-		IfNode node = new IfNode(ifStatement);
+		IfNode node = new IfNode(ifStatement.getCondition());
 		CFG cfg = new CFG(node);
         cfg.addExitNode(node);
 		
@@ -206,12 +207,12 @@ public class CFGFactory {
 
 	/**
 	 * Builds a control flow subgraph for a while statement.
-	 * @param whileStatement
-	 * @return
+	 * @param whileLoop
+	 * @return The CFG for the while loop.
 	 */
 	private static CFG build(WhileLoop whileLoop) {
 		
-		WhileNode node = new WhileNode(whileLoop);
+		WhileNode node = new WhileNode(whileLoop.getCondition());
 		CFG cfg = new CFG(node);
         cfg.addExitNode(node);
 		
@@ -234,6 +235,53 @@ public class CFGFactory {
             /* We merge continue nodes back into the while loop. */
             for(CFGNode continueNode : trueBranch.getContinueNodes()) {
             	continueNode.mergeInto(node);
+            }
+
+		} 		
+		
+		return cfg;
+		
+	}
+
+	/**
+	 * Builds a control flow subgraph for a for statement. A for statement is
+	 * simply a while statement with an expression before and after the loop
+	 * body.
+	 * @param forLoop
+	 * @return The CFG for the for loop.
+	 */
+	private static CFG build(ForLoop forLoop) {
+		
+		StatementNode initializer = new StatementNode(forLoop.getInitializer());
+		WhileNode loop = new WhileNode(forLoop.getCondition());
+		StatementNode increment = new StatementNode(forLoop.getIncrement());
+		
+        /* Set up the initializer and increment with respect to the loop. */
+		initializer.mergeInto(loop);
+		increment.mergeInto(loop);
+
+		CFG cfg = new CFG(initializer);
+        cfg.addExitNode(loop);
+		
+		CFG trueBranch = CFGFactory.buildSwitch(forLoop.getBody());
+		
+		if(trueBranch != null) {
+			loop.setTrueBranch(trueBranch.getEntryNode());
+			
+			/* Propagate return nodes. */
+			cfg.addAllReturnNodes(trueBranch.getReturnNodes());
+
+			/* The break nodes are exit nodes for this loop. */
+			cfg.addAllExitNodes(trueBranch.getBreakNodes());
+
+			/* We merge the exit nodes back into the while loop. */
+            for(CFGNode exitNode : trueBranch.getExitNodes()) {
+                exitNode.mergeInto(increment);
+            }
+            
+            /* We merge continue nodes back into the while loop. */
+            for(CFGNode continueNode : trueBranch.getContinueNodes()) {
+            	continueNode.mergeInto(increment);
             }
 
 		} 		
@@ -315,6 +363,8 @@ public class CFGFactory {
 			return CFGFactory.build((IfStatement) node);
 		} else if (node instanceof WhileLoop) {
 			return CFGFactory.build((WhileLoop) node);
+		} else if (node instanceof ForLoop) {
+			return CFGFactory.build((ForLoop) node);
 		} else if (node instanceof BreakStatement) {
 			return CFGFactory.build((BreakStatement) node);
 		} else if (node instanceof ContinueStatement) {
@@ -337,6 +387,14 @@ public class CFGFactory {
 	 * @return
 	 */
 	private static boolean isStatement(Node node) {
+
+		/*
+			TryStatement 
+			WithStatement
+			SwitchStatement
+			ForInLoop
+			DoLoop
+		*/
 
 		if(node instanceof VariableDeclaration ||
 			node instanceof TryStatement || 
