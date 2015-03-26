@@ -19,4 +19,9 @@ public class ScriptExitCFGNode extends CFGNode {
 		/* Nothing to do yet. */
 	}
 
+	@Override
+	public String printSubGraph(CFGNode mergeNode) {
+        return this.toString();
+	}
+
 }

@@ -51,4 +51,39 @@ public class IfNode extends CFGNode {
 		
 	}
 
+	@Override
+	public String printSubGraph(CFGNode mergeNode) {
+
+        String s;
+        
+        if(this.getFalseBranch() != this.mergeNode && this.getTrueBranch() != this.mergeNode) {
+            /* There is a then branch and an else branch. */
+            s = this.toString() + "?{" + this.getTrueBranch().printSubGraph(this.mergeNode) + ":" + this.getFalseBranch().printSubGraph(this.mergeNode) + "}";
+        }
+        else if(this.getFalseBranch() == this.mergeNode && this.getTrueBranch() != this.mergeNode) {
+            /* There is a then branch but no else branch. */
+            s = this.toString() + "?{" + this.getTrueBranch().printSubGraph(this.mergeNode) + "}";
+        }
+        else if(this.getFalseBranch() != this.mergeNode && this.getTrueBranch() == this.mergeNode) {
+            /* There is an else branch but no then branch. */
+            s = this.toString() + "?{" + this.getTrueBranch().printSubGraph(this.mergeNode) + "}";
+        }
+        else {
+            s = "ERROR";
+        }
+
+        if(mergeNode == this.mergeNode) {
+            /* We are not at the bottom level of the merge. */
+            return s;
+        } 
+
+        /* We are at the bottom level of the merge. */
+        String subGraph = this.mergeNode.printSubGraph(mergeNode);
+        if(subGraph.charAt(0) == '}') {
+            return s + subGraph;
+        }
+        return s + "->" + subGraph;
+
+	}
+
 }

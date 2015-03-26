@@ -11,7 +11,6 @@ import org.mozilla.javascript.ast.AstRoot;
 
 import ca.ubc.ece.salt.sdjsb.cfg.CFG;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGFactory;
-import ca.ubc.ece.salt.sdjsb.cfg.CFGPrinter;
 import junit.framework.TestCase;
 
 public class TestCFG extends TestCase {
@@ -29,10 +28,9 @@ public class TestCFG extends TestCase {
 		List<String> actualCFGs = new LinkedList<String>();
         int n = 1;
         for(CFG cfg : cfgs) {
-            CFGPrinter printer = new CFGPrinter(cfg);
-            String serialized = printer.print();
+            String serialized = cfg.getEntryNode().printSubGraph(null);
             actualCFGs.add(serialized);
-            if(printCFGs) System.out.println("CFG" + n + ": " + printer.print());
+            if(printCFGs) System.out.println("CFG" + n + ": " + serialized);
             n++;
         }
         
@@ -132,6 +130,20 @@ public class TestCFG extends TestCase {
 		List<String> expectedCFGs = new LinkedList<String>();
 		expectedCFGs.add("SCRIPT ENTRY->VAR->EXPR_RESULT->SCRIPT EXIT");
 		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->VAR->VAR->LT?{EXPR_VOID->EXPR_VOID->EXPR_VOID->INC}->FUNCTION EXIT");
+		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->FUNCTION EXIT");
+		
+		this.runTest(file, expectedCFGs, true);
+
+	}
+
+	@Test
+	public void testDo() throws IOException {
+		
+		String file = "./test/input/cfg/doloop.js";
+		
+		List<String> expectedCFGs = new LinkedList<String>();
+		expectedCFGs.add("SCRIPT ENTRY->VAR->EXPR_RESULT->SCRIPT EXIT");
+		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->VAR->{EXPR_VOID->EXPR_VOID->EXPR_VOID}?LT->FUNCTION EXIT");
 		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->FUNCTION EXIT");
 		
 		this.runTest(file, expectedCFGs, true);

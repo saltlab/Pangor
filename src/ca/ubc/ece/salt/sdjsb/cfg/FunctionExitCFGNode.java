@@ -19,4 +19,9 @@ public class FunctionExitCFGNode extends CFGNode {
 		/* Nothing to do yet. */
 	}
 
+	@Override
+	public String printSubGraph(CFGNode mergeNode) {
+        return this.toString();
+	}
+
 }

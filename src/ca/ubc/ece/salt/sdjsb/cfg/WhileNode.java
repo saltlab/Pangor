@@ -48,4 +48,23 @@ public class WhileNode extends CFGNode {
 		
 	}
 
+	@Override
+	public String printSubGraph(CFGNode mergeNode) {
+
+        String s;
+        
+        if(this.getTrueBranch() instanceof DoNode) {
+            s = "}?" + this.toString();
+        }
+        else {
+            s = this.toString() + "?{" + this.getTrueBranch().printSubGraph(this) + "}";
+        }
+        
+        String subGraph = this.mergeNode.printSubGraph(mergeNode);
+        if(subGraph.charAt(0) == '}') {
+            return s + subGraph;
+        }
+        return s + "->" + subGraph;
+	}
+
 }

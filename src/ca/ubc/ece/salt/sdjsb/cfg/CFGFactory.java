@@ -9,6 +9,7 @@ import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.Block;
 import org.mozilla.javascript.ast.BreakStatement;
 import org.mozilla.javascript.ast.ContinueStatement;
+import org.mozilla.javascript.ast.DoLoop;
 import org.mozilla.javascript.ast.ExpressionStatement;
 import org.mozilla.javascript.ast.ForLoop;
 import org.mozilla.javascript.ast.FunctionNode;
@@ -244,6 +245,54 @@ public class CFGFactory {
 	}
 
 	/**
+	 * Builds a control flow subgraph for a do loop.
+	 * @param doLoop
+	 * @return The CFG for the do loop.
+	 */
+	private static CFG build(DoLoop doLoop) {
+		
+		DoNode entry = new DoNode();
+		WhileNode loop = new WhileNode(doLoop.getCondition());
+		loop.setTrueBranch(entry);
+
+		CFG cfg = new CFG(entry);
+        cfg.addExitNode(loop);
+		
+		CFG trueBranch = CFGFactory.buildSwitch(doLoop.getBody());
+		
+		if(trueBranch != null) {
+			
+			/* The body is executed at least once. */
+			entry.mergeInto(trueBranch.getEntryNode());
+			
+			/* Propagate return nodes. */
+			cfg.addAllReturnNodes(trueBranch.getReturnNodes());
+
+			/* The break nodes are exit nodes for this loop. */
+			cfg.addAllExitNodes(trueBranch.getBreakNodes());
+
+			/* We merge the exit nodes back into the while loop. */
+            for(CFGNode exitNode : trueBranch.getExitNodes()) {
+                exitNode.mergeInto(loop);
+            }
+            
+            /* We merge continue nodes back into the while loop. */
+            for(CFGNode continueNode : trueBranch.getContinueNodes()) {
+            	continueNode.mergeInto(loop);
+            }
+
+		} 		
+		else {
+			
+			/* Infinite loop. */
+			entry.mergeInto(loop);
+		}
+		
+		return cfg;
+		
+	}
+
+	/**
 	 * Builds a control flow subgraph for a for statement. A for statement is
 	 * simply a while statement with an expression before and after the loop
 	 * body.
@@ -363,6 +412,8 @@ public class CFGFactory {
 			return CFGFactory.build((IfStatement) node);
 		} else if (node instanceof WhileLoop) {
 			return CFGFactory.build((WhileLoop) node);
+		} else if (node instanceof DoLoop) {
+			return CFGFactory.build((DoLoop) node);
 		} else if (node instanceof ForLoop) {
 			return CFGFactory.build((ForLoop) node);
 		} else if (node instanceof BreakStatement) {

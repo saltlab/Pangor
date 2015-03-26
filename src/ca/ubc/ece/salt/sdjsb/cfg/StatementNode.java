@@ -28,4 +28,20 @@ public class StatementNode extends CFGNode {
 		return this.next;
 	}
 
+	@Override
+	public String printSubGraph(CFGNode mergeNode) {
+
+        if(mergeNode == this.getNext()) {
+            /* We are not at the bottom level of the merge. */
+            return this.toString();
+        } 
+
+        String subGraph = this.getNext().printSubGraph(mergeNode);
+        if(subGraph.charAt(0) == '}') {
+            return this.toString() + subGraph;
+        }
+        return this.toString() + "->" + subGraph;
+
+	}
+
 }

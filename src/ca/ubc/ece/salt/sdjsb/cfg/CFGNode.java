@@ -30,6 +30,12 @@ public abstract class CFGNode {
 	 */
 	public abstract void mergeInto(CFGNode node);
 	
+	/**
+	 * Prints the subgraph beginning at this node.
+	 * @return 
+	 */
+	public abstract String printSubGraph(CFGNode mergeNode);
+	
 	@Override
 	public String toString() {
 		return Token.typeToName(this.statement.getType());

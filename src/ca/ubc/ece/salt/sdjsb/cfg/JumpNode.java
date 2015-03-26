@@ -12,4 +12,11 @@ public class JumpNode extends StatementNode {
 		super(statement);
 	}
 
+	@Override
+	public String printSubGraph(CFGNode mergeNode) {
+
+        return this.toString() + "(" + this.getNext().toString() + ")";
+
+	}
+
 }
