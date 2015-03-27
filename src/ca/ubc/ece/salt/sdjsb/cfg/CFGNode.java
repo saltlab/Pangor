@@ -38,7 +38,8 @@ public abstract class CFGNode {
 	
 	@Override
 	public String toString() {
-		return Token.typeToName(this.statement.getType());
+		String s = Token.typeToName(this.statement.getType());
+		return s;
 	}
 
 }

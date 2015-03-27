@@ -4,6 +4,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.mozilla.javascript.Node;
+import org.mozilla.javascript.Token;
+import org.mozilla.javascript.ast.Assignment;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.Block;
@@ -11,9 +13,14 @@ import org.mozilla.javascript.ast.BreakStatement;
 import org.mozilla.javascript.ast.ContinueStatement;
 import org.mozilla.javascript.ast.DoLoop;
 import org.mozilla.javascript.ast.ExpressionStatement;
+import org.mozilla.javascript.ast.ForInLoop;
 import org.mozilla.javascript.ast.ForLoop;
+import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.IfStatement;
+import org.mozilla.javascript.ast.InfixExpression;
+import org.mozilla.javascript.ast.Name;
+import org.mozilla.javascript.ast.PropertyGet;
 import org.mozilla.javascript.ast.ReturnStatement;
 import org.mozilla.javascript.ast.Scope;
 import org.mozilla.javascript.ast.SwitchStatement;
@@ -340,6 +347,78 @@ public class CFGFactory {
 	}
 
 	/**
+	 * Builds a control flow subgraph for a for in statement. A for in statement
+	 * is a loop that iterates over the keys of an object. The Rhino IR 
+	 * represents this using the Node labeled "ENUM_INIT_KEYS". Here, we make
+	 * a fake function that returns an object's keys.
+	 * @param forInLoop
+	 * @return The CFG for the for-in loop.
+	 */
+	private static CFG build(ForInLoop forInLoop) {
+		
+		AstNode iterator = forInLoop.getIterator();
+		StatementNode initializer = null;
+		CFG cfg;
+
+        /* We need to add a node that declares a variable. Interestingly,
+         * if a variable is declared it can also be initialized to a value
+         * here (although it will have no effect). */
+        initializer = new StatementNode(iterator);
+        cfg = new CFG(initializer);
+        
+        /* To represent key iteration, we make up a function that iterates 
+         * through each key in an object. The function name is invalid in JS
+         * to ensure that there isn't another function with the same name.
+         * Since we're not producing code, this is ok. */
+        AstNode target = ((VariableDeclaration) iterator).getVariables().get(0).getTarget();
+        PropertyGet keyIteratorMethod = new PropertyGet(forInLoop.getIteratedObject(), new Name(0, "~getNextkey"));
+        FunctionCall keyIteratorFunction = new FunctionCall();
+        keyIteratorFunction.setTarget(keyIteratorMethod);
+        Assignment targetAssignment = new Assignment(target, keyIteratorFunction);
+        targetAssignment.setType(Token.ASSIGN);
+
+        StatementNode assignment = new StatementNode(targetAssignment);
+
+        /* Do the same thing for the loop condition (if there is another key then loop). */
+        PropertyGet keyConditionMethod = new PropertyGet(forInLoop.getIteratedObject(), new Name(0, "~hasNextKey"));
+        FunctionCall keyConditionFunction = new FunctionCall();
+        keyConditionFunction.setTarget(keyConditionMethod);
+
+		WhileNode loop = new WhileNode(keyConditionFunction);
+		
+        /* Set up the initializer and increment with respect to the loop. */
+		initializer.mergeInto(loop);
+		loop.setTrueBranch(assignment);
+        cfg.addExitNode(loop);
+		
+		CFG trueBranch = CFGFactory.buildSwitch(forInLoop.getBody());
+		
+		if(trueBranch != null) {
+			assignment.mergeInto(trueBranch.getEntryNode());
+			
+			/* Propagate return nodes. */
+			cfg.addAllReturnNodes(trueBranch.getReturnNodes());
+
+			/* The break nodes are exit nodes for this loop. */
+			cfg.addAllExitNodes(trueBranch.getBreakNodes());
+
+			/* We merge the exit nodes back into the while loop. */
+            for(CFGNode exitNode : trueBranch.getExitNodes()) {
+                exitNode.mergeInto(loop);
+            }
+            
+            /* We merge continue nodes back into the while loop. */
+            for(CFGNode continueNode : trueBranch.getContinueNodes()) {
+            	continueNode.mergeInto(loop);
+            }
+
+		} 		
+		
+		return cfg;
+		
+	}
+
+	/**
 	 * Builds a control flow subgraph for a break statement.
 	 * @param entry The entry point for the subgraph.
 	 * @param exit The exit point for the subgraph.
@@ -416,6 +495,8 @@ public class CFGFactory {
 			return CFGFactory.build((DoLoop) node);
 		} else if (node instanceof ForLoop) {
 			return CFGFactory.build((ForLoop) node);
+		} else if (node instanceof ForInLoop) {
+			return CFGFactory.build((ForInLoop) node);
 		} else if (node instanceof BreakStatement) {
 			return CFGFactory.build((BreakStatement) node);
 		} else if (node instanceof ContinueStatement) {
@@ -443,8 +524,6 @@ public class CFGFactory {
 			TryStatement 
 			WithStatement
 			SwitchStatement
-			ForInLoop
-			DoLoop
 		*/
 
 		if(node instanceof VariableDeclaration ||
