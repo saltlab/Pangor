@@ -492,6 +492,41 @@ public class CFGFactory {
 	}
 
 	/**
+	 * Builds a control flow subgraph for a with statement.
+	 * @param withStatement
+	 * @return The CFG for the while loop.
+	 */
+	private static CFG build(WithStatement withStatement) {
+		
+		WithNode node = new WithNode(withStatement.getExpression());
+		CFG cfg = new CFG(node);
+        cfg.addExitNode(node);
+		
+		CFG scopeBlock = CFGFactory.buildSwitch(withStatement.getStatement());
+		
+		if(scopeBlock != null) {
+
+			node.setScopeBlock(scopeBlock.getEntryNode());
+			
+			/* Propagate return nodes. */
+			cfg.addAllReturnNodes(scopeBlock.getReturnNodes());
+
+			/* Propagate break nodes. */
+			cfg.addAllBreakNodes(scopeBlock.getBreakNodes());
+			
+			/* Propagate the exit nodes. */
+			cfg.addAllExitNodes(scopeBlock.getExitNodes());
+			
+			/* Propagate continue nodes. */
+			cfg.addAllContinueNodes(scopeBlock.getContinueNodes());
+			
+		} 		
+		
+		return cfg;
+		
+	}
+
+	/**
 	 * Builds a control flow subgraph for a break statement.
 	 * @param entry The entry point for the subgraph.
 	 * @param exit The exit point for the subgraph.
@@ -572,6 +607,8 @@ public class CFGFactory {
 			return CFGFactory.build((ForInLoop) node);
 		} else if (node instanceof SwitchStatement) {
 			return CFGFactory.build((SwitchStatement) node);
+		} else if (node instanceof WithStatement) {
+			return CFGFactory.build((WithStatement) node);
 		} else if (node instanceof BreakStatement) {
 			return CFGFactory.build((BreakStatement) node);
 		} else if (node instanceof ContinueStatement) {
@@ -598,7 +635,6 @@ public class CFGFactory {
 		/*
 			TryStatement 
 			WithStatement
-			SwitchStatement
 		*/
 
 		if(node instanceof VariableDeclaration ||

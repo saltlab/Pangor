@@ -185,61 +185,17 @@ public class TestCFG extends TestCase {
 
 	}
 
-	protected void runWithIR(String file) throws FileNotFoundException, IOException {
-
-		/* Parse the artifact with Rhino. */
-		Parser parser = new Parser();
-		AstRoot root = parser.parse(new FileReader(file), file, 1);
-		
-		/* Create the IR. */
-		IRFactory irFactory = new IRFactory();
-		ScriptNode script = irFactory.transformTree(root);
-
-		/* Print the IR. */
-		PrintTree printer = new PrintTree();
-		
-		try {
-            script.visit(printer);
-		} catch(Exception e) {
-			
-		}
-		
-	}
-	
 	@Test
-	public void testIR() throws IOException {
+	public void testWith() throws IOException {
+		
+		String file = "./test/input/cfg/with.js";
+		
+		List<String> expectedCFGs = new LinkedList<String>();
+		expectedCFGs.add("SCRIPT ENTRY->EXPR_RESULT->SCRIPT EXIT");
+		expectedCFGs.add("FUNCTION ENTRY->WITH(NAME){EXPR_VOID}->FUNCTION EXIT");
+		
+		this.runTest(file, expectedCFGs, true);
 
-		String file = "./test/input/cfg/ir.js";
-		
-		this.runWithIR(file);
-		
 	}
 	
-	private class PrintTree implements NodeVisitor {
-		
-		@Override
-		public boolean visit(AstNode node) {
-			System.out.println(Token.typeToName(node.getType()));
-			
-			for(Node child : node) {
-				if(child instanceof AstNode) this.visit((AstNode)child);
-				else this.visit(child);
-			}
-			
-			return false;
-		}
-		
-		public boolean visit(Node node) {
-			System.out.println(Token.typeToName(node.getType()));
-
-			for(Node child : node) {
-				if(child instanceof AstNode) this.visit((AstNode)child);
-				else this.visit(child);
-			}
-
-			return false;
-		}
-		
-	}
-
 }
