@@ -171,6 +171,20 @@ public class TestCFG extends TestCase {
 
 	}
 
+	@Test
+	public void testSwitch() throws IOException {
+		
+		String file = "./test/input/cfg/switch.js";
+		
+		List<String> expectedCFGs = new LinkedList<String>();
+		expectedCFGs.add("SCRIPT ENTRY->VAR->EXPR_RESULT->SCRIPT EXIT");
+		expectedCFGs.add("FUNCTION ENTRY->EXPR_VOID->VAR->CALL?{ASSIGN->EXPR_VOID}->FUNCTION EXIT");
+		expectedCFGs.add("FUNCTION ENTRY->VAR->CASE{cow:EXPR_VOID->BREAK(EXPR_VOID)->moose:EXPR_VOID->BREAK(EXPR_VOID)->horse:EXPR_VOID->BREAK(EXPR_VOID)->buffalo:EMPTY->default:EXPR_VOID}->EXPR_VOID->FUNCTION EXIT");
+		
+		this.runTest(file, expectedCFGs, true);
+
+	}
+
 	protected void runWithIR(String file) throws FileNotFoundException, IOException {
 
 		/* Parse the artifact with Rhino. */

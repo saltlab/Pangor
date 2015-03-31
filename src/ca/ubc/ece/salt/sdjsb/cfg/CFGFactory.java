@@ -12,6 +12,7 @@ import org.mozilla.javascript.ast.Block;
 import org.mozilla.javascript.ast.BreakStatement;
 import org.mozilla.javascript.ast.ContinueStatement;
 import org.mozilla.javascript.ast.DoLoop;
+import org.mozilla.javascript.ast.EmptyStatement;
 import org.mozilla.javascript.ast.ExpressionStatement;
 import org.mozilla.javascript.ast.ForInLoop;
 import org.mozilla.javascript.ast.ForLoop;
@@ -23,6 +24,7 @@ import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.PropertyGet;
 import org.mozilla.javascript.ast.ReturnStatement;
 import org.mozilla.javascript.ast.Scope;
+import org.mozilla.javascript.ast.SwitchCase;
 import org.mozilla.javascript.ast.SwitchStatement;
 import org.mozilla.javascript.ast.TryStatement;
 import org.mozilla.javascript.ast.VariableDeclaration;
@@ -127,7 +129,8 @@ public class CFGFactory {
 	 * @param block
 	 * @return The CFG for the block.
 	 */
-	private static CFG buildBlock(AstNode block) {
+	//private static CFG buildBlock(AstNode block) {
+	private static CFG buildBlock(Iterable<Node> block) {
 		/* Special cases:
 		 * 	- First statement in block (set entry point for the CFG and won't need to merge previous into it).
 		 * 	- Last statement: The exit nodes for the block will be the same as the exit nodes for this statement.
@@ -419,6 +422,76 @@ public class CFGFactory {
 	}
 
 	/**
+	 * Builds a control flow subgraph for a switch statement. A for statement is
+	 * simply a while statement with an expression before and after the loop
+	 * body.
+	 * @param forLoop
+	 * @return The CFG for the for loop.
+	 */
+	private static CFG build(SwitchStatement switchStatement) {
+		
+		/* Create the switch node. The expression is the value to switch on. */
+		SwitchNode switchNode = new SwitchNode(switchStatement.getExpression());
+
+		CFG cfg = new CFG(switchNode);
+		cfg.addExitNode(switchNode);
+		
+		/* Build the subgraphs for the cases. */
+		CFG previousSubGraph = null;
+		List<SwitchCase> switchCases = switchStatement.getCases();
+	 
+		for(SwitchCase switchCase : switchCases) {
+			
+			/* Build the subgraph for the case. */
+            CFG subGraph = null;
+			if(switchCase.getStatements() != null) {
+                List<Node> statements = new LinkedList<Node>(switchCase.getStatements());
+                subGraph = CFGFactory.buildBlock(statements);
+			}
+			
+			/* If it is an empty case, make our lives easier by adding an
+			 * empty statement as the entry and exit node. */
+			if(subGraph == null) {
+
+				StatementNode emptyCase = new StatementNode(new EmptyStatement());
+				subGraph = new CFG(emptyCase);
+				subGraph.addExitNode(emptyCase);
+				
+			}
+            
+            /* Add the node to the switch statement. */
+            switchNode.setCase(switchCase.getExpression(), subGraph.getEntryNode());
+			
+			/* Propagate return nodes. */
+			cfg.addAllReturnNodes(subGraph.getReturnNodes());
+
+            /* Propagate continue nodes. */
+            cfg.addAllContinueNodes(subGraph.getContinueNodes());
+
+			/* The break nodes are exit nodes for this loop. */
+			cfg.addAllExitNodes(subGraph.getBreakNodes());
+
+			if(previousSubGraph != null) {
+
+                /* Merge the exit nodes into the next case. */
+                for(CFGNode exitNode : previousSubGraph.getExitNodes()) {
+                    exitNode.mergeInto(subGraph.getEntryNode());
+                }
+
+			}
+			
+			previousSubGraph = subGraph;
+			
+		}
+
+        /* The rest of the exit nodes are exit nodes for the statement. */
+        cfg.addAllExitNodes(previousSubGraph.getExitNodes());
+		
+		return cfg;
+		
+	}
+
+	/**
 	 * Builds a control flow subgraph for a break statement.
 	 * @param entry The entry point for the subgraph.
 	 * @param exit The exit point for the subgraph.
@@ -497,6 +570,8 @@ public class CFGFactory {
 			return CFGFactory.build((ForLoop) node);
 		} else if (node instanceof ForInLoop) {
 			return CFGFactory.build((ForInLoop) node);
+		} else if (node instanceof SwitchStatement) {
+			return CFGFactory.build((SwitchStatement) node);
 		} else if (node instanceof BreakStatement) {
 			return CFGFactory.build((BreakStatement) node);
 		} else if (node instanceof ContinueStatement) {
