@@ -557,29 +557,30 @@ public class CFGFactory {
 	 */
 	private static CFG build(WithStatement withStatement) {
 		
-		WithNode node = new WithNode(withStatement.getExpression());
-		CFG cfg = new CFG(node);
-        cfg.addExitNode(node);
+		CFGNode withNode = new CFGNode(withStatement.getExpression());
+		CFG cfg = new CFG(withNode);
 		
 		CFG scopeBlock = CFGFactory.buildSwitch(withStatement.getStatement());
+
+        if(scopeBlock == null) {
+            CFGNode empty = new CFGNode(new EmptyStatement());
+            scopeBlock = new CFG(empty);
+            scopeBlock.addExitNode(empty);
+        }
 		
-		if(scopeBlock != null) {
+        withNode.addEdge(null, scopeBlock.getEntryNode());
+        
+        /* Propagate return nodes. */
+        cfg.addAllReturnNodes(scopeBlock.getReturnNodes());
 
-			node.setScopeBlock(scopeBlock.getEntryNode());
-			
-			/* Propagate return nodes. */
-			cfg.addAllReturnNodes(scopeBlock.getReturnNodes());
-
-			/* Propagate break nodes. */
-			cfg.addAllBreakNodes(scopeBlock.getBreakNodes());
-			
-			/* Propagate the exit nodes. */
-			cfg.addAllExitNodes(scopeBlock.getExitNodes());
-			
-			/* Propagate continue nodes. */
-			cfg.addAllContinueNodes(scopeBlock.getContinueNodes());
-			
-		} 		
+        /* Propagate break nodes. */
+        cfg.addAllBreakNodes(scopeBlock.getBreakNodes());
+        
+        /* Propagate the exit nodes. */
+        cfg.addAllExitNodes(scopeBlock.getExitNodes());
+        
+        /* Propagate continue nodes. */
+        cfg.addAllContinueNodes(scopeBlock.getContinueNodes());
 		
 		return cfg;
 		
