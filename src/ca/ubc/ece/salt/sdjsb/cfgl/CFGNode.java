@@ -1,8 +1,9 @@
-package ca.ubc.ece.salt.sdjsb.cfg2;
+package ca.ubc.ece.salt.sdjsb.cfgl;
 
 import java.util.LinkedList;
 import java.util.List;
 
+import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
 
 /**
@@ -15,6 +16,9 @@ public class CFGNode {
 	
 	/** The unique id for this node. **/
 	private long id;
+	
+	/** Optional name for this node. **/
+	private String name;
 	
 	/** The AST Statement which contains the actions this node performs. From
 	 * org.mozilla.javascript.Token. **/
@@ -31,6 +35,19 @@ public class CFGNode {
 		this.edges = new LinkedList<Edge>();
 		this.statement = statement;
 		this.id = CFGNode.getUniqueId();
+		this.name = null;
+	}
+	
+	/**
+	 * @param statement The statement that is executed when this node is 
+	 * 		  			reached.
+	 * @param name The name for this node (nice for printing and debugging).
+	 */
+	public CFGNode(AstNode statement, String name) {
+		this.edges = new LinkedList<Edge>();
+		this.statement = statement;
+		this.id = CFGNode.getUniqueId();
+		this.name = name;
 	}
 	
 	/**
@@ -47,6 +64,21 @@ public class CFGNode {
 		}
 		else {
             this.edges.add(new Edge(condition, node));
+		}
+	}
+	
+	/**
+	 * Add an edge to this node. If an edge with the same condition already
+	 * exists, that edge will be overwritten. 
+	 * @param edge The edge to add.
+	 */
+	public void addEdge(Edge edge) {
+		int index = this.edges.indexOf(edge);
+		if(index >= 0) {
+			this.edges.get(index).node = edge.node;
+		}
+		else {
+            this.edges.add(edge);
 		}
 	}
 	
@@ -78,6 +110,22 @@ public class CFGNode {
 	public long getId() {
 		return id;
 	}
+	
+	public String getName() {
+		
+		if(this.name != null) return this.name;
+		
+        String name;
+
+        try {
+            name = Token.typeToName(this.statement.getType());
+        }
+        catch(IllegalStateException e) {
+            name = Token.keywordToName(this.statement.getType());
+        }
+
+        return name;
+	}
 
 	/**
 	 * Make a copy of the given node.
@@ -98,30 +146,6 @@ public class CFGNode {
 		long id = CFGNode.idGen;
 		CFGNode.idGen++;
 		return id;
-	}
-
-	/**
-	 * A labeled edge from from this node to another.
-	 */
-	public class Edge {
-		
-		/* The condition in which this edge is traversed. If null then the edge
-		 * is always traversed. */
-		public AstNode condition;
-		public CFGNode node;
-		
-		public Edge(AstNode condition, CFGNode node) {
-			this.condition = condition;
-			this.node = node;
-		}
-		
-		@Override 
-		public boolean equals(Object o) {
-			if(o instanceof Edge) {
-				return ((Edge)o).condition == this.condition;
-			}
-			return false;
-		}
 	}
 
 }

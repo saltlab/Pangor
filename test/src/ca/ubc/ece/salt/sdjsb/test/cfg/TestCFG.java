@@ -1,20 +1,13 @@
 package ca.ubc.ece.salt.sdjsb.test.cfg;
 
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.junit.Test;
-import org.mozilla.javascript.IRFactory;
-import org.mozilla.javascript.Node;
 import org.mozilla.javascript.Parser;
-import org.mozilla.javascript.Token;
-import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
-import org.mozilla.javascript.ast.NodeVisitor;
-import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.sdjsb.cfg.CFG;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGFactory;

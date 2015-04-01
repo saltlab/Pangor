@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.cfg2;
+package ca.ubc.ece.salt.sdjsb.cfgl;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,7 +14,6 @@ import org.mozilla.javascript.ast.CatchClause;
 import org.mozilla.javascript.ast.ContinueStatement;
 import org.mozilla.javascript.ast.DoLoop;
 import org.mozilla.javascript.ast.EmptyStatement;
-import org.mozilla.javascript.ast.ExpressionStatement;
 import org.mozilla.javascript.ast.ForInLoop;
 import org.mozilla.javascript.ast.ForLoop;
 import org.mozilla.javascript.ast.FunctionCall;
@@ -33,8 +32,6 @@ import org.mozilla.javascript.ast.UnaryExpression;
 import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.WhileLoop;
 import org.mozilla.javascript.ast.WithStatement;
-
-import ca.ubc.ece.salt.sdjsb.cfg2.CFGNode.Edge;
 
 /**
  * Builds a control flow graph.
@@ -71,12 +68,15 @@ public class CFGFactory {
 	 * @return The complete CFG.
 	 */
 	private static CFG buildScriptCFG(ScriptNode scriptNode) {
+		
+		String name = "FUNCTION";
+		if(scriptNode instanceof AstRoot) name = "SCRIPT";
 
 		/* Start by getting the CFG for the script. There is one entry point
 		 * and one exit point for a script and function. */
 
-		CFGNode scriptEntry = new CFGNode(new EmptyStatement());
-		CFGNode scriptExit = new CFGNode(new EmptyStatement());
+		CFGNode scriptEntry = new CFGNode(new EmptyStatement(), name + "_ENTRY");
+		CFGNode scriptExit = new CFGNode(new EmptyStatement(), name + "_EXIT");
 		
         /* Build the CFG for the script. */
         CFG cfg = new CFG(scriptEntry);
@@ -188,7 +188,7 @@ public class CFGFactory {
 	 */
 	private static CFG build(IfStatement ifStatement) {
 		
-		CFGNode ifNode = new CFGNode(new EmptyStatement());
+		CFGNode ifNode = new CFGNode(new EmptyStatement(), "IF");
 		CFG cfg = new CFG(ifNode);
 		
 		/* Build the true branch. */
@@ -201,7 +201,7 @@ public class CFGFactory {
 			trueBranch.addExitNode(empty);
 		}
 		
-		ifNode.addEdge(ifStatement.getCondition(), trueBranch.getEntryNode());
+		ifNode.addEdge(new Edge(ifStatement.getCondition(), trueBranch.getEntryNode(), "true"));
 
         /* Propagate exit, return, continue and break nodes. */
         cfg.addAllExitNodes(trueBranch.getExitNodes());
@@ -219,7 +219,7 @@ public class CFGFactory {
 			falseBranch.addExitNode(empty);
 		}
 
-		ifNode.addEdge(new UnaryExpression(Token.NOT, 0, ifStatement.getElsePart()), trueBranch.getEntryNode());
+		ifNode.addEdge(new Edge(new UnaryExpression(Token.NOT, 0, ifStatement.getCondition()), falseBranch.getEntryNode(), "false"));
 
         /* Propagate exit, return, continue and break nodes. */
         cfg.addAllExitNodes(falseBranch.getExitNodes());

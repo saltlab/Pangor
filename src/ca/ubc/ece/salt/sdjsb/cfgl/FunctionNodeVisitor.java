@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.cfg2;
+package ca.ubc.ece.salt.sdjsb.cfgl;
 
 import java.util.LinkedList;
 import java.util.List;

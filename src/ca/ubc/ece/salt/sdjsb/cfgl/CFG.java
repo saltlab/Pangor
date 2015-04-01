@@ -1,10 +1,10 @@
-package ca.ubc.ece.salt.sdjsb.cfg2;
+package ca.ubc.ece.salt.sdjsb.cfgl;
 
 import java.util.LinkedList;
 import java.util.List;
 
 /**
- * A control flow graph or subgraph.
+ * A low(er) level control flow graph or subgraph.
  * 
  * The control flow graph contains an entry node where the graph begins. It
  * also keeps track of statements that exit the CFG. These include the last
