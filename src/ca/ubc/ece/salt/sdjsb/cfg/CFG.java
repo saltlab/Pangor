@@ -77,7 +77,7 @@ public class CFG {
 
 	/**
 	 * Add an continue node to this CFG.
-	 * @param node The last node before continueing an execution branch.
+	 * @param node The last node before continuing an execution branch.
 	 */
 	public void addContinueNode(CFGNode node) {
 		this.continueNodes.add(node);

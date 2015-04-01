@@ -197,5 +197,17 @@ public class TestCFG extends TestCase {
 		this.runTest(file, expectedCFGs, true);
 
 	}
+
+	@Test
+	public void testTryCatch() throws IOException {
+		
+		String file = "./test/input/cfg/trycatch.js";
+		
+		List<String> expectedCFGs = new LinkedList<String>();
+		expectedCFGs.add("SCRIPT ENTRY->VAR->TRY?{EXPR_RESULT->SHEQ?{THROW}->EXPR_RESULT,catch:EXPR_RESULT,finally:EXPR_RESULT}->SCRIPT EXIT");
+		
+		this.runTest(file, expectedCFGs, true);
+
+	}
 	
 }
