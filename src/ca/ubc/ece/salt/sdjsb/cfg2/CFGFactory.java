@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.cfg;
+package ca.ubc.ece.salt.sdjsb.cfg2;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -24,16 +24,17 @@ import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.PropertyGet;
 import org.mozilla.javascript.ast.ReturnStatement;
 import org.mozilla.javascript.ast.Scope;
+import org.mozilla.javascript.ast.ScriptNode;
 import org.mozilla.javascript.ast.SwitchCase;
 import org.mozilla.javascript.ast.SwitchStatement;
 import org.mozilla.javascript.ast.TryStatement;
+import org.mozilla.javascript.ast.UnaryExpression;
 import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.WhileLoop;
 import org.mozilla.javascript.ast.WithStatement;
 
 /**
  * Builds a control flow graph.
- * @author qhanam
  */
 public class CFGFactory {
 	
@@ -48,48 +49,49 @@ public class CFGFactory {
 		List<CFG> cfgs = new LinkedList<CFG>();
 		
 		/* Start by getting the CFG for the script. */
-		CFGNode entry = new ScriptEntryCFGNode(root);
-		CFGNode exit = new ScriptExitCFGNode(root);
-		
-        /* There is one entry point and one exit point for a script and function. */
-        CFG cfg = new CFG(entry);
-        cfg.addExitNode(exit);
-        
-        /* Build the CFG for the script. */
-        CFG subGraph = CFGFactory.build(root);
-        entry.mergeInto(subGraph.getEntryNode());
-        subGraph.mergeInto(exit);
-        cfgs.add(cfg);
+        cfgs.add(CFGFactory.buildScriptCFG(root));
 		
 		/* Get the list of functions in the script. */
 		List<FunctionNode> functions = FunctionNodeVisitor.getFunctions(root);
 		
 		/* For each function, generate its CFG. */
 		for (FunctionNode function : functions) {
-			
-            /* Start by getting the CFG for the script. */
-            entry = new FunctionEntryCFGNode(function);
-            exit = new FunctionExitCFGNode(function);
-            
-            /* There is one entry point and one exit point for a script and function. */
-            cfg = new CFG(entry);
-            cfg.addExitNode(exit);
-            
-            /* Build the CFG for the script. */
-            subGraph = CFGFactory.build(function);
-            entry.mergeInto(subGraph.getEntryNode());
-            subGraph.mergeInto(exit);
-            
-            /* Merge return nodes into function exit node. */
-            for(CFGNode node : subGraph.getReturnNodes()) {
-            	node.mergeInto(exit);
-            }
-            
-            cfgs.add(cfg);
-
+			cfgs.add(CFGFactory.buildScriptCFG(function));
 		}
 		
 		return cfgs;
+	}
+	
+	/**
+	 * Builds a CFG for a function or script.
+	 * @param scriptNode An ASTRoot node or FunctionNode.
+	 * @return The complete CFG.
+	 */
+	private static CFG buildScriptCFG(ScriptNode scriptNode) {
+
+		/* Start by getting the CFG for the script. There is one entry point
+		 * and one exit point for a script and function. */
+
+		CFGNode scriptEntry = new CFGNode(new EmptyStatement());
+		CFGNode scriptExit = new CFGNode(new EmptyStatement());
+		
+        /* Build the CFG for the script. */
+        CFG cfg = new CFG(scriptEntry);
+        cfg.addExitNode(scriptExit);
+        
+        /* Build the CFG subgraph for the script body. */
+        CFG subGraph = CFGFactory.build(scriptNode);
+
+        /* The next node in the graph is first node of the subgraph. */
+        scriptEntry.addEdge(null, subGraph.getEntryNode());
+        
+        /* Merge the subgraph's exit nodes into the script exit node. */
+        for(CFGNode exitNode : subGraph.getExitNodes()) {
+        	exitNode.addEdge(null, scriptExit);
+        }
+        
+        return cfg;
+		
 	}
 	
 	/**
@@ -109,19 +111,14 @@ public class CFGFactory {
 	}
 	
 	/**
-	 * Builds a CFG for a script.
-	 * @param block The block statement.
+	 * Builds a CFG for a script or function.
+	 * @param script The block statement ({@code AstRoot} or {@code FunctionNode}).
 	 */
-	private static CFG build(AstRoot script) {
-		return CFGFactory.buildBlock(script);
-	}
-
-	/**
-	 * Builds a CFG for a function or script.
-	 * @param block The block statement.
-	 */
-	private static CFG build(FunctionNode function) {
-		return CFGFactory.buildSwitch(function.getBody());
+	private static CFG build(ScriptNode script) {
+		if(script instanceof AstRoot) {
+            return CFGFactory.buildBlock(script);
+		}
+		return CFGFactory.buildSwitch(((FunctionNode)script).getBody());
 	}
 
 	/**
@@ -152,7 +149,11 @@ public class CFGFactory {
 				}
 				else {
 					/* Merge the previous subgraph into the entry point of this subgraph. */
-                    previous.mergeInto(subGraph.getEntryNode());
+					assert(previous.getExitNodes().size() == 1);
+					for(CFGNode exitNode : previous.getExitNodes()) {
+						exitNode.addEdge(null, subGraph.getEntryNode());
+						
+					}
 				}
 
                 /* Propagate return, continue and break nodes. */
@@ -184,32 +185,44 @@ public class CFGFactory {
 	 */
 	private static CFG build(IfStatement ifStatement) {
 		
-		IfNode node = new IfNode(ifStatement.getCondition());
-		CFG cfg = new CFG(node);
-        cfg.addExitNode(node);
+		CFGNode ifNode = new CFGNode(new EmptyStatement());
+		CFG cfg = new CFG(ifNode);
+		
+		/* Build the true branch. */
 		
 		CFG trueBranch = CFGFactory.buildSwitch(ifStatement.getThenPart());
-		CFG falseBranch = CFGFactory.buildSwitch(ifStatement.getElsePart());
 		
-		if(trueBranch != null) {
-			node.setTrueBranch(trueBranch.getEntryNode());
-
-            /* Propagate exit, return, continue and break nodes. */
-			cfg.addAllExitNodes(trueBranch.getExitNodes());
-            cfg.addAllReturnNodes(trueBranch.getReturnNodes());
-            cfg.addAllBreakNodes(trueBranch.getBreakNodes());
-            cfg.addAllContinueNodes(trueBranch.getContinueNodes());
-		} 		
-
-		if(falseBranch != null) {
-			node.setFalseBranch(falseBranch.getEntryNode());
-
-            /* Propagate exit, return, continue and break nodes. */
-			cfg.addAllExitNodes(falseBranch.getExitNodes());
-            cfg.addAllReturnNodes(falseBranch.getReturnNodes());
-            cfg.addAllBreakNodes(falseBranch.getBreakNodes());
-            cfg.addAllContinueNodes(falseBranch.getContinueNodes());
+		if(trueBranch == null) {
+			CFGNode empty = new CFGNode(new EmptyStatement());
+			trueBranch = new CFG(empty);
+			trueBranch.addExitNode(empty);
 		}
+		
+		ifNode.addEdge(ifStatement.getCondition(), trueBranch.getEntryNode());
+
+        /* Propagate exit, return, continue and break nodes. */
+        cfg.addAllExitNodes(trueBranch.getExitNodes());
+        cfg.addAllReturnNodes(trueBranch.getReturnNodes());
+        cfg.addAllBreakNodes(trueBranch.getBreakNodes());
+        cfg.addAllContinueNodes(trueBranch.getContinueNodes());
+        
+        /* Build the false branch. */
+
+		CFG falseBranch = CFGFactory.buildSwitch(ifStatement.getElsePart());
+
+		if(falseBranch == null) {
+			CFGNode empty = new CFGNode(new EmptyStatement());
+			falseBranch = new CFG(empty);
+			falseBranch.addExitNode(empty);
+		}
+
+		ifNode.addEdge(new UnaryExpression(Token.NOT, 0, ifStatement.getElsePart()), trueBranch.getEntryNode());
+
+        /* Propagate exit, return, continue and break nodes. */
+        cfg.addAllExitNodes(falseBranch.getExitNodes());
+        cfg.addAllReturnNodes(falseBranch.getReturnNodes());
+        cfg.addAllBreakNodes(falseBranch.getBreakNodes());
+        cfg.addAllContinueNodes(falseBranch.getContinueNodes());
 		
 		return cfg;
 		
@@ -238,12 +251,12 @@ public class CFGFactory {
 			cfg.addAllExitNodes(trueBranch.getBreakNodes());
 
 			/* We merge the exit nodes back into the while loop. */
-            for(CFGNode exitNode : trueBranch.getExitNodes()) {
+            for(Node exitNode : trueBranch.getExitNodes()) {
                 exitNode.mergeInto(node);
             }
             
             /* We merge continue nodes back into the while loop. */
-            for(CFGNode continueNode : trueBranch.getContinueNodes()) {
+            for(Node continueNode : trueBranch.getContinueNodes()) {
             	continueNode.mergeInto(node);
             }
 
@@ -281,12 +294,12 @@ public class CFGFactory {
 			cfg.addAllExitNodes(trueBranch.getBreakNodes());
 
 			/* We merge the exit nodes back into the while loop. */
-            for(CFGNode exitNode : trueBranch.getExitNodes()) {
+            for(Node exitNode : trueBranch.getExitNodes()) {
                 exitNode.mergeInto(loop);
             }
             
             /* We merge continue nodes back into the while loop. */
-            for(CFGNode continueNode : trueBranch.getContinueNodes()) {
+            for(Node continueNode : trueBranch.getContinueNodes()) {
             	continueNode.mergeInto(loop);
             }
 
@@ -333,12 +346,12 @@ public class CFGFactory {
 			cfg.addAllExitNodes(trueBranch.getBreakNodes());
 
 			/* We merge the exit nodes back into the while loop. */
-            for(CFGNode exitNode : trueBranch.getExitNodes()) {
+            for(Node exitNode : trueBranch.getExitNodes()) {
                 exitNode.mergeInto(increment);
             }
             
             /* We merge continue nodes back into the while loop. */
-            for(CFGNode continueNode : trueBranch.getContinueNodes()) {
+            for(Node continueNode : trueBranch.getContinueNodes()) {
             	continueNode.mergeInto(increment);
             }
 
@@ -405,12 +418,12 @@ public class CFGFactory {
 			cfg.addAllExitNodes(trueBranch.getBreakNodes());
 
 			/* We merge the exit nodes back into the while loop. */
-            for(CFGNode exitNode : trueBranch.getExitNodes()) {
+            for(Node exitNode : trueBranch.getExitNodes()) {
                 exitNode.mergeInto(loop);
             }
             
             /* We merge continue nodes back into the while loop. */
-            for(CFGNode continueNode : trueBranch.getContinueNodes()) {
+            for(Node continueNode : trueBranch.getContinueNodes()) {
             	continueNode.mergeInto(loop);
             }
 
@@ -473,7 +486,7 @@ public class CFGFactory {
 			if(previousSubGraph != null) {
 
                 /* Merge the exit nodes into the next case. */
-                for(CFGNode exitNode : previousSubGraph.getExitNodes()) {
+                for(Node exitNode : previousSubGraph.getExitNodes()) {
                     exitNode.mergeInto(subGraph.getEntryNode());
                 }
 
@@ -545,7 +558,7 @@ public class CFGFactory {
 		CFG finallyBlock = CFGFactory.buildSwitch(tryStatement.getFinallyBlock());
 
 		if(finallyBlock == null) { 
-			CFGNode empty = new StatementNode(new EmptyStatement());
+			Node empty = new StatementNode(new EmptyStatement());
 			finallyBlock = new CFG(empty);
 			finallyBlock.addExitNode(empty);
 		}
@@ -564,7 +577,7 @@ public class CFGFactory {
 		CFG tryBlock = CFGFactory.buildSwitch(tryStatement.getTryBlock());
 		
 		if(tryBlock == null) {
-			CFGNode empty = new StatementNode(new EmptyStatement());
+			Node empty = new StatementNode(new EmptyStatement());
 			tryBlock = new CFG(empty);
 			tryBlock.addExitNode(empty);
 		}
@@ -575,7 +588,7 @@ public class CFGFactory {
             cfg.addAllContinueNodes(tryBlock.getContinueNodes());
             
             /* Exit nodes exit to the finally block. */
-            for(CFGNode exitNode : tryBlock.getExitNodes()) {
+            for(Node exitNode : tryBlock.getExitNodes()) {
             	exitNode.mergeInto(finallyBlock.getEntryNode());
             }
 		}
@@ -590,7 +603,7 @@ public class CFGFactory {
 			CFG catchBlock = CFGFactory.buildSwitch(catchClause.getBody());
 			
 			if(catchBlock == null) {
-				CFGNode empty = new StatementNode(new EmptyStatement());
+				Node empty = new StatementNode(new EmptyStatement());
 				catchBlock = new CFG(empty);
 				catchBlock.addExitNode(empty);
 			}
@@ -601,7 +614,7 @@ public class CFGFactory {
                 cfg.addAllContinueNodes(catchBlock.getContinueNodes());
                 
                 /* Exit nodes exit to the finally block. */
-                for(CFGNode exitNode : catchBlock.getExitNodes()) {
+                for(Node exitNode : catchBlock.getExitNodes()) {
                     exitNode.mergeInto(finallyBlock.getEntryNode());
                 }
 				
@@ -623,7 +636,7 @@ public class CFGFactory {
 	 */
 	private static CFG build(BreakStatement breakStatement) {
 		
-		CFGNode node = new JumpNode(breakStatement);
+		Node node = new JumpNode(breakStatement);
 		CFG cfg = new CFG(node);
 		cfg.addBreakNode(node);
 		return cfg;
@@ -638,7 +651,7 @@ public class CFGFactory {
 	 */
 	private static CFG build(ContinueStatement continueStatement) {
 		
-		CFGNode node = new JumpNode(continueStatement);
+		Node node = new JumpNode(continueStatement);
 		CFG cfg = new CFG(node);
 		cfg.addContinueNode(node);
 		return cfg;
@@ -653,7 +666,7 @@ public class CFGFactory {
 	 */
 	private static CFG build(ReturnStatement returnStatement) {
 		
-		CFGNode node = new JumpNode(returnStatement);
+		Node node = new JumpNode(returnStatement);
 		CFG cfg = new CFG(node);
 		cfg.addReturnNode(node);
 		return cfg;
@@ -668,7 +681,7 @@ public class CFGFactory {
 	 */
 	private static CFG build(AstNode statement) {
 		
-		CFGNode node = new StatementNode(statement);
+		Node node = new StatementNode(statement);
 		CFG cfg = new CFG(node);
 		cfg.addExitNode(node);
 		return cfg;
