@@ -235,32 +235,42 @@ public class CFGFactory {
 	 */
 	private static CFG build(WhileLoop whileLoop) {
 		
-		WhileNode node = new WhileNode(whileLoop.getCondition());
-		CFG cfg = new CFG(node);
-        cfg.addExitNode(node);
+		CFGNode whileNode = new CFGNode(new EmptyStatement());
+		CFG cfg = new CFG(whileNode);
+
+		/* Build the true branch. */
 		
 		CFG trueBranch = CFGFactory.buildSwitch(whileLoop.getBody());
+
+		if(trueBranch == null) {
+			CFGNode empty = new CFGNode(new EmptyStatement());
+			trueBranch = new CFG(empty);
+			trueBranch.addExitNode(empty);
+		}
 		
-		if(trueBranch != null) {
-			node.setTrueBranch(trueBranch.getEntryNode());
-			
-			/* Propagate return nodes. */
-			cfg.addAllReturnNodes(trueBranch.getReturnNodes());
+		whileNode.addEdge(whileLoop.getCondition(), trueBranch.getEntryNode());
 
-			/* The break nodes are exit nodes for this loop. */
-			cfg.addAllExitNodes(trueBranch.getBreakNodes());
-
-			/* We merge the exit nodes back into the while loop. */
-            for(Node exitNode : trueBranch.getExitNodes()) {
-                exitNode.mergeInto(node);
-            }
-            
-            /* We merge continue nodes back into the while loop. */
-            for(Node continueNode : trueBranch.getContinueNodes()) {
-            	continueNode.mergeInto(node);
-            }
-
-		} 		
+        /* Propagate return nodes. */
+        cfg.addAllExitNodes(trueBranch.getExitNodes());
+        
+        /* The break nodes are exit nodes for this loop. */
+        cfg.addAllExitNodes(trueBranch.getBreakNodes());
+        
+        /* Exit nodes point back to the start of the loop. */
+        for(CFGNode exitNode : trueBranch.getExitNodes()) {
+        	exitNode.addEdge(null, whileNode);
+        }
+        
+        /* Continue nodes point back to the start of the loop. */
+        for(CFGNode continueNode : trueBranch.getContinueNodes()) {
+        	continueNode.addEdge(null, whileNode);
+        }
+        
+        /* Build the false branch. */
+        
+        CFGNode empty = new CFGNode(new EmptyStatement());
+		whileNode.addEdge(new UnaryExpression(Token.NOT, 0, whileLoop.getCondition()), empty);
+		cfg.addExitNode(empty);
 		
 		return cfg;
 		
@@ -273,45 +283,50 @@ public class CFGFactory {
 	 */
 	private static CFG build(DoLoop doLoop) {
 		
-		DoNode entry = new DoNode();
-		WhileNode loop = new WhileNode(doLoop.getCondition());
-		loop.setTrueBranch(entry);
-
-		CFG cfg = new CFG(entry);
-        cfg.addExitNode(loop);
+		CFGNode doNode = new CFGNode(new EmptyStatement());
+		CFGNode whileNode = new CFGNode(new EmptyStatement());
+		CFG cfg = new CFG(doNode);
 		
-		CFG trueBranch = CFGFactory.buildSwitch(doLoop.getBody());
+		/* Build the loop branch. */
 		
-		if(trueBranch != null) {
-			
-			/* The body is executed at least once. */
-			entry.mergeInto(trueBranch.getEntryNode());
-			
-			/* Propagate return nodes. */
-			cfg.addAllReturnNodes(trueBranch.getReturnNodes());
-
-			/* The break nodes are exit nodes for this loop. */
-			cfg.addAllExitNodes(trueBranch.getBreakNodes());
-
-			/* We merge the exit nodes back into the while loop. */
-            for(Node exitNode : trueBranch.getExitNodes()) {
-                exitNode.mergeInto(loop);
-            }
-            
-            /* We merge continue nodes back into the while loop. */
-            for(Node continueNode : trueBranch.getContinueNodes()) {
-            	continueNode.mergeInto(loop);
-            }
-
-		} 		
-		else {
-			
-			/* Infinite loop. */
-			entry.mergeInto(loop);
+		CFG loopBranch = CFGFactory.buildSwitch(doLoop.getBody());
+		
+		if(loopBranch == null) {
+			CFGNode empty = new CFGNode(new EmptyStatement());
+			loopBranch = new CFG(empty);
+			loopBranch.addExitNode(empty);
 		}
 		
-		return cfg;
+		/* We always execute the do block at least once. */
+		doNode.addEdge(null, loopBranch.getEntryNode());
+
+		/* Add edges from exit nodes from the loop to the while node. */
+		for(CFGNode exitNode : loopBranch.getExitNodes()) {
+			exitNode.addEdge(null, whileNode);
+		}
+
+        /* Propagate return nodes. */
+        cfg.addAllReturnNodes(loopBranch.getReturnNodes());
+
+        /* The break nodes are exit nodes for this loop. */
+        cfg.addAllExitNodes(loopBranch.getBreakNodes());
+
+        /* Continue nodes have edges to the while condition. */
+        for(CFGNode continueNode : loopBranch.getContinueNodes()) {
+        	continueNode.addEdge(null, whileNode);
+        }
 		
+		/* Add edge for true condition back to the start of the loop. */
+		whileNode.addEdge(doLoop.getCondition(), loopBranch.getEntryNode());
+		
+		/* Add edge for false condition. */
+
+        CFGNode empty = new CFGNode(new EmptyStatement());
+		whileNode.addEdge(new UnaryExpression(Token.NOT, 0, doLoop.getCondition()), empty);
+		cfg.addExitNode(empty);
+
+		return cfg;
+
 	}
 
 	/**
@@ -323,39 +338,44 @@ public class CFGFactory {
 	 */
 	private static CFG build(ForLoop forLoop) {
 		
-		StatementNode initializer = new StatementNode(forLoop.getInitializer());
-		WhileNode loop = new WhileNode(forLoop.getCondition());
-		StatementNode increment = new StatementNode(forLoop.getIncrement());
+		CFGNode forNode = new CFGNode(forLoop.getInitializer());
+		CFGNode increment = new CFGNode(forLoop.getIncrement());
+		increment.addEdge(null, forNode);
+		CFG cfg = new CFG(forNode);
 		
-        /* Set up the initializer and increment with respect to the loop. */
-		initializer.mergeInto(loop);
-		increment.mergeInto(loop);
-
-		CFG cfg = new CFG(initializer);
-        cfg.addExitNode(loop);
+		/* Build the true branch. */
 		
 		CFG trueBranch = CFGFactory.buildSwitch(forLoop.getBody());
+
+		if(trueBranch == null) {
+			CFGNode empty = new CFGNode(new EmptyStatement());
+			trueBranch = new CFG(empty);
+			trueBranch.addExitNode(empty);
+		}
 		
-		if(trueBranch != null) {
-			loop.setTrueBranch(trueBranch.getEntryNode());
-			
-			/* Propagate return nodes. */
-			cfg.addAllReturnNodes(trueBranch.getReturnNodes());
+		forNode.addEdge(forLoop.getCondition(), trueBranch.getEntryNode());
 
-			/* The break nodes are exit nodes for this loop. */
-			cfg.addAllExitNodes(trueBranch.getBreakNodes());
-
-			/* We merge the exit nodes back into the while loop. */
-            for(Node exitNode : trueBranch.getExitNodes()) {
-                exitNode.mergeInto(increment);
-            }
-            
-            /* We merge continue nodes back into the while loop. */
-            for(Node continueNode : trueBranch.getContinueNodes()) {
-            	continueNode.mergeInto(increment);
-            }
-
-		} 		
+        /* Propagate return nodes. */
+        cfg.addAllExitNodes(trueBranch.getExitNodes());
+        
+        /* The break nodes are exit nodes for this loop. */
+        cfg.addAllExitNodes(trueBranch.getBreakNodes());
+        
+        /* Exit nodes point to the increment node. */
+        for(CFGNode exitNode : trueBranch.getExitNodes()) {
+        	exitNode.addEdge(null, increment);
+        }
+        
+        /* Continue nodes point to the increment. */
+        for(CFGNode continueNode : trueBranch.getContinueNodes()) {
+        	continueNode.addEdge(null, increment);
+        }
+        
+        /* Build the false branch. */
+        
+        CFGNode empty = new CFGNode(new EmptyStatement());
+		forNode.addEdge(new UnaryExpression(Token.NOT, 0, forLoop.getCondition()), empty);
+		cfg.addExitNode(empty);
 		
 		return cfg;
 		
@@ -370,64 +390,86 @@ public class CFGFactory {
 	 * @return The CFG for the for-in loop.
 	 */
 	private static CFG build(ForInLoop forInLoop) {
-		
-		AstNode iterator = forInLoop.getIterator();
-		StatementNode initializer = null;
-		CFG cfg;
 
-        /* We need to add a node that declares a variable. Interestingly,
-         * if a variable is declared it can also be initialized to a value
-         * here (although it will have no effect). */
-        initializer = new StatementNode(iterator);
-        cfg = new CFG(initializer);
-        
-        /* To represent key iteration, we make up a function that iterates 
-         * through each key in an object. The function name is invalid in JS
-         * to ensure that there isn't another function with the same name.
-         * Since we're not producing code, this is ok. */
-        AstNode target = ((VariableDeclaration) iterator).getVariables().get(0).getTarget();
+		/* To represent key iteration, we make up two functions:
+		 *  
+		 * 	~getNextKey() - iterates through each key in an object. 
+		 *	~hasNextKey() - true if there is another key to iterate. 
+		 *
+         * These names are invalid in JavaScript to ensure that there isn't
+         * another function with the same name. Since we're not producing code,
+         * this is ok. */
+		
+		/* Start with the variable declaration. */
+		AstNode iterator = forInLoop.getIterator();
+		CFGNode forInNode = new CFGNode(iterator);
+		CFG cfg = new CFG(forInNode);
+		
+		/* Get the variable being assigned. */
+		AstNode target;
+		if(iterator instanceof VariableDeclaration) {
+            target = ((VariableDeclaration) iterator).getVariables().get(0).getTarget();
+		}
+		else if (iterator instanceof Name) {
+			target = iterator;
+		}
+		else {
+			target = new Name(0, "~error~");
+		}
+
+		/* Create the node that gets the next key in an object and assigns the
+		 * value to the iterator variable. */
+
         PropertyGet keyIteratorMethod = new PropertyGet(forInLoop.getIteratedObject(), new Name(0, "~getNextkey"));
         FunctionCall keyIteratorFunction = new FunctionCall();
         keyIteratorFunction.setTarget(keyIteratorMethod);
         Assignment targetAssignment = new Assignment(target, keyIteratorFunction);
         targetAssignment.setType(Token.ASSIGN);
+		
+        CFGNode assignment = new CFGNode(targetAssignment);
 
-        StatementNode assignment = new StatementNode(targetAssignment);
+        /* Create the the condition that checks if an object still has keys.
+         * The condition is assigned to the true/false loop branches. */
 
-        /* Do the same thing for the loop condition (if there is another key then loop). */
         PropertyGet keyConditionMethod = new PropertyGet(forInLoop.getIteratedObject(), new Name(0, "~hasNextKey"));
         FunctionCall keyConditionFunction = new FunctionCall();
         keyConditionFunction.setTarget(keyConditionMethod);
 
-		WhileNode loop = new WhileNode(keyConditionFunction);
+		CFGNode condition = new CFGNode(new EmptyStatement());
 		
-        /* Set up the initializer and increment with respect to the loop. */
-		initializer.mergeInto(loop);
-		loop.setTrueBranch(assignment);
-        cfg.addExitNode(loop);
+        /* Create the CFG for the loop body. */
 		
 		CFG trueBranch = CFGFactory.buildSwitch(forInLoop.getBody());
+
+		if(trueBranch == null) {
+			CFGNode empty = new CFGNode(new EmptyStatement());
+			trueBranch = new CFG(empty);
+			trueBranch.addExitNode(empty);
+		}
 		
-		if(trueBranch != null) {
-			assignment.mergeInto(trueBranch.getEntryNode());
-			
-			/* Propagate return nodes. */
-			cfg.addAllReturnNodes(trueBranch.getReturnNodes());
+        /* Propagate return nodes. */
+        cfg.addAllReturnNodes(trueBranch.getReturnNodes());
 
-			/* The break nodes are exit nodes for this loop. */
-			cfg.addAllExitNodes(trueBranch.getBreakNodes());
+        /* The break nodes are exit nodes for this loop. */
+        cfg.addAllExitNodes(trueBranch.getBreakNodes());
 
-			/* We merge the exit nodes back into the while loop. */
-            for(Node exitNode : trueBranch.getExitNodes()) {
-                exitNode.mergeInto(loop);
-            }
-            
-            /* We merge continue nodes back into the while loop. */
-            for(Node continueNode : trueBranch.getContinueNodes()) {
-            	continueNode.mergeInto(loop);
-            }
+        /* The exit nodes point back to the assignment node. */
+        for(CFGNode exitNode : trueBranch.getExitNodes()) {
+            exitNode.addEdge(null, assignment);
+        }
+        
+        /* The continue nodes point back to the assignment node. */
+        for(CFGNode continueNode : trueBranch.getContinueNodes()) {
+        	continueNode.addEdge(null, assignment);
+        }
+        
+        /* Create a node for the false branch to exit the loop. */
+        CFGNode falseBranch = new CFGNode(new EmptyStatement());
+        cfg.addExitNode(falseBranch);
 
-		} 		
+        /* Add the edges from the condition node to the start of the loop. */
+        condition.addEdge(keyConditionFunction, trueBranch.getEntryNode());
+		condition.addEdge(new UnaryExpression(Token.NOT, 0, keyConditionFunction), falseBranch);
 		
 		return cfg;
 		
@@ -729,25 +771,4 @@ public class CFGFactory {
 
 	}
 	
-	/**
-	 * Check if an AstNode is a statement.
-	 * @param node
-	 * @return
-	 */
-	private static boolean isStatement(Node node) {
-
-		if(node instanceof VariableDeclaration ||
-			node instanceof TryStatement || 
-			node instanceof IfStatement ||
-			node instanceof WithStatement ||
-			node instanceof BreakStatement ||
-			node instanceof ContinueStatement ||
-			node instanceof SwitchStatement ||
-			node instanceof ExpressionStatement) {
-			return true;
-		}
-
-		return false;
-	}
-
 }
