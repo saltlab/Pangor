@@ -20,6 +20,7 @@ import org.mozilla.javascript.ast.ForLoop;
 import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.IfStatement;
+import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.PropertyGet;
 import org.mozilla.javascript.ast.ReturnStatement;
@@ -437,6 +438,11 @@ public class CFGFactory {
 
 		CFGNode condition = new CFGNode(new EmptyStatement());
 		
+		/* Add the edges connecting the entry point to the assignment and
+		 * assignment to condition. */
+        forInNode.addEdge(null, assignment);
+        assignment.addEdge(null, condition);
+		
         /* Create the CFG for the loop body. */
 		
 		CFG trueBranch = CFGFactory.buildSwitch(forInLoop.getBody());
@@ -484,16 +490,12 @@ public class CFGFactory {
 	 */
 	private static CFG build(SwitchStatement switchStatement) {
 		
-		/* Create the switch node. The expression is the value to switch on. */
-		SwitchNode switchNode = new SwitchNode(switchStatement.getExpression());
-
+		CFGNode switchNode = new CFGNode(new EmptyStatement());
 		CFG cfg = new CFG(switchNode);
-		cfg.addExitNode(switchNode);
 		
-		/* Build the subgraphs for the cases. */
-		CFG previousSubGraph = null;
+		/* Add edges for each case. */
 		List<SwitchCase> switchCases = switchStatement.getCases();
-	 
+		CFG previousSubGraph = null;
 		for(SwitchCase switchCase : switchCases) {
 			
 			/* Build the subgraph for the case. */
@@ -502,19 +504,21 @@ public class CFGFactory {
                 List<Node> statements = new LinkedList<Node>(switchCase.getStatements());
                 subGraph = CFGFactory.buildBlock(statements);
 			}
-			
+
 			/* If it is an empty case, make our lives easier by adding an
 			 * empty statement as the entry and exit node. */
-			if(subGraph == null) {
+            if(subGraph == null) {
+                CFGNode empty = new CFGNode(new EmptyStatement());
+                subGraph = new CFG(empty);
+                subGraph.addExitNode(empty);
+            }
 
-				StatementNode emptyCase = new StatementNode(new EmptyStatement());
-				subGraph = new CFG(emptyCase);
-				subGraph.addExitNode(emptyCase);
-				
-			}
-            
-            /* Add the node to the switch statement. */
-            switchNode.setCase(switchCase.getExpression(), subGraph.getEntryNode());
+            /* Add an edge from the switch to the entry node for the case. We
+             * build a comparison expression for the edge by comparing the
+             * switch expression to the case expression. */
+            InfixExpression compare = new InfixExpression(switchStatement.getExpression(), switchCase.getExpression());
+            compare.setType(Token.SHEQ);
+            switchNode.addEdge(compare, subGraph.getEntryNode());
 			
 			/* Propagate return nodes. */
 			cfg.addAllReturnNodes(subGraph.getReturnNodes());
@@ -522,20 +526,21 @@ public class CFGFactory {
             /* Propagate continue nodes. */
             cfg.addAllContinueNodes(subGraph.getContinueNodes());
 
-			/* The break nodes are exit nodes for this loop. */
+			/* The break nodes are exit nodes for the switch. */
 			cfg.addAllExitNodes(subGraph.getBreakNodes());
 
 			if(previousSubGraph != null) {
 
-                /* Merge the exit nodes into the next case. */
-                for(Node exitNode : previousSubGraph.getExitNodes()) {
-                    exitNode.mergeInto(subGraph.getEntryNode());
+                /* Add an edge from the exit nodes of the previous case to the
+                 * entry node for this case. */
+                for(CFGNode exitNode : previousSubGraph.getExitNodes()) {
+                	exitNode.addEdge(null, subGraph.getEntryNode());
                 }
 
 			}
 			
 			previousSubGraph = subGraph;
-			
+            
 		}
 
         /* The rest of the exit nodes are exit nodes for the statement. */
