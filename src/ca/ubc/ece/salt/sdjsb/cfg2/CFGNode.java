@@ -16,11 +16,12 @@ public class CFGNode {
 	/** The unique id for this node. **/
 	private long id;
 	
-	/** The AST Statement which contains the actions this node performs. **/
+	/** The AST Statement which contains the actions this node performs. From
+	 * org.mozilla.javascript.Token. **/
 	private AstNode statement;
 	
 	/** The edges leaving this node. **/
-	List<Edge> edges;
+	private List<Edge> edges;
 	
 	/**
 	 * @param statement The statement that is executed when this node is 
@@ -33,12 +34,27 @@ public class CFGNode {
 	}
 	
 	/**
-	 * Add an edge to this node.
+	 * Add an edge to this node. If an edge with the same condition already
+	 * exists, that edge will be overwritten. 
 	 * @param condition The condition for which we traverse the edge.
 	 * @param node The node at the other end of this edge.
 	 */
 	public void addEdge(AstNode condition, CFGNode node) {
-		this.edges.add(new Edge(condition, node));
+		Edge edge = new Edge(condition, node);
+		int index = this.edges.indexOf(edge);
+		if(index >= 0) {
+			this.edges.get(index).node = node;
+		}
+		else {
+            this.edges.add(new Edge(condition, node));
+		}
+	}
+	
+	/**
+	 * @return The edges leaving this node.
+	 */
+	public List<Edge> getEdges() {
+		return this.edges;
 	}
 	
 	/**
@@ -47,6 +63,14 @@ public class CFGNode {
 	public AstNode getStatement() {
 		return statement;
 	}
+	
+	/**
+	 * @param statement The AST Statement which contains the actions this node
+	 * 					performs.
+	 */
+	public void setStatement(AstNode statement) {
+		this.statement = statement;
+	}
 
 	/**
 	 * @return The unique ID for this node.
@@ -54,7 +78,19 @@ public class CFGNode {
 	public long getId() {
 		return id;
 	}
-	
+
+	/**
+	 * Make a copy of the given node.
+	 * @param node The node to copy.
+	 * @return A shallow copy of the node. The condition AST and edge CFGs will
+	 * 		   be the same as the original.
+	 */
+	public static CFGNode copy(CFGNode node) {
+        CFGNode newNode = new CFGNode(node.getStatement());
+        for(Edge edge : node.getEdges()) newNode.addEdge(edge.condition, edge.node);
+        return newNode;
+	}
+
 	/**
 	 * @return A unique ID for a new node
 	 */
@@ -77,6 +113,14 @@ public class CFGNode {
 		public Edge(AstNode condition, CFGNode node) {
 			this.condition = condition;
 			this.node = node;
+		}
+		
+		@Override 
+		public boolean equals(Object o) {
+			if(o instanceof Edge) {
+				return ((Edge)o).condition == this.condition;
+			}
+			return false;
 		}
 	}
 

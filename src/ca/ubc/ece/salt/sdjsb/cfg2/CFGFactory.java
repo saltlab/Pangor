@@ -34,6 +34,8 @@ import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.WhileLoop;
 import org.mozilla.javascript.ast.WithStatement;
 
+import ca.ubc.ece.salt.sdjsb.cfg2.CFGNode.Edge;
+
 /**
  * Builds a control flow graph.
  */
@@ -589,24 +591,24 @@ public class CFGFactory {
 	/**
 	 * Builds a control flow subgraph for a try/catch statement.
 	 * 
-	 * NOTE: The resulting graph will not be accurate when there are jump
-	 * 		 statements in the try or catch blocks and a finally block.
-	 * 
 	 * @param tryStatement
 	 * @return The CFG for the while loop.
 	 */
 	private static CFG build(TryStatement tryStatement) {
 		
-		TryNode node = new TryNode(tryStatement);
-		CFG cfg = new CFG(node);
-		cfg.addExitNode(node);
+		CFGNode tryNode = new CFGNode(new EmptyStatement());
+		CFG cfg = new CFG(tryNode);
 		
-		/* Start by setting up the finally block. */
+		/* To make life easier, add a node that represents the exit of the try. */
+		CFGNode exit = new CFGNode(new EmptyStatement());
+		cfg.addExitNode(exit);
+		
+		/* Set up the finally block. */
 
 		CFG finallyBlock = CFGFactory.buildSwitch(tryStatement.getFinallyBlock());
 
 		if(finallyBlock == null) { 
-			Node empty = new StatementNode(new EmptyStatement());
+			CFGNode empty = new CFGNode(new EmptyStatement());
 			finallyBlock = new CFG(empty);
 			finallyBlock.addExitNode(empty);
 		}
@@ -615,17 +617,18 @@ public class CFGFactory {
             cfg.addAllReturnNodes(finallyBlock.getReturnNodes());
             cfg.addAllBreakNodes(finallyBlock.getBreakNodes());
             cfg.addAllContinueNodes(finallyBlock.getContinueNodes());
-            cfg.addAllExitNodes(finallyBlock.getExitNodes());
+            
+            for(CFGNode exitNode : finallyBlock.getExitNodes()) {
+            	exitNode.addEdge(null, exit);
+            }
 		}
-		
-		node.setFinallyBranch(finallyBlock.getEntryNode());
 		
 		/* Set up the try block. */
 		
 		CFG tryBlock = CFGFactory.buildSwitch(tryStatement.getTryBlock());
 		
 		if(tryBlock == null) {
-			Node empty = new StatementNode(new EmptyStatement());
+			CFGNode empty = new CFGNode(new EmptyStatement());
 			tryBlock = new CFG(empty);
 			tryBlock.addExitNode(empty);
 		}
@@ -635,13 +638,18 @@ public class CFGFactory {
             cfg.addAllBreakNodes(tryBlock.getBreakNodes());
             cfg.addAllContinueNodes(tryBlock.getContinueNodes());
             
+            /* Move the jump nodes after the finally block. */
+            moveJumpAfterFinally(finallyBlock, tryBlock.getBreakNodes(), null);
+            moveJumpAfterFinally(finallyBlock, tryBlock.getContinueNodes(), null);
+            moveJumpAfterFinally(finallyBlock, tryBlock.getReturnNodes(), null);
+
             /* Exit nodes exit to the finally block. */
-            for(Node exitNode : tryBlock.getExitNodes()) {
-            	exitNode.mergeInto(finallyBlock.getEntryNode());
+            for(CFGNode exitNode : tryBlock.getExitNodes()) {
+            	exitNode.addEdge(null, finallyBlock.getEntryNode());
             }
 		}
 		
-		node.setTryBranch(tryBlock.getEntryNode());
+		tryNode.addEdge(null, tryBlock.getEntryNode());
 		
 		/* Set up the catch clauses. */
 
@@ -651,7 +659,7 @@ public class CFGFactory {
 			CFG catchBlock = CFGFactory.buildSwitch(catchClause.getBody());
 			
 			if(catchBlock == null) {
-				Node empty = new StatementNode(new EmptyStatement());
+				CFGNode empty = new CFGNode(new EmptyStatement());
 				catchBlock = new CFG(empty);
 				catchBlock.addExitNode(empty);
 			}
@@ -660,20 +668,55 @@ public class CFGFactory {
                 cfg.addAllReturnNodes(catchBlock.getReturnNodes());
                 cfg.addAllBreakNodes(catchBlock.getBreakNodes());
                 cfg.addAllContinueNodes(catchBlock.getContinueNodes());
-                
+
+                /* Move the jump nodes after the finally block. */
+                moveJumpAfterFinally(finallyBlock, tryBlock.getBreakNodes(), catchClause.getCatchCondition());
+                moveJumpAfterFinally(finallyBlock, tryBlock.getContinueNodes(), catchClause.getCatchCondition());
+                moveJumpAfterFinally(finallyBlock, tryBlock.getReturnNodes(), catchClause.getCatchCondition());
+
                 /* Exit nodes exit to the finally block. */
-                for(Node exitNode : catchBlock.getExitNodes()) {
-                    exitNode.mergeInto(finallyBlock.getEntryNode());
+                for(CFGNode exitNode : catchBlock.getExitNodes()) {
+                    exitNode.addEdge(null, finallyBlock.getEntryNode());
                 }
 				
 			}
 			
-			node.addCatchClause(catchClause.getCatchCondition(), catchBlock.getEntryNode());
+			tryNode.addEdge(catchClause.getCatchCondition(), catchBlock.getEntryNode());
 			
 		}
 
 		return cfg;
 		
+	}
+
+	/**
+	 * Move the jump nodes from a try or catch block to after the finally block.
+	 * @param finallyBlock The finally block in the try statement.
+	 * @param jumpNodes The set of break, continue or return nodes.
+	 */
+	private static void moveJumpAfterFinally(CFG finallyBlock, List<CFGNode> jumpNodes, AstNode condition) {
+
+		for(CFGNode jumpNode : jumpNodes) {
+			
+			/* Make a shallow copy of the node. */
+			CFGNode newJumpNode = CFGNode.copy(jumpNode);
+			
+			/* Add an edge from the finally block to the return node. */
+			for(CFGNode exitNode : finallyBlock.getExitNodes()) {
+				exitNode.addEdge(condition, newJumpNode);
+			}
+			
+			/* Change the original jump node to do nothing. */
+			jumpNode.setStatement(new EmptyStatement());
+			
+			/* Remove any previous edges from the jump node. */
+			jumpNode.getEdges().clear();
+			
+			/* Add an edge from the original jump node to the start of the
+			 * finally block. */
+			jumpNode.addEdge(null, finallyBlock.getEntryNode());
+			
+		}
 	}
 
 	/**
@@ -684,9 +727,9 @@ public class CFGFactory {
 	 */
 	private static CFG build(BreakStatement breakStatement) {
 		
-		Node node = new JumpNode(breakStatement);
-		CFG cfg = new CFG(node);
-		cfg.addBreakNode(node);
+		CFGNode breakNode = new CFGNode(breakStatement);
+		CFG cfg = new CFG(breakNode);
+		cfg.addBreakNode(breakNode);
 		return cfg;
 
 	}
@@ -699,9 +742,9 @@ public class CFGFactory {
 	 */
 	private static CFG build(ContinueStatement continueStatement) {
 		
-		Node node = new JumpNode(continueStatement);
-		CFG cfg = new CFG(node);
-		cfg.addContinueNode(node);
+		CFGNode continueNode = new CFGNode(continueStatement);
+		CFG cfg = new CFG(continueNode);
+		cfg.addContinueNode(continueNode);
 		return cfg;
 
 	}
@@ -714,24 +757,25 @@ public class CFGFactory {
 	 */
 	private static CFG build(ReturnStatement returnStatement) {
 		
-		Node node = new JumpNode(returnStatement);
-		CFG cfg = new CFG(node);
-		cfg.addReturnNode(node);
+		CFGNode returnNode = new CFGNode(returnStatement);
+		CFG cfg = new CFG(returnNode);
+		cfg.addReturnNode(returnNode);
 		return cfg;
 
 	}
 	
 	/**
-	 * Builds a control flow subgraph for a statement.
+	 * Builds a control flow subgraph for a statement. If other statement types
+	 * are handled properly then this should only be an expression.
 	 * @param entry The entry point for the subgraph.
 	 * @param exit The exit point for the subgraph.
 	 * @return A list of exit nodes for the subgraph.
 	 */
 	private static CFG build(AstNode statement) {
 		
-		Node node = new StatementNode(statement);
-		CFG cfg = new CFG(node);
-		cfg.addExitNode(node);
+		CFGNode expressionNode = new CFGNode(statement);
+		CFG cfg = new CFG(expressionNode);
+		cfg.addExitNode(expressionNode);
 		return cfg;
 
 	}
