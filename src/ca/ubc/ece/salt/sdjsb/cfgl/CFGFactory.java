@@ -93,6 +93,11 @@ public class CFGFactory {
         	exitNode.addEdge(null, scriptExit);
         }
         
+        /* The return nodes should point to the function exit. */
+        for(CFGNode returnNode : subGraph.getReturnNodes()) {
+        	returnNode.addEdge(null, scriptExit);
+        }
+        
         return cfg;
 		
 	}

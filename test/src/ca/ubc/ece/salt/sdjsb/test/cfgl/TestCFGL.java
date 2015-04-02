@@ -126,4 +126,18 @@ public class TestCFGL extends TestCase {
 
 	}
 
+	@Test
+	public void testReturn() throws IOException {
+		
+		String file = "./test/input/cfg/return.js";
+		
+		List<String> expectedCFGs = new LinkedList<String>();
+		expectedCFGs.add("SCRIPT_ENTRY(0){2},VAR(2){3},EXPR_RESULT(3){1},SCRIPT_EXIT(1){}");
+		expectedCFGs.add("FUNCTION_ENTRY(4){6},EXPR_VOID(6){7},VAR(7){8},WHILE(8){true:9,false:15},EXPR_VOID(9){10},EMPTY(15){5},IF(10){true:11,false:12},FUNCTION_EXIT(5){},RETURN(11){5},EMPTY(12){13},EXPR_VOID(13){14},EXPR_VOID(14){8}");
+		expectedCFGs.add("FUNCTION_ENTRY(16){18},EXPR_VOID(18){17},FUNCTION_EXIT(17){}");
+		
+		this.runTest(file, expectedCFGs, true);
+
+	}
+
 }
