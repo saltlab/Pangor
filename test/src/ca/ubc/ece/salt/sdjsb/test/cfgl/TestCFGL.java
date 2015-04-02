@@ -140,4 +140,60 @@ public class TestCFGL extends TestCase {
 
 	}
 
+	@Test
+	public void testFor() throws IOException {
+		
+		String file = "./test/input/cfg/forloop.js";
+		
+		List<String> expectedCFGs = new LinkedList<String>();
+		expectedCFGs.add("SCRIPT_ENTRY(0){2},VAR(2){3},EXPR_RESULT(3){1},SCRIPT_EXIT(1){}");
+		expectedCFGs.add("FUNCTION_ENTRY(4){6},EXPR_VOID(6){7},VAR(7){8},VAR(8){9},FOR(9){11,14},EXPR_VOID(11){12},EMPTY(14){5},EXPR_VOID(12){13},FUNCTION_EXIT(5){},EXPR_VOID(13){10},INC(10){9}");
+		expectedCFGs.add("FUNCTION_ENTRY(15){17},EXPR_VOID(17){16},FUNCTION_EXIT(16){}");
+		
+		this.runTest(file, expectedCFGs, true);
+
+	}
+
+	@Test
+	public void testDo() throws IOException {
+		
+		String file = "./test/input/cfg/doloop.js";
+		
+		List<String> expectedCFGs = new LinkedList<String>();
+		expectedCFGs.add("SCRIPT_ENTRY(0){2},VAR(2){3},EXPR_RESULT(3){1},SCRIPT_EXIT(1){}");
+		expectedCFGs.add("FUNCTION_ENTRY(4){6},EXPR_VOID(6){7},VAR(7){8},DO(8){10},EXPR_VOID(10){11},EXPR_VOID(11){12},EXPR_VOID(12){9},WHILE(9){8,13},EMPTY(13){5},FUNCTION_EXIT(5){}");
+		expectedCFGs.add("FUNCTION_ENTRY(14){16},EXPR_VOID(16){15},FUNCTION_EXIT(15){}");
+		
+		this.runTest(file, expectedCFGs, true);
+
+	}
+
+	@Test
+	public void testForIn() throws IOException {
+		
+		String file = "./test/input/cfg/forinloop.js";
+		
+		List<String> expectedCFGs = new LinkedList<String>();
+		expectedCFGs.add("SCRIPT_ENTRY(0){2},VAR(2){3},EXPR_RESULT(3){1},SCRIPT_EXIT(1){}");
+		expectedCFGs.add("FUNCTION_ENTRY(4){6},EXPR_VOID(6){7},VAR(7){8},VAR(8){9},ASSIGN(9){10},FORIN(10){~hasNextKey():11,empty:13},EXPR_VOID(11){12},EMPTY(13){5},EXPR_VOID(12){9},FUNCTION_EXIT(5){}");
+		expectedCFGs.add("FUNCTION_ENTRY(14){16},EXPR_VOID(16){15},FUNCTION_EXIT(15){}");
+		
+		this.runTest(file, expectedCFGs, true);
+
+	}
+
+	@Test
+	public void testSwitch() throws IOException {
+		
+		String file = "./test/input/cfg/switch.js";
+		
+		List<String> expectedCFGs = new LinkedList<String>();
+		expectedCFGs.add("SCRIPT_ENTRY(0){2},VAR(2){3},EXPR_RESULT(3){1},SCRIPT_EXIT(1){}");
+		expectedCFGs.add("FUNCTION_ENTRY(4){6},EXPR_VOID(6){7},VAR(7){8},ASSIGN(8){9},FORIN(9){animals.~hasNextKey():10,!animals.~hasNextKey():11},EXPR_VOID(10){8},EMPTY(11){5},FUNCTION_EXIT(5){}");
+		expectedCFGs.add("FUNCTION_ENTRY(12){14},VAR(14){15},SWITCH(15){animal === \"cow\":16,animal === \"moose\":18,animal === \"horse\":20,animal === \"buffalo\":22,!(animal === \"buffalo\" || animal === \"horse\" || animal === \"moose\" || animal === \"cow\"):23},EXPR_VOID(16){17},EXPR_VOID(18){19},EXPR_VOID(20){21},EMPTY(22){23},EXPR_VOID(23){24},BREAK(17){24},BREAK(19){24},BREAK(21){24},EXPR_VOID(24){13},FUNCTION_EXIT(13){}");
+		
+		this.runTest(file, expectedCFGs, true);
+
+	}
+
 }

@@ -21,6 +21,7 @@ import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.IfStatement;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.Name;
+import org.mozilla.javascript.ast.ParenthesizedExpression;
 import org.mozilla.javascript.ast.PropertyGet;
 import org.mozilla.javascript.ast.ReturnStatement;
 import org.mozilla.javascript.ast.Scope;
@@ -291,8 +292,8 @@ public class CFGFactory {
 	 */
 	private static CFG build(DoLoop doLoop) {
 		
-		CFGNode doNode = new CFGNode(new EmptyStatement());
-		CFGNode whileNode = new CFGNode(new EmptyStatement());
+		CFGNode doNode = new CFGNode(new EmptyStatement(), "DO");
+		CFGNode whileNode = new CFGNode(new EmptyStatement(), "WHILE");
 		CFG cfg = new CFG(doNode);
 		
 		/* Build the loop branch. */
@@ -325,7 +326,7 @@ public class CFGFactory {
         }
 		
 		/* Add edge for true condition back to the start of the loop. */
-		whileNode.addEdge(doLoop.getCondition(), loopBranch.getEntryNode());
+		whileNode.addEdge(doLoop.getCondition(), doNode);
 		
 		/* Add edge for false condition. */
 
@@ -347,9 +348,15 @@ public class CFGFactory {
 	private static CFG build(ForLoop forLoop) {
 		
 		CFGNode forNode = new CFGNode(forLoop.getInitializer());
-		CFGNode increment = new CFGNode(forLoop.getIncrement());
-		increment.addEdge(null, forNode);
 		CFG cfg = new CFG(forNode);
+
+		/* After variables are declared, add an empty node with two edges. */
+		CFGNode condition = new CFGNode(new EmptyStatement(), "FOR");
+		forNode.addEdge(null, condition);
+
+		/* After the body of the loop executes, add the node to perform the increment. */
+		CFGNode increment = new CFGNode(forLoop.getIncrement());
+		increment.addEdge(null, condition);
 		
 		/* Build the true branch. */
 		
@@ -361,10 +368,10 @@ public class CFGFactory {
 			trueBranch.addExitNode(empty);
 		}
 		
-		forNode.addEdge(forLoop.getCondition(), trueBranch.getEntryNode());
+		condition.addEdge(forLoop.getCondition(), trueBranch.getEntryNode());
 
         /* Propagate return nodes. */
-        cfg.addAllExitNodes(trueBranch.getExitNodes());
+        cfg.addAllReturnNodes(trueBranch.getReturnNodes());
         
         /* The break nodes are exit nodes for this loop. */
         cfg.addAllExitNodes(trueBranch.getBreakNodes());
@@ -382,7 +389,7 @@ public class CFGFactory {
         /* Build the false branch. */
         
         CFGNode empty = new CFGNode(new EmptyStatement());
-		forNode.addEdge(new UnaryExpression(Token.NOT, 0, forLoop.getCondition()), empty);
+		condition.addEdge(new UnaryExpression(Token.NOT, 0, forLoop.getCondition()), empty);
 		cfg.addExitNode(empty);
 		
 		return cfg;
@@ -443,7 +450,7 @@ public class CFGFactory {
         FunctionCall keyConditionFunction = new FunctionCall();
         keyConditionFunction.setTarget(keyConditionMethod);
 
-		CFGNode condition = new CFGNode(new EmptyStatement());
+		CFGNode condition = new CFGNode(new EmptyStatement(), "FORIN");
 		
 		/* Add the edges connecting the entry point to the assignment and
 		 * assignment to condition. */
@@ -481,8 +488,8 @@ public class CFGFactory {
         cfg.addExitNode(falseBranch);
 
         /* Add the edges from the condition node to the start of the loop. */
-        condition.addEdge(keyConditionFunction, trueBranch.getEntryNode());
-		condition.addEdge(new UnaryExpression(Token.NOT, 0, keyConditionFunction), falseBranch);
+        condition.addEdge(new Edge(keyConditionFunction, trueBranch.getEntryNode(), keyConditionFunction.toSource()));
+		condition.addEdge(new Edge(new UnaryExpression(Token.NOT, 0, keyConditionFunction), falseBranch, "false"));
 		
 		return cfg;
 		
@@ -497,8 +504,12 @@ public class CFGFactory {
 	 */
 	private static CFG build(SwitchStatement switchStatement) {
 		
-		CFGNode switchNode = new CFGNode(new EmptyStatement());
+		CFGNode switchNode = new CFGNode(new EmptyStatement(), "SWITCH");
 		CFG cfg = new CFG(switchNode);
+		
+		/* Keep track of the default edge so we can update the condition later. */
+		Edge defaultEdge = null;
+		AstNode defaultCondition = null;
 		
 		/* Add edges for each case. */
 		List<SwitchCase> switchCases = switchStatement.getCases();
@@ -523,9 +534,22 @@ public class CFGFactory {
             /* Add an edge from the switch to the entry node for the case. We
              * build a comparison expression for the edge by comparing the
              * switch expression to the case expression. */
-            InfixExpression compare = new InfixExpression(switchStatement.getExpression(), switchCase.getExpression());
-            compare.setType(Token.SHEQ);
-            switchNode.addEdge(compare, subGraph.getEntryNode());
+            if(switchCase.getExpression() != null) {
+                InfixExpression compare = new InfixExpression(switchStatement.getExpression(), switchCase.getExpression());
+                compare.setType(Token.SHEQ);
+                switchNode.addEdge(new Edge(compare, subGraph.getEntryNode(), switchCase.getExpression().toSource()));
+                
+                if(defaultCondition == null) defaultCondition = compare;
+                else {
+                    defaultCondition = new InfixExpression(compare, defaultCondition);
+                    defaultCondition.setType(Token.OR);
+                }
+                
+            }
+            else {
+            	defaultEdge = new Edge(null, subGraph.getEntryNode(), "default");
+            	switchNode.addEdge(defaultEdge);
+            }
 			
 			/* Propagate return nodes. */
 			cfg.addAllReturnNodes(subGraph.getReturnNodes());
@@ -549,6 +573,10 @@ public class CFGFactory {
 			previousSubGraph = subGraph;
             
 		}
+		
+		/* Add the final default condition. */
+		if(defaultCondition != null) defaultCondition = new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(defaultCondition));
+		defaultEdge.condition = defaultCondition;
 
         /* The rest of the exit nodes are exit nodes for the statement. */
         cfg.addAllExitNodes(previousSubGraph.getExitNodes());

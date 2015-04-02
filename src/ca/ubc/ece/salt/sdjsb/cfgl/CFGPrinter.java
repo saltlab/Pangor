@@ -35,8 +35,8 @@ public class CFGPrinter {
 			
 			for(Edge edge : current.getEdges()) {
 
-				if(edge.name != null) {
-                    serial += edge.name + ":" + edge.node.getId() + ",";
+				if(edge.condition != null) {
+					serial += edge.condition.toSource() + ":" + edge.node.getId() + ",";
 				}
 				else {
                     serial += edge.node.getId() + ",";
