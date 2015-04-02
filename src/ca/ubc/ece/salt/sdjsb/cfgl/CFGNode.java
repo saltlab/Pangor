@@ -147,5 +147,12 @@ public class CFGNode {
 		CFGNode.idGen++;
 		return id;
 	}
+	
+	/**
+	 * Reset the ID generator value. Needed in between test cases.
+	 */
+	public static synchronized void resetIdGen() {
+		CFGNode.idGen = 0;
+	}
 
 }

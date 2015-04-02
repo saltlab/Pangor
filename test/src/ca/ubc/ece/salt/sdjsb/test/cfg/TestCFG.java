@@ -11,6 +11,7 @@ import org.mozilla.javascript.ast.AstRoot;
 
 import ca.ubc.ece.salt.sdjsb.cfg.CFG;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGFactory;
+import ca.ubc.ece.salt.sdjsb.cfgl.CFGNode;
 import junit.framework.TestCase;
 
 public class TestCFG extends TestCase {
@@ -23,6 +24,7 @@ public class TestCFG extends TestCase {
 		
 		/* Create the CFG. */
 		List<CFG> cfgs = CFGFactory.createCFGs(root);
+		
 
 		/* Get the serialized CFGs. */
 		List<String> actualCFGs = new LinkedList<String>();

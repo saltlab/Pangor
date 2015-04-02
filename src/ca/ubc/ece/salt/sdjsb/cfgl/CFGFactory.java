@@ -238,7 +238,7 @@ public class CFGFactory {
 	 */
 	private static CFG build(WhileLoop whileLoop) {
 		
-		CFGNode whileNode = new CFGNode(new EmptyStatement());
+		CFGNode whileNode = new CFGNode(new EmptyStatement(), "WHILE");
 		CFG cfg = new CFG(whileNode);
 
 		/* Build the true branch. */
@@ -251,10 +251,10 @@ public class CFGFactory {
 			trueBranch.addExitNode(empty);
 		}
 		
-		whileNode.addEdge(whileLoop.getCondition(), trueBranch.getEntryNode());
+		whileNode.addEdge(new Edge(whileLoop.getCondition(), trueBranch.getEntryNode(), "true"));
 
         /* Propagate return nodes. */
-        cfg.addAllExitNodes(trueBranch.getExitNodes());
+        cfg.addAllReturnNodes(trueBranch.getReturnNodes());
         
         /* The break nodes are exit nodes for this loop. */
         cfg.addAllExitNodes(trueBranch.getBreakNodes());
@@ -272,7 +272,7 @@ public class CFGFactory {
         /* Build the false branch. */
         
         CFGNode empty = new CFGNode(new EmptyStatement());
-		whileNode.addEdge(new UnaryExpression(Token.NOT, 0, whileLoop.getCondition()), empty);
+		whileNode.addEdge(new Edge(new UnaryExpression(Token.NOT, 0, whileLoop.getCondition()), empty, "false"));
 		cfg.addExitNode(empty);
 		
 		return cfg;
