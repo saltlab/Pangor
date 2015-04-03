@@ -2,5 +2,6 @@ bin/
 lib/
 tmp/
 repositories/
+test/output/
 .DS_Store
 *.swp

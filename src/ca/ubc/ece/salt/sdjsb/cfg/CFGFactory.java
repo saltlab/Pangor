@@ -467,8 +467,8 @@ public class CFGFactory {
 		
 		/* Add the edges connecting the entry point to the assignment and
 		 * assignment to condition. */
-        forInNode.addEdge(null, assignment);
-        assignment.addEdge(null, condition);
+        forInNode.addEdge(null, condition);
+        condition.addEdge(new Edge(keyConditionFunction, assignment));
 		
         /* Create the CFG for the loop body. */
 		
@@ -489,20 +489,20 @@ public class CFGFactory {
 
         /* The exit nodes point back to the assignment node. */
         for(CFGNode exitNode : trueBranch.getExitNodes()) {
-            exitNode.addEdge(null, assignment);
+            exitNode.addEdge(null, condition);
         }
         
         /* The continue nodes point back to the assignment node. */
         for(CFGNode continueNode : trueBranch.getContinueNodes()) {
-        	continueNode.addEdge(null, assignment);
+        	continueNode.addEdge(null, condition);
         }
         
         /* Create a node for the false branch to exit the loop. */
         CFGNode falseBranch = new CFGNode(new EmptyStatement());
         cfg.addExitNode(falseBranch);
 
-        /* Add the edges from the condition node to the start of the loop. */
-        condition.addEdge(new Edge(keyConditionFunction, trueBranch.getEntryNode()));
+        /* Add the edges from the assignment node to the start of the loop. */
+        assignment.addEdge(null, trueBranch.getEntryNode());
 		condition.addEdge(new Edge(new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(keyConditionFunction)), falseBranch));
 		
 		return cfg;
