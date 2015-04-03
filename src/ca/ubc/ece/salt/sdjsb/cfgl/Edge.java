@@ -14,19 +14,9 @@ public class Edge {
 	/** The node that this edge points to. */
 	public CFGNode node;
 	
-	/** The optional name for this edge. */
-	public String name;
-	
 	public Edge(AstNode condition, CFGNode node) {
 		this.condition = condition;
 		this.node = node;
-		this.name = null;
-	}
-	
-	public Edge(AstNode condition, CFGNode node, String name) {
-		this.condition = condition;
-		this.node = node;
-		this.name = name;
 	}
 	
 	@Override 

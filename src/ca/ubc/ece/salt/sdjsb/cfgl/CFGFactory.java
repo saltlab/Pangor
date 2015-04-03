@@ -215,7 +215,7 @@ public class CFGFactory {
 			trueBranch.addExitNode(empty);
 		}
 		
-		ifNode.addEdge(new Edge(ifStatement.getCondition(), trueBranch.getEntryNode(), "true"));
+		ifNode.addEdge(new Edge(ifStatement.getCondition(), trueBranch.getEntryNode()));
 
         /* Propagate exit, return, continue, break and throw nodes. */
         cfg.addAllExitNodes(trueBranch.getExitNodes());
@@ -234,7 +234,7 @@ public class CFGFactory {
 			falseBranch.addExitNode(empty);
 		}
 
-		ifNode.addEdge(new Edge(new UnaryExpression(Token.NOT, 0, ifStatement.getCondition()), falseBranch.getEntryNode(), "false"));
+		ifNode.addEdge(new Edge(new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(ifStatement.getCondition())), falseBranch.getEntryNode()));
 
         /* Propagate exit, return, continue and break nodes. */
         cfg.addAllExitNodes(falseBranch.getExitNodes());
@@ -267,7 +267,7 @@ public class CFGFactory {
 			trueBranch.addExitNode(empty);
 		}
 		
-		whileNode.addEdge(new Edge(whileLoop.getCondition(), trueBranch.getEntryNode(), "true"));
+		whileNode.addEdge(new Edge(whileLoop.getCondition(), trueBranch.getEntryNode()));
 
         /* Propagate return and throw nodes. */
         cfg.addAllReturnNodes(trueBranch.getReturnNodes());
@@ -289,7 +289,7 @@ public class CFGFactory {
         /* Build the false branch. */
         
         CFGNode empty = new CFGNode(new EmptyStatement());
-		whileNode.addEdge(new Edge(new UnaryExpression(Token.NOT, 0, whileLoop.getCondition()), empty, "false"));
+		whileNode.addEdge(new Edge(new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(whileLoop.getCondition())), empty));
 		cfg.addExitNode(empty);
 		
 		return cfg;
@@ -343,7 +343,7 @@ public class CFGFactory {
 		/* Add edge for false condition. */
 
         CFGNode empty = new CFGNode(new EmptyStatement());
-		whileNode.addEdge(new UnaryExpression(Token.NOT, 0, doLoop.getCondition()), empty);
+		whileNode.addEdge(new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(doLoop.getCondition())), empty);
 		cfg.addExitNode(empty);
 
 		return cfg;
@@ -402,7 +402,7 @@ public class CFGFactory {
         /* Build the false branch. */
         
         CFGNode empty = new CFGNode(new EmptyStatement());
-		condition.addEdge(new UnaryExpression(Token.NOT, 0, forLoop.getCondition()), empty);
+		condition.addEdge(new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(forLoop.getCondition())), empty);
 		cfg.addExitNode(empty);
 		
 		return cfg;
@@ -502,8 +502,8 @@ public class CFGFactory {
         cfg.addExitNode(falseBranch);
 
         /* Add the edges from the condition node to the start of the loop. */
-        condition.addEdge(new Edge(keyConditionFunction, trueBranch.getEntryNode(), keyConditionFunction.toSource()));
-		condition.addEdge(new Edge(new UnaryExpression(Token.NOT, 0, keyConditionFunction), falseBranch, "false"));
+        condition.addEdge(new Edge(keyConditionFunction, trueBranch.getEntryNode()));
+		condition.addEdge(new Edge(new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(keyConditionFunction)), falseBranch));
 		
 		return cfg;
 		
@@ -551,7 +551,7 @@ public class CFGFactory {
             if(switchCase.getExpression() != null) {
                 InfixExpression compare = new InfixExpression(switchStatement.getExpression(), switchCase.getExpression());
                 compare.setType(Token.SHEQ);
-                switchNode.addEdge(new Edge(compare, subGraph.getEntryNode(), switchCase.getExpression().toSource()));
+                switchNode.addEdge(new Edge(compare, subGraph.getEntryNode()));
                 
                 if(defaultCondition == null) defaultCondition = compare;
                 else {
@@ -561,7 +561,7 @@ public class CFGFactory {
                 
             }
             else {
-            	defaultEdge = new Edge(null, subGraph.getEntryNode(), "default");
+            	defaultEdge = new Edge(null, subGraph.getEntryNode());
             	switchNode.addEdge(defaultEdge);
             }
 			
