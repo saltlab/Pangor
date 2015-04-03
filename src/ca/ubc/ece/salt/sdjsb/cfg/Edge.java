@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.cfgl;
+package ca.ubc.ece.salt.sdjsb.cfg;
 
 import org.mozilla.javascript.ast.AstNode;
 

@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.test.cfgl;
+package ca.ubc.ece.salt.sdjsb.test.cfg;
 
 import java.io.FileReader;
 import java.io.IOException;
@@ -9,10 +9,10 @@ import org.junit.Test;
 import org.mozilla.javascript.Parser;
 import org.mozilla.javascript.ast.AstRoot;
 
-import ca.ubc.ece.salt.sdjsb.cfgl.CFG;
-import ca.ubc.ece.salt.sdjsb.cfgl.CFGFactory;
-import ca.ubc.ece.salt.sdjsb.cfgl.CFGNode;
-import ca.ubc.ece.salt.sdjsb.cfgl.CFGPrinter;
+import ca.ubc.ece.salt.sdjsb.cfg.CFG;
+import ca.ubc.ece.salt.sdjsb.cfg.CFGFactory;
+import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
+import ca.ubc.ece.salt.sdjsb.cfg.CFGPrinter;
 import junit.framework.TestCase;
 
 public class TestCFGL extends TestCase {
