@@ -9,7 +9,7 @@ import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.ObjectProperty;
 import org.mozilla.javascript.ast.VariableInitializer;
 
-import fr.labri.gumtree.io.ParserASTNode;
+import ca.ubc.ece.salt.gumtree.ast.ParserASTNode;
 import fr.labri.gumtree.tree.Tree;
 
 public class PreProcessor {
@@ -44,8 +44,7 @@ public class PreProcessor {
 			/* Look for Tree nodes that were inserted. */
 			if (this.context.treeClassifier.getDstAddTrees().contains(t)) {
 				
-				ParserASTNode<AstNode> parserNode = t.getASTNode();
-				AstNode node = parserNode.getASTNode();
+				AstNode node = t.<AstNode>getASTNode();
 				
 				/* Check if the inserted node is a conditional statement. */
 				if(node instanceof ConditionalExpression) {
@@ -54,12 +53,12 @@ public class PreProcessor {
 
 					/* Get the tree parent. */
 					Tree dstParentTree = t.getParent();
-					AstNode dstParentNode = (AstNode)dstParentTree.getASTNode().getASTNode();
+					AstNode dstParentNode = (AstNode)dstParentTree.getASTNode();
 					
 					/* Find the source Tree node that maps to the destination
 					 * Tree node. */
 					Tree srcParentTree = this.context.mappings.getSrc(dstParentTree);
-					AstNode srcParentNode = (AstNode)srcParentTree.getASTNode().getASTNode();
+					AstNode srcParentNode = (AstNode)srcParentTree.getASTNode();
 					
 					if(srcParentTree != null && dstParentNode == node.getParent()) {
 

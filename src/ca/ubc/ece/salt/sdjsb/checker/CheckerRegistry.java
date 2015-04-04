@@ -8,8 +8,8 @@ import java.util.List;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.NodeVisitor;
 
+import ca.ubc.ece.salt.gumtree.ast.ParserASTNode;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext.ChangeType;
-import fr.labri.gumtree.io.ParserASTNode;
 import fr.labri.gumtree.tree.Tree;
 
 /**
@@ -77,28 +77,22 @@ public class CheckerRegistry {
 		/* Iterate the source tree. Call the CheckerRegistry to trigger events. */
 		for (Tree t: this.checkerContext.srcTree.getTrees()) {
 			if (this.checkerContext.treeClassifier.getSrcMvTrees().contains(t)) {
-				ParserASTNode<AstNode> parserNode = t.getASTNode(); // TODO: We should pass the source AND destination nodes.
-				this.sourceMove(parserNode.getASTNode());
+				this.sourceMove(t.<AstNode>getASTNode());
 			} if (this.checkerContext.treeClassifier.getSrcUpdTrees().contains(t)) {
-				ParserASTNode<AstNode> parserNode = t.getASTNode();
-				this.sourceUpdate(parserNode.getASTNode());
+				this.sourceUpdate(t.<AstNode>getASTNode());
 			} if (this.checkerContext.treeClassifier.getSrcDelTrees().contains(t)) {
-				ParserASTNode<AstNode> parserNode = t.getASTNode();
-				this.sourceDelete(parserNode.getASTNode());
+				this.sourceDelete(t.<AstNode>getASTNode());
 			}
 		}
 
 		/* Iterate the destination tree. Call the CheckerRegistry to trigger events. */
 		for (Tree t: this.checkerContext.dstTree.getTrees()) {
 			if (this.checkerContext.treeClassifier.getDstMvTrees().contains(t)) {
-				ParserASTNode<AstNode> parserNode = t.getASTNode();
-				this.destinationMove(parserNode.getASTNode());
+				this.destinationMove(t.<AstNode>getASTNode());
 			} if (this.checkerContext.treeClassifier.getDstUpdTrees().contains(t)) {
-				ParserASTNode<AstNode> parserNode = t.getASTNode();
-				this.destinationUpdate(parserNode.getASTNode());
+				this.destinationUpdate(t.<AstNode>getASTNode());
 			} if (this.checkerContext.treeClassifier.getDstAddTrees().contains(t)) {
-				ParserASTNode<AstNode> parserNode = t.getASTNode();
-				this.destinationInsert(parserNode.getASTNode());
+				this.destinationInsert(t.<AstNode>getASTNode());
 			}
 		}
 		

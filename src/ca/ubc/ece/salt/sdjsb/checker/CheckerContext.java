@@ -5,8 +5,8 @@ import java.util.Map;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
 
+import ca.ubc.ece.salt.gumtree.ast.ParserASTNode;
 import fr.labri.gumtree.actions.TreeClassifier;
-import fr.labri.gumtree.io.ParserASTNode;
 import fr.labri.gumtree.matchers.MappingStore;
 import fr.labri.gumtree.tree.Tree;
 

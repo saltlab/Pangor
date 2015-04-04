@@ -2,9 +2,11 @@ package ca.ubc.ece.salt.sdjsb;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InvalidClassException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -18,6 +20,10 @@ import fr.labri.gumtree.matchers.MappingStore;
 import fr.labri.gumtree.matchers.Matcher;
 import fr.labri.gumtree.matchers.MatcherFactories;
 import fr.labri.gumtree.tree.Tree;
+import ca.ubc.ece.salt.gumtree.ast.ASTClassifier;
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
+import ca.ubc.ece.salt.gumtree.ast.ParserASTNode;
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.checker.Alert;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerRegistry;
@@ -161,6 +167,10 @@ public class SDJSB  {
 		/* We use mapping ids to keep track of mapping changes from the source
 		 * to the destination. */
 		MappingStore mappings = matcher.getMappings();
+		
+		/* Assign the classifications directly to the AstNodes. */
+		ASTClassifier astClassifier = new ASTClassifier(src, dst, c, mappings);
+		astClassifier.classifyASTNodes();
 
 		/* Create the 'event bus' for the repair checkers. */
 		CheckerContext checkerContext = new CheckerContext(src, dst, srcTreeNodeMap, dstTreeNodeMap, c, mappings);

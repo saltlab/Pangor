@@ -10,9 +10,9 @@ import org.mozilla.javascript.ast.NodeVisitor;
 import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.VariableInitializer;
 
+import ca.ubc.ece.salt.gumtree.ast.ParserASTNode;
 import ca.ubc.ece.salt.sdjsb.checker.AbstractChecker;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext;
-import fr.labri.gumtree.io.ParserASTNode;
 
 /**
  * Detects repairs that fix undefined variables.

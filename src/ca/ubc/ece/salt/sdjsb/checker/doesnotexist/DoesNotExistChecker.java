@@ -12,12 +12,12 @@ import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NodeVisitor;
 import org.mozilla.javascript.ast.VariableInitializer;
 
+import ca.ubc.ece.salt.gumtree.ast.ParserASTNode;
 import ca.ubc.ece.salt.sdjsb.checker.AbstractChecker;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext.ChangeType;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerUtilities;
 import ca.ubc.ece.salt.sdjsb.checker.doesnotexist.DoesNotExistCheckerUtilities.NameType;
-import fr.labri.gumtree.io.ParserASTNode;
 
 /**
  * Detects repairs that fix fields that do not exist.

@@ -17,6 +17,6 @@
 	<classpathentry kind="lib" path="lib/log4j-over-slf4j-1.7.10.jar"/>
 	<classpathentry kind="lib" path="lib/slf4j-api-1.7.10.jar"/>
 	<classpathentry kind="lib" path="lib/jsch-0.1.51.jar"/>
-	<classpathentry kind="lib" path="lib/rhino-1.7R4.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/rhino"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

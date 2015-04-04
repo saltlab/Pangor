@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+
 public class CFGPrinter {
 	
 	public static String print(Output type, CFG cfg) {
@@ -42,6 +44,7 @@ public class CFGPrinter {
 		queue.add(cfg.getEntryNode());
 		visited.add(cfg.getEntryNode());
 		String serial = "digraph control_flow_graph {\n";
+		serial += "node [ style = filled fillcolor = \"white\" ];\n";
 		
 		while(true) {
 			
@@ -51,15 +54,22 @@ public class CFGPrinter {
 				break;
 			}
 			
+			/* Print the display settings for this node. */
+			String label = current.getStatement().toSource().replace("\n", "").replace("\"", "\\\"");
+
+			if(label.equals(";")) label = "";
+
+			serial += current.getId() + " [ fillcolor = \"" + getFillColor(current) + "\" label = \"" + label + "\" ];\n";
+			
 			for(Edge edge : current.getEdges()) {
 
-                serial += current.getName() + "_" + current.getId() + " -> " + edge.node.getName() +  "_" + edge.node.getId();
+                serial += current.getId() + " -> " + edge.node.getId();
 
 				if(edge.condition != null) {
-					serial += " [ label = \"" + edge.condition.toSource() + "\" ];\n";
+					serial += " [ color = \"" + getFillColor(edge) + "\" label = \"" + edge.condition.toSource() + "\" ];\n";
 				}
 				else {
-                    serial += ";\n";
+                    serial += " [ color = \"grey\" ];\n";
 				}
 				
 				if(!visited.contains(edge.node)) { 
@@ -74,6 +84,42 @@ public class CFGPrinter {
 		
 		return serial;
 		
+	}
+	
+	/**
+	 * @param changeType The change type of the underlying AstNode.
+	 * @return The color to fill the GraphViz CFGNode.
+	 */
+	private static String getFillColor(CFGNode node) {
+		return getFillColor(node.getStatement().getChangeType());
+	}
+	
+	/**
+	 * @param changeType The change type of the underlying AstNode.
+	 * @return The color to fill the GraphViz CFGNode.
+	 */
+	private static String getFillColor(Edge edge) {
+		return getFillColor(edge.condition.getChangeType());
+	}
+	
+	/**
+	 * @param changeType The change type of the underlying AstNode.
+	 * @return The color to fill the GraphViz CFGNode.
+	 */
+	private static String getFillColor(ChangeType changeType) {
+
+		switch(changeType) {
+		case INSERTED:
+			return "green";
+		case REMOVED:
+			return "red";
+		case MOVED:
+			return "yellow";
+		case UPDATED:
+		default:
+			return "grey";
+		}
+
 	}
 	
 	/**
