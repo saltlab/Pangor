@@ -59,17 +59,17 @@ public class CFGPrinter {
 
 			if(label.equals(";")) label = "";
 
-			serial += current.getId() + " [ fillcolor = \"" + getFillColor(current) + "\" label = \"" + label + "\" ];\n";
+			serial += current.getId() + " [ fillcolor = \"" + getFillColor(current.getStatement().getChangeType()) + "\" label = \"" + label + "\" ];\n";
 			
 			for(Edge edge : current.getEdges()) {
 
                 serial += current.getId() + " -> " + edge.node.getId();
 
 				if(edge.condition != null) {
-					serial += " [ color = \"" + getFillColor(edge) + "\" label = \"" + edge.condition.toSource() + "\" ];\n";
+					serial += " [ color = \"" + getFillColor(edge.changeType) + "\" fontcolor = \"" + getFillColor(edge.condition.getChangeType()) + "\" label = \"" + edge.condition.toSource() + "\" ];\n";
 				}
 				else {
-                    serial += " [ color = \"grey\" ];\n";
+                    serial += " [ color = \"" + getFillColor(edge.changeType) + "\" ];\n";
 				}
 				
 				if(!visited.contains(edge.node)) { 
@@ -90,22 +90,6 @@ public class CFGPrinter {
 	 * @param changeType The change type of the underlying AstNode.
 	 * @return The color to fill the GraphViz CFGNode.
 	 */
-	private static String getFillColor(CFGNode node) {
-		return getFillColor(node.getStatement().getChangeType());
-	}
-	
-	/**
-	 * @param changeType The change type of the underlying AstNode.
-	 * @return The color to fill the GraphViz CFGNode.
-	 */
-	private static String getFillColor(Edge edge) {
-		return getFillColor(edge.condition.getChangeType());
-	}
-	
-	/**
-	 * @param changeType The change type of the underlying AstNode.
-	 * @return The color to fill the GraphViz CFGNode.
-	 */
 	private static String getFillColor(ChangeType changeType) {
 
 		switch(changeType) {
@@ -116,8 +100,12 @@ public class CFGPrinter {
 		case MOVED:
 			return "yellow";
 		case UPDATED:
-		default:
+			return "blue";
+		case UNCHANGED:
 			return "grey";
+		case UNKNOWN:
+		default:
+			return "black";
 		}
 
 	}

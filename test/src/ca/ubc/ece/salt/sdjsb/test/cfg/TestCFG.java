@@ -16,7 +16,7 @@ import ca.ubc.ece.salt.sdjsb.cfg.CFGPrinter;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGPrinter.Output;
 import junit.framework.TestCase;
 
-public class TestCFGL extends TestCase {
+public class TestCFG extends TestCase {
 	
 	protected void runTest(String file, List<String> expectedCFGs, Output output) throws IOException {
 

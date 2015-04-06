@@ -2,6 +2,8 @@ package ca.ubc.ece.salt.sdjsb.cfg;
 
 import org.mozilla.javascript.ast.AstNode;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+
 /**
  * A labeled, directed edge to another node.
  */
@@ -14,9 +16,13 @@ public class Edge {
 	/** The node that this edge points to. */
 	public CFGNode node;
 	
+	/** The change operation applied to the edge from source to destination. **/
+	public ChangeType changeType;
+	
 	public Edge(AstNode condition, CFGNode node) {
 		this.condition = condition;
 		this.node = node;
+		this.changeType = ChangeType.UNKNOWN;
 	}
 	
 	@Override 
@@ -26,4 +32,5 @@ public class Edge {
 		}
 		return false;
 	}
+	
 }

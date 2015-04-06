@@ -27,6 +27,9 @@ public class CFGNode {
 	/** The edges leaving this node. **/
 	private List<Edge> edges;
 	
+	/** The corresponding source or destination CFGNode. */
+	private CFGNode mappedNode;
+	
 	/**
 	 * @param statement The statement that is executed when this node is 
 	 * 		  			reached.
@@ -36,6 +39,7 @@ public class CFGNode {
 		this.statement = statement;
 		this.id = CFGNode.getUniqueId();
 		this.name = null;
+		this.setMappedNode(null);
 	}
 	
 	/**
@@ -110,6 +114,20 @@ public class CFGNode {
 	public long getId() {
 		return id;
 	}
+
+	/**
+	 * @return the corresponding node in the source or destination CFG.
+	 */
+	public CFGNode getMappedNode() {
+		return mappedNode;
+	}
+
+	/**
+	 * @param mappedNode the corresponding node in the source or destination CFG.	 
+	 */
+	public void setMappedNode(CFGNode mappedNode) {
+		this.mappedNode = mappedNode;
+	}
 	
 	public String getName() {
 		
@@ -153,6 +171,11 @@ public class CFGNode {
 	 */
 	public static synchronized void resetIdGen() {
 		CFGNode.idGen = 0;
+	}
+	
+	@Override
+	public String toString() {
+		return this.id + "_" + this.getName();
 	}
 
 }
