@@ -826,8 +826,7 @@ public class CFGFactory {
 
             /* Exit nodes exit to the finally block. */
             for(CFGNode exitNode : tryBlock.getExitNodes()) {
-                assert(tryNode.getEdges().size() > 0);
-            	exitNode.addEdge(null, tryNode.getEdges().get(0).node);
+            	exitNode.addEdge(null, finallyBlock.getEntryNode());
             }
 		}
 		

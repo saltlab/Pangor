@@ -161,5 +161,12 @@ public class TestCFGDiff extends TestCase {
 
 	}
 	
+    @Test
+	public void testActionMethods() throws IOException {
+		
+		String src = "./test/input/does_not_exist/ActionMethods_old.js";
+		String dst = "./test/input/does_not_exist/ActionMethods_new.js";
+		this.runTest(src, dst, Output.DOT);
 
+	}
 }
