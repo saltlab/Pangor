@@ -33,6 +33,7 @@ public class CFGDifferencing {
 		
 		/* Map CFG nodes in the two CFGs. */
 		srcCFG.getEntryNode().setMappedNode(dstCFG.getEntryNode());
+		dstCFG.getEntryNode().setMappedNode(srcCFG.getEntryNode());
 		CFGNode srcExit = mapCFGNodes(srcCFG, dstASTMap);
 		CFGNode dstExit = mapCFGNodes(dstCFG, srcASTMap);
 		
@@ -41,7 +42,7 @@ public class CFGDifferencing {
 		dstExit.setMappedNode(srcExit);
 		
 		/* Classify the edges as inserted, deleted or unchanged. */
-		//classifyEdges(srcCFG, ChangeType.REMOVED);
+		classifyEdges(srcCFG, ChangeType.REMOVED);
 		classifyEdges(dstCFG, ChangeType.INSERTED);
 
 	}
@@ -62,8 +63,8 @@ public class CFGDifferencing {
 
 			CFGNode cfgNode = queue.remove();
 			
-			/* We only classify edges from non-empty nodes. */
-			if(cfgNode.getStatement().getType() != Token.EMPTY) {
+			/* We only classify edges from non-empty nodes or the entry node. */
+			if(cfgNode.getStatement().getType() != Token.EMPTY || cfgNode.getName().equals("FUNCTION_ENTRY") || cfgNode.getName().equals("SCRIPT_ENTRY")) {
             
                 /* Get the next non-empty node. */
                 /* Label all edges in between and return the non-empty node. This should be recursive. */
