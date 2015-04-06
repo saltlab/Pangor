@@ -35,6 +35,8 @@ import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.WhileLoop;
 import org.mozilla.javascript.ast.WithStatement;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+
 /**
  * Builds a control flow graph.
  */
@@ -77,7 +79,7 @@ public class CFGFactory {
 		/* Start by getting the CFG for the script. There is one entry point
 		 * and one exit point for a script and function. */
 
-		CFGNode scriptEntry = new CFGNode(new EmptyStatement(), name + "_ENTRY");
+		CFGNode scriptEntry = new CFGNode(scriptNode, name + "_ENTRY");
 		CFGNode scriptExit = new CFGNode(new EmptyStatement(), name + "_EXIT");
 		
         /* Build the CFG for the script. */
@@ -234,7 +236,13 @@ public class CFGFactory {
 			falseBranch.addExitNode(empty);
 		}
 
-		ifNode.addEdge(new Edge(new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(ifStatement.getCondition())), falseBranch.getEntryNode()));
+		/* The false branch condition is the negation of the true branch 
+		 * condition. We give it the same change type label as the true
+		 * branch condition. */
+		AstNode falseBranchCondition = new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(ifStatement.getCondition()));
+		falseBranchCondition.setChangeType(ifStatement.getCondition().getChangeType());
+
+		ifNode.addEdge(new Edge(falseBranchCondition, falseBranch.getEntryNode()));
 
         /* Propagate exit, return, continue and break nodes. */
         cfg.addAllExitNodes(falseBranch.getExitNodes());
@@ -287,9 +295,15 @@ public class CFGFactory {
         }
         
         /* Build the false branch. */
+
+		/* The false branch condition is the negation of the true branch 
+		 * condition. We give it the same change type label as the true
+		 * branch condition. */
+		AstNode falseBranchCondition = new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(whileLoop.getCondition()));
+		falseBranchCondition.setChangeType(whileLoop.getCondition().getChangeType());
         
         CFGNode empty = new CFGNode(new EmptyStatement());
-		whileNode.addEdge(new Edge(new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(whileLoop.getCondition())), empty));
+		whileNode.addEdge(new Edge(falseBranchCondition, empty));
 		cfg.addExitNode(empty);
 		
 		return cfg;
@@ -342,8 +356,14 @@ public class CFGFactory {
 		
 		/* Add edge for false condition. */
 
+		/* The false branch condition is the negation of the true branch 
+		 * condition. We give it the same change type label as the true
+		 * branch condition. */
+		AstNode falseBranchCondition = new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(doLoop.getCondition()));
+		falseBranchCondition.setChangeType(doLoop.getCondition().getChangeType());
+
         CFGNode empty = new CFGNode(new EmptyStatement());
-		whileNode.addEdge(new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(doLoop.getCondition())), empty);
+		whileNode.addEdge(falseBranchCondition, empty);
 		cfg.addExitNode(empty);
 
 		return cfg;
@@ -400,9 +420,15 @@ public class CFGFactory {
         }
         
         /* Build the false branch. */
+
+		/* The false branch condition is the negation of the true branch 
+		 * condition. We give it the same change type label as the true
+		 * branch condition. */
+		AstNode falseBranchCondition = new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(forLoop.getCondition()));
+		falseBranchCondition.setChangeType(forLoop.getCondition().getChangeType());
         
         CFGNode empty = new CFGNode(new EmptyStatement());
-		condition.addEdge(new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(forLoop.getCondition())), empty);
+		condition.addEdge(falseBranchCondition, empty);
 		cfg.addExitNode(empty);
 		
 		return cfg;
@@ -448,11 +474,16 @@ public class CFGFactory {
 		/* Create the node that gets the next key in an object and assigns the
 		 * value to the iterator variable. */
 
-        PropertyGet keyIteratorMethod = new PropertyGet(forInLoop.getIteratedObject(), new Name(0, "~getNextkey"));
+		Name getNextKey = new Name(0, "~getNextKey");
+		getNextKey.setChangeType(iterator.getChangeType());
+        PropertyGet keyIteratorMethod = new PropertyGet(forInLoop.getIteratedObject(), getNextKey);
+        keyIteratorMethod.setChangeType(iterator.getChangeType());
         FunctionCall keyIteratorFunction = new FunctionCall();
         keyIteratorFunction.setTarget(keyIteratorMethod);
+        keyIteratorFunction.setChangeType(iterator.getChangeType());
         Assignment targetAssignment = new Assignment(target, keyIteratorFunction);
         targetAssignment.setType(Token.ASSIGN);
+        targetAssignment.setChangeType(target.getChangeType());
 		
         CFGNode assignment = new CFGNode(targetAssignment);
 
@@ -460,8 +491,10 @@ public class CFGFactory {
          * The condition is assigned to the true/false loop branches. */
 
         PropertyGet keyConditionMethod = new PropertyGet(forInLoop.getIteratedObject(), new Name(0, "~hasNextKey"));
+        keyConditionMethod.setChangeType(iterator.getChangeType());
         FunctionCall keyConditionFunction = new FunctionCall();
         keyConditionFunction.setTarget(keyConditionMethod);
+        keyConditionFunction.setChangeType(iterator.getChangeType());
 
 		CFGNode condition = new CFGNode(new EmptyStatement(), "FORIN");
 		
@@ -500,6 +533,12 @@ public class CFGFactory {
         /* Create a node for the false branch to exit the loop. */
         CFGNode falseBranch = new CFGNode(new EmptyStatement());
         cfg.addExitNode(falseBranch);
+
+		/* The false branch condition is the negation of the true branch 
+		 * condition. We give it the same change type label as the true
+		 * branch condition. */
+		AstNode falseBranchCondition = new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(keyConditionFunction));
+		falseBranchCondition.setChangeType(keyConditionFunction.getChangeType());
 
         /* Add the edges from the assignment node to the start of the loop. */
         assignment.addEdge(null, trueBranch.getEntryNode());
@@ -553,10 +592,16 @@ public class CFGFactory {
                 compare.setType(Token.SHEQ);
                 switchNode.addEdge(new Edge(compare, subGraph.getEntryNode()));
                 
-                if(defaultCondition == null) defaultCondition = compare;
+                if(defaultCondition == null) {
+                	defaultCondition = compare;
+                	defaultCondition.setChangeType(compare.getChangeType());
+                }
                 else {
-                    defaultCondition = new InfixExpression(compare, defaultCondition);
-                    defaultCondition.setType(Token.OR);
+                    AstNode infix = new InfixExpression(compare, defaultCondition);
+                    infix.setType(Token.OR);
+                    if(compare.getChangeType() == defaultCondition.getChangeType()) infix.setChangeType(compare.getChangeType());
+                    else infix.setChangeType(ChangeType.UPDATED);
+                    defaultCondition = infix;
                 }
                 
             }
@@ -588,9 +633,19 @@ public class CFGFactory {
 			previousSubGraph = subGraph;
             
 		}
+
+		/* The false branch condition is the negation of the true branch 
+		 * condition. We give it the same change type label as the true
+		 * branch condition. */
+		if(defaultCondition != null)  {
+
+            AstNode falseBranchCondition = new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(defaultCondition));
+            falseBranchCondition.setChangeType(defaultCondition.getChangeType());
+            defaultCondition = falseBranchCondition;
+
+		}
 		
 		/* Add the final default condition. */
-		if(defaultCondition != null) defaultCondition = new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(defaultCondition));
 		defaultEdge.condition = defaultCondition;
 
         /* The rest of the exit nodes are exit nodes for the statement. */

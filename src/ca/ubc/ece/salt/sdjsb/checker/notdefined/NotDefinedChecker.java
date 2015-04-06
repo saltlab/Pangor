@@ -129,8 +129,7 @@ public class NotDefinedChecker extends AbstractChecker {
     
 	@Override
 	public void pre() { 
-		ParserASTNode<AstNode> srcTree = this.context.srcTree.getASTNode();
-		AstNode root = srcTree.getASTNode();
+		AstNode root = this.context.srcTree.getASTNode();
 		VariableNodeVisitor visitor = new VariableNodeVisitor();
 		root.visit(visitor);
 		this.variablesUsedInSource = visitor.identifiers;

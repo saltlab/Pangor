@@ -34,6 +34,11 @@ public class TestCallbackError extends TestSDJSB {
 		this.runTest(new String[] {src, dst}, expectedAlerts, true);
 	}
 
+	/**
+	 * This test fails right now because it's a bit limited by AST
+	 * differencing. When we implement CFG analysis we should be able to
+	 * make this test pass.
+	 */
 	@Test
 	public void testMultiCheck(){
 		String src = "./test/input/callback_error/cbe_multi_check_old.js";

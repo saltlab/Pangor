@@ -82,8 +82,7 @@ public class DoesNotExistChecker extends AbstractChecker {
     
 	@Override
 	public void pre() { 
-		ParserASTNode<AstNode> srcTree = this.context.dstTree.getASTNode();
-		AstNode root = srcTree.getASTNode();
+		AstNode root = this.context.dstTree.getASTNode();
 		IdentifierNodeVisitor visitor = new IdentifierNodeVisitor();
 		root.visit(visitor);
 		this.identifiersInDestination = visitor.identifiers;

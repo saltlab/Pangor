@@ -34,6 +34,10 @@ public class TestDoesNotExist extends TestSDJSB {
 		this.runTest(new String[] {src, dst}, expectedAlerts, true);
 	}
 
+	/**
+	 *  This test fails. In general this checker is not precise enough for
+	 *  practical use (too many false positives).
+	 */
 	@Test
 	public void testMove(){
 		String src = "./test/input/does_not_exist/ProcessContainer_old.js";

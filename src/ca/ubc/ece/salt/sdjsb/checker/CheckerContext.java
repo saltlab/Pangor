@@ -89,8 +89,7 @@ public class CheckerContext {
 		Tree src = this.getSrcTree(node);
 		Tree dst = this.mappings.getDst(src);
 		if(dst == null) return null;
-		ParserASTNode<AstNode> dstNode = dst.getASTNode();
-		return dstNode.getASTNode();
+		return dst.getASTNode();
 	}
 
 	/**

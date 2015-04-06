@@ -2,13 +2,16 @@ package ca.ubc.ece.salt.sdjsb.test.cfg.diff;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Test;
 import org.mozilla.javascript.ast.AstRoot;
 
 import ca.ubc.ece.salt.gumtree.ast.ASTClassifier;
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.sdjsb.cfg.CFG;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGFactory;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
@@ -77,9 +80,30 @@ public class TestCFGDiff extends TestCase {
 		List<CFG> srcCFGs = CFGFactory.createCFGs((AstRoot)src.getClassifiedASTNode());
 		List<CFG> dstCFGs = CFGFactory.createCFGs((AstRoot)dst.getClassifiedASTNode());
 		
-		/* Difference the CFGs. */
-		/* TODO: We need to match CFGs somehow. Maybe just with the order they are produced? Java doesn't have this problem. */
-		CFGDifferencing.computeEdgeChanges(srcCFGs.get(0), dstCFGs.get(0));
+		/* Difference the CFGs.
+		 * 
+		 * We match source and destination CFGs based on the function node
+		 * mappings from AST differencing. */
+		Map<ClassifiedASTNode, CFG> dstEntryMap = new HashMap<ClassifiedASTNode, CFG>();
+		Map<ClassifiedASTNode, CFG> srcEntryMap = new HashMap<ClassifiedASTNode, CFG>();
+
+		for(CFG dstCFG : dstCFGs) {
+			dstEntryMap.put(dstCFG.getEntryNode().getStatement(), dstCFG);
+		}
+
+		for(CFG srcCFG : srcCFGs) {
+			srcEntryMap.put(srcCFG.getEntryNode().getStatement(), srcCFG);
+		}
+
+		for(CFG dstCFG : dstCFGs) {
+			
+			if(srcEntryMap.containsKey(dstCFG.getEntryNode().getStatement().getMapping())) {
+				CFG srcCFG = srcEntryMap.get(dstCFG.getEntryNode().getStatement().getMapping());
+                CFGDifferencing.computeEdgeChanges(srcCFG, dstCFG);
+                //CFGDifferencing.computeEdgeChanges(srcCFGs.get(0), dstCFGs.get(0));
+			}
+			
+		}
 
 		/* Print the CFGs. */
 		System.out.println("Source CFGs: *************");
@@ -118,5 +142,24 @@ public class TestCFGDiff extends TestCase {
 		this.runTest(src, dst, Output.DOT);
 
 	}
+
+	@Test
+	public void testReverseIf() throws IOException {
+		
+		String src = "./test/input/special_type_handling/sth_undefined_new.js";
+		String dst = "./test/input/special_type_handling/sth_undefined_old.js";
+		this.runTest(src, dst, Output.DOT);
+
+	}
+
+	@Test
+	public void testMultipleCFGs() throws IOException {
+		
+		String src = "./test/input/callback_parameter/cbp_old.js";
+		String dst = "./test/input/callback_parameter/cbp_new.js";
+		this.runTest(src, dst, Output.DOT);
+
+	}
+	
 
 }

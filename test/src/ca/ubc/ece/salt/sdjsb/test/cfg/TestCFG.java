@@ -36,7 +36,7 @@ public class TestCFG extends TestCase {
         for(CFG cfg : cfgs) {
             String serialized = CFGPrinter.adjacencyList(cfg);
             actualCFGs.add(serialized);
-            System.out.println("CFG" + n + ": " + CFGPrinter.print(output, cfg));
+            if(output != Output.NONE) System.out.println("CFG" + n + ": " + CFGPrinter.print(output, cfg));
             n++;
         }
         
@@ -67,7 +67,7 @@ public class TestCFG extends TestCase {
 		expectedCFGs.add("SCRIPT_ENTRY(0){2},VAR(2){3},EXPR_RESULT(3){1},SCRIPT_EXIT(1){}");
 		expectedCFGs.add("FUNCTION_ENTRY(4){6},EXPR_VOID(6){7},IF(7){name:8,!(name):9},EXPR_VOID(8){5},EXPR_VOID(9){10},FUNCTION_EXIT(5){},EXPR_VOID(10){5}");
 		
-		this.runTest(file, expectedCFGs, Output.DOT);
+		this.runTest(file, expectedCFGs, Output.NONE);
 
 	}
 
@@ -176,10 +176,10 @@ public class TestCFG extends TestCase {
 		
 		List<String> expectedCFGs = new LinkedList<String>();
 		expectedCFGs.add("SCRIPT_ENTRY(0){2},VAR(2){3},EXPR_RESULT(3){1},SCRIPT_EXIT(1){}");
-		expectedCFGs.add("FUNCTION_ENTRY(4){6},EXPR_VOID(6){7},VAR(7){8},VAR(8){9},ASSIGN(9){10},FORIN(10){noises.~hasNextKey():11,!(noises.~hasNextKey()):13},EXPR_VOID(11){12},EMPTY(13){5},EXPR_VOID(12){9},FUNCTION_EXIT(5){}");
+		expectedCFGs.add("FUNCTION_ENTRY(4){6},EXPR_VOID(6){7},VAR(7){8},VAR(8){10},FORIN(10){noises.~hasNextKey():9,!(noises.~hasNextKey()):13},ASSIGN(9){11},EMPTY(13){5},EXPR_VOID(11){12},FUNCTION_EXIT(5){},EXPR_VOID(12){10}");
 		expectedCFGs.add("FUNCTION_ENTRY(14){16},EXPR_VOID(16){15},FUNCTION_EXIT(15){}");
 		
-		this.runTest(file, expectedCFGs, Output.DOT);
+		this.runTest(file, expectedCFGs, Output.NONE);
 
 	}
 
@@ -190,8 +190,8 @@ public class TestCFG extends TestCase {
 		
 		List<String> expectedCFGs = new LinkedList<String>();
 		expectedCFGs.add("SCRIPT_ENTRY(0){2},VAR(2){3},EXPR_RESULT(3){1},SCRIPT_EXIT(1){}");
-		expectedCFGs.add("FUNCTION_ENTRY(4){6},EXPR_VOID(6){7},VAR(7){8},ASSIGN(8){9},FORIN(9){animals.~hasNextKey():10,!(animals.~hasNextKey()):11},EXPR_VOID(10){8},EMPTY(11){5},FUNCTION_EXIT(5){}");
-		expectedCFGs.add("FUNCTION_ENTRY(12){14},VAR(14){15},SWITCH(15){animal === \"cow\":16,animal === \"moose\":18,animal === \"horse\":20,animal === \"buffalo\":22,!(animal === \"buffalo\" || animal === \"horse\" || animal === \"moose\" || animal === \"cow\"):23},EXPR_VOID(16){17},EXPR_VOID(18){19},EXPR_VOID(20){21},EMPTY(22){23},EXPR_VOID(23){24},BREAK(17){24},BREAK(19){24},BREAK(21){24},EXPR_VOID(24){13},FUNCTION_EXIT(13){}");
+		expectedCFGs.add("FUNCTION_ENTRY(4){6},EXPR_VOID(6){7},VAR(7){9},FORIN(9){animals.~hasNextKey():8,!(animals.~hasNextKey()):11},ASSIGN(8){10},EMPTY(11){5},EXPR_VOID(10){9},FUNCTION_EXIT(5){}");
+		expectedCFGs.add("FUNCTION_ENTRY(12){14},VAR(14){15},SWITCH(15){animal === \\\"cow\\\":16,animal === \\\"moose\\\":18,animal === \\\"horse\\\":20,animal === \\\"buffalo\\\":22,!(animal === \\\"buffalo\\\" || animal === \\\"horse\\\" || animal === \\\"moose\\\" || animal === \\\"cow\\\"):23},EXPR_VOID(16){17},EXPR_VOID(18){19},EXPR_VOID(20){21},EMPTY(22){23},EXPR_VOID(23){24},BREAK(17){24},BREAK(19){24},BREAK(21){24},EXPR_VOID(24){13},FUNCTION_EXIT(13){}");
 		
 		this.runTest(file, expectedCFGs, Output.NONE);
 
