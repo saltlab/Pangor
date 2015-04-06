@@ -1,7 +1,6 @@
 package ca.ubc.ece.salt.sdjsb.cfg;
 
-import org.mozilla.javascript.ast.AstNode;
-
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 
 /**
@@ -11,7 +10,7 @@ public class Edge {
 	
 	/** The condition in which this edge is traversed. If null then the edge
 	 * is always traversed. **/
-	public AstNode condition;
+	public ClassifiedASTNode condition;
 	
 	/** The node that this edge points to. */
 	public CFGNode node;
@@ -19,7 +18,7 @@ public class Edge {
 	/** The change operation applied to the edge from source to destination. **/
 	public ChangeType changeType;
 	
-	public Edge(AstNode condition, CFGNode node) {
+	public Edge(ClassifiedASTNode condition, CFGNode node) {
 		this.condition = condition;
 		this.node = node;
 		this.changeType = ChangeType.UNKNOWN;

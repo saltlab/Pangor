@@ -55,18 +55,18 @@ public class CFGPrinter {
 			}
 			
 			/* Print the display settings for this node. */
-			String label = current.getStatement().toSource().replace("\n", "").replace("\"", "\\\"");
+			String label = current.getStatement().getCFGLabel();
 
 			if(label.equals(";")) label = "";
 
-			serial += current.getId() + " [ fillcolor = \"" + getFillColor(current.getStatement().getChangeType()) + "\" label = \"" + label + "\" ];\n";
+			serial += "\t" + current.getId() + " [ fillcolor = \"" + getFillColor(current.getStatement().getChangeType()) + "\" label = \"" + label + "\" ];\n";
 			
 			for(Edge edge : current.getEdges()) {
 
-                serial += current.getId() + " -> " + edge.node.getId();
+                serial += "\t" + current.getId() + " -> " + edge.node.getId();
 
 				if(edge.condition != null) {
-					serial += " [ color = \"" + getFillColor(edge.changeType) + "\" fontcolor = \"" + getFillColor(edge.condition.getChangeType()) + "\" label = \"" + edge.condition.toSource() + "\" ];\n";
+					serial += " [ color = \"" + getFillColor(edge.changeType) + "\" fontcolor = \"" + getFillColor(edge.condition.getChangeType()) + "\" label = \"" + edge.condition.getCFGLabel() + "\" ];\n";
 				}
 				else {
                     serial += " [ color = \"" + getFillColor(edge.changeType) + "\" ];\n";
@@ -139,7 +139,7 @@ public class CFGPrinter {
 			for(Edge edge : current.getEdges()) {
 
 				if(edge.condition != null) {
-					serial += edge.condition.toSource() + ":" + edge.node.getId() + ",";
+					serial += edge.condition.getCFGLabel() + ":" + edge.node.getId() + ",";
 				}
 				else {
                     serial += edge.node.getId() + ",";

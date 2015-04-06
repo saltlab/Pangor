@@ -3,8 +3,7 @@ package ca.ubc.ece.salt.sdjsb.cfg;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.mozilla.javascript.Token;
-import org.mozilla.javascript.ast.AstNode;
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 
 /**
  * A control flow graph node. Thread safe.
@@ -22,7 +21,7 @@ public class CFGNode {
 	
 	/** The AST Statement which contains the actions this node performs. From
 	 * org.mozilla.javascript.Token. **/
-	private AstNode statement;
+	private ClassifiedASTNode statement;
 	
 	/** The edges leaving this node. **/
 	private List<Edge> edges;
@@ -34,7 +33,7 @@ public class CFGNode {
 	 * @param statement The statement that is executed when this node is 
 	 * 		  			reached.
 	 */
-	public CFGNode(AstNode statement) {
+	public CFGNode(ClassifiedASTNode statement) {
 		this.edges = new LinkedList<Edge>();
 		this.statement = statement;
 		this.id = CFGNode.getUniqueId();
@@ -47,7 +46,7 @@ public class CFGNode {
 	 * 		  			reached.
 	 * @param name The name for this node (nice for printing and debugging).
 	 */
-	public CFGNode(AstNode statement, String name) {
+	public CFGNode(ClassifiedASTNode statement, String name) {
 		this.edges = new LinkedList<Edge>();
 		this.statement = statement;
 		this.id = CFGNode.getUniqueId();
@@ -60,7 +59,7 @@ public class CFGNode {
 	 * @param condition The condition for which we traverse the edge.
 	 * @param node The node at the other end of this edge.
 	 */
-	public void addEdge(AstNode condition, CFGNode node) {
+	public void addEdge(ClassifiedASTNode condition, CFGNode node) {
 		Edge edge = new Edge(condition, node);
 		int index = this.edges.indexOf(edge);
 		if(index >= 0) {
@@ -96,7 +95,7 @@ public class CFGNode {
 	/**
 	 * @return The AST Statement which contains the actions this node performs.
 	 */
-	public AstNode getStatement() {
+	public ClassifiedASTNode getStatement() {
 		return statement;
 	}
 	
@@ -104,7 +103,7 @@ public class CFGNode {
 	 * @param statement The AST Statement which contains the actions this node
 	 * 					performs.
 	 */
-	public void setStatement(AstNode statement) {
+	public void setStatement(ClassifiedASTNode statement) {
 		this.statement = statement;
 	}
 
@@ -133,16 +132,8 @@ public class CFGNode {
 		
 		if(this.name != null) return this.name;
 		
-        String name;
-
-        try {
-            name = Token.typeToName(this.statement.getType());
-        }
-        catch(IllegalStateException e) {
-            name = Token.keywordToName(this.statement.getType());
-        }
-
-        return name;
+		return this.statement.getTypeName();
+		
 	}
 
 	/**

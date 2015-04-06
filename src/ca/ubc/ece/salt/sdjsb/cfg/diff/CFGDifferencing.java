@@ -8,24 +8,42 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 
-import org.mozilla.javascript.Token;
-import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.EmptyStatement;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.cfg.CFG;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
 import ca.ubc.ece.salt.sdjsb.cfg.Edge;
 
 /**
- * Performs post-process operations after the CFG has been created.
+ * Computes edge changes between CFGs using the node changes from the AST.
+ * 
+ * Edges can be labeled as unchanged, inserted or removed. An empty node is
+ * a node that contains an EmptyStatement AST node. A non-empty node is a
+ * node that contains any other AST node type.
+ * 
+ * Unchanged: Node A has a path to non empty node B through zero or more
+ * 			  empty nodes in both the source CFG and the destination CFG. 
+ * 
+ * Inserted: Node A has a path to non-empty node B through zero or more
+ * 			 empty nodes in the destination CFG, but not in the source CFG.
+ * 
+ * Deleted: Node A has a path to non-empty node B through zero or more
+ * 			 empty nodes in the source CFG, but not in the destination CFG.
  */
 public class CFGDifferencing {
 	
+	/**
+	 * Computes edge changes between CFGs using the node changes from the AST.
+	 * 
+	 * @param srcCFG the labeled source CFG.
+	 * @param dstCFG the labeled destination CFG.
+	 */
 	public static void computeEdgeChanges(CFG srcCFG, CFG dstCFG) {
 
-		Map<AstNode, CFGNode> srcASTMap = new HashMap<AstNode, CFGNode>();
-		Map<AstNode, CFGNode> dstASTMap = new HashMap<AstNode, CFGNode>();
+		Map<ClassifiedASTNode, CFGNode> srcASTMap = new HashMap<ClassifiedASTNode, CFGNode>();
+		Map<ClassifiedASTNode, CFGNode> dstASTMap = new HashMap<ClassifiedASTNode, CFGNode>();
 		
 		/* Map AST nodes to CFG nodes for reverse lookup. */
 		buildASTMap(srcCFG, srcASTMap);
@@ -64,7 +82,7 @@ public class CFGDifferencing {
 			CFGNode cfgNode = queue.remove();
 			
 			/* We only classify edges from non-empty nodes or the entry node. */
-			if(cfgNode.getStatement().getType() != Token.EMPTY || cfgNode.getName().equals("FUNCTION_ENTRY") || cfgNode.getName().equals("SCRIPT_ENTRY")) {
+			if(!cfgNode.getStatement().isEmpty() || cfgNode.getName().equals("FUNCTION_ENTRY") || cfgNode.getName().equals("SCRIPT_ENTRY")) {
             
                 /* Get the next non-empty node. */
                 /* Label all edges in between and return the non-empty node. This should be recursive. */
@@ -193,7 +211,7 @@ public class CFGDifferencing {
 	 * Map the CFG nodes in the source and destination CFGs.
 	 * @return the FUNCTION_EXIT or SCRIPT_EXIT node
 	 */
-	private static CFGNode mapCFGNodes(CFG cfg, Map<AstNode, CFGNode> map) {
+	private static CFGNode mapCFGNodes(CFG cfg, Map<ClassifiedASTNode, CFGNode> map) {
 		
 		CFGNode functExitNode = null;
 		Set<CFGNode> visited = new HashSet<CFGNode>();
@@ -206,13 +224,13 @@ public class CFGDifferencing {
 		while(!queue.isEmpty()) {
 
 			CFGNode cfgNode = queue.remove();
-            AstNode astNode = cfgNode.getStatement();
+            ClassifiedASTNode astNode = cfgNode.getStatement();
             
             /* If this is the FUNCTION_EXIT or SCRIPT_EXIT node, store it. */ 
             if(cfgNode.getName().equals("FUNCTION_EXIT") || cfgNode.getName().equals("SCRIPT_EXIT")) functExitNode = cfgNode;
             
             /* Get the mapping of AST nodes in the source and destination. */
-            AstNode astMapping = (AstNode) astNode.getMapping();
+            ClassifiedASTNode astMapping = (ClassifiedASTNode) astNode.getMapping();
             if(astMapping != null) {
             	
             	/* Look up the AST node's CFG node. */
@@ -240,7 +258,7 @@ public class CFGDifferencing {
 	 * Builds a mapping of AST nodes to CFG nodes.
 	 * @param cfg the CFG to map.
 	 */
-	private static void buildASTMap(CFG cfg, Map<AstNode, CFGNode> map) {
+	private static void buildASTMap(CFG cfg, Map<ClassifiedASTNode, CFGNode> map) {
 
 		Set<CFGNode> visited = new HashSet<CFGNode>();
 		Queue<CFGNode> queue = new LinkedList<CFGNode>();
@@ -250,7 +268,7 @@ public class CFGDifferencing {
 		while(!queue.isEmpty()) {
 
 			CFGNode cfgNode = queue.remove();
-            AstNode astNode = cfgNode.getStatement();
+            ClassifiedASTNode astNode = cfgNode.getStatement();
             map.put(astNode, cfgNode);
             
             for(Edge edge : cfgNode.getEdges()) {
