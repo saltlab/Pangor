@@ -14,28 +14,28 @@ import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.cfg.CFG;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
-import ca.ubc.ece.salt.sdjsb.cfg.Edge;
+import ca.ubc.ece.salt.sdjsb.cfg.CFGEdge;
 
 /**
- * Computes edge changes between CFGs using the node changes from the AST.
+ * Computes edge changes between CFGs using the to changes from the AST.
  * 
- * Edges can be labeled as unchanged, inserted or removed. An empty node is
- * a node that contains an EmptyStatement AST node. A non-empty node is a
- * node that contains any other AST node type.
+ * Edges can be labeled as unchanged, inserted or removed. An empty to is
+ * a to that contains an EmptyStatement AST to. A non-empty to is a
+ * to that contains any other AST to type.
  * 
- * Unchanged: Node A has a path to non empty node B through zero or more
- * 			  empty nodes in both the source CFG and the destination CFG. 
+ * Unchanged: Node A has a path to non empty to B through zero or more
+ * 			  empty tos in both the source CFG and the destination CFG. 
  * 
- * Inserted: Node A has a path to non-empty node B through zero or more
- * 			 empty nodes in the destination CFG, but not in the source CFG.
+ * Inserted: Node A has a path to non-empty to B through zero or more
+ * 			 empty tos in the destination CFG, but not in the source CFG.
  * 
- * Deleted: Node A has a path to non-empty node B through zero or more
- * 			 empty nodes in the source CFG, but not in the destination CFG.
+ * Deleted: Node A has a path to non-empty to B through zero or more
+ * 			 empty tos in the source CFG, but not in the destination CFG.
  */
 public class CFGDifferencing {
 	
 	/**
-	 * Computes edge changes between CFGs using the node changes from the AST.
+	 * Computes edge changes between CFGs using the to changes from the AST.
 	 * 
 	 * @param srcCFG the labeled source CFG.
 	 * @param dstCFG the labeled destination CFG.
@@ -45,17 +45,17 @@ public class CFGDifferencing {
 		Map<ClassifiedASTNode, CFGNode> srcASTMap = new HashMap<ClassifiedASTNode, CFGNode>();
 		Map<ClassifiedASTNode, CFGNode> dstASTMap = new HashMap<ClassifiedASTNode, CFGNode>();
 		
-		/* Map AST nodes to CFG nodes for reverse lookup. */
+		/* Map AST tos to CFG tos for reverse lookup. */
 		buildASTMap(srcCFG, srcASTMap);
 		buildASTMap(dstCFG, dstASTMap);
 		
-		/* Map CFG nodes in the two CFGs. */
+		/* Map CFG tos in the two CFGs. */
 		srcCFG.getEntryNode().setMappedNode(dstCFG.getEntryNode());
 		dstCFG.getEntryNode().setMappedNode(srcCFG.getEntryNode());
 		CFGNode srcExit = mapCFGNodes(srcCFG, dstASTMap);
 		CFGNode dstExit = mapCFGNodes(dstCFG, srcASTMap);
 		
-		/* Map the function and script exit nodes. */
+		/* Map the function and script exit tos. */
 		srcExit.setMappedNode(dstExit);
 		dstExit.setMappedNode(srcExit);
 		
@@ -81,42 +81,42 @@ public class CFGDifferencing {
 
 			CFGNode cfgNode = queue.remove();
 			
-			/* We only classify edges from non-empty nodes or the entry node. */
+			/* We only classify edges from non-empty tos or the entry to. */
 			if(!cfgNode.getStatement().isEmpty() || cfgNode.getName().equals("FUNCTION_ENTRY") || cfgNode.getName().equals("SCRIPT_ENTRY")) {
             
-                /* Get the next non-empty node. */
-                /* Label all edges in between and return the non-empty node. This should be recursive. */
+                /* Get the next non-empty to. */
+                /* Label all edges in between and return the non-empty to. This should be recursive. */
                 
                 CFGNode mappedCFGNode = cfgNode.getMappedNode();
                 
                 /* Get the non-empty edges. */
-                Map<CFGNode, Stack<Edge>> nodeNonEmpty = getPathsToNext(cfgNode, new Stack<Edge>());
+                Map<CFGNode, Stack<CFGEdge>> toNonEmpty = getPathsToNext(cfgNode, new Stack<CFGEdge>());
                 
                 if(mappedCFGNode == null) {
                     
                     /* If there is no mapped CFGNode, all edges are changed. */
-                    for(CFGNode key : nodeNonEmpty.keySet()) {
-                        labelEdgesOnPath(nodeNonEmpty.get(key), changeType);
+                    for(CFGNode key : toNonEmpty.keySet()) {
+                        labelEdgesOnPath(toNonEmpty.get(key), changeType);
                     }
 
                 }
                 else {
 
-                    /* Get the non-empty edges for the mapped node. */
-                    Map<CFGNode, Stack<Edge>> mappedNonEmpty = getPathsToNext(mappedCFGNode, new Stack<Edge>());
+                    /* Get the non-empty edges for the mapped to. */
+                    Map<CFGNode, Stack<CFGEdge>> mappedNonEmpty = getPathsToNext(mappedCFGNode, new Stack<CFGEdge>());
                     Set<CFGNode> mappedKeySet = mappedNonEmpty.keySet();
                     
-                    /* Iterate through the non-empty nodes on the path. */
-                    for(CFGNode key : nodeNonEmpty.keySet()) {
+                    /* Iterate through the non-empty tos on the path. */
+                    for(CFGNode key : toNonEmpty.keySet()) {
                     	
-                        /* If this node and the mapped node have empty paths to
-                         * the same non-empty node, the path is unchanged. */
+                        /* If this to and the mapped to have empty paths to
+                         * the same non-empty to, the path is unchanged. */
                         if(mappedKeySet.contains(key.getMappedNode())) {
-                            labelEdgesOnPath(nodeNonEmpty.get(key), ChangeType.UNCHANGED);
+                            labelEdgesOnPath(toNonEmpty.get(key), ChangeType.UNCHANGED);
                         }
                         /* Otherwise, the path is changed. */
                         else {
-                            labelEdgesOnPath(nodeNonEmpty.get(key), changeType);
+                            labelEdgesOnPath(toNonEmpty.get(key), changeType);
                         }
                     }
                     
@@ -124,10 +124,10 @@ public class CFGDifferencing {
                 
 			}
 
-            for(Edge edge : cfgNode.getEdges()) {
-            	if(!visited.contains(edge.node)) {
-            		queue.add(edge.node);
-            		visited.add(edge.node);
+            for(CFGEdge edge : cfgNode.getEdges()) {
+            	if(!visited.contains(edge.getTo())) {
+            		queue.add(edge.getTo());
+            		visited.add(edge.getTo());
             	}
             }
 			
@@ -143,11 +143,11 @@ public class CFGDifferencing {
 	 * @param path
 	 * @param changeType The change type to apply to the edge.
 	 */
-	private static void labelEdgesOnPath(Stack<Edge> path, ChangeType changeType) {
+	private static void labelEdgesOnPath(Stack<CFGEdge> path, ChangeType changeType) {
 		
 		while(!path.empty()) {
 
-            Edge edge = path.pop();
+            CFGEdge edge = path.pop();
 
             if(edge.changeType == ChangeType.UNKNOWN) {
                 edge.changeType = changeType;
@@ -161,43 +161,43 @@ public class CFGDifferencing {
 	}
 	
 	/**
-	 * Recursively find the paths to the next non-empty nodes.
+	 * Recursively find the paths to the next non-empty tos.
 	 * @param stack the current path from the root CFGNode.
 	 */
-	private static Map<CFGNode, Stack<Edge>> getPathsToNext (CFGNode current, Stack<Edge> path) {
+	private static Map<CFGNode, Stack<CFGEdge>> getPathsToNext (CFGNode current, Stack<CFGEdge> path) {
 		
-		/* The paths to non-empty nodes. */
-        Map<CFGNode, Stack<Edge>> paths = new HashMap<CFGNode, Stack<Edge>>();
+		/* The paths to non-empty tos. */
+        Map<CFGNode, Stack<CFGEdge>> paths = new HashMap<CFGNode, Stack<CFGEdge>>();
 		
-        for(Edge edge : current.getEdges()) {
+        for(CFGEdge edge : current.getEdges()) {
         	
-        	CFGNode node = edge.node;
+        	CFGNode to = edge.getTo();
 		
-            if(node.getName().equals("FUNCTION_EXIT") || node.getName().equals("SCRIPT_EXIT")) {
+            if(to.getName().equals("FUNCTION_EXIT") || to.getName().equals("SCRIPT_EXIT")) {
 
-                /* Function exit nodes are considered non-empty. */
+                /* Function exit tos are considered non-empty. */
             	@SuppressWarnings("unchecked")
-				Stack<Edge> newPath = (Stack<Edge>) path.clone();
+				Stack<CFGEdge> newPath = (Stack<CFGEdge>) path.clone();
                 newPath.add(edge);
-                paths.put(node, newPath);
+                paths.put(to, newPath);
 
             }
-            else if(!(node.getStatement() instanceof EmptyStatement)) {
+            else if(!(to.getStatement() instanceof EmptyStatement)) {
 
-                /* Add the path for the non-empty node. */
+                /* Add the path for the non-empty to. */
                 @SuppressWarnings("unchecked")
-				Stack<Edge> newPath = (Stack<Edge>) path.clone();
+				Stack<CFGEdge> newPath = (Stack<CFGEdge>) path.clone();
                 newPath.add(edge);
-                paths.put(node, newPath);
+                paths.put(to, newPath);
 
             }	
             else {
                 
-                /* Add this node to the stack and recurse */
+                /* Add this to to the stack and recurse */
                 @SuppressWarnings("unchecked")
-				Stack<Edge> newPath = (Stack<Edge>) path.clone();
+				Stack<CFGEdge> newPath = (Stack<CFGEdge>) path.clone();
                 newPath.add(edge);
-                Map<CFGNode, Stack<Edge>> subPaths = getPathsToNext(edge.node, newPath);
+                Map<CFGNode, Stack<CFGEdge>> subPaths = getPathsToNext(edge.getTo(), newPath);
                 paths.putAll(subPaths);
                 
             }
@@ -208,8 +208,8 @@ public class CFGDifferencing {
 	}
 
 	/**
-	 * Map the CFG nodes in the source and destination CFGs.
-	 * @return the FUNCTION_EXIT or SCRIPT_EXIT node
+	 * Map the CFG tos in the source and destination CFGs.
+	 * @return the FUNCTION_EXIT or SCRIPT_EXIT to
 	 */
 	private static CFGNode mapCFGNodes(CFG cfg, Map<ClassifiedASTNode, CFGNode> map) {
 		
@@ -226,14 +226,14 @@ public class CFGDifferencing {
 			CFGNode cfgNode = queue.remove();
             ClassifiedASTNode astNode = cfgNode.getStatement();
             
-            /* If this is the FUNCTION_EXIT or SCRIPT_EXIT node, store it. */ 
+            /* If this is the FUNCTION_EXIT or SCRIPT_EXIT to, store it. */ 
             if(cfgNode.getName().equals("FUNCTION_EXIT") || cfgNode.getName().equals("SCRIPT_EXIT")) functExitNode = cfgNode;
             
-            /* Get the mapping of AST nodes in the source and destination. */
+            /* Get the mapping of AST tos in the source and destination. */
             ClassifiedASTNode astMapping = (ClassifiedASTNode) astNode.getMapping();
             if(astMapping != null) {
             	
-            	/* Look up the AST node's CFG node. */
+            	/* Look up the AST to's CFG to. */
             	CFGNode cfgMapping = map.get(astMapping);
             	
             	/* Assign the CFG mapping. */
@@ -241,10 +241,10 @@ public class CFGDifferencing {
             	
             }
             
-            for(Edge edge : cfgNode.getEdges()) {
-            	if(!visited.contains(edge.node)) {
-            		queue.add(edge.node);
-            		visited.add(edge.node);
+            for(CFGEdge edge : cfgNode.getEdges()) {
+            	if(!visited.contains(edge.getTo())) {
+            		queue.add(edge.getTo());
+            		visited.add(edge.getTo());
             	}
             }
 			
@@ -255,7 +255,7 @@ public class CFGDifferencing {
 	}
 	
 	/**
-	 * Builds a mapping of AST nodes to CFG nodes.
+	 * Builds a mapping of AST tos to CFG tos.
 	 * @param cfg the CFG to map.
 	 */
 	private static void buildASTMap(CFG cfg, Map<ClassifiedASTNode, CFGNode> map) {
@@ -271,10 +271,10 @@ public class CFGDifferencing {
             ClassifiedASTNode astNode = cfgNode.getStatement();
             map.put(astNode, cfgNode);
             
-            for(Edge edge : cfgNode.getEdges()) {
-            	if(!visited.contains(edge.node)) {
-            		queue.add(edge.node);
-            		visited.add(edge.node);
+            for(CFGEdge edge : cfgNode.getEdges()) {
+            	if(!visited.contains(edge.getTo())) {
+            		queue.add(edge.getTo());
+            		visited.add(edge.getTo());
             	}
             }
 			

@@ -24,17 +24,19 @@ public class CFGNode {
 	private ClassifiedASTNode statement;
 	
 	/** The edges leaving this node. **/
-	private List<Edge> edges;
+	private List<CFGEdge> edges;
 	
 	/** The corresponding source or destination CFGNode. */
 	private CFGNode mappedNode;
+	
+	/** 
 	
 	/**
 	 * @param statement The statement that is executed when this node is 
 	 * 		  			reached.
 	 */
 	public CFGNode(ClassifiedASTNode statement) {
-		this.edges = new LinkedList<Edge>();
+		this.edges = new LinkedList<CFGEdge>();
 		this.statement = statement;
 		this.id = CFGNode.getUniqueId();
 		this.name = null;
@@ -47,7 +49,7 @@ public class CFGNode {
 	 * @param name The name for this node (nice for printing and debugging).
 	 */
 	public CFGNode(ClassifiedASTNode statement, String name) {
-		this.edges = new LinkedList<Edge>();
+		this.edges = new LinkedList<CFGEdge>();
 		this.statement = statement;
 		this.id = CFGNode.getUniqueId();
 		this.name = name;
@@ -60,13 +62,13 @@ public class CFGNode {
 	 * @param node The node at the other end of this edge.
 	 */
 	public void addEdge(ClassifiedASTNode condition, CFGNode node) {
-		Edge edge = new Edge(condition, node);
+		CFGEdge edge = new CFGEdge(condition, this, node);
 		int index = this.edges.indexOf(edge);
 		if(index >= 0) {
-			this.edges.get(index).node = node;
+			this.edges.get(index).setTo(node);
 		}
 		else {
-            this.edges.add(new Edge(condition, node));
+            this.edges.add(new CFGEdge(condition, this, node));
 		}
 	}
 	
@@ -75,10 +77,10 @@ public class CFGNode {
 	 * exists, that edge will be overwritten. 
 	 * @param edge The edge to add.
 	 */
-	public void addEdge(Edge edge) {
+	public void addEdge(CFGEdge edge) {
 		int index = this.edges.indexOf(edge);
 		if(index >= 0) {
-			this.edges.get(index).node = edge.node;
+			this.edges.get(index).setTo(edge.getTo());
 		}
 		else {
             this.edges.add(edge);
@@ -88,7 +90,7 @@ public class CFGNode {
 	/**
 	 * @return The edges leaving this node.
 	 */
-	public List<Edge> getEdges() {
+	public List<CFGEdge> getEdges() {
 		return this.edges;
 	}
 	
@@ -144,7 +146,7 @@ public class CFGNode {
 	 */
 	public static CFGNode copy(CFGNode node) {
         CFGNode newNode = new CFGNode(node.getStatement());
-        for(Edge edge : node.getEdges()) newNode.addEdge(edge.condition, edge.node);
+        for(CFGEdge edge : node.getEdges()) newNode.addEdge(edge.getCondition(), edge.getTo());
         return newNode;
 	}
 

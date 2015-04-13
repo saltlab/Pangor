@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.test.cfg.diff;
+package ca.ubc.ece.salt.sdjsb.test.analysis;
 
 import java.io.File;
 import java.io.IOException;
@@ -7,11 +7,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Assert;
 import org.junit.Test;
 import org.mozilla.javascript.ast.AstRoot;
 
 import ca.ubc.ece.salt.gumtree.ast.ASTClassifier;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
+import ca.ubc.ece.salt.sdjsb.analysis.Analysis;
 import ca.ubc.ece.salt.sdjsb.cfg.CFG;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGFactory;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
@@ -27,16 +29,16 @@ import fr.labri.gumtree.matchers.MatcherFactories;
 import fr.labri.gumtree.tree.Tree;
 import junit.framework.TestCase;
 
-public class TestCFGDiff extends TestCase {
+public class TestAnalysis extends TestCase {
 
 	/**
 	 * Integration test for CFG building and GumTree differencing.
 	 * @param file
 	 * @param expectedCFGs
 	 * @param output
-	 * @throws IOException
+	 * @throws Exception 
 	 */
-	protected void runTest(String srcFile, String dstFile, Output output) throws IOException {
+	protected void runTest(String srcFile, String dstFile, Output output) throws Exception {
 
         /* Create the abstract GumTree representations of the ASTs.
          * 
@@ -109,6 +111,12 @@ public class TestCFGDiff extends TestCase {
 		this.getCFGs(srcCFGs, output);
 		System.out.println("Destination CFGs: *************");
 		this.getCFGs(dstCFGs, output);
+		
+		/* Run the analysis. */
+		Analysis analysis = new Analysis((AstRoot)dst.getClassifiedASTNode(), dstCFGs);
+		
+        analysis.analyze();
+
 	}
 	
 	/**
@@ -134,7 +142,7 @@ public class TestCFGDiff extends TestCase {
 	}
 
 	@Test
-	public void testIf() throws IOException {
+	public void testIf() throws Exception {
 		
 		String src = "./test/input/special_type_handling/sth_undefined_old.js";
 		String dst = "./test/input/special_type_handling/sth_undefined_new.js";
@@ -143,7 +151,7 @@ public class TestCFGDiff extends TestCase {
 	}
 
 	@Test
-	public void testReverseIf() throws IOException {
+	public void testReverseIf() throws Exception {
 		
 		String src = "./test/input/special_type_handling/sth_undefined_new.js";
 		String dst = "./test/input/special_type_handling/sth_undefined_old.js";
@@ -152,7 +160,7 @@ public class TestCFGDiff extends TestCase {
 	}
 
 	@Test
-	public void testMultipleCFGs() throws IOException {
+	public void testMultipleCFGs() throws Exception {
 		
 		String src = "./test/input/callback_parameter/cbp_old.js";
 		String dst = "./test/input/callback_parameter/cbp_new.js";
@@ -161,7 +169,7 @@ public class TestCFGDiff extends TestCase {
 	}
 	
     @Test
-	public void testActionMethods() throws IOException {
+	public void testActionMethods() throws Exception {
 		
 		String src = "./test/input/does_not_exist/ActionMethods_old.js";
 		String dst = "./test/input/does_not_exist/ActionMethods_new.js";

@@ -67,6 +67,16 @@ public class CFGFactory {
 	}
 	
 	/**
+	 * Computes the node dominators for the graph.
+	 * 
+	 * This is needed 
+	 * @param cfg
+	 */
+	private static void computeDominators(CFG cfg) {
+		
+	}
+	
+	/**
 	 * Builds a CFG for a function or script.
 	 * @param scriptNode An ASTRoot node or FunctionNode.
 	 * @return The complete CFG.
@@ -217,7 +227,7 @@ public class CFGFactory {
 			trueBranch.addExitNode(empty);
 		}
 		
-		ifNode.addEdge(new Edge(ifStatement.getCondition(), trueBranch.getEntryNode()));
+		ifNode.addEdge(new CFGEdge(ifStatement.getCondition(), ifNode, trueBranch.getEntryNode()));
 
         /* Propagate exit, return, continue, break and throw nodes. */
         cfg.addAllExitNodes(trueBranch.getExitNodes());
@@ -242,7 +252,7 @@ public class CFGFactory {
 		AstNode falseBranchCondition = new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(ifStatement.getCondition()));
 		falseBranchCondition.setChangeType(ifStatement.getCondition().getChangeType());
 
-		ifNode.addEdge(new Edge(falseBranchCondition, falseBranch.getEntryNode()));
+		ifNode.addEdge(new CFGEdge(falseBranchCondition, ifNode, falseBranch.getEntryNode()));
 
         /* Propagate exit, return, continue and break nodes. */
         cfg.addAllExitNodes(falseBranch.getExitNodes());
@@ -275,7 +285,7 @@ public class CFGFactory {
 			trueBranch.addExitNode(empty);
 		}
 		
-		whileNode.addEdge(new Edge(whileLoop.getCondition(), trueBranch.getEntryNode()));
+		whileNode.addEdge(new CFGEdge(whileLoop.getCondition(), whileNode, trueBranch.getEntryNode()));
 
         /* Propagate return and throw nodes. */
         cfg.addAllReturnNodes(trueBranch.getReturnNodes());
@@ -303,7 +313,7 @@ public class CFGFactory {
 		falseBranchCondition.setChangeType(whileLoop.getCondition().getChangeType());
         
         CFGNode empty = new CFGNode(new EmptyStatement());
-		whileNode.addEdge(new Edge(falseBranchCondition, empty));
+		whileNode.addEdge(new CFGEdge(falseBranchCondition, whileNode, empty));
 		cfg.addExitNode(empty);
 		
 		return cfg;
@@ -501,7 +511,7 @@ public class CFGFactory {
 		/* Add the edges connecting the entry point to the assignment and
 		 * assignment to condition. */
         forInNode.addEdge(null, condition);
-        condition.addEdge(new Edge(keyConditionFunction, assignment));
+        condition.addEdge(new CFGEdge(keyConditionFunction, condition, assignment));
 		
         /* Create the CFG for the loop body. */
 		
@@ -542,7 +552,7 @@ public class CFGFactory {
 
         /* Add the edges from the assignment node to the start of the loop. */
         assignment.addEdge(null, trueBranch.getEntryNode());
-		condition.addEdge(new Edge(new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(keyConditionFunction)), falseBranch));
+		condition.addEdge(new CFGEdge(new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(keyConditionFunction)), condition, falseBranch));
 		
 		return cfg;
 		
@@ -561,7 +571,7 @@ public class CFGFactory {
 		CFG cfg = new CFG(switchNode);
 		
 		/* Keep track of the default edge so we can update the condition later. */
-		Edge defaultEdge = null;
+		CFGEdge defaultEdge = null;
 		AstNode defaultCondition = null;
 		
 		/* Add edges for each case. */
@@ -590,7 +600,7 @@ public class CFGFactory {
             if(switchCase.getExpression() != null) {
                 InfixExpression compare = new InfixExpression(switchStatement.getExpression(), switchCase.getExpression());
                 compare.setType(Token.SHEQ);
-                switchNode.addEdge(new Edge(compare, subGraph.getEntryNode()));
+                switchNode.addEdge(new CFGEdge(compare, switchNode, subGraph.getEntryNode()));
                 
                 if(defaultCondition == null) {
                 	defaultCondition = compare;
@@ -606,7 +616,7 @@ public class CFGFactory {
                 
             }
             else {
-            	defaultEdge = new Edge(null, subGraph.getEntryNode());
+            	defaultEdge = new CFGEdge(null, switchNode, subGraph.getEntryNode());
             	switchNode.addEdge(defaultEdge);
             }
 			
@@ -646,7 +656,7 @@ public class CFGFactory {
 		}
 		
 		/* Add the final default condition. */
-		defaultEdge.condition = defaultCondition;
+		defaultEdge.setCondition(defaultCondition);
 
         /* The rest of the exit nodes are exit nodes for the statement. */
         cfg.addAllExitNodes(previousSubGraph.getExitNodes());

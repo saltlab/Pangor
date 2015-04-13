@@ -44,7 +44,7 @@ public class CFGPrinter {
 		queue.add(cfg.getEntryNode());
 		visited.add(cfg.getEntryNode());
 		String serial = "digraph control_flow_graph {\n";
-		serial += "node [ style = filled fillcolor = \"white\" ];\n";
+		serial += "to [ style = filled fillcolor = \"white\" ];\n";
 		
 		while(true) {
 			
@@ -54,27 +54,27 @@ public class CFGPrinter {
 				break;
 			}
 			
-			/* Print the display settings for this node. */
+			/* Print the display settings for this to. */
 			String label = current.getStatement().getCFGLabel();
 
 			if(label.equals(";")) label = "";
 
 			serial += "\t" + current.getId() + " [ fillcolor = \"" + getFillColor(current.getStatement().getChangeType()) + "\" label = \"" + label + "\" ];\n";
 			
-			for(Edge edge : current.getEdges()) {
+			for(CFGEdge edge : current.getEdges()) {
 
-                serial += "\t" + current.getId() + " -> " + edge.node.getId();
+                serial += "\t" + current.getId() + " -> " + edge.getTo().getId();
 
-				if(edge.condition != null) {
-					serial += " [ color = \"" + getFillColor(edge.changeType) + "\" fontcolor = \"" + getFillColor(edge.condition.getChangeType()) + "\" label = \"" + edge.condition.getCFGLabel() + "\" ];\n";
+				if(edge.getCondition() != null) {
+					serial += " [ color = \"" + getFillColor(edge.changeType) + "\" fontcolor = \"" + getFillColor(edge.getCondition().getChangeType()) + "\" label = \"" + edge.getCondition().getCFGLabel() + "\" ];\n";
 				}
 				else {
                     serial += " [ color = \"" + getFillColor(edge.changeType) + "\" ];\n";
 				}
 				
-				if(!visited.contains(edge.node)) { 
-					queue.add(edge.node);
-					visited.add(edge.node);
+				if(!visited.contains(edge.getTo())) { 
+					queue.add(edge.getTo());
+					visited.add(edge.getTo());
 				}
 			}
 
@@ -111,8 +111,8 @@ public class CFGPrinter {
 	}
 	
 	/**
-	 * Prints a CFG as a directed adjacency list. That is, only nodes from
-	 * outgoing edges are listed as adjacent to a node. 
+	 * Prints a CFG as a directed adjacency list. That is, only tos from
+	 * outgoing edges are listed as adjacent to a to. 
 	 * 
 	 * i.e., [t1(id1){oe1-1, oe1-2, ... , oe1-n},t2(id2){oe2-1, oe-2-2, ... , oe2-n}, ... , tm(idm){oem-1, oem-2, ... , oem-n}]
 	 * @param cfg The control flow graph.
@@ -136,18 +136,18 @@ public class CFGPrinter {
 			
 			serial += current.getName() + "(" + current.getId() + "){";
 			
-			for(Edge edge : current.getEdges()) {
+			for(CFGEdge edge : current.getEdges()) {
 
-				if(edge.condition != null) {
-					serial += edge.condition.getCFGLabel() + ":" + edge.node.getId() + ",";
+				if(edge.getCondition() != null) {
+					serial += edge.getCondition().getCFGLabel() + ":" + edge.getTo().getId() + ",";
 				}
 				else {
-                    serial += edge.node.getId() + ",";
+                    serial += edge.getTo().getId() + ",";
 				}
 				
-				if(!visited.contains(edge.node)) { 
-					queue.add(edge.node);
-					visited.add(edge.node);
+				if(!visited.contains(edge.getTo())) { 
+					queue.add(edge.getTo());
+					visited.add(edge.getTo());
 				}
 			}
 			
