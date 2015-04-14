@@ -1,13 +1,11 @@
 package ca.ubc.ece.salt.sdjsb.test.analysis;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
 import org.junit.Test;
 import org.mozilla.javascript.ast.AstRoot;
 
