@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.analysis;
+package ca.ubc.ece.salt.sdjsb.analysis.specialtype;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,7 +21,7 @@ import java.util.Set;
  *     inserted and the use is in the original program.
  *     
  */
-public class LatticeElement {
+public class SpecialTypeLatticeElement {
 	
 	/**
 	 * Keeps track of the edges this LatticeElement has already visited. This
@@ -39,13 +39,13 @@ public class LatticeElement {
 	 */
 	public Map<String, SpecialType> nonSpecialTypes;
 	
-	public LatticeElement() {
+	public SpecialTypeLatticeElement() {
 		this.specialTypes = new HashMap<String, SpecialType>();
 		this.nonSpecialTypes = new HashMap<String, SpecialType>();
 		this.visitedEdges = new HashSet<Long>();
 	}
 
-	public LatticeElement(HashMap<String, SpecialType> specialTypes, HashMap<String, SpecialType> nonSpecialTypes, HashSet<Long> visitedEdges) {
+	public SpecialTypeLatticeElement(HashMap<String, SpecialType> specialTypes, HashMap<String, SpecialType> nonSpecialTypes, HashSet<Long> visitedEdges) {
 		this.specialTypes = specialTypes;
 		this.nonSpecialTypes = nonSpecialTypes;
 		this.visitedEdges = visitedEdges;
@@ -54,8 +54,8 @@ public class LatticeElement {
 	/**
 	 * @return a copy of the LatticeElement.
 	 */
-	public static LatticeElement copy(LatticeElement le) {
-		return new LatticeElement(new HashMap<String, SpecialType>(le.specialTypes), new HashMap<String, SpecialType>(le.nonSpecialTypes), new HashSet<Long>(le.visitedEdges));
+	public static SpecialTypeLatticeElement copy(SpecialTypeLatticeElement le) {
+		return new SpecialTypeLatticeElement(new HashMap<String, SpecialType>(le.specialTypes), new HashMap<String, SpecialType>(le.nonSpecialTypes), new HashSet<Long>(le.visitedEdges));
 	}
 	
 	/**

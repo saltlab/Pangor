@@ -144,18 +144,6 @@ public class AnalysisUtilities {
 	}
 
 	/**
-	 * Checks if one AstNode is a child of another AstNode.
-	 * @param parent The parent AstNode to check.
-	 * @param child The child AstNode to look for.
-	 * @return True if {@code parent} contains {@code child}.
-	 */
-	public static boolean contains(AstNode parent, AstNode child) {
-		ContainsTreeVisitor visitor = new ContainsTreeVisitor(child);
-		parent.visit(visitor);
-		return visitor.contains;
-	}
-
-	/**
 	 * Returns the top level identifier for a node. If the node is a name, it will
 	 * check the parent nodes until it gets to the top of the identifier.
 	 * @param node A subnode of an identifier.

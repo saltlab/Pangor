@@ -13,7 +13,7 @@ import org.mozilla.javascript.ast.StringLiteral;
 import org.mozilla.javascript.ast.UnaryExpression;
 
 import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;
-import ca.ubc.ece.salt.sdjsb.analysis.LatticeElement.SpecialType;
+import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeLatticeElement.SpecialType;
 
 public class SpecialTypeAnalysisUtilities {
 

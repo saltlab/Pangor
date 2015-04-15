@@ -1,12 +1,9 @@
-package ca.ubc.ece.salt.sdjsb.analysis;
+package ca.ubc.ece.salt.sdjsb.analysis.specialtype;
 
 import java.util.Set;
 
 import org.mozilla.javascript.ast.AstNode;
 
-import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysisUtilities;
-import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeCheck;
-import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeVisitor;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGEdge;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
 
@@ -26,7 +23,7 @@ import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
  *     inserted and the use is in the original program.
  *     
  */
-public class TransferFunction {
+public class SpecialTypeTransferFunction {
 	
 	/**
 	 * Transfer the lattice element over the CFGEdge.
@@ -36,7 +33,7 @@ public class TransferFunction {
 	 * @param edge
 	 * @return
 	 */
-	public void transfer(CFGEdge edge, LatticeElement sourceLE) {
+	public void transfer(CFGEdge edge, SpecialTypeLatticeElement sourceLE) {
 		
 		AstNode condition = (AstNode)edge.getCondition();
 		if(condition == null) return;
@@ -67,7 +64,7 @@ public class TransferFunction {
 	 * @param node The node to transfer over.
 	 * @return
 	 */
-	public void transfer(CFGNode node, LatticeElement le) {
+	public void transfer(CFGNode node, SpecialTypeLatticeElement le) {
 		
 		AstNode statement = (AstNode)node.getStatement();
 		System.out.println("Transfering over node: " + statement.toSource());

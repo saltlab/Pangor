@@ -10,6 +10,8 @@ import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ScriptNode;
 
+import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeLatticeElement;
+import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeTransferFunction;
 import ca.ubc.ece.salt.sdjsb.cfg.CFG;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGEdge;
 
@@ -88,11 +90,11 @@ public class Analysis {
 	private void pathSensitiveAnalysis(CFG cfg, Stack<Set<Name>> scopeStack) {
 		
 		/* Initialize the transfer function we will use for the LatticeElement. */
-		TransferFunction tf = new TransferFunction();
+		SpecialTypeTransferFunction tf = new SpecialTypeTransferFunction();
 		
 		/* Initialize the stack for a depth-first traversal. */
 		Stack<PathState> stack = new Stack<PathState>();
-		for(CFGEdge edge : cfg.getEntryNode().getEdges()) stack.add(new PathState(edge, new LatticeElement()));
+		for(CFGEdge edge : cfg.getEntryNode().getEdges()) stack.add(new PathState(edge, new SpecialTypeLatticeElement()));
 		
 		while(!stack.isEmpty()) {
 			
@@ -110,7 +112,7 @@ public class Analysis {
                 /* If an edge has been visited on this path, don't visit it
                  * again (only loop once). */
 				if(!state.le.visitedEdges.contains(edge.getId())) {
-					LatticeElement copy = LatticeElement.copy(state.le);
+					SpecialTypeLatticeElement copy = SpecialTypeLatticeElement.copy(state.le);
 					copy.visitedEdges.add(edge.getId());
                     stack.add(new PathState(edge, copy));
 				}
@@ -146,9 +148,9 @@ public class Analysis {
 	private class PathState {
 		
 		public CFGEdge edge;
-		public LatticeElement le;
+		public SpecialTypeLatticeElement le;
 		
-		public PathState (CFGEdge edge, LatticeElement le) {
+		public PathState (CFGEdge edge, SpecialTypeLatticeElement le) {
 			this.edge = edge;
 			this.le = le;
 		}

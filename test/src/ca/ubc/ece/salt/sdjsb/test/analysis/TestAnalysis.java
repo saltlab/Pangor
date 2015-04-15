@@ -6,7 +6,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Test;
+import org.kohsuke.args4j.CmdLineException;
+import org.kohsuke.args4j.CmdLineParser;
 import org.mozilla.javascript.ast.AstRoot;
 
 import ca.ubc.ece.salt.gumtree.ast.ASTClassifier;
@@ -18,8 +19,10 @@ import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGPrinter;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGPrinter.Output;
 import ca.ubc.ece.salt.sdjsb.cfg.diff.CFGDifferencing;
+import ca.ubc.ece.salt.sdjsb.checker.Alert;
 import fr.labri.gumtree.actions.RootAndLeavesClassifier;
 import fr.labri.gumtree.actions.TreeClassifier;
+import fr.labri.gumtree.client.DiffOptions;
 import fr.labri.gumtree.gen.js.RhinoTreeGenerator;
 import fr.labri.gumtree.matchers.MappingStore;
 import fr.labri.gumtree.matchers.Matcher;
@@ -36,7 +39,19 @@ public class TestAnalysis extends TestCase {
 	 * @param output
 	 * @throws Exception 
 	 */
-	protected void runTest(String srcFile, String dstFile, Output output) throws Exception {
+	protected void runTest(String[] args, List<String> classifiers, List<Alert> expectedAlerts, Output output) throws Exception {
+		
+		/* Parse the options. */
+		DiffOptions options = new DiffOptions();
+		CmdLineParser parser = new CmdLineParser(options);
+
+		try {
+			parser.parseArgument(args);
+		} catch (CmdLineException e) {
+			System.err.println("Usage:\nSDJSB /path/to/src /path/to/dst");
+			e.printStackTrace();
+			return;
+		}
 
         /* Create the abstract GumTree representations of the ASTs.
          * 
@@ -48,8 +63,8 @@ public class TestAnalysis extends TestCase {
         RhinoTreeGenerator srcRhinoTreeGenerator = new RhinoTreeGenerator();
         RhinoTreeGenerator dstRhinoTreeGenerator = new RhinoTreeGenerator();
 
-        Tree src = srcRhinoTreeGenerator.fromFile(new File(srcFile).getAbsolutePath());
-        Tree dst = dstRhinoTreeGenerator.fromFile(new File(dstFile).getAbsolutePath());
+        Tree src = srcRhinoTreeGenerator.fromFile(new File(options.getSrc()).getAbsolutePath());
+        Tree dst = dstRhinoTreeGenerator.fromFile(new File(options.getDst()).getAbsolutePath());
 
 		/* Match the source AST nodes to the destination AST nodes. The default
 		 * algorithm for doing this is the GumTree algorithm. */
@@ -139,39 +154,4 @@ public class TestAnalysis extends TestCase {
 		
 	}
 
-	@Test
-	public void testIf() throws Exception {
-		
-		String src = "./test/input/special_type_handling/sth_undefined_old.js";
-		String dst = "./test/input/special_type_handling/sth_undefined_new.js";
-		this.runTest(src, dst, Output.DOT);
-
-	}
-
-	@Test
-	public void testReverseIf() throws Exception {
-		
-		String src = "./test/input/special_type_handling/sth_undefined_new.js";
-		String dst = "./test/input/special_type_handling/sth_undefined_old.js";
-		this.runTest(src, dst, Output.DOT);
-
-	}
-
-	@Test
-	public void testMultipleCFGs() throws Exception {
-		
-		String src = "./test/input/callback_parameter/cbp_old.js";
-		String dst = "./test/input/callback_parameter/cbp_new.js";
-		this.runTest(src, dst, Output.DOT);
-
-	}
-	
-    @Test
-	public void testActionMethods() throws Exception {
-		
-		String src = "./test/input/does_not_exist/ActionMethods_old.js";
-		String dst = "./test/input/does_not_exist/ActionMethods_new.js";
-		this.runTest(src, dst, Output.DOT);
-
-	}
 }
