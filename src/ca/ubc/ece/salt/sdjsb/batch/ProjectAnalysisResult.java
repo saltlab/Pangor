@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import ca.ubc.ece.salt.sdjsb.checker.Alert;
+import ca.ubc.ece.salt.sdjsb.alert.Alert;
 
 /**
  * Maintains the set of alerts for a project analysis.

@@ -22,7 +22,6 @@ import org.mozilla.javascript.ast.WhileLoop;
 
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerUtilities;
-import ca.ubc.ece.salt.sdjsb.checker.specialtype.SpecialTypeMap.SpecialType;
 
 public class DoesNotExistCheckerUtilities {
 

@@ -1,6 +1,6 @@
 package ca.ubc.ece.salt.sdjsb.checker.notdefined;
 
-import ca.ubc.ece.salt.sdjsb.checker.Alert;
+import ca.ubc.ece.salt.sdjsb.alert.Alert;
 
 public class NotDefinedAlert extends Alert {
 	

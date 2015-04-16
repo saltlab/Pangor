@@ -3,7 +3,7 @@ package ca.ubc.ece.salt.sdjsb.batch;
 import java.util.ArrayList;
 import java.util.List;
 
-import ca.ubc.ece.salt.sdjsb.checker.Alert;
+import ca.ubc.ece.salt.sdjsb.alert.Alert;
 
 public class AlertPrinter {
 	

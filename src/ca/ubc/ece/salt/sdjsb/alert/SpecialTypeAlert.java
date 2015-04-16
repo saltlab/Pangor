@@ -1,7 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.checker.specialtype;
-
-import ca.ubc.ece.salt.sdjsb.checker.Alert;
-import ca.ubc.ece.salt.sdjsb.checker.specialtype.SpecialTypeMap.SpecialType;
+package ca.ubc.ece.salt.sdjsb.alert;
 
 public class SpecialTypeAlert extends Alert {
 	
@@ -31,6 +28,23 @@ public class SpecialTypeAlert extends Alert {
 			return this.variableIdentifier.equals(sta.variableIdentifier) && this.specialType == sta.specialType;
 		}
 		return false;
+	}
+
+	/**
+	 * The list of special types that a variable could be assigned to. Note
+	 * that the FALSEY type indicates that a variable could be one of 
+	 * {undefined, NaN, blank, zero} (i.e. the variable evaluates to false in
+	 * a condition expression).
+	 * 
+	 * @author qhanam
+	 */
+	public enum SpecialType {
+		FALSEY,
+		UNDEFINED,
+		NULL,
+		NAN,
+		BLANK,
+		ZERO
 	}
 
 }

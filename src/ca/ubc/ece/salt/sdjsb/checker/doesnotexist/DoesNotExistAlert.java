@@ -1,6 +1,6 @@
 package ca.ubc.ece.salt.sdjsb.checker.doesnotexist;
 
-import ca.ubc.ece.salt.sdjsb.checker.Alert;
+import ca.ubc.ece.salt.sdjsb.alert.Alert;
 import ca.ubc.ece.salt.sdjsb.checker.doesnotexist.DoesNotExistCheckerUtilities.NameType;
 
 public class DoesNotExistAlert extends Alert {

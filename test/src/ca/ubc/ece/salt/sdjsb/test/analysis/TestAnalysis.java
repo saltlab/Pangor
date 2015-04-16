@@ -2,7 +2,6 @@ package ca.ubc.ece.salt.sdjsb.test.analysis;
 
 import java.io.File;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -12,14 +11,11 @@ import org.mozilla.javascript.ast.AstRoot;
 
 import ca.ubc.ece.salt.gumtree.ast.ASTClassifier;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
-import ca.ubc.ece.salt.sdjsb.analysis.Analysis;
+import ca.ubc.ece.salt.sdjsb.alert.Alert;
+import ca.ubc.ece.salt.sdjsb.analysis.AbstractFlowAnalysis;
 import ca.ubc.ece.salt.sdjsb.cfg.CFG;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGFactory;
-import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
-import ca.ubc.ece.salt.sdjsb.cfg.CFGPrinter;
-import ca.ubc.ece.salt.sdjsb.cfg.CFGPrinter.Output;
 import ca.ubc.ece.salt.sdjsb.cfg.diff.CFGDifferencing;
-import ca.ubc.ece.salt.sdjsb.checker.Alert;
 import fr.labri.gumtree.actions.RootAndLeavesClassifier;
 import fr.labri.gumtree.actions.TreeClassifier;
 import fr.labri.gumtree.client.DiffOptions;
@@ -33,13 +29,13 @@ import junit.framework.TestCase;
 public class TestAnalysis extends TestCase {
 
 	/**
-	 * Integration test for CFG building and GumTree differencing.
-	 * @param file
-	 * @param expectedCFGs
-	 * @param output
+	 * Tests flow analysis repair classifiers.
+	 * @param args The command line arguments (i.e., old and new file names).
+	 * @param expectedAlerts The list of alerts that should be produced.
+	 * @param printAlerts If true, print the alerts to standard output.
 	 * @throws Exception 
 	 */
-	protected void runTest(String[] args, List<String> classifiers, List<Alert> expectedAlerts, Output output) throws Exception {
+	protected void runTest(String[] args, List<Alert> expectedAlerts, boolean printAlerts, AbstractFlowAnalysis<?> analysis) throws Exception {
 		
 		/* Parse the options. */
 		DiffOptions options = new DiffOptions();
@@ -118,40 +114,34 @@ public class TestAnalysis extends TestCase {
 			}
 			
 		}
-
-		/* Print the CFGs. */
-		System.out.println("Source CFGs: *************");
-		this.getCFGs(srcCFGs, output);
-		System.out.println("Destination CFGs: *************");
-		this.getCFGs(dstCFGs, output);
 		
 		/* Run the analysis. */
-		Analysis analysis = new Analysis((AstRoot)dst.getClassifiedASTNode(), dstCFGs);
-		
-        analysis.analyze();
+		AstRoot script = (AstRoot)dst.getClassifiedASTNode();
+        analysis.analyze(script, dstCFGs);
+
+		/* Check the output. */
+        List<Alert> actualAlerts = analysis.getAlerts();
+        this.check(actualAlerts, expectedAlerts);
+        
+        /* Output if needed. */
+        if(printAlerts) {
+        	for(Alert alert : actualAlerts) {
+        		System.out.println(alert.getLongDescription());
+        	}
+        }
 
 	}
 	
-	/**
-	 * Prints a list of CFGs from a file.
-	 * @param cfgs The CFGs from either the source or destination file.
-	 * @param output How to display the output (adjacency list or DOT).
-	 */
-	private void getCFGs(List<CFG> cfgs, Output output) {
-
-		/* Reset the CFGNode id generator value (needed for consistent test cases). */
-		CFGNode.resetIdGen();
-
-		/* Get the serialized CFGs. */
-		List<String> actualCFGs = new LinkedList<String>();
-        int n = 1;
-        for(CFG cfg : cfgs) {
-            String serialized = CFGPrinter.adjacencyList(cfg);
-            actualCFGs.add(serialized);
-            System.out.println("CFG" + n + ": " + CFGPrinter.print(output, cfg));
-            n++;
-        }
+	protected void check(List<Alert> actualAlerts, List<Alert> expectedAlerts) {
+		/* Check that all the expected alerts are produced by SDJSB. */
+		for(Alert expected : expectedAlerts) {
+			assertTrue("SDJSB did not produce the alert \"" + expected.getLongDescription() + "\"", actualAlerts.contains(expected));
+		}
 		
+		/* Check that only the expected alerts are produced by SDJSB. */
+		for(Alert actual : actualAlerts) {
+			assertTrue("SDJSB produced the unexpected alert \"" + actual.getLongDescription() + "\"", expectedAlerts.contains(actual));
+		}
 	}
-
+	
 }

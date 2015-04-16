@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.junit.Test;
 
-import ca.ubc.ece.salt.sdjsb.checker.Alert;
+import ca.ubc.ece.salt.sdjsb.alert.Alert;
 import ca.ubc.ece.salt.sdjsb.checker.doesnotexist.DoesNotExistCheckerUtilities.NameType;
 import ca.ubc.ece.salt.sdjsb.checker.doesnotexist.DoesNotExistAlert;
 

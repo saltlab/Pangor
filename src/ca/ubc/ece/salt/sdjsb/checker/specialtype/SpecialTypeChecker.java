@@ -6,10 +6,11 @@ import org.mozilla.javascript.ast.Assignment;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.VariableInitializer;
 
+import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert;
+import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert.SpecialType;
 import ca.ubc.ece.salt.sdjsb.checker.AbstractChecker;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerUtilities;
-import ca.ubc.ece.salt.sdjsb.checker.specialtype.SpecialTypeMap.SpecialType;
 
 /**
  * Detects repairs that fix special type handling bugs. These include bugs

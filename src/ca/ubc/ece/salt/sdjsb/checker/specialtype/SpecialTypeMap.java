@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.EnumSet;
 
+import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert.SpecialType;
+
 /**
  * Keeps track of possible special type values for variables.
  * @author qhanam
@@ -67,23 +69,6 @@ public class SpecialTypeMap {
 			return map.get(name);
 		}
 		throw new IllegalArgumentException("Name not found in map.");
-	}
-	
-	/**
-	 * The list of special types that a variable could be assigned to. Note
-	 * that the FALSEY type indicates that a variable could be one of 
-	 * {undefined, NaN, blank, zero} (i.e. the variable evaluates to false in
-	 * a condition expression).
-	 * 
-	 * @author qhanam
-	 */
-	public enum SpecialType {
-		FALSEY,
-		UNDEFINED,
-		NULL,
-		NAN,
-		BLANK,
-		ZERO
 	}
 
 }

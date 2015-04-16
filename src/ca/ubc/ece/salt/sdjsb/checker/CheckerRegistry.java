@@ -9,6 +9,7 @@ import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.NodeVisitor;
 
 import ca.ubc.ece.salt.gumtree.ast.ParserASTNode;
+import ca.ubc.ece.salt.sdjsb.alert.Alert;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext.ChangeType;
 import fr.labri.gumtree.tree.Tree;
 
@@ -69,7 +70,7 @@ public class CheckerRegistry {
 	 * Runs the analysis by iterating through the source and destination tree
 	 * pre-order and raising events that are handled by individual checkers.
 	 */
-	public void analyze() { 
+	public void analyze() {
 		
 		/* Trigger pre-processing events. */
 		this.pre();

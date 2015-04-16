@@ -5,6 +5,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert.SpecialType;
+import ca.ubc.ece.salt.sdjsb.analysis.AbstractLatticeElement;
+
 /**
  * A SpecialTypeLatticeElement
  * 
@@ -21,7 +24,7 @@ import java.util.Set;
  *     inserted and the use is in the original program.
  *     
  */
-public class SpecialTypeLatticeElement {
+public class SpecialTypeLatticeElement extends AbstractLatticeElement{
 	
 	/**
 	 * Keeps track of the edges this LatticeElement has already visited. This
@@ -56,23 +59,6 @@ public class SpecialTypeLatticeElement {
 	 */
 	public static SpecialTypeLatticeElement copy(SpecialTypeLatticeElement le) {
 		return new SpecialTypeLatticeElement(new HashMap<String, SpecialType>(le.specialTypes), new HashMap<String, SpecialType>(le.nonSpecialTypes), new HashSet<Long>(le.visitedEdges));
-	}
-	
-	/**
-	 * The list of special types that a variable could be assigned to. Note
-	 * that the FALSEY type indicates that a variable could be one of 
-	 * {undefined, NaN, blank, zero} (i.e. the variable evaluates to false in
-	 * a condition expression).
-	 * 
-	 * @author qhanam
-	 */
-	public enum SpecialType {
-		FALSEY,
-		UNDEFINED,
-		NULL,
-		NAN,
-		BLANK,
-		ZERO
 	}
 	
 }

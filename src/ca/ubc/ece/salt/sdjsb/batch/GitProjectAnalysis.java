@@ -34,7 +34,7 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
 import ca.ubc.ece.salt.sdjsb.SDJSB;
-import ca.ubc.ece.salt.sdjsb.checker.Alert;
+import ca.ubc.ece.salt.sdjsb.alert.Alert;
 import fr.labri.gumtree.client.DiffOptions;
 
 public class GitProjectAnalysis {

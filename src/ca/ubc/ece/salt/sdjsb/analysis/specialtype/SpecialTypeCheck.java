@@ -1,6 +1,6 @@
 package ca.ubc.ece.salt.sdjsb.analysis.specialtype;
 
-import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeLatticeElement.SpecialType;
+import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert.SpecialType;
 
 /**
  * Stores the details of a special typ check in a conditional.

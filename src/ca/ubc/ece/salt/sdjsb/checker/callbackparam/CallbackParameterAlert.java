@@ -1,6 +1,6 @@
 package ca.ubc.ece.salt.sdjsb.checker.callbackparam;
 
-import ca.ubc.ece.salt.sdjsb.checker.Alert;
+import ca.ubc.ece.salt.sdjsb.alert.Alert;
 
 public class CallbackParameterAlert extends Alert {
 	

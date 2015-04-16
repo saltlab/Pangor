@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.mozilla.javascript.ast.AstNode;
 
+import ca.ubc.ece.salt.sdjsb.alert.Alert;
+
 /**
  * Provides an interface for tools to statically analyze source changes.
  * 
