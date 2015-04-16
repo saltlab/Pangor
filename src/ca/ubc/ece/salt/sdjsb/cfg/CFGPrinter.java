@@ -15,6 +15,8 @@ public class CFGPrinter {
             	return CFGPrinter.adjacencyList(cfg);
             case DOT:
             	return CFGPrinter.graphViz(cfg);
+            case DOT_TEST:
+            	return CFGPrinter.graphVizTest(cfg);
             default:
             	return null;
 		}
@@ -28,7 +30,18 @@ public class CFGPrinter {
 	public enum Output {
 		ADJACENCY_LIST,
 		DOT,
+		DOT_TEST,
 		NONE
+	}
+	
+	/**
+	 * Prints a CFG in the DOT language without newlines or tabs (for testing).
+	 * @param cfg The control flow graph.
+	 * @return A .gv file (DOT language format).
+	 */
+	public static String graphVizTest(CFG cfg) {
+		String graph = CFGPrinter.graphViz(cfg).replace("\\", "\\\\").replace("\n", " ").replace("\t", "").replace("\"", "\\\"");
+		return graph;
 	}
 	
 	/**
