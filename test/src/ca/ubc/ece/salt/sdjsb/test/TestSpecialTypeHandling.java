@@ -188,14 +188,26 @@ public class TestSpecialTypeHandling extends TestSDJSB {
 	}
 
 	/**
+	 * This should fail because of the limitations of AST differencing.
+	 */
+	@Test
+	public void testUndefinedReturn(){
+		String src = "./test/input/special_type_handling/sth_undefined_return_old.js";
+		String dst = "./test/input/special_type_handling/sth_undefined_return_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		expectedAlerts.add(new SpecialTypeAlert("STH", "a", SpecialType.UNDEFINED));
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	/**
 	 * This fails, but it's actually GumTree's fault and there's not much we can do.
 	 */
-//	@Test
-//	public void testUsedInCondition(){
-//		String src = "./test/input/special_type_handling/CLI_old.js";
-//		String dst = "./test/input/special_type_handling/CLI_new.js";
-//		List<Alert> expectedAlerts = new LinkedList<Alert>();
-//		this.runTest(new String[] {src, dst}, expectedAlerts, false);
-//	}
+	@Test
+	public void testUsedInCondition(){
+		String src = "./test/input/special_type_handling/CLI_old.js";
+		String dst = "./test/input/special_type_handling/CLI_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+	}
 
 }

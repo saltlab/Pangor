@@ -1,8 +1,10 @@
 package ca.ubc.ece.salt.sdjsb.analysis.specialtype;
 
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.InfixExpression;
@@ -95,7 +97,7 @@ public class SpecialTypeAnalysisUtilities {
                     boolean isSpecialType = false;
 
                     /* Get the value that this node evaluates to on the branch. */
-                    if(node == condition) branchesOn = BranchesOn.TRUE;
+                    if(ie == condition) branchesOn = BranchesOn.TRUE;
                     else branchesOn = SpecialTypeAnalysisUtilities.branchesOn(condition, ie.getParent());
                     
                     if(branchesOn == BranchesOn.UNKNOWN) return null;
@@ -107,7 +109,8 @@ public class SpecialTypeAnalysisUtilities {
                     	isSpecialType = branchesOn == BranchesOn.TRUE ? false : true;
                     }
                     	
-                    if(branchesOn != BranchesOn.UNKNOWN) return new SpecialTypeCheck(identifier, specialType, isSpecialType);
+                    if(branchesOn != BranchesOn.UNKNOWN) 
+                    	return new SpecialTypeCheck(identifier, specialType, isSpecialType);
                     
                 }
 				
@@ -121,10 +124,15 @@ public class SpecialTypeAnalysisUtilities {
 			String identifier = AnalysisUtilities.getIdentifier(node);
 			
 			if(identifier != null) {
-				BranchesOn branchesOn = SpecialTypeAnalysisUtilities.branchesOn(condition, node);
+				BranchesOn branchesOn;
+				
+                if(node == condition) branchesOn = BranchesOn.TRUE;
+                else branchesOn = SpecialTypeAnalysisUtilities.branchesOn(condition, node.getParent());
 
-                if(branchesOn == BranchesOn.TRUE) return new SpecialTypeCheck(identifier, SpecialType.FALSEY, true);
-                else if(branchesOn == BranchesOn.FALSE) return new SpecialTypeCheck(identifier, SpecialType.FALSEY, false);
+                if(branchesOn == BranchesOn.TRUE) 
+                	return new SpecialTypeCheck(identifier, SpecialType.FALSEY, false);
+                else if(branchesOn == BranchesOn.FALSE) 
+                	return new SpecialTypeCheck(identifier, SpecialType.FALSEY, true);
 			}
 			
 		}
@@ -259,7 +267,7 @@ public class SpecialTypeAnalysisUtilities {
 	 * @param node the tree to look for assignments in.
 	 * @return the list of identifiers that are assignd to.
 	 */
-	public static Set<String> getIdentifierAssignments(AstNode node) {
+	public static List<Pair<String, AstNode>> getIdentifierAssignments(AstNode node) {
 
         AssignmentTreeVisitor assignmentVisitor = new AssignmentTreeVisitor();
         node.visit(assignmentVisitor);

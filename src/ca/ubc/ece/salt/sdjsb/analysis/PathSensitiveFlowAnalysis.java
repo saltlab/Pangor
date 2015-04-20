@@ -16,7 +16,7 @@ import ca.ubc.ece.salt.sdjsb.cfg.CFGEdge;
  *
  * @param <LE> The type that stores the analysis information.
  */
-public abstract class PathSensitiveFlowAnalysis<LE extends AbstractLatticeElement> extends AbstractFlowAnalysis<LE> {
+public abstract class PathSensitiveFlowAnalysis<LE extends AbstractLatticeElement> extends FlowAnalysis<LE> {
 
 	public PathSensitiveFlowAnalysis() {
 		super();
@@ -52,7 +52,7 @@ public abstract class PathSensitiveFlowAnalysis<LE extends AbstractLatticeElemen
 
                 /* If an edge has been visited on this path, don't visit it
                  * again (only loop once). */
-				if(state.le.getVisitedCount(edge) == 0) {
+				if(edge.getCondition() == null || state.le.getVisitedCount(edge) == 0) {
 					LE copy = this.copy(state.le);
 					copy.visit(edge);
                     stack.add(new PathState(edge, copy));

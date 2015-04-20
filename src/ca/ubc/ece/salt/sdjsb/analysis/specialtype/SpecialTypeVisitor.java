@@ -35,7 +35,7 @@ public class SpecialTypeVisitor implements NodeVisitor {
     public boolean visit(AstNode node) {
     	
     	/* We only inspect inserted conditions. */
-    	if(node.getChangeType() == ChangeType.INSERTED) {
+    	if(node.getChangeType() == ChangeType.INSERTED || node.getChangeType() == ChangeType.REMOVED) {
 
             SpecialTypeCheck stc = SpecialTypeAnalysisUtilities.getSpecialTypeCheck(condition, node);
             if(stc != null) this.specialTypeChecks.add(stc);

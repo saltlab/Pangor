@@ -11,7 +11,7 @@ public abstract class AbstractLatticeElement {
 	 * Keeps track of the edges this LatticeElement has already visited. This
 	 * is so that we can break from loops after a defined number of iterations.
 	 */
-	private Map<Long, Integer> visitedEdges;
+	protected Map<Long, Integer> visitedEdges;
 	
 	public AbstractLatticeElement() {
 		this.visitedEdges = new HashMap<Long, Integer>();

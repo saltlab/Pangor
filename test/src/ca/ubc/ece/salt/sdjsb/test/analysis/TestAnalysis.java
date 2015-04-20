@@ -12,7 +12,7 @@ import org.mozilla.javascript.ast.AstRoot;
 import ca.ubc.ece.salt.gumtree.ast.ASTClassifier;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
-import ca.ubc.ece.salt.sdjsb.analysis.AbstractFlowAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.FlowAnalysis;
 import ca.ubc.ece.salt.sdjsb.cfg.CFG;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGFactory;
 import ca.ubc.ece.salt.sdjsb.cfg.diff.CFGDifferencing;
@@ -35,7 +35,7 @@ public class TestAnalysis extends TestCase {
 	 * @param printAlerts If true, print the alerts to standard output.
 	 * @throws Exception 
 	 */
-	protected void runTest(String[] args, List<Alert> expectedAlerts, boolean printAlerts, AbstractFlowAnalysis<?> analysis) throws Exception {
+	protected void runTest(String[] args, List<Alert> expectedAlerts, boolean printAlerts, FlowAnalysis<?> analysis) throws Exception {
 		
 		/* Parse the options. */
 		DiffOptions options = new DiffOptions();
@@ -118,17 +118,17 @@ public class TestAnalysis extends TestCase {
 		/* Run the analysis. */
 		AstRoot script = (AstRoot)dst.getClassifiedASTNode();
         analysis.analyze(script, dstCFGs);
-
-		/* Check the output. */
         List<Alert> actualAlerts = analysis.getAlerts();
-        this.check(actualAlerts, expectedAlerts);
-        
+
         /* Output if needed. */
         if(printAlerts) {
         	for(Alert alert : actualAlerts) {
         		System.out.println(alert.getLongDescription());
         	}
         }
+
+		/* Check the output. */
+        this.check(actualAlerts, expectedAlerts);
 
 	}
 	

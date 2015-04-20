@@ -57,7 +57,7 @@ public class CFGPrinter {
 		queue.add(cfg.getEntryNode());
 		visited.add(cfg.getEntryNode());
 		String serial = "digraph control_flow_graph {\n";
-		serial += "to [ style = filled fillcolor = \"white\" ];\n";
+		serial += "node [ style = filled fillcolor = \"white\" ];\n";
 		
 		while(true) {
 			

@@ -1,9 +1,7 @@
 package ca.ubc.ece.salt.sdjsb.analysis.specialtype;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert.SpecialType;
 import ca.ubc.ece.salt.sdjsb.analysis.AbstractLatticeElement;
@@ -27,12 +25,6 @@ import ca.ubc.ece.salt.sdjsb.analysis.AbstractLatticeElement;
 public class SpecialTypeLatticeElement extends AbstractLatticeElement{
 	
 	/**
-	 * Keeps track of the edges this LatticeElement has already visited. This
-	 * is so that we can break from loops.
-	 */
-	public Set<Long> visitedEdges;
-	
-	/**
 	 * Keeps track of identifiers that are special types on the path. 
 	 */
 	public Map<String, SpecialType> specialTypes;
@@ -42,15 +34,22 @@ public class SpecialTypeLatticeElement extends AbstractLatticeElement{
 	 */
 	public Map<String, SpecialType> nonSpecialTypes;
 	
+	/**
+	 * Keeps track of new special type assignments.
+	 */
+	public Map<String, SpecialType> assignments;
+	
 	public SpecialTypeLatticeElement() {
 		this.specialTypes = new HashMap<String, SpecialType>();
 		this.nonSpecialTypes = new HashMap<String, SpecialType>();
-		this.visitedEdges = new HashSet<Long>();
+		this.assignments = new HashMap<String, SpecialType>();
+		this.visitedEdges = new HashMap<Long, Integer>();
 	}
 
-	public SpecialTypeLatticeElement(HashMap<String, SpecialType> specialTypes, HashMap<String, SpecialType> nonSpecialTypes, HashSet<Long> visitedEdges) {
+	public SpecialTypeLatticeElement(Map<String, SpecialType> specialTypes, Map<String, SpecialType> nonSpecialTypes, Map<String, SpecialType> assignments, Map<Long, Integer> visitedEdges) {
 		this.specialTypes = specialTypes;
 		this.nonSpecialTypes = nonSpecialTypes;
+		this.assignments = assignments;
 		this.visitedEdges = visitedEdges;
 	}
 	
@@ -58,7 +57,10 @@ public class SpecialTypeLatticeElement extends AbstractLatticeElement{
 	 * @return a copy of the LatticeElement.
 	 */
 	public static SpecialTypeLatticeElement copy(SpecialTypeLatticeElement le) {
-		return new SpecialTypeLatticeElement(new HashMap<String, SpecialType>(le.specialTypes), new HashMap<String, SpecialType>(le.nonSpecialTypes), new HashSet<Long>(le.visitedEdges));
+		return new SpecialTypeLatticeElement(new HashMap<String, SpecialType>(le.specialTypes), 
+											 new HashMap<String, SpecialType>(le.nonSpecialTypes), 
+											 new HashMap<String, SpecialType>(le.assignments), 
+											 new HashMap<Long, Integer>(le.visitedEdges));
 	}
 	
 }

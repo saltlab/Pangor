@@ -69,11 +69,12 @@ public class CFGFactory {
 	/**
 	 * Computes the node dominators for the graph.
 	 * 
-	 * This is needed 
+	 * This may be needed later for merging results from different paths.
+	 * 
 	 * @param cfg
 	 */
 	private static void computeDominators(CFG cfg) {
-		
+		throw new UnsupportedOperationException();
 	}
 	
 	/**
@@ -943,7 +944,7 @@ public class CFGFactory {
 		return cfg;
 
 	}
-	
+
 	/**
 	 * Builds a control flow subgraph for a statement. If other statement types
 	 * are handled properly then this should only be an expression.
@@ -966,7 +967,7 @@ public class CFGFactory {
 	private static CFG buildSwitch(AstNode node) {
 		
 		if(node == null) return null;
-
+		
 		if (node instanceof Block) {
 			return CFGFactory.build((Block) node);
 		} else if (node instanceof IfStatement) {

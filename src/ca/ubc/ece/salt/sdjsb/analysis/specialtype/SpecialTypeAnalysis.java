@@ -1,11 +1,15 @@
 package ca.ubc.ece.salt.sdjsb.analysis.specialtype;
 
+import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.ScriptNode;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert;
+import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert.SpecialType;
 import ca.ubc.ece.salt.sdjsb.analysis.PathSensitiveFlowAnalysis;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGEdge;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
@@ -39,8 +43,6 @@ public class SpecialTypeAnalysis extends PathSensitiveFlowAnalysis<SpecialTypeLa
 		AstNode condition = (AstNode)edge.getCondition();
 		if(condition == null) return;
 		
-        //System.out.println("Transfering over edge condition: " + condition.toSource());
-		
 		/* Check if condition has an inserted special type check and whether
 		 * the check evaluates to true or false. */
 		SpecialTypeVisitor visitor = new SpecialTypeVisitor(condition);
@@ -50,11 +52,11 @@ public class SpecialTypeAnalysis extends PathSensitiveFlowAnalysis<SpecialTypeLa
 		for(SpecialTypeCheck specialTypeCheck : visitor.getSpecialTypeChecks()) {
 			if(specialTypeCheck.isSpecialType) {
 				sourceLE.specialTypes.put(specialTypeCheck.identifier, specialTypeCheck.specialType);
-				//System.out.println(specialTypeCheck.identifier + " is " + specialTypeCheck.specialType);
+				System.out.println(specialTypeCheck.identifier + " is " + specialTypeCheck.specialType);
 			}
 			else {
 				sourceLE.nonSpecialTypes.put(specialTypeCheck.identifier, specialTypeCheck.specialType);
-				//System.out.println(specialTypeCheck.identifier + " is not " + specialTypeCheck.specialType);
+				System.out.println(specialTypeCheck.identifier + " is not " + specialTypeCheck.specialType);
 			}
 		}
 		
@@ -64,9 +66,6 @@ public class SpecialTypeAnalysis extends PathSensitiveFlowAnalysis<SpecialTypeLa
 	public void transfer(CFGNode node, SpecialTypeLatticeElement sourceLE) {
 
 		AstNode statement = (AstNode)node.getStatement();
-//		System.out.println("Transfering over node: " + statement.toSource());
-//		System.out.println("Non-special types:  " + sourceLE.nonSpecialTypes);
-//		System.out.println("Special types:  " + sourceLE.specialTypes);
 		
 		/* Check if the statement has a moved or unchanged identifier use. */
         Set<String> usedIdentifiers = SpecialTypeAnalysisUtilities.getUsedIdentifiers(statement);
@@ -74,25 +73,51 @@ public class SpecialTypeAnalysis extends PathSensitiveFlowAnalysis<SpecialTypeLa
         for(String identifier : sourceLE.nonSpecialTypes.keySet()) {
         	if(usedIdentifiers.contains(identifier)) {
         		
-        		/* Trigger an alert! */
-        		this.registerAlert(new SpecialTypeAlert("STH", identifier, sourceLE.nonSpecialTypes.get(identifier)) );
+        		/* Check that this identifier hasn't been newly assigned to
+        		 * the special type we are checking. */
+        		SpecialType assignedTo = sourceLE.assignments.get(identifier);
+        		if(assignedTo != SpecialType.FALSEY && assignedTo != sourceLE.nonSpecialTypes.get(identifier)) {
+        		
+                    /* Trigger an alert! */
+                    this.registerAlert(new SpecialTypeAlert("STH", identifier, sourceLE.nonSpecialTypes.get(identifier)) );
+                   
+        		}
         		
         		/* Remove the identifier so we don't log redundant alerts. */
-        		sourceLE.nonSpecialTypes.remove(identifier);
+        		// We can't do this while we're looping through sourceLE elements! Also, we're already getting redundant elements from multiple paths.
+        		//sourceLE.nonSpecialTypes.remove(identifier);
 
         	}
         }
         
         /* Check if the statement has an assignment. */
-        Set<String> assignedIdentifiers = SpecialTypeAnalysisUtilities.getIdentifierAssignments(statement);
+        List<Pair<String, AstNode>> assignments = SpecialTypeAnalysisUtilities.getIdentifierAssignments(statement);
         
-        for(String identifier : sourceLE.nonSpecialTypes.keySet()) {
-        	if(assignedIdentifiers.contains(identifier)) {
-        		
-        		/* Remove the identifier. */
-        		sourceLE.nonSpecialTypes.remove(identifier);
-
+        for(Pair<String, AstNode> assignment : assignments) {
+        	
+        	SpecialType specialType = SpecialTypeAnalysisUtilities.getSpecialType(assignment.getValue());
+        	
+        	/* Store the assignment if it is a new special type assignment. */
+        	if(specialType != null && (assignment.getValue().getChangeType() == ChangeType.INSERTED 
+        			|| assignment.getValue().getChangeType() == ChangeType.REMOVED
+        			|| assignment.getValue().getChangeType() == ChangeType.UPDATED)) {
+        		sourceLE.assignments.put(assignment.getKey(), specialType);
         	}
+        	
+        	/* Remove the assignment (if it exists) if it is not (any old
+        	 * assignments are no longer relevant). */
+        	else {
+        		sourceLE.assignments.remove(assignment.getKey());
+        	}
+        	
+        	/* Remove the identifier from the special type set (if it exists). */
+        	if(sourceLE.nonSpecialTypes.containsKey(assignment.getKey())) {
+
+        		/* Remove the identifier. */
+        		sourceLE.nonSpecialTypes.remove(assignment.getKey());
+        		
+        	}
+        	
         }
 		
 	}
