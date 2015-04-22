@@ -11,7 +11,6 @@ import org.mozilla.javascript.Parser;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
 
-import ca.ubc.ece.salt.sdjsb.ast.AstNodeTraverse;
 import junit.framework.TestCase;
 
 public class TestASTClone extends TestCase {
@@ -23,7 +22,7 @@ public class TestASTClone extends TestCase {
 		AstRoot original = parser.parse(new FileReader(file), file, 1);
 		
 		/* Clone the AST. */
-		AstRoot clone = (AstRoot)original.clone();
+		AstRoot clone = (AstRoot)original.clone(original.getParent());
 
 		/* Get the serialized ASTs. */
 		String expected = TestASTClone.serialize(original);
@@ -254,6 +253,14 @@ public class TestASTClone extends TestCase {
 	public void testTryStatement() throws IOException, CloneNotSupportedException {
 		
 		String file = "./test/input/ast/try.js";
+		this.runTest(file);
+
+	}
+
+	@Test
+	public void testUndefinedConditional() throws IOException, CloneNotSupportedException {
+		
+		String file = "./test/input/ast/sth_undefined_conditional_new.js";
 		this.runTest(file);
 
 	}

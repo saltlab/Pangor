@@ -115,4 +115,12 @@ public class TestASTPreProcessing extends TestCase {
 
 	}
 
+	@Test
+	public void testUndefinedConditional() throws IOException, CloneNotSupportedException {
+		
+		String file = "./test/input/ast_preproc/sth_undefined_conditional_new.js";
+		this.runTest(file);
+
+	}
+
 }

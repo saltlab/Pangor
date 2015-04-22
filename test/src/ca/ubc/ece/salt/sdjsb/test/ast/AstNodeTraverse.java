@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.ast;
+package ca.ubc.ece.salt.sdjsb.test.ast;
 
 import java.util.LinkedList;
 import java.util.List;
