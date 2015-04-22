@@ -91,4 +91,28 @@ public class TestASTPreProcessing extends TestCase {
 
 	}
 
+	@Test
+	public void testIfCondition() throws IOException, CloneNotSupportedException {
+		
+		String file = "./test/input/ast_preproc/if.js";
+		this.runTest(file);
+
+	}
+
+	@Test
+	public void testReturn() throws IOException, CloneNotSupportedException {
+		
+		String file = "./test/input/ast_preproc/return.js";
+		this.runTest(file);
+
+	}
+
+	@Test
+	public void testThrow() throws IOException, CloneNotSupportedException {
+		
+		String file = "./test/input/ast_preproc/throw.js";
+		this.runTest(file);
+
+	}
+
 }

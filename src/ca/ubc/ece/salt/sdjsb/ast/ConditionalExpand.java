@@ -51,11 +51,11 @@ class ConditionalExpand implements NodeVisitor {
 		else if(statement instanceof ThrowStatement)
 			statement.visit(expander);
 		else if(statement instanceof IfStatement)
-			((IfStatement)statement).getCondition().visit(expander);
+			statement.visit(expander);
 		else if(statement instanceof WhileLoop)
-			((WhileLoop)statement).getCondition().visit(expander);
+			statement.visit(expander);
 		else if(statement instanceof ForLoop)
-			((ForLoop)statement).getCondition().visit(expander);
+			statement.visit(expander);
 		else if(statement instanceof ForInLoop)
 			((ForInLoop)statement).getIteratedObject().visit(expander);
 		else if(statement instanceof SwitchStatement)
@@ -188,6 +188,120 @@ class ConditionalExpand implements NodeVisitor {
 				ConditionalExpression ce = (ConditionalExpression) es.getExpression();
 				if(this.isTrueBranch) es.setExpression(ce.getTrueExpression());
 				else es.setExpression(ce.getFalseExpression());
+				
+				/* Add the test condition. */
+				this.setCondition(ce.getTestExpression());
+				
+				/* We have expanded the statement. */
+				this.expanded = true;
+				
+			}
+			
+		}
+
+		else if(node instanceof IfStatement) {
+			
+			IfStatement is = (IfStatement) node;
+			
+			if(is.getCondition() instanceof ConditionalExpression) {
+
+				/* Expand the statement by pulling up. */
+				ConditionalExpression ce = (ConditionalExpression) is.getCondition();
+				if(this.isTrueBranch) is.setCondition(ce.getTrueExpression());
+				else is.setCondition(ce.getFalseExpression());
+				
+				/* Add the test condition. */
+				this.setCondition(ce.getTestExpression());
+				
+				/* We have expanded the statement. */
+				this.expanded = true;
+				
+			}
+			
+			/* Do not continue visiting the if statement. */
+			return false;
+			
+		}
+
+		else if(node instanceof WhileLoop) {
+			
+			WhileLoop is = (WhileLoop) node;
+			
+			if(is.getCondition() instanceof ConditionalExpression) {
+
+				/* Expand the statement by pulling up. */
+				ConditionalExpression ce = (ConditionalExpression) is.getCondition();
+				if(this.isTrueBranch) is.setCondition(ce.getTrueExpression());
+				else is.setCondition(ce.getFalseExpression());
+				
+				/* Add the test condition. */
+				this.setCondition(ce.getTestExpression());
+				
+				/* We have expanded the statement. */
+				this.expanded = true;
+				
+			}
+			
+			/* Do not continue visiting the loop body. */
+			return false;
+			
+		}
+
+		else if(node instanceof ForLoop) {
+			
+			ForLoop is = (ForLoop) node;
+			
+			if(is.getCondition() instanceof ConditionalExpression) {
+
+				/* Expand the statement by pulling up. */
+				ConditionalExpression ce = (ConditionalExpression) is.getCondition();
+				if(this.isTrueBranch) is.setCondition(ce.getTrueExpression());
+				else is.setCondition(ce.getFalseExpression());
+				
+				/* Add the test condition. */
+				this.setCondition(ce.getTestExpression());
+				
+				/* We have expanded the statement. */
+				this.expanded = true;
+				
+			}
+			
+			/* Do not continue visiting the loop body. */
+			return false;
+			
+		}
+
+		else if(node instanceof ReturnStatement) {
+			
+			ReturnStatement is = (ReturnStatement) node;
+			
+			if(is.getReturnValue() instanceof ConditionalExpression) {
+
+				/* Expand the statement by pulling up. */
+				ConditionalExpression ce = (ConditionalExpression) is.getReturnValue();
+				if(this.isTrueBranch) is.setReturnValue(ce.getTrueExpression());
+				else is.setReturnValue(ce.getFalseExpression());
+				
+				/* Add the test condition. */
+				this.setCondition(ce.getTestExpression());
+				
+				/* We have expanded the statement. */
+				this.expanded = true;
+				
+			}
+			
+		}
+
+		else if(node instanceof ThrowStatement) {
+			
+			ThrowStatement is = (ThrowStatement) node;
+			
+			if(is.getExpression() instanceof ConditionalExpression) {
+
+				/* Expand the statement by pulling up. */
+				ConditionalExpression ce = (ConditionalExpression) is.getExpression();
+				if(this.isTrueBranch) is.setExpression(ce.getTrueExpression());
+				else is.setExpression(ce.getFalseExpression());
 				
 				/* Add the test condition. */
 				this.setCondition(ce.getTestExpression());

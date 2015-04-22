@@ -1,5 +1,6 @@
 package ca.ubc.ece.salt.sdjsb.ast;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -7,6 +8,7 @@ import java.util.Queue;
 import org.apache.commons.lang3.tuple.Pair;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.IfStatement;
+import org.mozilla.javascript.ast.Scope;
 
 public class ConditionalPreProcessor extends StatementPreProcessor {
 	
@@ -38,15 +40,28 @@ public class ConditionalPreProcessor extends StatementPreProcessor {
 		if(pairs.size() == 1) return null;
 		
 		/* We have expanded statements, so create the if statements. */
-		for(Pair<AstNode, AstNode> pair : pairs) {
-			IfStatement newIfStatement = new IfStatement();
-			newIfStatement.setThenPart(pair.getLeft());
-			newIfStatement.setCondition(pair.getRight());
+		Iterator<Pair<AstNode, AstNode>> iterator = pairs.iterator();
+		while(iterator.hasNext()) {
+			Pair<AstNode, AstNode> pair = iterator.next();
+
+			if(iterator.hasNext()) {
+                IfStatement newIfStatement = new IfStatement();
+                Scope thenScope = new Scope();
+                thenScope.addChild(pair.getLeft());
+                newIfStatement.setThenPart(thenScope);
+                newIfStatement.setCondition(pair.getRight());
+                
+                if(current == null) ifStatement = newIfStatement;
+                else current.setElsePart(newIfStatement);
+
+                current = newIfStatement;
+			}
+			else {
+				Scope elseScope = new Scope();
+				elseScope.addChild(pair.getLeft());
+				current.setElsePart(elseScope);
+			}
 			
-			if(current == null) ifStatement = newIfStatement;
-			else current.setElsePart(newIfStatement);
-			
-			current = newIfStatement;
 		}
 		
 		return ifStatement;
