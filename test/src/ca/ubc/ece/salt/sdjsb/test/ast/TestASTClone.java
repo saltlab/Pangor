@@ -11,9 +11,10 @@ import org.mozilla.javascript.Parser;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
 
+import ca.ubc.ece.salt.sdjsb.ast.AstNodeTraverse;
 import junit.framework.TestCase;
 
-public class TestAST extends TestCase {
+public class TestASTClone extends TestCase {
 	
 	protected void runTest(String file) throws IOException, CloneNotSupportedException {
 
@@ -25,8 +26,8 @@ public class TestAST extends TestCase {
 		AstRoot clone = (AstRoot)original.clone();
 
 		/* Get the serialized ASTs. */
-		String expected = TestAST.serialize(original);
-		String actual = TestAST.serialize(clone);
+		String expected = TestASTClone.serialize(original);
+		String actual = TestASTClone.serialize(clone);
 		
 		System.out.println(expected);
 		System.out.println(actual);
