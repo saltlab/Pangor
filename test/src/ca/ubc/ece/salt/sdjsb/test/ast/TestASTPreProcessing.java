@@ -28,7 +28,7 @@ public class TestASTPreProcessing extends TestCase {
 	}
 	
 	@Test
-	public void testAstRoot() throws IOException, CloneNotSupportedException {
+	public void testVar() throws IOException, CloneNotSupportedException {
 		
 		String file = "./test/input/ast_preproc/var.js";
 		this.runTest(file);
@@ -36,9 +36,9 @@ public class TestASTPreProcessing extends TestCase {
 	}
 
 	@Test
-	public void testFunctionNode() throws IOException, CloneNotSupportedException {
+	public void testNestedVar() throws IOException, CloneNotSupportedException {
 		
-		String file = "./test/input/ast/function.js";
+		String file = "./test/input/ast_preproc/var_nested.js";
 		this.runTest(file);
 
 	}
@@ -46,151 +46,47 @@ public class TestASTPreProcessing extends TestCase {
 	@Test
 	public void testInfixExpression() throws IOException, CloneNotSupportedException {
 		
-		String file = "./test/input/ast/infix.js";
+		String file = "./test/input/ast_preproc/infix.js";
 		this.runTest(file);
 
 	}
 
 	@Test
-	public void testReturnStatement() throws IOException, CloneNotSupportedException {
+	public void testNestedInfixExpression() throws IOException, CloneNotSupportedException {
 		
-		String file = "./test/input/ast/return.js";
+		String file = "./test/input/ast_preproc/infix_nested.js";
 		this.runTest(file);
 
 	}
 
 	@Test
-	public void testIfStatement() throws IOException, CloneNotSupportedException {
+	public void testStatement() throws IOException, CloneNotSupportedException {
 		
-		String file = "./test/input/ast/if.js";
+		String file = "./test/input/ast_preproc/statement.js";
 		this.runTest(file);
 
 	}
 
 	@Test
-	public void testWhileLoop() throws IOException, CloneNotSupportedException {
+	public void testFunction() throws IOException, CloneNotSupportedException {
 		
-		String file = "./test/input/ast/while.js";
+		String file = "./test/input/ast_preproc/function.js";
 		this.runTest(file);
 
 	}
 
 	@Test
-	public void testDoLoop() throws IOException, CloneNotSupportedException {
+	public void testIfThenElse() throws IOException, CloneNotSupportedException {
 		
-		String file = "./test/input/ast/do.js";
+		String file = "./test/input/ast_preproc/ifthen.js";
 		this.runTest(file);
 
 	}
 
 	@Test
-	public void testForLoop() throws IOException, CloneNotSupportedException {
+	public void testWhileBody() throws IOException, CloneNotSupportedException {
 		
-		String file = "./test/input/ast/for.js";
-		this.runTest(file);
-
-	}
-
-	@Test
-	public void testForInLoop() throws IOException, CloneNotSupportedException {
-		
-		String file = "./test/input/ast/forin.js";
-		this.runTest(file);
-
-	}
-
-	@Test
-	public void testFunctionCall() throws IOException, CloneNotSupportedException {
-		
-		String file = "./test/input/ast/call.js";
-		this.runTest(file);
-
-	}
-
-	@Test
-	public void testVariableDeclaration() throws IOException, CloneNotSupportedException {
-		
-		String file = "./test/input/ast/var.js";
-		this.runTest(file);
-
-	}
-
-	@Test
-	public void testUnaryExpression() throws IOException, CloneNotSupportedException {
-		
-		String file = "./test/input/ast/unary.js";
-		this.runTest(file);
-
-	}
-
-	@Test
-	public void testSwitchStatement() throws IOException, CloneNotSupportedException {
-		
-		String file = "./test/input/ast/switch.js";
-		this.runTest(file);
-
-	}
-
-	@Test
-	public void testParenthesizedExpression() throws IOException, CloneNotSupportedException {
-		
-		String file = "./test/input/ast/paren.js";
-		this.runTest(file);
-
-	}
-
-	@Test
-	public void testObjectLiteral() throws IOException, CloneNotSupportedException {
-		
-		String file = "./test/input/ast/obj.js";
-		this.runTest(file);
-
-	}
-
-	@Test
-	public void testElementGet() throws IOException, CloneNotSupportedException {
-		
-		String file = "./test/input/ast/elementget.js";
-		this.runTest(file);
-
-	}
-
-	@Test
-	public void testConditionalExpression() throws IOException, CloneNotSupportedException {
-		
-		String file = "./test/input/ast/conditional.js";
-		this.runTest(file);
-
-	}
-
-	@Test
-	public void testArrayLiteral() throws IOException, CloneNotSupportedException {
-		
-		String file = "./test/input/ast/array.js";
-		this.runTest(file);
-
-	}
-
-	@Test
-	public void testThrowStatement() throws IOException, CloneNotSupportedException {
-		
-		String file = "./test/input/ast/throw.js";
-		this.runTest(file);
-
-	}
-
-	@Test
-	public void testWithStatement() throws IOException, CloneNotSupportedException {
-		
-		String file = "./test/input/ast/with.js";
-		this.runTest(file);
-
-	}
-
-	@Test
-	public void testTryStatement() throws IOException, CloneNotSupportedException {
-		
-		String file = "./test/input/ast/try.js";
+		String file = "./test/input/ast_preproc/whilebody.js";
 		this.runTest(file);
 
 	}

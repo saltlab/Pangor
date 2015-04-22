@@ -10,6 +10,7 @@ import org.mozilla.javascript.ast.ForLoop;
 import org.mozilla.javascript.ast.IfStatement;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.NodeVisitor;
+import org.mozilla.javascript.ast.ParenthesizedExpression;
 import org.mozilla.javascript.ast.ReturnStatement;
 import org.mozilla.javascript.ast.SwitchStatement;
 import org.mozilla.javascript.ast.ThrowStatement;
@@ -145,6 +146,48 @@ class ConditionalExpand implements NodeVisitor {
 				ConditionalExpression ce = (ConditionalExpression) ie.getInitializer();
 				if(this.isTrueBranch) ie.setInitializer(ce.getTrueExpression());
 				else ie.setInitializer(ce.getFalseExpression());
+				
+				/* Add the test condition. */
+				this.setCondition(ce.getTestExpression());
+				
+				/* We have expanded the statement. */
+				this.expanded = true;
+				
+			}
+			
+		}
+
+		else if(node instanceof ParenthesizedExpression) {
+			
+			ParenthesizedExpression pe = (ParenthesizedExpression) node;
+			
+			if(pe.getExpression() instanceof ConditionalExpression) {
+
+				/* Expand the statement by pulling up. */
+				ConditionalExpression ce = (ConditionalExpression) pe.getExpression();
+				if(this.isTrueBranch) pe.setExpression(ce.getTrueExpression());
+				else pe.setExpression(ce.getFalseExpression());
+				
+				/* Add the test condition. */
+				this.setCondition(ce.getTestExpression());
+				
+				/* We have expanded the statement. */
+				this.expanded = true;
+				
+			}
+			
+		}
+
+		else if(node instanceof ExpressionStatement) {
+			
+			ExpressionStatement es = (ExpressionStatement) node;
+			
+			if(es.getExpression() instanceof ConditionalExpression) {
+
+				/* Expand the statement by pulling up. */
+				ConditionalExpression ce = (ConditionalExpression) es.getExpression();
+				if(this.isTrueBranch) es.setExpression(ce.getTrueExpression());
+				else es.setExpression(ce.getFalseExpression());
 				
 				/* Add the test condition. */
 				this.setCondition(ce.getTestExpression());
