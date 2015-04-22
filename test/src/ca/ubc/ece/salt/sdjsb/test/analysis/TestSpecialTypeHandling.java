@@ -165,6 +165,14 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 
+	/**
+	 * TODO:
+	 * This fails to produce the alert because GumTree miss-classifies the
+	 * identifier. It might be possible to capture it using looser change
+	 * checking (i.e., get the infix operator change type instead of the
+	 * identifier change type) or post-processing the change classifications.
+	 * @throws Exception
+	 */
 	@Test
 	public void testRealWorldConditional() throws Exception {
 		String src = "./test/input/special_type_handling/sample-conf_old.js";
