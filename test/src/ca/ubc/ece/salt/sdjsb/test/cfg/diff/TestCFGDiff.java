@@ -136,5 +136,22 @@ public class TestCFGDiff extends TestCase {
 		this.runTest(new String[] {src, dst}, expectedSrcCFGs, expectedDstCFGs, Output.DOT);
 
 	}
+
+	/**
+	 * This test fails. Too complex to add expected CFGs. We are using it to debug exceptions.
+	 * @throws Exception
+	 */
+	@Test
+	public void testPM1() throws Exception {
+		
+		String src = "./test/input/cfg_diff/CLI_0_old.js";
+		String dst = "./test/input/cfg_diff/CLI_0_new.js";
+
+		List<String> expectedSrcCFGs = new LinkedList<String>();
+		List<String> expectedDstCFGs = new LinkedList<String>();
+		
+		this.runTest(new String[] {src, dst}, expectedSrcCFGs, expectedDstCFGs, Output.DOT);
+
+	}
 	
 }

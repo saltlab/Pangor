@@ -33,8 +33,10 @@ import org.eclipse.jgit.errors.MissingObjectException;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
+import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
 import ca.ubc.ece.salt.sdjsb.SDJSB;
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
+import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysis;
 import fr.labri.gumtree.client.DiffOptions;
 
 public class GitProjectAnalysis {
@@ -63,7 +65,7 @@ public class GitProjectAnalysis {
 	 * @throws GitAPIException
 	 * @throws IOException
 	 */
-	public void analyze() throws GitAPIException, IOException {
+	public void analyze() throws GitAPIException, IOException, Exception {
 		
 		/* Get the list of bug fixing commits from version history. */
 		List<Pair<String, String>> bugFixingCommits = this.getBugFixingCommitPairs();
@@ -86,7 +88,7 @@ public class GitProjectAnalysis {
 	 * @throws IOException
 	 * @throws GitAPIException
 	 */
-	private void analyzeDiff(String buggyRevision, String bugFixingRevision) throws IOException, GitAPIException {
+	private void analyzeDiff(String buggyRevision, String bugFixingRevision) throws IOException, GitAPIException, Exception {
 
 		ObjectId buggy = this.repository.resolve(buggyRevision + "^{tree}");
 		ObjectId repaired = this.repository.resolve(bugFixingRevision + "^{tree}");
@@ -115,7 +117,10 @@ public class GitProjectAnalysis {
                 	}
                 }
                 catch(Exception ignore) { 
-                	System.err.println("Ignoring exception in ProjectAnalysis.runSDJSB.");
+                	System.err.println("Ignoring exception in ProjectAnalysis.runSDJSB.\nBuggy Revision: " + buggyRevision + "\nOld File: " + diff.getOldPath() + "\nBug Fixing Revision: " + bugFixingRevision + "\nNew File:" + diff.getNewPath());
+                	System.out.println(oldFile);
+                	System.out.println(newFile);
+                	throw ignore;
                 }
 			}
 		}
@@ -173,7 +178,8 @@ public class GitProjectAnalysis {
 	 * @param oldFile The buggy source code.
 	 * @param newFile The repaired source code.
 	 */
-	private static List<Alert> runSDJSB(String oldFile, String newFile) {
+	private static List<Alert> runSDJSB(String oldFile, String newFile) throws Exception {
+
         /* Analyze the files using SDJSB. */
         DiffOptions options = new DiffOptions();
         CmdLineParser parser = new CmdLineParser(options);
@@ -185,8 +191,33 @@ public class GitProjectAnalysis {
             e.printStackTrace();
             return null;
         }
-
-        return SDJSB.analyze(options, oldFile, newFile);
+        
+        /* Control flow difference the files. */
+        ControlFlowDifferencing cfd = null;
+        try {
+            cfd = new ControlFlowDifferencing(new String[] {"", ""}, oldFile, newFile);
+        }
+        catch(Exception e) {
+        	throw e;
+//        	System.err.println("Error while differencing the files.");
+//        	System.err.println(e.getMessage());
+//        	return null;
+        }
+        
+        /* Run the analysis. */ 
+        List<Alert> alerts;
+        try {
+            alerts = cfd.analyze(new SpecialTypeAnalysis());
+        }
+        catch(Exception e) {
+        	throw e;
+//        	System.err.println("Error while analyzing the files.");
+//        	System.err.println(e.getMessage());
+//        	return null;
+        }
+        
+        return alerts;
+        //return SDJSB.analyze(options, oldFile, newFile);
 	}
 	
 	/**

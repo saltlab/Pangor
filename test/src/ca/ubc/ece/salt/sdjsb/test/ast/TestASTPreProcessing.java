@@ -123,4 +123,12 @@ public class TestASTPreProcessing extends TestCase {
 
 	}
 
+	@Test
+	public void testNestedReturn() throws IOException, CloneNotSupportedException {
+		
+		String file = "./test/input/ast_preproc/return_nested.js";
+		this.runTest(file);
+
+	}
+
 }

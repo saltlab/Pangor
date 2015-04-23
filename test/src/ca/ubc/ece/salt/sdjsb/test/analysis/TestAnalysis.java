@@ -17,9 +17,12 @@ public class TestAnalysis extends TestCase {
 	 * @throws Exception 
 	 */
 	protected void runTest(String[] args, List<Alert> expectedAlerts, boolean printAlerts, FlowAnalysis<?> analysis) throws Exception {
+		
+		/* Control flow difference the files. */
+		ControlFlowDifferencing cfd = new ControlFlowDifferencing(args);
         
 		/* Run the analysis. */
-        List<Alert> actualAlerts = ControlFlowDifferencing.analyze(args, analysis);
+        List<Alert> actualAlerts = cfd.analyze(analysis);
 
         /* Output if needed. */
         if(printAlerts) {

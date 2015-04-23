@@ -27,28 +27,59 @@ import fr.labri.gumtree.matchers.Matcher;
 import fr.labri.gumtree.matchers.MatcherFactories;
 import fr.labri.gumtree.tree.Tree;
 
+/**
+ * A control class for performing control flow differencing and running a flow
+ * analysis on a source and destination file.
+ */
 public class ControlFlowDifferencing {
 	
+	/** Stores the CFG and AST for analysis. **/
+	private CFDContext context;
+	
+	List<FlowAnalysis<?>> analyses;
+
 	/**
-	 * Perform a control flow differencing analysis. Currently this method only
-	 * analyzes the destination file. Eventually a meta-analysis should be
-	 * implemented that can use the results from analyzing both the source and
-	 * destination files.
-	 * @param args The command line arguments (options) for the analysis.
-	 * @param analysis The analysis to run.
-	 * @return The list of alerts from the analysis.
-	 * @throws Exception
+	 * Creates the analysis context by control flow differencing the source
+	 * and destination files (provided as a string).
+	 * @param args The command line options (contains the paths to the source
+	 * 			   and destination files to difference).
+	 * @throws Exception thrown when a problem occurs during control flow differencing.
 	 */
-	public static List<Alert> analyze(String[] args, FlowAnalysis<?> analysis) throws Exception {
+	public ControlFlowDifferencing(String[] args) throws Exception {
+		this(args, null, null);
+	}
+	
+	/**
+	 * Creates the analysis context by control flow differencing the source
+	 * and destination files (provided as a string).
+	 * @param args The analysis/differencing options.
+	 * @param srcSourceCode The source file as a string.
+	 * @param dstSourceCode The destination file as a string.
+	 * @throws Exception thrown when a problem occurs during control flow differencing.
+	 */
+	public ControlFlowDifferencing(String[] args, String srcSourceCode, String dstSourceCode) throws Exception {
 
 		/* Get the analysis options. */
 		DiffOptions options = ControlFlowDifferencing.getAnalysisOptions(args);
 
 		/* Set up the analysis context. */
-		CFDContext context = ControlFlowDifferencing.setup(options);
+		this.context =  ControlFlowDifferencing.setup(options, srcSourceCode, dstSourceCode);
 		
+	}
+
+	/**
+	 * Perform a control flow differencing analysis. Currently this method only
+	 * analyzes the destination file. Eventually a meta-analysis should be
+	 * implemented that can use the results from analyzing both the source and
+	 * destination files.
+	 * @param analysis The analysis to run.
+	 * @return The list of alerts from the analysis.
+	 * @throws Exception
+	 */
+	public List<Alert> analyze(FlowAnalysis<?> analysis) throws Exception {
+
 		/* Analyze the destination file. */
-        analysis.analyze(context.dstScript, context.dstCFGs);
+        analysis.analyze(this.context.dstScript, this.context.dstCFGs);
 
         /* Return the results. */
         return analysis.getAlerts();
@@ -78,10 +109,24 @@ public class ControlFlowDifferencing {
 	 * @throws Exception
 	 */
 	public static CFDContext setup(DiffOptions options) throws Exception {
+		return setup(options, null, null);
+	}
+
+	/**
+	 * Compute the control flow changes.
+	 * @param options The command line analysis options.
+	 * @return The context for a control flow differencing analysis.
+	 * @throws Exception
+	 */
+	public static CFDContext setup(DiffOptions options, String srcSourceCode, String dstSourceCode) throws Exception {
 
         /* Create the abstract GumTree representations of the ASTs. */
-        Tree src = ControlFlowDifferencing.createGumTree(options.getSrc());
-        Tree dst = ControlFlowDifferencing.createGumTree(options.getDst());
+        Tree src = null;
+        Tree dst = null;
+        if(srcSourceCode == null) src = ControlFlowDifferencing.createGumTree(options.getSrc());
+        else src = ControlFlowDifferencing.createGumTree(srcSourceCode, options.getSrc());
+        if(dstSourceCode == null) dst = ControlFlowDifferencing.createGumTree(options.getDst());
+        else dst = ControlFlowDifferencing.createGumTree(dstSourceCode, options.getDst());
 
 		/* Match the source tree nodes to the destination tree nodes. */
         Matcher matcher = ControlFlowDifferencing.matchTreeNodes(src, dst);
@@ -134,7 +179,7 @@ public class ControlFlowDifferencing {
      * from the Rhino parser, so we need some language specific info from
      * RhinoTreeGenerator.
 	 * 
-	 * @param path The path to the source file.
+	 * @param file The file containing the source code.
 	 * @return The GumTree (AST) representation of the source file.
 	 * @throws IOException When something goes wrong reading the source file. 
 	 */
@@ -142,6 +187,26 @@ public class ControlFlowDifferencing {
 
         RhinoTreeGenerator rhinoTreeGenerator = new RhinoTreeGenerator();
         Tree tree = rhinoTreeGenerator.fromFile(new File(path).getAbsolutePath());
+        return tree;
+		
+	}
+	
+	/**
+	 * Create the abstract GumTree representation of the ASTs.
+	 * 
+	 * Note: GumTree would use TreeGeneratorRegistry here to build the src
+     * and dst trees. However, we're working with the JavaScript AstNodes
+     * from the Rhino parser, so we need some language specific info from
+     * RhinoTreeGenerator.
+	 * 
+	 * @param file The file containing the source code.
+	 * @return The GumTree (AST) representation of the source file.
+	 * @throws IOException When something goes wrong reading the source file. 
+	 */
+	public static Tree createGumTree(String source, String path) throws IOException {
+
+        RhinoTreeGenerator rhinoTreeGenerator = new RhinoTreeGenerator();
+        Tree tree = rhinoTreeGenerator.fromSource(source, path);
         return tree;
 		
 	}
