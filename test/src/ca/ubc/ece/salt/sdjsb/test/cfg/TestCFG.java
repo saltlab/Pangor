@@ -219,7 +219,7 @@ public class TestCFG extends TestCase {
 		expectedCFGs.add("SCRIPT_ENTRY(0){2},EXPR_RESULT(2){1},SCRIPT_EXIT(1){}");
 		expectedCFGs.add("FUNCTION_ENTRY(3){5},VAR(5){6},TRY(6){err:9,11},EXPR_VOID(9){8},EXPR_VOID(11){12},EXPR_VOID(8){18,err:10},IF(12){x === Infinity:13,!(x === Infinity):14},RETURN(18){4},EMPTY(10){4},THROW(13){8},EMPTY(14){15},FUNCTION_EXIT(4){},EXPR_VOID(15){16},EMPTY(16){8}");
 		
-		this.runTest(file, expectedCFGs, Output.DOT);
+		this.runTest(file, expectedCFGs, Output.NONE);
 
 	}
 
@@ -230,9 +230,9 @@ public class TestCFG extends TestCase {
 		
 		List<String> expectedCFGs = new LinkedList<String>();
 		expectedCFGs.add("SCRIPT_ENTRY(0){2},EXPR_RESULT(2){1},SCRIPT_EXIT(1){}");
-		expectedCFGs.add("FUNCTION_ENTRY(3){5},VAR(5){6},TRY(6){err:9,11},EXPR_VOID(9){8},EXPR_VOID(11){12},EXPR_VOID(8){18,err:10},IF(12){x === Infinity:13,!(x === Infinity):14},RETURN(18){4},EMPTY(10){4},THROW(13){8},EMPTY(14){15},FUNCTION_EXIT(4){},EXPR_VOID(15){16},EMPTY(16){8}");
+		expectedCFGs.add("FUNCTION_ENTRY(3){5},TRY(5){err:8,10},EXPR_VOID(8){7},EXPR_VOID(10){7},EMPTY(7){err:9,11},EMPTY(9){4},EMPTY(11){4},FUNCTION_EXIT(4){}");
 		
-		this.runTest(file, expectedCFGs, Output.DOT);
+		this.runTest(file, expectedCFGs, Output.NONE);
 
 	}
 
@@ -242,10 +242,9 @@ public class TestCFG extends TestCase {
 		String file = "./test/input/cfg/conditional.js";
 		
 		List<String> expectedCFGs = new LinkedList<String>();
-		expectedCFGs.add("SCRIPT_ENTRY(0){2},EXPR_RESULT(2){1},SCRIPT_EXIT(1){}");
-		expectedCFGs.add("FUNCTION_ENTRY(3){5},VAR(5){6},TRY(6){err:9,11},EXPR_VOID(9){8},EXPR_VOID(11){12},EXPR_VOID(8){18,err:10},IF(12){x === Infinity:13,!(x === Infinity):14},RETURN(18){4},EMPTY(10){4},THROW(13){8},EMPTY(14){15},FUNCTION_EXIT(4){},EXPR_VOID(15){16},EMPTY(16){8}");
+		expectedCFGs.add("SCRIPT_ENTRY(0){2},VAR(2){1},SCRIPT_EXIT(1){}");
 		
-		this.runTest(file, expectedCFGs, Output.DOT);
+		this.runTest(file, expectedCFGs, Output.NONE);
 
 	}
 

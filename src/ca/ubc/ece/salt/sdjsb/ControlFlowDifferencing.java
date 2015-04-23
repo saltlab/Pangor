@@ -41,8 +41,11 @@ public class ControlFlowDifferencing {
 	 */
 	public static List<Alert> analyze(String[] args, FlowAnalysis<?> analysis) throws Exception {
 
+		/* Get the analysis options. */
+		DiffOptions options = ControlFlowDifferencing.getAnalysisOptions(args);
+
 		/* Set up the analysis context. */
-		CFDContext context = ControlFlowDifferencing.setup(args);
+		CFDContext context = ControlFlowDifferencing.setup(options);
 		
 		/* Analyze the destination file. */
         analysis.analyze(context.dstScript, context.dstCFGs);
@@ -51,17 +54,30 @@ public class ControlFlowDifferencing {
         return analysis.getAlerts();
 		
 	}
-
+	
 	/**
 	 * Compute the control flow changes.
-	 * @param args The command line arguments (options) for the analysis.
+	 * @param args The command line analysis arguments.
 	 * @return The context for a control flow differencing analysis.
-	 * @throws Exception
+	 * @throws Exception 
 	 */
 	public static CFDContext setup(String[] args) throws Exception {
 		
 		/* Get the analysis options. */
 		DiffOptions options = ControlFlowDifferencing.getAnalysisOptions(args);
+
+		/* Set up the analysis context. */
+		return ControlFlowDifferencing.setup(options);
+		
+	}
+
+	/**
+	 * Compute the control flow changes.
+	 * @param options The command line analysis options.
+	 * @return The context for a control flow differencing analysis.
+	 * @throws Exception
+	 */
+	public static CFDContext setup(DiffOptions options) throws Exception {
 
         /* Create the abstract GumTree representations of the ASTs. */
         Tree src = ControlFlowDifferencing.createGumTree(options.getSrc());
