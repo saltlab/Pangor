@@ -53,9 +53,12 @@ public class CFGDifferencing {
 		CFGNode srcExit = mapCFGNodes(srcCFG, dstASTMap);
 		CFGNode dstExit = mapCFGNodes(dstCFG, srcASTMap);
 		
-		/* Map the function and script exit tos. */
-		srcExit.setMappedNode(dstExit);
-		dstExit.setMappedNode(srcExit);
+		/* Map the function and script exit nodes. The function exit node may
+		 * not exist if all paths throw an exception. */
+		if(srcExit != null && dstExit != null) {
+            srcExit.setMappedNode(dstExit);
+            dstExit.setMappedNode(srcExit);
+		}
 		
 		/* Classify the edges as inserted, deleted or unchanged. */
 		classifyEdges(srcCFG, ChangeType.REMOVED);

@@ -4,6 +4,10 @@ import java.io.File;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -33,6 +37,7 @@ import org.eclipse.jgit.errors.MissingObjectException;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
+import ca.ubc.ece.salt.sdjsb.CFDTask;
 import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
 import ca.ubc.ece.salt.sdjsb.SDJSB;
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
@@ -213,7 +218,11 @@ public class GitProjectAnalysis {
         /* Run the analysis. */ 
         List<Alert> alerts;
         try {
-            alerts = cfd.analyze(new SpecialTypeAnalysis());
+        	ExecutorService executor = Executors.newSingleThreadExecutor();
+        	CFDTask task = new CFDTask(cfd, new SpecialTypeAnalysis());
+        	Future<List<Alert>> future = executor.submit(task);
+        	
+        	alerts = future.get(5, TimeUnit.SECONDS);
         }
         catch(Exception e) {
         	throw e;
