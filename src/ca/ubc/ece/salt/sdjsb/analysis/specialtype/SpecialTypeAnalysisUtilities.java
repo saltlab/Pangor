@@ -60,6 +60,20 @@ public class SpecialTypeAnalysisUtilities {
             return null;
         }
 	}
+	
+	/**
+	 * Returns the special type identified by the string literal.
+	 * @param stringLiteral
+	 * @return
+	 */
+	public static SpecialType getSpecialTypeString(StringLiteral stringLiteral) {
+		
+		switch(stringLiteral.getValue()) {
+		case "undefined":
+		
+		}
+		return null;
+	}
 
 	/**
 	 * @param condition the top level branch condition.
@@ -86,6 +100,27 @@ public class SpecialTypeAnalysisUtilities {
 				else if(getSpecialType(ie.getRight()) != null) {
 					specialType = getSpecialType(ie.getRight());
 					identifier = AnalysisUtilities.getIdentifier(ie.getLeft());
+				}
+				else {
+					/* Handle the 'typeof' case. */
+                     UnaryExpression ue = null;
+                     StringLiteral sl = null;
+
+					if(ie.getLeft() instanceof UnaryExpression && ie.getRight() instanceof StringLiteral) {
+						 ue = (UnaryExpression)ie.getLeft();
+						 sl = (StringLiteral)ie.getRight();
+					}
+					else if(ie.getRight() instanceof UnaryExpression && ie.getLeft() instanceof StringLiteral) {
+						 ue = (UnaryExpression)ie.getRight();
+						 sl = (StringLiteral)ie.getLeft();
+					}
+
+					if(ue != null && sl != null) {
+                         if(ue.getOperator() == Token.TYPEOF && sl.getValue().equals("undefined")) {
+                        	 specialType = SpecialType.UNDEFINED;
+                        	 identifier = AnalysisUtilities.getIdentifier(ue.getOperand());
+                         }
+					}
 				}
 
                 if(identifier != null && specialType != null) {
