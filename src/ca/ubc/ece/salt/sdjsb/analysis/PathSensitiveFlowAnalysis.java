@@ -43,7 +43,7 @@ public abstract class PathSensitiveFlowAnalysis<LE extends AbstractLatticeElemen
 		for(CFGEdge edge : cfg.getEntryNode().getEdges()) stack.add(new PathState(edge, this.entryValue((ScriptNode)cfg.getEntryNode().getStatement())));
 		
 		/* Break when the number of edges visited gets to 1 million. */
-		while(!stack.isEmpty() && edgesVisited < 1000000) {
+		while(!stack.isEmpty() && edgesVisited < 100000) {
 			
 			PathState state = stack.pop();
 			edgesVisited++;
@@ -60,6 +60,8 @@ public abstract class PathSensitiveFlowAnalysis<LE extends AbstractLatticeElemen
 				/* Increment the # of paths visited by one if we're at an exit node. */
 				if(edge.getTo().getEdges().size() == 0) {
 					pathsComplete++;
+					System.out.println("Paths Complete: " + pathsComplete);
+					System.out.println("Edges Visited: " + edgesVisited);
 				}
 				
                 /* If an edge has been visited on this path, don't visit it

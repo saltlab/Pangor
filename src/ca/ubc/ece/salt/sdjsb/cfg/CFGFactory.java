@@ -644,6 +644,13 @@ public class CFGFactory {
 			previousSubGraph = subGraph;
             
 		}
+		
+		/* Setup the default path if wasn't explicitly given in the switch statement. */
+		if(defaultEdge == null) {
+			CFGNode defaultPath = new CFGNode(new EmptyStatement());
+            defaultEdge = new CFGEdge(null, switchNode, new CFGNode(new EmptyStatement()));
+            cfg.addExitNode(defaultPath);
+		}
 
 		/* The false branch condition is the negation of the true branch 
 		 * condition. We give it the same change type label as the true

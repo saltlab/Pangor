@@ -113,7 +113,17 @@ public class GitProjectAnalysis {
 		List<DiffEntry> diffs = diffCommand.call();
 		
 		for(DiffEntry diff : diffs) {
+			
+			
 			if(diff.getOldPath().matches("^.*\\.js$") && diff.getNewPath().matches("^.*\\.js$")){
+
+                /* Skip jquery files. */
+                if(diff.getOldPath().matches("^.*jquery.*$") || diff.getNewPath().matches("^.*jquery.*$")) {
+                	System.err.println("Skipping jquery file: " + diff.getOldPath());
+                	continue;
+                }
+
+                System.err.println("Exploring:\nBuggy Revision: " + buggyRevision + "\nOld File: " + diff.getOldPath() + "\nBug Fixing Revision: " + bugFixingRevision + "\nNew File:" + diff.getNewPath());
                 String oldFile = this.fetchBlob(buggyRevision, diff.getOldPath());
                 String newFile = this.fetchBlob(bugFixingRevision, diff.getOldPath());
                 
@@ -209,6 +219,10 @@ public class GitProjectAnalysis {
         ControlFlowDifferencing cfd = null;
         try {
             cfd = new ControlFlowDifferencing(new String[] {"", ""}, oldFile, newFile);
+        }
+        catch(ArrayIndexOutOfBoundsException e) {
+        	System.err.println("ArrayIndexOutOfBoundsException: possibly caused by empty file.");
+        	return new LinkedList<Alert>();
         }
         catch(EvaluatorException e) {
         	System.err.println("Evaluator exception: " + e.getMessage());
