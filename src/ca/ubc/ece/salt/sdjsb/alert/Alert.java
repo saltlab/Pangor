@@ -88,5 +88,10 @@ public abstract class Alert {
 	public String toString() {
 		return this.type + "_" + this.subtype;
 	}
+	
+	@Override
+	public int hashCode() {
+		return this.getLongDescription().hashCode();
+	}
 
 }

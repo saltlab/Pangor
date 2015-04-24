@@ -2,8 +2,10 @@ package ca.ubc.ece.salt.sdjsb.batch;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -128,7 +130,7 @@ public class GitProjectAnalysis {
                 String newFile = this.fetchBlob(bugFixingRevision, diff.getOldPath());
                 
                 try {
-                	List<Alert> alertsFromAnalysis = GitProjectAnalysis.runSDJSB(oldFile, newFile);
+                	Set<Alert> alertsFromAnalysis = GitProjectAnalysis.runSDJSB(oldFile, newFile);
                 	for(Alert alertFromAnalysis : alertsFromAnalysis) {
                 		this.analysisResult.insert(new BatchAlert(alertFromAnalysis, bugFixingRevision, buggyRevision, diff.getOldPath(), diff.getNewPath()));
                 	}
@@ -140,7 +142,7 @@ public class GitProjectAnalysis {
                 	throw ignore;
                 }
                 catch(Error e) {
-                	System.err.println("Ignoring exception in ProjectAnalysis.runSDJSB.\nBuggy Revision: " + buggyRevision + "\nOld File: " + diff.getOldPath() + "\nBug Fixing Revision: " + bugFixingRevision + "\nNew File:" + diff.getNewPath());
+                	System.err.println("Ignoring error in ProjectAnalysis.runSDJSB.\nBuggy Revision: " + buggyRevision + "\nOld File: " + diff.getOldPath() + "\nBug Fixing Revision: " + bugFixingRevision + "\nNew File:" + diff.getNewPath());
                 	System.out.println(oldFile);
                 	System.out.println(newFile);
                 	throw e;
@@ -201,7 +203,7 @@ public class GitProjectAnalysis {
 	 * @param oldFile The buggy source code.
 	 * @param newFile The repaired source code.
 	 */
-	private static List<Alert> runSDJSB(String oldFile, String newFile) throws Exception {
+	private static Set<Alert> runSDJSB(String oldFile, String newFile) throws Exception {
 
         /* Analyze the files using SDJSB. */
         DiffOptions options = new DiffOptions();
@@ -222,11 +224,11 @@ public class GitProjectAnalysis {
         }
         catch(ArrayIndexOutOfBoundsException e) {
         	System.err.println("ArrayIndexOutOfBoundsException: possibly caused by empty file.");
-        	return new LinkedList<Alert>();
+        	return new HashSet<Alert>();
         }
         catch(EvaluatorException e) {
         	System.err.println("Evaluator exception: " + e.getMessage());
-        	return new LinkedList<Alert>();
+        	return new HashSet<Alert>();
         }
         catch(Exception e) {
         	throw e;
@@ -236,11 +238,11 @@ public class GitProjectAnalysis {
         }
         
         /* Run the analysis. */ 
-        List<Alert> alerts;
+        Set<Alert> alerts;
         ExecutorService executor = Executors.newSingleThreadExecutor();
         try {
         	CFDTask task = new CFDTask(cfd, new SpecialTypeAnalysis());
-        	Future<List<Alert>> future = executor.submit(task);
+        	Future<Set<Alert>> future = executor.submit(task);
         	
         	alerts = future.get(2, TimeUnit.SECONDS);
 //        	alerts = cfd.analyze(new SpecialTypeAnalysis());

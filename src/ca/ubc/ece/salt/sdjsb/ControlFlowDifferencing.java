@@ -6,6 +6,7 @@ import java.io.InvalidClassException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -76,7 +77,7 @@ public class ControlFlowDifferencing {
 	 * @return The list of alerts from the analysis.
 	 * @throws Exception
 	 */
-	public List<Alert> analyze(FlowAnalysis<?> analysis) throws Exception {
+	public Set<Alert> analyze(FlowAnalysis<?> analysis) throws Exception {
 
 		/* Analyze the destination file. */
         analysis.analyze(this.context.dstScript, this.context.dstCFGs);

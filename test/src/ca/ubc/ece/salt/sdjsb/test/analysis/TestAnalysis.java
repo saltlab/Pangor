@@ -1,6 +1,7 @@
 package ca.ubc.ece.salt.sdjsb.test.analysis;
 
 import java.util.List;
+import java.util.Set;
 
 import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
@@ -22,7 +23,7 @@ public class TestAnalysis extends TestCase {
 		ControlFlowDifferencing cfd = new ControlFlowDifferencing(args);
         
 		/* Run the analysis. */
-        List<Alert> actualAlerts = cfd.analyze(analysis);
+        Set<Alert> actualAlerts = cfd.analyze(analysis);
 
         /* Output if needed. */
         if(printAlerts) {
@@ -36,7 +37,7 @@ public class TestAnalysis extends TestCase {
 
 	}
 	
-	protected void check(List<Alert> actualAlerts, List<Alert> expectedAlerts) {
+	protected void check(Set<Alert> actualAlerts, List<Alert> expectedAlerts) {
 		/* Check that all the expected alerts are produced by SDJSB. */
 		for(Alert expected : expectedAlerts) {
 			assertTrue("SDJSB did not produce the alert \"" + expected.getLongDescription() + "\"", actualAlerts.contains(expected));

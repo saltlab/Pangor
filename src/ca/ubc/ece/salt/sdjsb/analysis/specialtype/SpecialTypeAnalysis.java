@@ -1,5 +1,6 @@
 package ca.ubc.ece.salt.sdjsb.analysis.specialtype;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -50,12 +51,51 @@ public class SpecialTypeAnalysis extends PathSensitiveFlowAnalysis<SpecialTypeLa
 
 		/* Add any special type checks to the lattice element. */
 		for(SpecialTypeCheck specialTypeCheck : visitor.getSpecialTypeChecks()) {
+
+			/* Is the identifier definitely a special type on this path or 
+			 * definitely not a special type on this path?
+			 */
 			if(specialTypeCheck.isSpecialType) {
-				sourceLE.specialTypes.put(specialTypeCheck.identifier, specialTypeCheck.specialType);
+				
+				/* Is the identifier already in the map? */
+				if(sourceLE.specialTypes.containsKey(specialTypeCheck.identifier)) {
+					
+					/* Add the special type to the list of types the
+					 * identifier could possibly be (based on the type check). */
+					List<SpecialType> couldBe = sourceLE.specialTypes.get(specialTypeCheck.identifier);
+					if(!couldBe.contains(specialTypeCheck.specialType)) couldBe.add(specialTypeCheck.specialType);
+
+				}
+				else {
+
+					/* Add the special type to the list of types the
+					 * identifier could possibly be (based on the type check). */
+					LinkedList<SpecialType> couldBe = new LinkedList<SpecialType>();
+					couldBe.add(specialTypeCheck.specialType);
+                    sourceLE.specialTypes.put(specialTypeCheck.identifier, couldBe);
+
+				}
 				System.out.println(specialTypeCheck.identifier + " is " + specialTypeCheck.specialType);
 			}
 			else {
-				sourceLE.nonSpecialTypes.put(specialTypeCheck.identifier, specialTypeCheck.specialType);
+
+				/* Is the identifier already in the map? */
+				if(sourceLE.nonSpecialTypes.containsKey(specialTypeCheck.identifier)) {
+
+					/* Add the special type to the list of types the
+					 * identifier could not possibly be (based on the type check). */
+					List<SpecialType> couldBe = sourceLE.nonSpecialTypes.get(specialTypeCheck.identifier);
+					if(!couldBe.contains(specialTypeCheck.specialType)) couldBe.add(specialTypeCheck.specialType);
+
+				}
+				else {
+
+					/* Add the special type to the list of types the
+					 * identifier could not possibly be (based on the type check). */
+					LinkedList<SpecialType> couldNotBe = new LinkedList<SpecialType>();
+					couldNotBe.add(specialTypeCheck.specialType);
+                    sourceLE.nonSpecialTypes.put(specialTypeCheck.identifier, couldNotBe);
+				}
 				System.out.println(specialTypeCheck.identifier + " is not " + specialTypeCheck.specialType);
 			}
 		}
@@ -67,25 +107,32 @@ public class SpecialTypeAnalysis extends PathSensitiveFlowAnalysis<SpecialTypeLa
 
 		AstNode statement = (AstNode)node.getStatement();
 		
-		/* Check if the statement has a moved or unchanged identifier use. */
+		/* Loop through the moved or unchanged identifiers that are used in
+		 * this statement. */
         Set<String> usedIdentifiers = SpecialTypeAnalysisUtilities.getUsedIdentifiers(statement);
-
         for(String identifier : sourceLE.nonSpecialTypes.keySet()) {
+
+        	/* Is the identifier in our "definitely not a special type" list? */
         	if(usedIdentifiers.contains(identifier)) {
         		
         		/* Check that this identifier hasn't been newly assigned to
         		 * the special type we are checking. */
         		SpecialType assignedTo = sourceLE.assignments.get(identifier);
-        		if(assignedTo != SpecialType.FALSEY && assignedTo != sourceLE.nonSpecialTypes.get(identifier)) {
-        		
-                    /* Trigger an alert! */
-                    this.registerAlert(new SpecialTypeAlert("STH", identifier, sourceLE.nonSpecialTypes.get(identifier)) );
+        		if(assignedTo != SpecialType.FALSEY) {
+        			
+        			List<SpecialType> specialTypes = sourceLE.nonSpecialTypes.get(identifier);
+        			for(SpecialType specialType : specialTypes) {
+        				
+        				if(assignedTo != specialType) {
+
+                            /* Trigger an alert! */
+                            this.registerAlert(new SpecialTypeAlert("STH", identifier, specialType) );
+        					
+        				}
+        				
+        			}
                    
         		}
-        		
-        		/* Remove the identifier so we don't log redundant alerts. */
-        		// We can't do this while we're looping through sourceLE elements! Also, we're already getting redundant elements from multiple paths.
-        		//sourceLE.nonSpecialTypes.remove(identifier);
 
         	}
         }

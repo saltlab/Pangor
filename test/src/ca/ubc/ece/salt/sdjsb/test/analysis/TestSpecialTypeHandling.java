@@ -29,6 +29,15 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 	}
 
 	@Test
+	public void testTypeOf() throws Exception {
+		String src = "./test/input/special_type_handling/sth_undefined_typeof_old.js";
+		String dst = "./test/input/special_type_handling/sth_undefined_typeof_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		expectedAlerts.add(new SpecialTypeAlert("STH", "a", SpecialType.UNDEFINED));
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	@Test
 	public void testUndefinedReturn() throws Exception{
 		String src = "./test/input/special_type_handling/sth_undefined_return_old.js";
 		String dst = "./test/input/special_type_handling/sth_undefined_return_new.js";
