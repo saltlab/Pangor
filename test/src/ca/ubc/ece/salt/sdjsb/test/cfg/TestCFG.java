@@ -248,4 +248,16 @@ public class TestCFG extends TestCase {
 
 	}
 
+	@Test
+	public void testEmptyStatementLoop() throws IOException {
+		
+		String file = "./test/input/cfg/Common_old.js";
+		
+		List<String> expectedCFGs = new LinkedList<String>();
+		expectedCFGs.add("SCRIPT_ENTRY(0){2},VAR(2){1},SCRIPT_EXIT(1){}");
+		
+		this.runTest(file, expectedCFGs, Output.DOT);
+
+	}
+
 }

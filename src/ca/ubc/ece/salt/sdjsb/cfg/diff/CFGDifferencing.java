@@ -8,8 +8,6 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
 
-import org.mozilla.javascript.ast.EmptyStatement;
-
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.cfg.CFG;
@@ -114,6 +112,10 @@ public class CFGDifferencing {
                         if(mappedKeySet.contains(key.getMappedNode())) {
                             labelEdgesOnPath(toNonEmpty.get(key), ChangeType.UNCHANGED);
                         }
+                        /* If we end on an empty node, the change type is unknown. */
+                        else if(key.getStatement().isEmpty()) {
+                        	labelEdgesOnPath(toNonEmpty.get(key), ChangeType.UNKNOWN);
+                        }
                         /* Otherwise, the path is changed. */
                         else {
                             labelEdgesOnPath(toNonEmpty.get(key), changeType);
@@ -161,44 +163,56 @@ public class CFGDifferencing {
 	}
 	
 	/**
-	 * Recursively find the paths to the next non-empty tos.
-	 * @param stack the current path from the root CFGNode.
+	 * Recursively find the paths to the next non-empty nodes.
+	 * 
+	 * Empty nodes include branch conditions and empty statements. One
+	 * limitation of this current implementation is that actions might still
+	 * be performed within a branch condition (e.g., while(i--)).
+	 * 
+	 * @param current The current node we are investigating.
+	 * @param path The current path from the root CFGNode.
 	 */
 	private static Map<CFGNode, Stack<CFGEdge>> getPathsToNext (CFGNode current, Stack<CFGEdge> path) {
 		
-		/* The paths to non-empty tos. */
+		/* The paths to non-empty nodes. */
         Map<CFGNode, Stack<CFGEdge>> paths = new HashMap<CFGNode, Stack<CFGEdge>>();
 		
         for(CFGEdge edge : current.getEdges()) {
         	
         	CFGNode to = edge.getTo();
+
+            @SuppressWarnings("unchecked")
+            Stack<CFGEdge> newPath = (Stack<CFGEdge>) path.clone();
+            newPath.add(edge);
 		
             if(to.getName().equals("FUNCTION_EXIT") || to.getName().equals("SCRIPT_EXIT")) {
 
-                /* Function exit tos are considered non-empty. */
-            	@SuppressWarnings("unchecked")
-				Stack<CFGEdge> newPath = (Stack<CFGEdge>) path.clone();
-                newPath.add(edge);
+                /* Function exit nodes are considered non-empty. */
                 paths.put(to, newPath);
 
             }
-            else if(!(to.getStatement() instanceof EmptyStatement)) {
+            else if(!(to.getStatement().isEmpty())) {
 
                 /* Add the path for the non-empty to. */
-                @SuppressWarnings("unchecked")
-				Stack<CFGEdge> newPath = (Stack<CFGEdge>) path.clone();
-                newPath.add(edge);
                 paths.put(to, newPath);
 
             }	
             else {
+            	
+            	/* We need to check for duplicate nodes because edges can also
+            	 * perform actions (e.g., while(i--)). */
+            	if(path.contains(edge)) {
+            		/* We're in an infinite loop (probably because of an
+            		 * action in an edge condition. For now we'll just break
+            		 * the loop. A lower level IR might help mitigate this. */
+            		paths.put(to, newPath);
+            	}
+            	else {
+                    /* Add this to to the stack and recurse */
+                    Map<CFGNode, Stack<CFGEdge>> subPaths = getPathsToNext(edge.getTo(), newPath);
+                    paths.putAll(subPaths);
+            	}
                 
-                /* Add this to to the stack and recurse */
-                @SuppressWarnings("unchecked")
-				Stack<CFGEdge> newPath = (Stack<CFGEdge>) path.clone();
-                newPath.add(edge);
-                Map<CFGNode, Stack<CFGEdge>> subPaths = getPathsToNext(edge.getTo(), newPath);
-                paths.putAll(subPaths);
                 
             }
 

@@ -122,6 +122,12 @@ public class GitProjectAnalysis {
                 	System.out.println(newFile);
                 	throw ignore;
                 }
+                catch(Error e) {
+                	System.err.println("Ignoring exception in ProjectAnalysis.runSDJSB.\nBuggy Revision: " + buggyRevision + "\nOld File: " + diff.getOldPath() + "\nBug Fixing Revision: " + bugFixingRevision + "\nNew File:" + diff.getNewPath());
+                	System.out.println(oldFile);
+                	System.out.println(newFile);
+                	throw e;
+                }
 			}
 		}
 		
