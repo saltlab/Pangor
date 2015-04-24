@@ -216,4 +216,12 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 
+	@Test
+	public void testInfiniteLoop() throws Exception {
+		String src = "./test/input/cfg_diff/CLI_1_old.js";
+		String dst = "./test/input/cfg_diff/CLI_1_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
 }

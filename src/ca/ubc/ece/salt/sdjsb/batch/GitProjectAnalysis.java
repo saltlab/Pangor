@@ -8,6 +8,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -36,6 +37,7 @@ import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+import org.mozilla.javascript.EvaluatorException;
 
 import ca.ubc.ece.salt.sdjsb.CFDTask;
 import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
@@ -208,6 +210,10 @@ public class GitProjectAnalysis {
         try {
             cfd = new ControlFlowDifferencing(new String[] {"", ""}, oldFile, newFile);
         }
+        catch(EvaluatorException e) {
+        	System.err.println("Evaluator exception: " + e.getMessage());
+        	return new LinkedList<Alert>();
+        }
         catch(Exception e) {
         	throw e;
 //        	System.err.println("Error while differencing the files.");
@@ -217,18 +223,28 @@ public class GitProjectAnalysis {
         
         /* Run the analysis. */ 
         List<Alert> alerts;
+        ExecutorService executor = Executors.newSingleThreadExecutor();
         try {
-        	ExecutorService executor = Executors.newSingleThreadExecutor();
         	CFDTask task = new CFDTask(cfd, new SpecialTypeAnalysis());
         	Future<List<Alert>> future = executor.submit(task);
         	
-        	alerts = future.get(5, TimeUnit.SECONDS);
+        	alerts = future.get(2, TimeUnit.SECONDS);
+//        	alerts = cfd.analyze(new SpecialTypeAnalysis());
+
+        }
+        catch(TimeoutException e) {
+        	System.err.println("Timeout occurred.");
+        	throw e;
+//        	return new LinkedList<Alert>();
         }
         catch(Exception e) {
         	throw e;
 //        	System.err.println("Error while analyzing the files.");
 //        	System.err.println(e.getMessage());
 //        	return null;
+        }
+        finally {
+        	executor.shutdownNow();
         }
         
         return alerts;
