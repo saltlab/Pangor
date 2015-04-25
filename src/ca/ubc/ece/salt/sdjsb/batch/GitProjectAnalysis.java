@@ -45,6 +45,7 @@ import ca.ubc.ece.salt.sdjsb.CFDTask;
 import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
 import ca.ubc.ece.salt.sdjsb.SDJSB;
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
+import ca.ubc.ece.salt.sdjsb.analysis.notdefined.NotDefinedAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysis;
 import fr.labri.gumtree.client.DiffOptions;
 
@@ -232,32 +233,25 @@ public class GitProjectAnalysis {
         }
         catch(Exception e) {
         	throw e;
-//        	System.err.println("Error while differencing the files.");
-//        	System.err.println(e.getMessage());
-//        	return null;
         }
         
         /* Run the analysis. */ 
         Set<Alert> alerts;
         ExecutorService executor = Executors.newSingleThreadExecutor();
         try {
-        	CFDTask task = new CFDTask(cfd, new SpecialTypeAnalysis());
+//        	CFDTask task = new CFDTask(cfd, new SpecialTypeAnalysis());
+        	CFDTask task = new CFDTask(cfd, new NotDefinedAnalysis());
         	Future<Set<Alert>> future = executor.submit(task);
         	
-        	alerts = future.get(2, TimeUnit.SECONDS);
-//        	alerts = cfd.analyze(new SpecialTypeAnalysis());
+        	alerts = future.get(10, TimeUnit.SECONDS);
 
         }
         catch(TimeoutException e) {
         	System.err.println("Timeout occurred.");
         	throw e;
-//        	return new LinkedList<Alert>();
         }
         catch(Exception e) {
         	throw e;
-//        	System.err.println("Error while analyzing the files.");
-//        	System.err.println(e.getMessage());
-//        	return null;
         }
         finally {
         	executor.shutdownNow();

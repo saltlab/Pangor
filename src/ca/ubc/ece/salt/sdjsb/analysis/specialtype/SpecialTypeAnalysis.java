@@ -11,6 +11,7 @@ import org.mozilla.javascript.ast.ScriptNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert;
 import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert.SpecialType;
+import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;
 import ca.ubc.ece.salt.sdjsb.analysis.PathSensitiveFlowAnalysis;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGEdge;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
@@ -109,7 +110,7 @@ public class SpecialTypeAnalysis extends PathSensitiveFlowAnalysis<SpecialTypeLa
 		
 		/* Loop through the moved or unchanged identifiers that are used in
 		 * this statement. */
-        Set<String> usedIdentifiers = SpecialTypeAnalysisUtilities.getUsedIdentifiers(statement);
+        Set<String> usedIdentifiers = AnalysisUtilities.getUsedIdentifiers(statement);
         for(String identifier : sourceLE.nonSpecialTypes.keySet()) {
 
         	/* Is the identifier in our "definitely not a special type" list? */

@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.analysis.specialtype;
+package ca.ubc.ece.salt.sdjsb.analysis;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,10 +16,10 @@ import org.mozilla.javascript.ast.ObjectProperty;
 import org.mozilla.javascript.ast.VariableInitializer;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;
+import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysisUtilities;
 
 /**
- * A visitor for finding identifier uses.
+ * A visitor for finding identifier uses that were either moved or unchanged.
  * 
  * An identifier is used if it is passed as an argument, if one one of its
  * fields or methods are accessed or if it is dereferenced in an expression.

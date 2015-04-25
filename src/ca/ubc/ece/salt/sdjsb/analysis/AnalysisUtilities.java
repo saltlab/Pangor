@@ -1,6 +1,7 @@
 package ca.ubc.ece.salt.sdjsb.analysis;
 
 import java.util.List;
+import java.util.Set;
 
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
@@ -286,5 +287,18 @@ public class AnalysisUtilities {
         }
         return false;
     }
+
+	/**
+	 * Generates a list of identifiers that were used in the tree.
+	 * @param node the tree to look for uses in.
+	 * @return the list of identifiers that were used in the tree.
+	 */
+	public static Set<String> getUsedIdentifiers(AstNode node) {
+
+        UseTreeVisitor useVisitor = new UseTreeVisitor();
+        node.visit(useVisitor);
+        return useVisitor.getUsedIdentifiers();
+        
+	}
 
 }

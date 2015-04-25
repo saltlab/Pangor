@@ -157,9 +157,15 @@ public class SpecialTypeAnalysisUtilities {
 		else {
 			
 			String identifier = AnalysisUtilities.getIdentifier(node);
-			
+
 			if(identifier != null) {
 				BranchesOn branchesOn;
+
+				/* There are many false positive falsey identifiers due to
+				 * incorrect GumTree matching. Most of these are callback error
+				 * checks and callback checks. Filter these out.
+				 */
+                if(identifier.matches("e|err|error|cb|callback")) return null; 
 				
                 if(node == condition) branchesOn = BranchesOn.TRUE;
                 else branchesOn = SpecialTypeAnalysisUtilities.branchesOn(condition, node.getParent());
@@ -282,19 +288,6 @@ public class SpecialTypeAnalysisUtilities {
 		TRUE,
 		FALSE,
 		UNKNOWN
-	}
-
-	/**
-	 * Generates a list of identifiers that were used in the tree.
-	 * @param node the tree to look for uses in.
-	 * @return the list of identifiers that were used in the tree.
-	 */
-	public static Set<String> getUsedIdentifiers(AstNode node) {
-
-        UseTreeVisitor useVisitor = new UseTreeVisitor();
-        node.visit(useVisitor);
-        return useVisitor.getUsedIdentifiers();
-        
 	}
 	
 	/**

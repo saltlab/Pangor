@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.test;
+package ca.ubc.ece.salt.sdjsb.test.analysis;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -7,17 +7,19 @@ import org.junit.Test;
 
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
 import ca.ubc.ece.salt.sdjsb.alert.NotDefinedAlert;
+import ca.ubc.ece.salt.sdjsb.analysis.FlowAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.notdefined.NotDefinedAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.notdefined.NotDefinedLatticeElement;
 
-public class TestNotDefined extends TestSDJSB {
+public class TestNotDefined extends TestAnalysis {
 	
-	private void runTest(String[] args, List<Alert> expectedAlerts, boolean printAlerts) {
-		List<String> checkers = new LinkedList<String>();
-		checkers.add("ca.ubc.ece.salt.sdjsb.checker.notdefined.NotDefinedChecker");
-		super.runTest(args, checkers, expectedAlerts, printAlerts);
+	private void runTest(String[] args, List<Alert> expectedAlerts, boolean printAlerts) throws Exception {
+		FlowAnalysis<NotDefinedLatticeElement> analysis = new NotDefinedAnalysis();
+		super.runTest(args, expectedAlerts, printAlerts, analysis);
 	}
-	
+
 	@Test
-	public void testNotDefined(){
+	public void testNotDefined() throws Exception{
 		String src = "./test/input/not_defined/nd_old.js";
 		String dst = "./test/input/not_defined/nd_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
@@ -26,7 +28,7 @@ public class TestNotDefined extends TestSDJSB {
 	}
 
 	@Test
-	public void testFieldAccess(){
+	public void testFieldAccess() throws Exception {
 		String src = "./test/input/not_defined/nd_field_old.js";
 		String dst = "./test/input/not_defined/nd_field_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
@@ -35,7 +37,7 @@ public class TestNotDefined extends TestSDJSB {
 	}
 
 	@Test
-	public void testUsedVariable(){
+	public void testUsedVariable() throws Exception {
 		String src = "./test/input/not_defined/nd_used_variable_old.js";
 		String dst = "./test/input/not_defined/nd_used_variable_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
@@ -43,7 +45,7 @@ public class TestNotDefined extends TestSDJSB {
 	}
 
 	@Test
-	public void testUsedField(){
+	public void testUsedField() throws Exception {
 		String src = "./test/input/not_defined/nd_used_field_old.js";
 		String dst = "./test/input/not_defined/nd_used_field_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
@@ -51,7 +53,7 @@ public class TestNotDefined extends TestSDJSB {
 	}
 
 	@Test
-	public void testUsedCall(){
+	public void testUsedCall() throws Exception {
 		String src = "./test/input/not_defined/nd_used_call_old.js";
 		String dst = "./test/input/not_defined/nd_used_call_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
@@ -59,11 +61,12 @@ public class TestNotDefined extends TestSDJSB {
 	}
 
 	@Test
-	public void testCallField(){
+	public void testCallField() throws Exception {
 		String src = "./test/input/not_defined/CliUx_old.js";
 		String dst = "./test/input/not_defined/CliUx_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
+
 
 }
