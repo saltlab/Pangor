@@ -43,7 +43,6 @@ import org.mozilla.javascript.EvaluatorException;
 
 import ca.ubc.ece.salt.sdjsb.CFDTask;
 import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
-import ca.ubc.ece.salt.sdjsb.SDJSB;
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
 import ca.ubc.ece.salt.sdjsb.analysis.notdefined.NotDefinedAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysis;
@@ -258,7 +257,6 @@ public class GitProjectAnalysis {
         }
         
         return alerts;
-        //return SDJSB.analyze(options, oldFile, newFile);
 	}
 	
 	/**

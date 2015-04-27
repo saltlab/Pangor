@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.analysis;
+package ca.ubc.ece.salt.sdjsb.analysis.flow;
 
 import java.util.LinkedList;
 import java.util.List;

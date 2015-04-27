@@ -18,6 +18,8 @@ import org.mozilla.javascript.ast.ParenthesizedExpression;
 import org.mozilla.javascript.ast.WhileLoop;
 
 import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert.SpecialType;
+import ca.ubc.ece.salt.sdjsb.analysis.flow.IdentifiersTreeVisitor;
+import ca.ubc.ece.salt.sdjsb.analysis.flow.UseTreeVisitor;
 import ca.ubc.ece.salt.sdjsb.checker.specialtype.SpecialTypeCheckerUtilities;
 
 public class AnalysisUtilities {

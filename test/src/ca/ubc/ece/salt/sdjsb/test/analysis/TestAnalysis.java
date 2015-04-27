@@ -5,7 +5,7 @@ import java.util.Set;
 
 import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
-import ca.ubc.ece.salt.sdjsb.analysis.FlowAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.Analysis;
 import junit.framework.TestCase;
 
 public class TestAnalysis extends TestCase {
@@ -17,7 +17,7 @@ public class TestAnalysis extends TestCase {
 	 * @param printAlerts If true, print the alerts to standard output.
 	 * @throws Exception 
 	 */
-	protected void runTest(String[] args, List<Alert> expectedAlerts, boolean printAlerts, FlowAnalysis<?> analysis) throws Exception {
+	protected void runTest(String[] args, List<Alert> expectedAlerts, boolean printAlerts, Analysis analysis) throws Exception {
 		
 		/* Control flow difference the files. */
 		ControlFlowDifferencing cfd = new ControlFlowDifferencing(args);

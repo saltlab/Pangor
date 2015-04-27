@@ -3,7 +3,7 @@ package ca.ubc.ece.salt.sdjsb.analysis.notdefined;
 import java.util.HashSet;
 import java.util.Set;
 
-import ca.ubc.ece.salt.sdjsb.analysis.AbstractLatticeElement;
+import ca.ubc.ece.salt.sdjsb.analysis.flow.AbstractLatticeElement;
 
 public class NotDefinedLatticeElement extends AbstractLatticeElement {
 

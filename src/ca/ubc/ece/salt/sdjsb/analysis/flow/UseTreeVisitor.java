@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.analysis;
+package ca.ubc.ece.salt.sdjsb.analysis.flow;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -16,6 +16,7 @@ import org.mozilla.javascript.ast.ObjectProperty;
 import org.mozilla.javascript.ast.VariableInitializer;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysisUtilities;
 
 /**

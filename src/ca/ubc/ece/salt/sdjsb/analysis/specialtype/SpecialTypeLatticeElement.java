@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert.SpecialType;
-import ca.ubc.ece.salt.sdjsb.analysis.AbstractLatticeElement;
+import ca.ubc.ece.salt.sdjsb.analysis.flow.AbstractLatticeElement;
 
 /**
  * A SpecialTypeLatticeElement

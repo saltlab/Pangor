@@ -15,7 +15,8 @@ import org.mozilla.javascript.ast.AstRoot;
 import ca.ubc.ece.salt.gumtree.ast.ASTClassifier;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
-import ca.ubc.ece.salt.sdjsb.analysis.FlowAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.Analysis;
+import ca.ubc.ece.salt.sdjsb.analysis.flow.FlowAnalysis;
 import ca.ubc.ece.salt.sdjsb.cfg.CFG;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGFactory;
 import ca.ubc.ece.salt.sdjsb.cfg.diff.CFGDifferencing;
@@ -77,10 +78,10 @@ public class ControlFlowDifferencing {
 	 * @return The list of alerts from the analysis.
 	 * @throws Exception
 	 */
-	public Set<Alert> analyze(FlowAnalysis<?> analysis) throws Exception {
+	public Set<Alert> analyze(Analysis analysis) throws Exception {
 
-		/* Analyze the destination file. */
-        analysis.analyze(this.context.dstScript, this.context.dstCFGs);
+		/* Perform the analysis. */
+        analysis.analyze(this.context.srcScript, this.context.srcCFGs, this.context.dstScript, this.context.dstCFGs);
 
         /* Return the results. */
         return analysis.getAlerts();

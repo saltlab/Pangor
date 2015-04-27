@@ -3,16 +3,18 @@ package ca.ubc.ece.salt.sdjsb.analysis.specialtype;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.ScriptNode;
 
+import ca.ubc.ece.salt.sdjsb.analysis.flow.Scope;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert;
 import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert.SpecialType;
 import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;
-import ca.ubc.ece.salt.sdjsb.analysis.PathSensitiveFlowAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.flow.PathSensitiveFlowAnalysis;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGEdge;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
 
@@ -40,7 +42,7 @@ public class SpecialTypeAnalysis extends PathSensitiveFlowAnalysis<SpecialTypeLa
 	}
 
 	@Override
-	public void transfer(CFGEdge edge, SpecialTypeLatticeElement sourceLE) {
+	public void transfer(CFGEdge edge, SpecialTypeLatticeElement sourceLE, Stack<Scope> scopeStack) {
 
 		AstNode condition = (AstNode)edge.getCondition();
 		if(condition == null) return;
@@ -104,7 +106,7 @@ public class SpecialTypeAnalysis extends PathSensitiveFlowAnalysis<SpecialTypeLa
 	}
 
 	@Override
-	public void transfer(CFGNode node, SpecialTypeLatticeElement sourceLE) {
+	public void transfer(CFGNode node, SpecialTypeLatticeElement sourceLE, Stack<Scope> scopeStack) {
 
 		AstNode statement = (AstNode)node.getStatement();
 		
@@ -127,7 +129,7 @@ public class SpecialTypeAnalysis extends PathSensitiveFlowAnalysis<SpecialTypeLa
         				if(assignedTo != specialType) {
 
                             /* Trigger an alert! */
-                            this.registerAlert(new SpecialTypeAlert("STH", identifier, specialType) );
+                            this.registerAlert(scopeStack.peek().scope, new SpecialTypeAlert("STH", identifier, specialType) );
         					
         				}
         				

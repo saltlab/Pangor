@@ -1,15 +1,11 @@
-package ca.ubc.ece.salt.sdjsb.analysis;
+package ca.ubc.ece.salt.sdjsb.analysis.flow;
 
-import java.util.Set;
 import java.util.Stack;
 
-import org.mozilla.javascript.ast.AstNode;
-import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.sdjsb.cfg.CFG;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGEdge;
-import ca.ubc.ece.salt.sdjsb.cfg.CFGPrinter;
 
 /**
  * A path sensitive flow analysis.
@@ -33,7 +29,7 @@ public abstract class PathSensitiveFlowAnalysis<LE extends AbstractLatticeElemen
 	 * @param scopeStack the scope for the function.
 	 */
 	@Override
-	protected void analyze(CFG cfg, Stack<Set<Name>> scopeStack) {
+	protected void analyze(CFG cfg, Stack<Scope> scopeStack) {
 		
 		long pathsComplete = 0;
 		long edgesVisited = 0;
@@ -42,17 +38,17 @@ public abstract class PathSensitiveFlowAnalysis<LE extends AbstractLatticeElemen
 		Stack<PathState> stack = new Stack<PathState>();
 		for(CFGEdge edge : cfg.getEntryNode().getEdges()) stack.add(new PathState(edge, this.entryValue((ScriptNode)cfg.getEntryNode().getStatement())));
 		
-		/* Break when the number of edges visited gets to 1 million. */
+		/* Break when the number of edges visited reaches some limit. */
 		while(!stack.isEmpty() && edgesVisited < 100000) {
 			
 			PathState state = stack.pop();
 			edgesVisited++;
 			
 			/* Transfer over the edge. */
-			this.transfer(state.edge, state.le);
+			this.transfer(state.edge, state.le, scopeStack);
 			
 			/* Transfer over the node. */
-			this.transfer(state.edge.getTo(), state.le);
+			this.transfer(state.edge.getTo(), state.le, scopeStack);
 			
 			/* Push the new edges onto the stack. */
 			for(CFGEdge edge : state.edge.getTo().getEdges()) {

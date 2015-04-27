@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
 import ca.ubc.ece.salt.sdjsb.alert.NotDefinedAlert;
-import ca.ubc.ece.salt.sdjsb.analysis.FlowAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.flow.FlowAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.notdefined.NotDefinedAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.notdefined.NotDefinedLatticeElement;
 

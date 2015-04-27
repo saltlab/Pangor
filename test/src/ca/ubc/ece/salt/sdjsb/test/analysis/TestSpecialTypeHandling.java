@@ -8,7 +8,7 @@ import org.junit.Test;
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
 import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert;
 import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert.SpecialType;
-import ca.ubc.ece.salt.sdjsb.analysis.FlowAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.flow.FlowAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeLatticeElement;
 

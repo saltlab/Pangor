@@ -2,6 +2,7 @@ package ca.ubc.ece.salt.sdjsb.analysis.notdefined;
 
 import java.util.List;
 import java.util.Set;
+import java.util.Stack;
 
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.Name;
@@ -9,10 +10,10 @@ import org.mozilla.javascript.ast.ScriptNode;
 import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.VariableInitializer;
 
+import ca.ubc.ece.salt.sdjsb.analysis.flow.Scope;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.alert.NotDefinedAlert;
-import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;
-import ca.ubc.ece.salt.sdjsb.analysis.PathSensitiveFlowAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.flow.PathSensitiveFlowAnalysis;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGEdge;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
 
@@ -24,7 +25,7 @@ public class NotDefinedAnalysis extends PathSensitiveFlowAnalysis<NotDefinedLatt
 	}
 
 	@Override
-	public void transfer(CFGEdge edge, NotDefinedLatticeElement sourceLE) {
+	public void transfer(CFGEdge edge, NotDefinedLatticeElement sourceLE, Stack<Scope> scopeStack) {
 
 		AstNode statement = (AstNode)edge.getCondition();
 		
@@ -39,7 +40,7 @@ public class NotDefinedAnalysis extends PathSensitiveFlowAnalysis<NotDefinedLatt
 			
             /* Trigger an alert! */
 			if(sourceLE.inserted.contains(usedIdentifier) && !sourceLE.deleted.contains(usedIdentifier)) {
-				this.registerAlert(new NotDefinedAlert("ND", usedIdentifier));
+				this.registerAlert(scopeStack.peek().scope, new NotDefinedAlert("ND", usedIdentifier));
 			}
 			
 		}
@@ -47,7 +48,7 @@ public class NotDefinedAnalysis extends PathSensitiveFlowAnalysis<NotDefinedLatt
 	}
 
 	@Override
-	public void transfer(CFGNode node, NotDefinedLatticeElement sourceLE) {
+	public void transfer(CFGNode node, NotDefinedLatticeElement sourceLE, Stack<Scope> scopeStack) {
 		
 		AstNode statement = (AstNode)node.getStatement();
 
@@ -93,7 +94,7 @@ public class NotDefinedAnalysis extends PathSensitiveFlowAnalysis<NotDefinedLatt
 			
             /* Trigger an alert! */
 			if(sourceLE.inserted.contains(usedIdentifier) && !sourceLE.deleted.contains(usedIdentifier)) {
-				this.registerAlert(new NotDefinedAlert("ND", usedIdentifier));
+				this.registerAlert(scopeStack.peek().scope, new NotDefinedAlert("ND", usedIdentifier));
 			}
 			
 		}
