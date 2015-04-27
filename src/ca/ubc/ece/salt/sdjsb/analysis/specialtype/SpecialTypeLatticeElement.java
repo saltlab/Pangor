@@ -42,17 +42,17 @@ public class SpecialTypeLatticeElement extends AbstractLatticeElement{
 	public Map<String, SpecialType> assignments;
 	
 	public SpecialTypeLatticeElement() {
+		super();
 		this.specialTypes = new HashMap<String, List<SpecialType>>();
 		this.nonSpecialTypes = new HashMap<String, List<SpecialType>>();
 		this.assignments = new HashMap<String, SpecialType>();
-		this.visitedEdges = new HashMap<Long, Integer>();
 	}
 
 	public SpecialTypeLatticeElement(Map<String, List<SpecialType>> specialTypes, Map<String, List<SpecialType>> nonSpecialTypes, Map<String, SpecialType> assignments, Map<Long, Integer> visitedEdges) {
+		super(visitedEdges);
 		this.specialTypes = specialTypes;
 		this.nonSpecialTypes = nonSpecialTypes;
 		this.assignments = assignments;
-		this.visitedEdges = visitedEdges;
 	}
 	
 	/**

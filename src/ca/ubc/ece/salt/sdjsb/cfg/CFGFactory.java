@@ -286,7 +286,7 @@ public class CFGFactory {
 			trueBranch.addExitNode(empty);
 		}
 		
-		whileNode.addEdge(new CFGEdge(whileLoop.getCondition(), whileNode, trueBranch.getEntryNode()));
+		whileNode.addEdge(new CFGEdge(whileLoop.getCondition(), whileNode, trueBranch.getEntryNode(), true));
 
         /* Propagate return and throw nodes. */
         cfg.addAllReturnNodes(trueBranch.getReturnNodes());
@@ -363,7 +363,7 @@ public class CFGFactory {
         }
 		
 		/* Add edge for true condition back to the start of the loop. */
-		whileNode.addEdge(doLoop.getCondition(), doNode);
+		whileNode.addEdge(doLoop.getCondition(), doNode, true);
 		
 		/* Add edge for false condition. */
 
@@ -411,7 +411,7 @@ public class CFGFactory {
 			trueBranch.addExitNode(empty);
 		}
 		
-		condition.addEdge(forLoop.getCondition(), trueBranch.getEntryNode());
+		condition.addEdge(forLoop.getCondition(), trueBranch.getEntryNode(), true);
 
         /* Propagate return and throw nodes. */
         cfg.addAllReturnNodes(trueBranch.getReturnNodes());
@@ -512,7 +512,7 @@ public class CFGFactory {
 		/* Add the edges connecting the entry point to the assignment and
 		 * assignment to condition. */
         forInNode.addEdge(null, condition);
-        condition.addEdge(new CFGEdge(keyConditionFunction, condition, assignment));
+        condition.addEdge(new CFGEdge(keyConditionFunction, condition, assignment, true));
 		
         /* Create the CFG for the loop body. */
 		

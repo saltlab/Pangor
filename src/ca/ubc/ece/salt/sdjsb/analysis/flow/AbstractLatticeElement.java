@@ -13,6 +13,10 @@ public abstract class AbstractLatticeElement {
 	 */
 	protected Map<Long, Integer> visitedEdges;
 	
+	public AbstractLatticeElement(Map<Long, Integer> visitedEdges) {
+		this.visitedEdges = visitedEdges;
+	}
+	
 	public AbstractLatticeElement() {
 		this.visitedEdges = new HashMap<Long, Integer>();
 	}

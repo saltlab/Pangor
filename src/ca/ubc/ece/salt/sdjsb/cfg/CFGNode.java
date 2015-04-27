@@ -29,6 +29,9 @@ public class CFGNode {
 	/** The corresponding source or destination CFGNode. */
 	private CFGNode mappedNode;
 	
+	/** A semaphore for counting the edges in and visits. */
+	private int edgesIn;
+	
 	/** 
 	
 	/**
@@ -41,6 +44,7 @@ public class CFGNode {
 		this.id = CFGNode.getUniqueId();
 		this.name = null;
 		this.setMappedNode(null);
+		this.edgesIn = 0;
 	}
 	
 	/**
@@ -53,6 +57,23 @@ public class CFGNode {
 		this.statement = statement;
 		this.id = CFGNode.getUniqueId();
 		this.name = name;
+		this.edgesIn = 0;
+	}
+	
+	/**
+	 * Add one to the number of edges going into the node.
+	 */
+	public void incrementEdges() {
+		this.edgesIn++;
+	}
+	
+	/**
+	 * Subtract one from the number of edges going into the node.
+	 * @return true if the decrement reaches 0.
+	 */
+	public boolean decrementEdges() {
+		this.edgesIn--;
+		return this.edgesIn == 0;
 	}
 	
 	/**
@@ -69,6 +90,23 @@ public class CFGNode {
 		}
 		else {
             this.edges.add(new CFGEdge(condition, this, node));
+		}
+	}
+
+	/**
+	 * Add an edge to this node. If an edge with the same condition already
+	 * exists, that edge will be overwritten. 
+	 * @param condition The condition for which we traverse the edge.
+	 * @param node The node at the other end of this edge.
+	 */
+	public void addEdge(ClassifiedASTNode condition, CFGNode node, boolean loopEdge) {
+		CFGEdge edge = new CFGEdge(condition, this, node, loopEdge);
+		int index = this.edges.indexOf(edge);
+		if(index >= 0) {
+			this.edges.get(index).setTo(node);
+		}
+		else {
+            this.edges.add(new CFGEdge(condition, this, node, loopEdge));
 		}
 	}
 	

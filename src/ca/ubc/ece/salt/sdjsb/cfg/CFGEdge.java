@@ -1,5 +1,7 @@
 package ca.ubc.ece.salt.sdjsb.cfg;
 
+import org.mozilla.javascript.ast.AstNode;
+
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 
@@ -27,11 +29,27 @@ public class CFGEdge {
 	/** The change operation applied to the edge from source to destination. **/
 	public ChangeType changeType;
 	
+	/** Does this edge traverse a path that loops? */
+	public boolean loopEdge;
+	
 	public CFGEdge(ClassifiedASTNode condition, CFGNode from, CFGNode to) {
 		this.condition = condition;
 		this.to = to;
 		this.changeType = ChangeType.UNKNOWN;
 		this.id = CFGEdge.getUniqueId();
+		this.loopEdge = false;
+
+		if(condition != null && ((AstNode)condition).toSource().equals("i < 5")) 
+			System.out.println(((AstNode)condition).toSource() + ":" + loopEdge);
+	}
+
+	public CFGEdge(ClassifiedASTNode condition, CFGNode from, CFGNode to, boolean loopEdge) {
+		this.condition = condition;
+		this.to = to;
+		this.changeType = ChangeType.UNKNOWN;
+		this.id = CFGEdge.getUniqueId();
+		//System.out.println(((AstNode)condition).toSource() + ":" + loopEdge);
+		this.loopEdge = loopEdge;
 	}
 
 	/**

@@ -73,6 +73,15 @@ public class TestNotDefined extends TestAnalysis {
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
+	
+	@Test
+	public void testNested() throws Exception {
+		String src = "./test/input/not_defined/nd_nested_old.js";
+		String dst = "./test/input/not_defined/nd_nested_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		expectedAlerts.add(new NotDefinedAlert("ND", "i"));
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
 
 
 }

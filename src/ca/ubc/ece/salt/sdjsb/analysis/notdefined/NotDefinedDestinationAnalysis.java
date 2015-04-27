@@ -11,12 +11,12 @@ import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.VariableInitializer;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.sdjsb.analysis.flow.PathSensitiveFlowAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.flow.PathInsensitiveFlowAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.Scope;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGEdge;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
 
-public class NotDefinedDestinationAnalysis extends PathSensitiveFlowAnalysis<NotDefinedLatticeElement> {
+public class NotDefinedDestinationAnalysis extends PathInsensitiveFlowAnalysis<NotDefinedLatticeElement> {
 	
 	List<GlobalToLocal> notDefinedRepairs;
 	
@@ -44,7 +44,7 @@ public class NotDefinedDestinationAnalysis extends PathSensitiveFlowAnalysis<Not
 		for(String usedIdentifier : usedIdentifiers) {
 			
             /* Trigger an alert! */
-			if(sourceLE.inserted.contains(usedIdentifier) && !sourceLE.deleted.contains(usedIdentifier)) {
+			if(sourceLE.inserted.contains(usedIdentifier)) {
 				this.notDefinedRepairs.add(new GlobalToLocal(scope, usedIdentifier));
 			}
 			
@@ -93,7 +93,7 @@ public class NotDefinedDestinationAnalysis extends PathSensitiveFlowAnalysis<Not
 		for(String usedIdentifier : usedIdentifiers) {
 			
             /* Trigger an alert! */
-			if(sourceLE.inserted.contains(usedIdentifier) && !sourceLE.deleted.contains(usedIdentifier)) {
+			if(sourceLE.inserted.contains(usedIdentifier)) {
 				this.notDefinedRepairs.add(new GlobalToLocal(scope, usedIdentifier));
 			}
 			
@@ -118,6 +118,20 @@ public class NotDefinedDestinationAnalysis extends PathSensitiveFlowAnalysis<Not
 			this.scope = scope;
 			this.identifier = identifier;
 		}
+	}
+
+	@Override
+	protected NotDefinedLatticeElement join(NotDefinedLatticeElement left,
+			NotDefinedLatticeElement right) {
+
+		if(left == null) return right;
+		else if(right == null) return left;
+		
+		NotDefinedLatticeElement ndle = new NotDefinedLatticeElement();
+		ndle.inserted.addAll(left.inserted);
+		ndle.inserted.addAll(right.inserted);
+		
+		return ndle;
 	}
 
 }
