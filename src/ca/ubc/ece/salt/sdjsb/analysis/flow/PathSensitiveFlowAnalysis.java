@@ -4,6 +4,7 @@ import java.util.Stack;
 
 import org.mozilla.javascript.ast.ScriptNode;
 
+import ca.ubc.ece.salt.sdjsb.analysis.scope.Scope;
 import ca.ubc.ece.salt.sdjsb.cfg.CFG;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGEdge;
 
@@ -29,7 +30,7 @@ public abstract class PathSensitiveFlowAnalysis<LE extends AbstractLatticeElemen
 	 * @param scopeStack the scope for the function.
 	 */
 	@Override
-	protected void analyze(CFG cfg, Stack<Scope> scopeStack) {
+	protected void analyze(CFG cfg, Scope scope) {
 		
 		long pathsComplete = 0;
 		long edgesVisited = 0;
@@ -45,10 +46,10 @@ public abstract class PathSensitiveFlowAnalysis<LE extends AbstractLatticeElemen
 			edgesVisited++;
 			
 			/* Transfer over the edge. */
-			this.transfer(state.edge, state.le, scopeStack);
+			this.transfer(state.edge, state.le, scope);
 			
 			/* Transfer over the node. */
-			this.transfer(state.edge.getTo(), state.le, scopeStack);
+			this.transfer(state.edge.getTo(), state.le, scope);
 			
 			/* Push the new edges onto the stack. */
 			for(CFGEdge edge : state.edge.getTo().getEdges()) {

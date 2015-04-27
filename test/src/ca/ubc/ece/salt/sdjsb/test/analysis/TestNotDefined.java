@@ -7,14 +7,12 @@ import org.junit.Test;
 
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
 import ca.ubc.ece.salt.sdjsb.alert.NotDefinedAlert;
-import ca.ubc.ece.salt.sdjsb.analysis.flow.FlowAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.notdefined.NotDefinedAnalysis;
-import ca.ubc.ece.salt.sdjsb.analysis.notdefined.NotDefinedLatticeElement;
 
 public class TestNotDefined extends TestAnalysis {
 	
 	private void runTest(String[] args, List<Alert> expectedAlerts, boolean printAlerts) throws Exception {
-		FlowAnalysis<NotDefinedLatticeElement> analysis = new NotDefinedAnalysis();
+		NotDefinedAnalysis analysis = new NotDefinedAnalysis();
 		super.runTest(args, expectedAlerts, printAlerts, analysis);
 	}
 
@@ -64,6 +62,14 @@ public class TestNotDefined extends TestAnalysis {
 	public void testCallField() throws Exception {
 		String src = "./test/input/not_defined/CliUx_old.js";
 		String dst = "./test/input/not_defined/CliUx_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	@Test
+	public void testDeletedHigher() throws Exception {
+		String src = "./test/input/not_defined/nd_deleted_higher_old.js";
+		String dst = "./test/input/not_defined/nd_deleted_higher_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}

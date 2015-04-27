@@ -1,109 +1,67 @@
 package ca.ubc.ece.salt.sdjsb.analysis.notdefined;
 
-import java.util.List;
-import java.util.Set;
-import java.util.Stack;
+import java.util.LinkedList;
 
 import org.mozilla.javascript.ast.AstNode;
-import org.mozilla.javascript.ast.Name;
-import org.mozilla.javascript.ast.ScriptNode;
-import org.mozilla.javascript.ast.VariableDeclaration;
-import org.mozilla.javascript.ast.VariableInitializer;
 
-import ca.ubc.ece.salt.sdjsb.analysis.flow.Scope;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.alert.NotDefinedAlert;
-import ca.ubc.ece.salt.sdjsb.analysis.flow.PathSensitiveFlowAnalysis;
-import ca.ubc.ece.salt.sdjsb.cfg.CFGEdge;
-import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
+import ca.ubc.ece.salt.sdjsb.analysis.meta.MetaAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.notdefined.NotDefinedDestinationAnalysis.GlobalToLocal;
+import ca.ubc.ece.salt.sdjsb.analysis.scope.Scope;
+import ca.ubc.ece.salt.sdjsb.analysis.scope.ScopeAnalysis;
 
-public class NotDefinedAnalysis extends PathSensitiveFlowAnalysis<NotDefinedLatticeElement> {
+public class NotDefinedAnalysis extends MetaAnalysis<ScopeAnalysis, NotDefinedDestinationAnalysis> {
 
-	@Override
-	public NotDefinedLatticeElement entryValue(ScriptNode function) {
-		return new NotDefinedLatticeElement();
+	public NotDefinedAnalysis() {
+		super(new ScopeAnalysis(), new NotDefinedDestinationAnalysis());
 	}
 
+	/**
+	 * Synthesized alerts by inspecting the results of the scope analysis on
+	 * the source file and the not defined analysis on the destination file.
+	 */
 	@Override
-	public void transfer(CFGEdge edge, NotDefinedLatticeElement sourceLE, Stack<Scope> scopeStack) {
+	protected void synthesizeAlerts() {
 
-		AstNode statement = (AstNode)edge.getCondition();
-		
-		if(statement == null) return;
-
-		/* Check if there are any moved or unchanged variable uses that were
-		 * newly defined on the path. */
-		
-		Set<String> usedIdentifiers = VariableNodeVisitor.getUsedVariables(statement);
-		
-		for(String usedIdentifier : usedIdentifiers) {
+		for(GlobalToLocal gtl : new LinkedList<GlobalToLocal>(this.dstAnalysis.notDefinedRepairs)) {
 			
-            /* Trigger an alert! */
-			if(sourceLE.inserted.contains(usedIdentifier) && !sourceLE.deleted.contains(usedIdentifier)) {
-				this.registerAlert(scopeStack.peek().scope, new NotDefinedAlert("ND", usedIdentifier));
+			/* Remove identifiers that were deleted in the source scope.
+			 * Check the entire scope tree. this reduces false positives from
+			 * methods which are renamed. */
+			
+			Scope srcScope = this.srcAnalysis.getDstScope();
+			
+			if(this.deletedInScope(srcScope, gtl.identifier)) {
+				this.dstAnalysis.notDefinedRepairs.remove(gtl);
 			}
 			
 		}
+	
+		/* Generate alerts for the remaining GlobalToLocal elements. */
+		for(GlobalToLocal gtl : this.dstAnalysis.notDefinedRepairs) {
+			this.registerAlert(new NotDefinedAlert("ND", gtl.identifier));
+		}
 
 	}
-
-	@Override
-	public void transfer(CFGNode node, NotDefinedLatticeElement sourceLE, Stack<Scope> scopeStack) {
+	
+	/**
+	 * Determines if the identifier was deleted in some source scope.
+	 * @param scope The source scope to check.
+	 * @param notDefinedRepairs The list of potential not defined repairs.
+	 * @return true if the identifier was deleted in the scope or a method scope.
+	 */
+	private boolean deletedInScope(Scope scope, String identifier) {
 		
-		AstNode statement = (AstNode)node.getStatement();
-
-		/* Add inserted and deleted variable declarations to the inserted and
-		 * deleted sets. */
-
-		if(statement instanceof VariableDeclaration) { 
-
-			VariableDeclaration vd = (VariableDeclaration) statement;
-			List<VariableInitializer> variables = vd.getVariables();
-
-			for(VariableInitializer variable : variables) {
-				
-				if(variable.getChangeType() == ChangeType.INSERTED && variable.getTarget() instanceof Name) {
-                    sourceLE.inserted.add(((Name)variable.getTarget()).getIdentifier());
-				}
-				else if(variable.getChangeType() == ChangeType.REMOVED && variable.getTarget() instanceof Name) {
-                    sourceLE.deleted.add(((Name)variable.getTarget()).getIdentifier());
-				}
-				
-			}
-
-		}
-		else if(statement instanceof VariableInitializer) { 
-
-			VariableInitializer variable = (VariableInitializer) statement;
-
-            if(variable.getChangeType() == ChangeType.INSERTED && variable.getTarget() instanceof Name) {
-                sourceLE.inserted.add(((Name)variable.getTarget()).getIdentifier());
-            }
-            else if(variable.getChangeType() == ChangeType.REMOVED && variable.getTarget() instanceof Name) {
-                sourceLE.deleted.add(((Name)variable.getTarget()).getIdentifier());
-            }
-
-		}
-
-		/* Check if there are any moved or unchanged variable uses that were
-		 * newly defined on the path. */
+		AstNode node = scope.variables.get(identifier);
+		if(node != null && node.getParent().getChangeType() == ChangeType.REMOVED) return true;
 		
-		Set<String> usedIdentifiers = VariableNodeVisitor.getUsedVariables(statement);
-		
-		for(String usedIdentifier : usedIdentifiers) {
-			
-            /* Trigger an alert! */
-			if(sourceLE.inserted.contains(usedIdentifier) && !sourceLE.deleted.contains(usedIdentifier)) {
-				this.registerAlert(scopeStack.peek().scope, new NotDefinedAlert("ND", usedIdentifier));
-			}
-			
+		for(Scope child : scope.children) {
+			if(deletedInScope(child, identifier)) return true;
 		}
 		
-	}
-
-	@Override
-	public NotDefinedLatticeElement copy(NotDefinedLatticeElement le) {
-		return NotDefinedLatticeElement.copy(le);
+		return false;
+		
 	}
 
 }

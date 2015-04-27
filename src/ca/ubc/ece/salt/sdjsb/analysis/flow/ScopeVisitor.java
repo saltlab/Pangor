@@ -31,12 +31,13 @@ public class ScopeVisitor implements NodeVisitor {
 		if(script instanceof FunctionNode) {
 			FunctionNode function = (FunctionNode) script;
 			scopeVisitor = new ScopeVisitor(function.getParams());
+            function.getBody().visit(scopeVisitor);
 		}
 		else {
 			scopeVisitor = new ScopeVisitor();
+            script.visit(scopeVisitor);
 		}
 		
-		script.visit(scopeVisitor);
 		
 		return scopeVisitor.localScope;
 		
@@ -72,21 +73,20 @@ public class ScopeVisitor implements NodeVisitor {
 			
 			return false;
 		}
-		else if (node instanceof VariableDeclaration) {
+		else if (node instanceof VariableInitializer) {
 			
-			VariableDeclaration vd = (VariableDeclaration) node;
+			VariableInitializer vi = (VariableInitializer) node;
 			
-			for(VariableInitializer vi : vd.getVariables()) {
-				if(vi.getTarget() instanceof Name) {
-                    Name variable = (Name) vi.getTarget();
-                    this.localScope.put(variable.getIdentifier(), variable);
-					
-				}
-			}
+            if(vi.getTarget() instanceof Name) {
+
+                Name variable = (Name) vi.getTarget();
+                this.localScope.put(variable.getIdentifier(), variable);
+                
+            }
 			
 		}
 		
-		return false;
+		return true;
 	}
 
 }

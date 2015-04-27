@@ -1,5 +1,6 @@
 package ca.ubc.ece.salt.sdjsb.analysis.meta;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -7,7 +8,6 @@ import org.mozilla.javascript.ast.AstRoot;
 
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
 import ca.ubc.ece.salt.sdjsb.analysis.Analysis;
-import ca.ubc.ece.salt.sdjsb.analysis.flow.FlowAnalysis;
 import ca.ubc.ece.salt.sdjsb.cfg.CFG;
 
 /**
@@ -15,15 +15,17 @@ import ca.ubc.ece.salt.sdjsb.cfg.CFG;
  * @author qhanam
  *
  */
-public class MetaAnalysis implements Analysis {
+public abstract class MetaAnalysis<S extends Analysis, D extends Analysis> implements Analysis {
 	
 	Set<Alert> alerts;
 	
-	FlowAnalysis<?> srcAnalysis;
-	FlowAnalysis<?> dstAnalysis;
+	protected S srcAnalysis;
+	protected D dstAnalysis;
 	
-	public MetaAnalysis(FlowAnalysis<?> srcAnalysis, FlowAnalysis<?> dstAnalysis) {
+	public MetaAnalysis(S srcAnalysis, D dstAnalysis) {
 		
+		this.alerts = new HashSet<Alert>();
+
 		this.srcAnalysis = srcAnalysis;
 		this.dstAnalysis = dstAnalysis;
 		
@@ -37,6 +39,7 @@ public class MetaAnalysis implements Analysis {
 		this.dstAnalysis.analyze(dstRoot, dstCFGs);
 		
 		/* Synthesize the alerts. */
+		this.synthesizeAlerts();
 		
 	}
 
@@ -46,6 +49,9 @@ public class MetaAnalysis implements Analysis {
 		/* Analyze the destination file only. */
 		this.dstAnalysis.analyze(root, cfgs);
 		
+		/* The alerts are the same as the flow analysis. */
+		this.alerts = this.dstAnalysis.getAlerts();
+		
 	}
 
 
@@ -53,6 +59,12 @@ public class MetaAnalysis implements Analysis {
 	public Set<Alert> getAlerts() {
 		return this.alerts;
 	}
+	
+	/**
+	 * Create the set of alerts from the alerts produced by the source and
+	 * destination analyses.
+	 */
+	protected abstract void synthesizeAlerts();
 	
 	/**
 	 * Registers an alert to be reported to the user.
