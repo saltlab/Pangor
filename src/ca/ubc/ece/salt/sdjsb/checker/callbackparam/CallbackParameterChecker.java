@@ -6,6 +6,7 @@ import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.Name;
 
+import ca.ubc.ece.salt.sdjsb.alert.CallbackParameterAlert;
 import ca.ubc.ece.salt.sdjsb.checker.AbstractChecker;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext.ChangeType;

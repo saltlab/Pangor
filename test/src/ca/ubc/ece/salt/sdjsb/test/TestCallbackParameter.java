@@ -6,7 +6,7 @@ import java.util.List;
 import org.junit.Test;
 
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
-import ca.ubc.ece.salt.sdjsb.checker.callbackparam.CallbackParameterAlert;
+import ca.ubc.ece.salt.sdjsb.alert.CallbackParameterAlert;
 
 public class TestCallbackParameter extends TestSDJSB {
 	
