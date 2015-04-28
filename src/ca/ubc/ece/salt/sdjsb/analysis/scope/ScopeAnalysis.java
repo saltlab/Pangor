@@ -98,7 +98,7 @@ public class ScopeAnalysis implements Analysis {
         
 		Scope scope = new Scope(parent, function);
 		scope.variables = ScopeVisitor.getLocalScope(function);
-
+		
 		if(parent != null) parent.children.add(scope);
 		
 		/* Put the scope in the scope map. */

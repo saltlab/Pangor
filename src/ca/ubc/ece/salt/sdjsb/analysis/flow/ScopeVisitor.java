@@ -67,8 +67,9 @@ public class ScopeVisitor implements NodeVisitor {
 			
 			FunctionNode fn = (FunctionNode) node;
 		
-			if(!fn.getName().equals(""))
+			if(!fn.getName().equals("")) {
                 this.localScope.put(fn.getName(), fn);
+			}
 			
 			return false;
 		}
@@ -77,7 +78,6 @@ public class ScopeVisitor implements NodeVisitor {
 			VariableInitializer vi = (VariableInitializer) node;
 			
             if(vi.getTarget() instanceof Name) {
-
                 Name variable = (Name) vi.getTarget();
                 this.localScope.put(variable.getIdentifier(), variable);
                 

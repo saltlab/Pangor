@@ -80,7 +80,8 @@ public class NotDefinedDestinationAnalysis extends PathInsensitiveFlowAnalysis<N
 			VariableInitializer variable = (VariableInitializer) statement;
 
             if(variable.getChangeType() == ChangeType.INSERTED && variable.getTarget() instanceof Name) {
-                sourceLE.inserted.add(((Name)variable.getTarget()).getIdentifier());
+                Name name = (Name) variable.getTarget();
+                sourceLE.inserted.add(name.getIdentifier());
             }
 
 		}

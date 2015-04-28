@@ -44,6 +44,7 @@ import org.mozilla.javascript.EvaluatorException;
 import ca.ubc.ece.salt.sdjsb.CFDTask;
 import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
+import ca.ubc.ece.salt.sdjsb.analysis.notdefined.NotDefinedAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.notdefined.NotDefinedDestinationAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysis;
 import fr.labri.gumtree.client.DiffOptions;
@@ -239,7 +240,7 @@ public class GitProjectAnalysis {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         try {
 //        	CFDTask task = new CFDTask(cfd, new SpecialTypeAnalysis());
-        	CFDTask task = new CFDTask(cfd, new NotDefinedDestinationAnalysis());
+        	CFDTask task = new CFDTask(cfd, new NotDefinedAnalysis());
         	Future<Set<Alert>> future = executor.submit(task);
         	
         	alerts = future.get(10, TimeUnit.SECONDS);

@@ -83,5 +83,34 @@ public class TestNotDefined extends TestAnalysis {
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 
+	/**
+	 * This gives a false positive. The developer initializes 'fs' to the same
+	 * thing twice... which is kind of a bad practice bug on their part.
+	 */
+	@Test
+	public void testProcessContainer() throws Exception {
+		String src = "./test/input/not_defined/ProcessContainer_old.js";
+		String dst = "./test/input/not_defined/ProcessContainer_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	@Test
+	public void testCLI1() throws Exception {
+		String src = "./test/input/not_defined/CLI1_old.js";
+		String dst = "./test/input/not_defined/CLI1_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	@Test
+	public void testReload() throws Exception {
+		String src = "./test/input/not_defined/Reload_old.js";
+		String dst = "./test/input/not_defined/Reload_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		expectedAlerts.add(new NotDefinedAlert("ND", "cleanUp"));
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
 
 }

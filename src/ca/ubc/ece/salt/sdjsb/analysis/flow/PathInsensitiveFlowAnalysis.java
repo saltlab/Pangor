@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.sdjsb.analysis.scope.Scope;

@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NodeVisitor;
 import org.mozilla.javascript.ast.VariableInitializer;
@@ -36,7 +37,11 @@ public class VariableNodeVisitor implements NodeVisitor {
     @Override
     public boolean visit(AstNode node) {
         
-        if(node instanceof Name && NotDefinedAnalysisUtilities.isVariable((Name)node)) {
+    	if(node instanceof FunctionNode) {
+    		/* Don't visit functions because they aren't part of the CFG. */
+    		return false;
+    	}
+    	else if(node instanceof Name && NotDefinedAnalysisUtilities.isVariable((Name)node)) {
         
             if(!(node.getParent() instanceof VariableInitializer) && (node.getChangeType() == ChangeType.MOVED || node.getChangeType() == ChangeType.UNCHANGED) ) {
                 this.identifiers.add(((Name)node).getIdentifier());

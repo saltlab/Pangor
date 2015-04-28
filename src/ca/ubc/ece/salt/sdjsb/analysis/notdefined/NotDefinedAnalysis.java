@@ -54,7 +54,7 @@ public class NotDefinedAnalysis extends MetaAnalysis<ScopeAnalysis, NotDefinedDe
 	private boolean deletedInScope(Scope scope, String identifier) {
 		
 		AstNode node = scope.variables.get(identifier);
-		if(node != null && node.getParent().getChangeType() == ChangeType.REMOVED) return true;
+		if(node != null && node.getChangeType() == ChangeType.REMOVED) return true;
 		
 		for(Scope child : scope.children) {
 			if(deletedInScope(child, identifier)) return true;

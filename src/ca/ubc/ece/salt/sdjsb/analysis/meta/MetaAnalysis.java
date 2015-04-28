@@ -35,6 +35,7 @@ public abstract class MetaAnalysis<S extends Analysis, D extends Analysis> imple
 	public void analyze(AstRoot srcRoot, List<CFG> srcCFGs, AstRoot dstRoot, List<CFG> dstCFGs) throws Exception {
 
 		/* Analyze the two files. */
+
 		this.srcAnalysis.analyze(srcRoot, srcCFGs);
 		this.dstAnalysis.analyze(dstRoot, dstCFGs);
 		
