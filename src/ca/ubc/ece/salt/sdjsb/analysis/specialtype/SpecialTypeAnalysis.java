@@ -54,6 +54,12 @@ public class SpecialTypeAnalysis extends PathSensitiveFlowAnalysis<SpecialTypeLa
 		/* Add any special type checks to the lattice element. */
 		for(SpecialTypeCheck specialTypeCheck : visitor.getSpecialTypeChecks()) {
 
+            /* There are many false positive falsey identifiers due to
+             * incorrect GumTree matching. Most of these are callback error
+             * checks and callback checks. Filter these out.
+             */
+            if(specialTypeCheck.identifier.matches("e|err|error|cb|callback")) return; 
+
 			/* Is the identifier definitely a special type on this path or 
 			 * definitely not a special type on this path?
 			 */

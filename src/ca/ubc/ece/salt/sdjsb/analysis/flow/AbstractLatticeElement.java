@@ -45,5 +45,5 @@ public abstract class AbstractLatticeElement {
 		if(count == null) return 0;
 		else return count;
 	}
-
+	
 }

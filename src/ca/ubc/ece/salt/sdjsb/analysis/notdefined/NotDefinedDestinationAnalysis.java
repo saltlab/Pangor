@@ -18,6 +18,7 @@ import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
 
 public class NotDefinedDestinationAnalysis extends PathInsensitiveFlowAnalysis<NotDefinedLatticeElement> {
 	
+	/** Stores the possible not defined variable repairs. */
 	List<GlobalToLocal> notDefinedRepairs;
 	
 	public NotDefinedDestinationAnalysis() {
@@ -106,20 +107,6 @@ public class NotDefinedDestinationAnalysis extends PathInsensitiveFlowAnalysis<N
 	public NotDefinedLatticeElement copy(NotDefinedLatticeElement le) {
 		return NotDefinedLatticeElement.copy(le);
 	}
-	
-	/**
-	 * Stores a variable that has been newly declared on a path but used as a
-	 * global at a later point. 
-	 */
-	 class GlobalToLocal {
-		public Scope scope;
-		public String identifier;
-		
-		public GlobalToLocal(Scope scope, String identifier) {
-			this.scope = scope;
-			this.identifier = identifier;
-		}
-	}
 
 	@Override
 	protected NotDefinedLatticeElement join(NotDefinedLatticeElement left,
@@ -133,6 +120,20 @@ public class NotDefinedDestinationAnalysis extends PathInsensitiveFlowAnalysis<N
 		ndle.inserted.addAll(right.inserted);
 		
 		return ndle;
+	}
+	
+	/**
+	 * Stores a variable that has been newly declared on a path but used as a
+	 * global at a later point. 
+	 */
+	 class GlobalToLocal {
+		public Scope scope;
+		public String identifier;
+		
+		public GlobalToLocal(Scope scope, String identifier) {
+			this.scope = scope;
+			this.identifier = identifier;
+		}
 	}
 
 }

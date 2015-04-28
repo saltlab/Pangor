@@ -17,6 +17,16 @@ public class SpecialTypeVisitor implements NodeVisitor {
     private List<SpecialTypeCheck> specialTypeChecks;
     private AstNode condition;
     
+    /**
+     * @param condition The branch condition to investigate.
+     * @return A list of all the special type checks in the condition.
+     */
+    public static List<SpecialTypeCheck> getSpecialTypeChecks(AstNode condition) {
+    	SpecialTypeVisitor visitor = new SpecialTypeVisitor(condition);
+    	condition.visit(visitor);
+    	return visitor.specialTypeChecks;
+    }
+    
     public SpecialTypeVisitor(AstNode condition) {
 		this.specialTypeChecks = new LinkedList<SpecialTypeCheck>();
 		this.condition = condition;

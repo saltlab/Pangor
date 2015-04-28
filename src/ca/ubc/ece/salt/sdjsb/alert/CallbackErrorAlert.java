@@ -1,6 +1,5 @@
-package ca.ubc.ece.salt.sdjsb.checker.callbackerror;
+package ca.ubc.ece.salt.sdjsb.alert;
 
-import ca.ubc.ece.salt.sdjsb.alert.Alert;
 
 public class CallbackErrorAlert extends Alert {
 	

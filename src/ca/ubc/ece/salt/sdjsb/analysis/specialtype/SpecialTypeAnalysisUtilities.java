@@ -160,12 +160,6 @@ public class SpecialTypeAnalysisUtilities {
 			if(identifier != null) {
 				BranchesOn branchesOn;
 
-				/* There are many false positive falsey identifiers due to
-				 * incorrect GumTree matching. Most of these are callback error
-				 * checks and callback checks. Filter these out.
-				 */
-                if(identifier.matches("e|err|error|cb|callback")) return null; 
-				
                 if(node == condition) branchesOn = BranchesOn.TRUE;
                 else branchesOn = SpecialTypeAnalysisUtilities.branchesOn(condition, node.getParent());
 
