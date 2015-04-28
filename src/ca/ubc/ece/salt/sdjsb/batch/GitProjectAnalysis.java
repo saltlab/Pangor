@@ -243,8 +243,8 @@ public class GitProjectAnalysis {
         try {
 //        	CFDTask task = new CFDTask(cfd, new SpecialTypeAnalysis());
 //        	CFDTask task = new CFDTask(cfd, new NotDefinedAnalysis());
-//        	CFDTask task = new CFDTask(cfd, new CallbackParamAnalysis());
-        	CFDTask task = new CFDTask(cfd, new CallbackErrorAnalysis());
+        	CFDTask task = new CFDTask(cfd, new CallbackParamAnalysis());
+//        	CFDTask task = new CFDTask(cfd, new CallbackErrorAnalysis());
         	Future<Set<Alert>> future = executor.submit(task);
         	
         	alerts = future.get(10, TimeUnit.SECONDS);

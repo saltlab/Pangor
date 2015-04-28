@@ -47,4 +47,20 @@ public class TestCallbackError extends TestAnalysis {
 		this.runTest(new String[] {src, dst}, expectedAlerts, true);
 	}
 
+	@Test
+	public void testInteractorDaemonizer() throws Exception {
+		String src = "./test/input/callback_error/InteractorDaemonizer_old.js";
+		String dst = "./test/input/callback_error/InteractorDaemonizer_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+	}
+
+	@Test
+	public void testCLI2() throws Exception {
+		String src = "./test/input/callback_error/CLI2_old.js";
+		String dst = "./test/input/callback_error/CLI2_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+	}
+
 }

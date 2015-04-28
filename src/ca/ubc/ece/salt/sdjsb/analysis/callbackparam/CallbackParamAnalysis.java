@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
+import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.Name;
 
@@ -60,7 +61,10 @@ public class CallbackParamAnalysis extends ScopeAnalysis {
 			List<AstNode> parameters = function.getParams();
 			
 			/* Check for a new error parameter. */
-			if(function.getChangeType() != ChangeType.INSERTED && !parameters.isEmpty()) {
+			if(function.getChangeType() != ChangeType.INSERTED && !parameters.isEmpty() 
+					&& function.getParent() instanceof FunctionCall 
+					&& function.getParent().getChangeType() != ChangeType.MOVED 
+					&& function.getParent().getChangeType() != ChangeType.INSERTED) {
 
                 AstNode errorParameter = parameters.get(0);
                 if(errorParameter instanceof Name) {

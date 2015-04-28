@@ -144,6 +144,11 @@ public class CallbackErrorFlowAnalysis extends PathInsensitiveFlowAnalysis<Callb
 			return false;
 			
 		}
+		
+		@Override
+		public int hashCode() {
+			return (this.functionName + this.identifier).hashCode();
+		}
 	}
 
 }
