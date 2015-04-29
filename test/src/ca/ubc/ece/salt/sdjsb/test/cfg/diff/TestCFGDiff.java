@@ -223,4 +223,38 @@ public class TestCFGDiff extends TestCase {
 
 	}
 	
+	/**
+	 * Too complex to add expected CFGs. We are using it to debug exceptions.
+	 * 
+	 * This shows a special type handling false positive (claims 'e' is falsey checked).
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testPM2_7() throws Exception {
+		
+		String src = "./test/input/special_type_handling/ForkMode_e_old.js";
+		String dst = "./test/input/special_type_handling/ForkMode_e_new.js";
+
+		this.runTest(new String[] {src, dst}, null, null, Output.DOT);
+
+	}
+
+	/**
+	 * Too complex to add expected CFGs. We are using it to debug exceptions.
+	 * 
+	 * This shows a special type handling false positive (claims 'e' is falsey checked).
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testPM2_8() throws Exception {
+		
+		String src = "./test/input/special_type_handling/ForkMode_e2_old.js";
+		String dst = "./test/input/special_type_handling/ForkMode_e2_new.js";
+
+		this.runTest(new String[] {src, dst}, null, null, Output.DOT);
+
+	}
+	
 }

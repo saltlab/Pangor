@@ -21,5 +21,20 @@ public final class Scope {
 		this.variables = new HashMap<String, AstNode>();
 		this.children = new LinkedList<Scope>();
 	}
+	
+
+	/**
+	 * Starting with the current scope, search the tree upwards until the
+	 * identifier is found (or not found).
+	 * @param variable The variable to find.
+	 * @return The Name node where the variable is declared.
+	 */
+	public AstNode getVariableDeclaration(String variable) {
+		
+		if(this.variables.containsKey(variable)) return this.variables.get(variable);
+		if(this.parent == null) return null;
+		return parent.getVariableDeclaration(variable);
+		
+	}
 
 }

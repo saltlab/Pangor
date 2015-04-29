@@ -239,15 +239,36 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 	
+	@Test
+	public void testForkMode() throws Exception {
+		String src = "./test/input/special_type_handling/ForkMode_old.js";
+		String dst = "./test/input/special_type_handling/ForkMode_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+	}
+
 	/**
 	 * This produces a false positive. This is caused by incorrect traversal
 	 * of try/catch statements.
 	 * @throws Exception
 	 */
 	@Test
-	public void testForkMode() throws Exception {
-		String src = "./test/input/special_type_handling/ForkMode_old.js";
-		String dst = "./test/input/special_type_handling/ForkMode_new.js";
+	public void testForkMode2() throws Exception {
+		String src = "./test/input/special_type_handling/ForkMode_e_old.js";
+		String dst = "./test/input/special_type_handling/ForkMode_e_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+	}
+
+	/**
+	 * This produces a false positive. This is caused by incorrect traversal
+	 * of try/catch statements.
+	 * @throws Exception
+	 */
+	@Test
+	public void testForkMode3() throws Exception {
+		String src = "./test/input/special_type_handling/ForkMode_e2_old.js";
+		String dst = "./test/input/special_type_handling/ForkMode_e2_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
 		this.runTest(new String[] {src, dst}, expectedAlerts, true);
 	}

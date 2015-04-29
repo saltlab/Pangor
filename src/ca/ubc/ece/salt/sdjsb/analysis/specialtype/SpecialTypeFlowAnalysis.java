@@ -80,6 +80,10 @@ public class SpecialTypeFlowAnalysis extends PathSensitiveFlowAnalysis<SpecialTy
 			 */
 			if(specialTypeCheck.isSpecialType) {
 				
+				/* Make sure this identifier wasn't introduced as a variable. */
+                AstNode declaration = scope.getVariableDeclaration(specialTypeCheck.identifier);
+				if(declaration != null && declaration.getChangeType() == ChangeType.INSERTED) return;
+				
 				/* Is the identifier already in the map? */
 				if(sourceLE.specialTypes.containsKey(specialTypeCheck.identifier)) {
 					
@@ -101,6 +105,10 @@ public class SpecialTypeFlowAnalysis extends PathSensitiveFlowAnalysis<SpecialTy
 
 			}
 			else {
+
+				/* Make sure this identifier wasn't introduced as a variable. */
+                AstNode declaration = scope.getVariableDeclaration(specialTypeCheck.identifier);
+				if(declaration != null && declaration.getChangeType() == ChangeType.INSERTED) return;
 
 				/* Is the identifier already in the map? */
 				if(sourceLE.nonSpecialTypes.containsKey(specialTypeCheck.identifier)) {
