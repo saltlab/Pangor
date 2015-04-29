@@ -48,6 +48,7 @@ public class SpecialTypeVisitor implements NodeVisitor {
     	if(node.getChangeType() == ChangeType.INSERTED || node.getChangeType() == ChangeType.REMOVED) {
 
             SpecialTypeCheck stc = SpecialTypeAnalysisUtilities.getSpecialTypeCheck(condition, node);
+
             if(stc != null) this.specialTypeChecks.add(stc);
 
     	}

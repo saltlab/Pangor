@@ -10,6 +10,7 @@ import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.ConditionalExpression;
 import org.mozilla.javascript.ast.ElementGet;
 import org.mozilla.javascript.ast.FunctionCall;
+import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.NodeVisitor;
 import org.mozilla.javascript.ast.ObjectProperty;
@@ -44,6 +45,10 @@ public class UseTreeVisitor implements NodeVisitor {
     public boolean visit(AstNode node) {
 
         /* Investigate the subtrees. */
+    	if (node instanceof FunctionNode) {
+    		/* Do not visit function declarations. */ 
+    		return false;
+    	}
         if (node instanceof Assignment || node instanceof ObjectProperty) {
 
             AstNode right = ((InfixExpression)node).getRight();

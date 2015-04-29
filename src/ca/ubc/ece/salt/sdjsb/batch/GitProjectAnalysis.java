@@ -241,9 +241,9 @@ public class GitProjectAnalysis {
         Set<Alert> alerts;
         ExecutorService executor = Executors.newSingleThreadExecutor();
         try {
-//        	CFDTask task = new CFDTask(cfd, new SpecialTypeAnalysis());
+        	CFDTask task = new CFDTask(cfd, new SpecialTypeAnalysis());
 //        	CFDTask task = new CFDTask(cfd, new NotDefinedAnalysis());
-        	CFDTask task = new CFDTask(cfd, new CallbackParamAnalysis());
+//        	CFDTask task = new CFDTask(cfd, new CallbackParamAnalysis());
 //        	CFDTask task = new CFDTask(cfd, new CallbackErrorAnalysis());
         	Future<Set<Alert>> future = executor.submit(task);
         	

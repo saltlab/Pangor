@@ -208,5 +208,19 @@ public class TestCFGDiff extends TestCase {
 		this.runTest(new String[] {src, dst}, null, null, Output.DOT);
 
 	}
+
+	/**
+	 * Too complex to add expected CFGs. We are using it to debug exceptions.
+	 * @throws Exception
+	 */
+	@Test
+	public void testPM2_6() throws Exception {
+		
+		String src = "./test/input/special_type_handling/ForkMode_old.js";
+		String dst = "./test/input/special_type_handling/ForkMode_new.js";
+
+		this.runTest(new String[] {src, dst}, null, null, Output.DOT);
+
+	}
 	
 }

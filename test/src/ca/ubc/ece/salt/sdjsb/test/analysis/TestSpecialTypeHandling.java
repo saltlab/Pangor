@@ -8,14 +8,12 @@ import org.junit.Test;
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
 import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert;
 import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert.SpecialType;
-import ca.ubc.ece.salt.sdjsb.analysis.flow.FlowAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysis;
-import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeLatticeElement;
 
 public class TestSpecialTypeHandling extends TestAnalysis {
 	
 	private void runTest(String[] args, List<Alert> expectedAlerts, boolean printAlerts) throws Exception {
-		FlowAnalysis<SpecialTypeLatticeElement> analysis = new SpecialTypeAnalysis();
+		SpecialTypeAnalysis analysis = new SpecialTypeAnalysis();
 		super.runTest(args, expectedAlerts, printAlerts, analysis);
 	}
 
@@ -231,6 +229,27 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String dst = "./test/input/cfg_diff/CLI_1_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	@Test
+	public void testCommon() throws Exception {
+		String src = "./test/input/special_type_handling/Common_old.js";
+		String dst = "./test/input/special_type_handling/Common_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+	
+	/**
+	 * This produces a false positive. This is caused by incorrect traversal
+	 * of try/catch statements.
+	 * @throws Exception
+	 */
+	@Test
+	public void testForkMode() throws Exception {
+		String src = "./test/input/special_type_handling/ForkMode_old.js";
+		String dst = "./test/input/special_type_handling/ForkMode_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, true);
 	}
 
 }
