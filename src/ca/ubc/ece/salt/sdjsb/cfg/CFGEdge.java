@@ -51,6 +51,13 @@ public class CFGEdge {
 		//System.out.println(((AstNode)condition).toSource() + ":" + loopEdge);
 		this.loopEdge = loopEdge;
 	}
+	
+	/**
+	 * @return a shallow copy of the edge.
+	 */
+	public CFGEdge copy() {
+		return new CFGEdge(this.condition, this.from, this.to, this.loopEdge);
+	}
 
 	/**
 	 * @param to the node this edge enters.

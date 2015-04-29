@@ -1,7 +1,10 @@
 package ca.ubc.ece.salt.sdjsb.cfg;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 
 /**
  * A low(er) level control flow graph or subgraph.
@@ -27,6 +30,75 @@ public class CFG {
 		this.continueNodes = new LinkedList<CFGNode>();
 		this.throwNodes = new LinkedList<CFGNode>();
 		this.returnNodes = new LinkedList<CFGNode>();
+	}
+	
+	/** 
+	 * @return a copy of the CFG.
+	 */
+	public CFG copy() {
+
+		CFGNode entryNodeCopy = CFGNode.copy(this.entryNode);
+		
+		/* Keep track of the nodes we have copied. */
+		Map<CFGNode, CFGNode> newNodes = new HashMap<CFGNode, CFGNode>();
+		newNodes.put(this.entryNode, entryNodeCopy);
+		
+		/* Depth first traversal. */
+		Stack<CFGNode> stack = new Stack<CFGNode>();
+		stack.push(entryNodeCopy);
+
+		/* Traverse and copy the CFG. */
+		while(!stack.isEmpty()) {
+			CFGNode node = stack.pop();
+
+			/* Copy the list of edges. */
+			List<CFGEdge> copiedEdges = new LinkedList<CFGEdge>(node.getEdges());
+			
+			/* Re-assign the 'to' part of the edge. Copy the node if it hasn't
+			 * been copied yet. */
+			for(CFGEdge copiedEdge : copiedEdges) {
+				CFGNode nodeCopy = newNodes.get(copiedEdge.getTo());
+				if(nodeCopy == null) {
+					nodeCopy = CFGNode.copy(copiedEdge.getTo());
+					newNodes.put(copiedEdge.getTo(), nodeCopy);
+					stack.push(nodeCopy);
+				}
+				copiedEdge.setTo(nodeCopy);
+			}
+			
+			/* Assign the new edges to the current node. */
+			node.setEdges(copiedEdges);
+		}
+		
+		/* Copy the CFG and add all the jump nodes. */
+		CFG cfg = new CFG(entryNodeCopy);
+		
+		for(CFGNode exitNode : this.exitNodes) {
+			CFGNode node = newNodes.get(exitNode);
+			if(node != null) cfg.addExitNode(node);
+		}
+
+		for(CFGNode node : this.breakNodes) {
+			CFGNode copy = newNodes.get(node);
+			if(copy != null) cfg.addExitNode(copy);
+		}
+
+		for(CFGNode node : this.continueNodes) {
+			CFGNode copy = newNodes.get(node);
+			if(copy != null) cfg.addExitNode(copy);
+		}
+
+		for(CFGNode node : this.returnNodes) {
+			CFGNode copy = newNodes.get(node);
+			if(copy != null) cfg.addExitNode(copy);
+		}
+
+		for(CFGNode node : this.throwNodes) {
+			CFGNode copy = newNodes.get(node);
+			if(copy != null) cfg.addExitNode(copy);
+		}
+		
+		return cfg;
 	}
 	
 	/**

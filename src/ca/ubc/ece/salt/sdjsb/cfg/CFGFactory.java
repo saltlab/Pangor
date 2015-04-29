@@ -795,10 +795,10 @@ public class CFGFactory {
 				
                 /* Move the jump nodes after the finally block and propagate them
                  * through the CFG. */
-                cfg.addAllBreakNodes(moveJumpAfterFinally(finallyBlock, catchBlock.getBreakNodes(), catchCondition));
-                cfg.addAllContinueNodes(moveJumpAfterFinally(finallyBlock, catchBlock.getContinueNodes(), catchCondition));
-                cfg.addAllReturnNodes(moveJumpAfterFinally(finallyBlock, catchBlock.getReturnNodes(), catchCondition));
-                cfg.addAllThrowNodes(moveJumpAfterFinally(finallyBlock, catchBlock.getThrowNodes(), catchCondition));
+                cfg.addAllBreakNodes(moveJumpAfterFinally(finallyBlock.copy(), catchBlock.getBreakNodes(), catchCondition));
+                cfg.addAllContinueNodes(moveJumpAfterFinally(finallyBlock.copy(), catchBlock.getContinueNodes(), catchCondition));
+                cfg.addAllReturnNodes(moveJumpAfterFinally(finallyBlock.copy(), catchBlock.getReturnNodes(), catchCondition));
+                cfg.addAllThrowNodes(moveJumpAfterFinally(finallyBlock.copy(), catchBlock.getThrowNodes(), catchCondition));
 
                 /* Exit nodes exit to the finally block. */
                 for(CFGNode exitNode : catchBlock.getExitNodes()) {
@@ -832,9 +832,9 @@ public class CFGFactory {
             
             /* Move the jump nodes after the finally block and propagate them
              * through the CFG. */
-            cfg.addAllBreakNodes(moveJumpAfterFinally(finallyBlock, tryBlock.getBreakNodes(), null));
-            cfg.addAllContinueNodes(moveJumpAfterFinally(finallyBlock, tryBlock.getContinueNodes(), null));
-            cfg.addAllReturnNodes(moveJumpAfterFinally(finallyBlock, tryBlock.getReturnNodes(), null));
+            cfg.addAllBreakNodes(moveJumpAfterFinally(finallyBlock.copy(), tryBlock.getBreakNodes(), null));
+            cfg.addAllContinueNodes(moveJumpAfterFinally(finallyBlock.copy(), tryBlock.getContinueNodes(), null));
+            cfg.addAllReturnNodes(moveJumpAfterFinally(finallyBlock.copy(), tryBlock.getReturnNodes(), null));
 
             /* Throw nodes point to a catch block. We assume the first because
              * to get the correct one we need to do data flow analysis. */

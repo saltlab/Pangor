@@ -133,6 +133,13 @@ public class CFGNode {
 	}
 	
 	/**
+	 * @param edges The new edges for the node.
+	 */
+	public void setEdges(List<CFGEdge> edges) {
+		this.edges = edges;
+	}
+	
+	/**
 	 * @return The AST Statement which contains the actions this node performs.
 	 */
 	public ClassifiedASTNode getStatement() {
