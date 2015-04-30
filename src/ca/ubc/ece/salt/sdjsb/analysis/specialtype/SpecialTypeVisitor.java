@@ -16,6 +16,7 @@ public class SpecialTypeVisitor implements NodeVisitor {
     
     private List<SpecialTypeCheck> specialTypeChecks;
     private AstNode condition;
+    private boolean newTypesOnly;
     
     /**
      * @param condition The branch condition to investigate.
@@ -26,10 +27,37 @@ public class SpecialTypeVisitor implements NodeVisitor {
     	condition.visit(visitor);
     	return visitor.specialTypeChecks;
     }
+
+    /**
+     * @param condition The branch condition to investigate.
+     * @param newTypesOnly If true, will only consider INSERTED and
+     * 							REMOVED special types.
+     * @return A list of all the special type checks in the condition.
+     */
+    public static List<SpecialTypeCheck> getSpecialTypeChecks(AstNode condition, boolean newTypesOnly) {
+    	SpecialTypeVisitor visitor = new SpecialTypeVisitor(condition, newTypesOnly);
+    	condition.visit(visitor);
+    	return visitor.specialTypeChecks;
+    }
     
+    /**
+     * @param condition The condition to inspect for special types.
+     */
     public SpecialTypeVisitor(AstNode condition) {
 		this.specialTypeChecks = new LinkedList<SpecialTypeCheck>();
 		this.condition = condition;
+		this.newTypesOnly = true;
+    }
+
+    /**
+     * @param condition The condition to inspect for special types.
+     * @param newTypesOnly If true, will only consider INSERTED and
+     * 							REMOVED special types.
+     */
+    public SpecialTypeVisitor(AstNode condition, boolean newTypesOnly) {
+		this.specialTypeChecks = new LinkedList<SpecialTypeCheck>();
+		this.condition = condition;
+		this.newTypesOnly = newTypesOnly;
     }
     
     /**
@@ -45,7 +73,7 @@ public class SpecialTypeVisitor implements NodeVisitor {
     public boolean visit(AstNode node) {
     	
     	/* We only inspect inserted conditions. */
-    	if(node.getChangeType() == ChangeType.INSERTED || node.getChangeType() == ChangeType.REMOVED) {
+    	if(!this.newTypesOnly || (node.getChangeType() == ChangeType.INSERTED || node.getChangeType() == ChangeType.REMOVED)) {
 
             SpecialTypeCheck stc = SpecialTypeAnalysisUtilities.getSpecialTypeCheck(condition, node);
 

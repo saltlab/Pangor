@@ -9,8 +9,6 @@ import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ScriptNode;
 
-import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert.SpecialType;
 import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;
 import ca.ubc.ece.salt.sdjsb.analysis.flow.PathInsensitiveFlowAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.Scope;
@@ -19,12 +17,12 @@ import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeVisitor;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGEdge;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
 
-public class CallbackErrorFlowAnalysis extends PathInsensitiveFlowAnalysis<CallbackErrorLatticeElement> {
+public class CallbackErrorSourceFlowAnalysis extends PathInsensitiveFlowAnalysis<CallbackErrorLatticeElement> {
 	
 	/** Stores the possible callback error check repairs. */
 	private Set<CallbackErrorCheck> callbackErrorChecks;
 	
-	public CallbackErrorFlowAnalysis() {
+	public CallbackErrorSourceFlowAnalysis() {
 		this.callbackErrorChecks = new HashSet<CallbackErrorCheck>();
 	}
 	
@@ -55,17 +53,19 @@ public class CallbackErrorFlowAnalysis extends PathInsensitiveFlowAnalysis<Callb
 
 		CallbackErrorLatticeElement cele = new CallbackErrorLatticeElement();
 		
-		/* If this is the script (no parameters) or the function was inserted, there is nothing to do. */
-		if(!(node instanceof FunctionNode) || node.getChangeType() == ChangeType.INSERTED) return cele;
+		/* If this is the script (no parameters), there is nothing to do. The
+		 * function must also have a mapping to the source file (the function
+		 * should not be inserted) */
+		if(!(node instanceof FunctionNode) || node.getMapping() == null) return cele;
 
-		/* Look through the parameters to see if there is an unchanged error parameter. */
+		/* Look through the parameters to see if there is an error parameter. */
         FunctionNode function = (FunctionNode) node;
         for(AstNode parameter : function.getParams()) {
             if(parameter instanceof Name) {
                 
                 /* Match only error parameters for now. */
                 Name name = (Name) parameter;
-                if(name.getIdentifier().matches("(?i)e(rr(or)?)?") && name.getChangeType() != ChangeType.INSERTED) {
+                if(name.getIdentifier().matches("(?i)e(rr(or)?)?")) {
                     
                     /* Add the parameter to the lattice element. */
                     cele.parameters.add(name.getIdentifier());
@@ -88,7 +88,7 @@ public class CallbackErrorFlowAnalysis extends PathInsensitiveFlowAnalysis<Callb
 		if(condition == null || !(scope.scope instanceof FunctionNode)) return;
 		
 		/* Look for inserted parameter checks. */
-        List<SpecialTypeCheck> specialTypeChecks = SpecialTypeVisitor.getSpecialTypeChecks(condition);
+        List<SpecialTypeCheck> specialTypeChecks = SpecialTypeVisitor.getSpecialTypeChecks(condition, false);
         
         for(SpecialTypeCheck specialTypeCheck : specialTypeChecks) {
         	if(sourceLE.parameters.contains(specialTypeCheck.identifier)) {
@@ -97,7 +97,7 @@ public class CallbackErrorFlowAnalysis extends PathInsensitiveFlowAnalysis<Callb
         		
                 /* Register an alert. */
                 String signature = AnalysisUtilities.getFunctionSignature(function);
-                this.callbackErrorChecks.add(new CallbackErrorCheck(function.getName(), signature, specialTypeCheck.identifier, specialTypeCheck.specialType));
+                this.callbackErrorChecks.add(new CallbackErrorCheck(scope, function.getName(), signature, specialTypeCheck.identifier, specialTypeCheck.specialType));
         		
         	}
         }
@@ -113,42 +113,6 @@ public class CallbackErrorFlowAnalysis extends PathInsensitiveFlowAnalysis<Callb
 	@Override
 	public CallbackErrorLatticeElement copy(CallbackErrorLatticeElement le) {
 		return le.copy();
-	}
-
-	/**
-	 * Stores a parameter that was unchanged and had a special type check
-	 * inserted.
-	 */
-	public class CallbackErrorCheck {
-		public String functionName;
-		public String functionSignature;
-		public String identifier;
-		public SpecialType type;
-		
-		public CallbackErrorCheck(String functionName, String functionSignature, String identifier, SpecialType type) {
-			this.functionName = functionName;
-			this.functionSignature = functionSignature;
-			this.identifier = identifier;
-			this.type = type;
-		}
-		
-		@Override
-		public boolean equals(Object o) {
-			
-			if(!(o instanceof CallbackErrorCheck)) return false;
-			
-			CallbackErrorCheck cec = (CallbackErrorCheck) o;
-			
-			if(this.functionName.equals(cec.functionName) && this.identifier.equals(cec.identifier)) return true;
-			
-			return false;
-			
-		}
-		
-		@Override
-		public int hashCode() {
-			return (this.functionName + this.identifier).hashCode();
-		}
 	}
 
 }

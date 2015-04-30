@@ -272,5 +272,13 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
 		this.runTest(new String[] {src, dst}, expectedAlerts, true);
 	}
+	
+	@Test
+	public void testMovieFunctions() throws Exception {
+		String src = "./test/input/special_type_handling/movie-functions_old.js";
+		String dst = "./test/input/special_type_handling/movie-functions_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+	}
 
 }
