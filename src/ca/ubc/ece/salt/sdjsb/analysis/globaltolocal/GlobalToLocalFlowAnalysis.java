@@ -1,10 +1,11 @@
-package ca.ubc.ece.salt.sdjsb.analysis.notdefined;
+package ca.ubc.ece.salt.sdjsb.analysis.globaltolocal;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ScriptNode;
 import org.mozilla.javascript.ast.VariableDeclaration;
@@ -16,22 +17,22 @@ import ca.ubc.ece.salt.sdjsb.analysis.scope.Scope;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGEdge;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
 
-public class NotDefinedDestinationAnalysis extends PathInsensitiveFlowAnalysis<NotDefinedLatticeElement> {
+public class GlobalToLocalFlowAnalysis extends PathInsensitiveFlowAnalysis<GlobalToLocalLatticeElement> {
 	
 	/** Stores the possible not defined variable repairs. */
 	List<GlobalToLocal> notDefinedRepairs;
 	
-	public NotDefinedDestinationAnalysis() {
+	public GlobalToLocalFlowAnalysis() {
 		this.notDefinedRepairs = new LinkedList<GlobalToLocal>();
 	}
 
 	@Override
-	public NotDefinedLatticeElement entryValue(ScriptNode function) {
-		return new NotDefinedLatticeElement();
+	public GlobalToLocalLatticeElement entryValue(ScriptNode function) {
+		return new GlobalToLocalLatticeElement();
 	}
 
 	@Override
-	public void transfer(CFGEdge edge, NotDefinedLatticeElement sourceLE, Scope scope) {
+	public void transfer(CFGEdge edge, GlobalToLocalLatticeElement sourceLE, Scope scope) {
 
 		AstNode statement = (AstNode)edge.getCondition();
 		
@@ -54,14 +55,25 @@ public class NotDefinedDestinationAnalysis extends PathInsensitiveFlowAnalysis<N
 	}
 
 	@Override
-	public void transfer(CFGNode node, NotDefinedLatticeElement sourceLE, Scope scope) {
+	public void transfer(CFGNode node, GlobalToLocalLatticeElement sourceLE, Scope scope) {
 		
 		AstNode statement = (AstNode)node.getStatement();
 
-		/* Add inserted and deleted variable declarations to the inserted and
-		 * deleted sets. */
 
 		if(statement instanceof VariableDeclaration) { 
+			
+			/* The function should not be a new function. If it is, then
+			 * declaring new variables for it makes sense and is not considered
+			 * a repair. */
+			
+			if(scope.scope instanceof FunctionNode) {
+				
+				FunctionNode function = (FunctionNode) scope.scope;
+				if(function.getChangeType() == ChangeType.INSERTED) return;
+				
+			}
+			
+            /* Add inserted variable declarations to the inserted and deleted sets. */
 
 			VariableDeclaration vd = (VariableDeclaration) statement;
 			List<VariableInitializer> variables = vd.getVariables();
@@ -104,18 +116,18 @@ public class NotDefinedDestinationAnalysis extends PathInsensitiveFlowAnalysis<N
 	}
 
 	@Override
-	public NotDefinedLatticeElement copy(NotDefinedLatticeElement le) {
-		return NotDefinedLatticeElement.copy(le);
+	public GlobalToLocalLatticeElement copy(GlobalToLocalLatticeElement le) {
+		return GlobalToLocalLatticeElement.copy(le);
 	}
 
 	@Override
-	protected NotDefinedLatticeElement join(NotDefinedLatticeElement left,
-			NotDefinedLatticeElement right) {
+	protected GlobalToLocalLatticeElement join(GlobalToLocalLatticeElement left,
+			GlobalToLocalLatticeElement right) {
 
 		if(left == null) return right;
 		else if(right == null) return left;
 		
-		NotDefinedLatticeElement ndle = new NotDefinedLatticeElement();
+		GlobalToLocalLatticeElement ndle = new GlobalToLocalLatticeElement();
 		ndle.inserted.addAll(left.inserted);
 		ndle.inserted.addAll(right.inserted);
 		

@@ -6,7 +6,7 @@ import java.util.List;
 import org.junit.Test;
 
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
-import ca.ubc.ece.salt.sdjsb.alert.NotDefinedAlert;
+import ca.ubc.ece.salt.sdjsb.alert.GlobalToLocalAlert;
 
 public class TestNotDefined extends TestSDJSB {
 	
@@ -21,7 +21,7 @@ public class TestNotDefined extends TestSDJSB {
 		String src = "./test/input/not_defined/nd_old.js";
 		String dst = "./test/input/not_defined/nd_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
-		expectedAlerts.add(new NotDefinedAlert("ND", "a"));
+		expectedAlerts.add(new GlobalToLocalAlert("ND", "a"));
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 
@@ -30,7 +30,7 @@ public class TestNotDefined extends TestSDJSB {
 		String src = "./test/input/not_defined/nd_field_old.js";
 		String dst = "./test/input/not_defined/nd_field_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
-		expectedAlerts.add(new NotDefinedAlert("ND", "a"));
+		expectedAlerts.add(new GlobalToLocalAlert("ND", "a"));
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 

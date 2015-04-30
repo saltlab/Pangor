@@ -6,13 +6,13 @@ import java.util.List;
 import org.junit.Test;
 
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
-import ca.ubc.ece.salt.sdjsb.alert.NotDefinedAlert;
-import ca.ubc.ece.salt.sdjsb.analysis.notdefined.NotDefinedAnalysis;
+import ca.ubc.ece.salt.sdjsb.alert.GlobalToLocalAlert;
+import ca.ubc.ece.salt.sdjsb.analysis.globaltolocal.GlobalToLocalAnalysis;
 
-public class TestNotDefined extends TestAnalysis {
+public class TestGlobalToLocal extends TestAnalysis {
 	
 	private void runTest(String[] args, List<Alert> expectedAlerts, boolean printAlerts) throws Exception {
-		NotDefinedAnalysis analysis = new NotDefinedAnalysis();
+		GlobalToLocalAnalysis analysis = new GlobalToLocalAnalysis();
 		super.runTest(args, expectedAlerts, printAlerts, analysis);
 	}
 
@@ -21,7 +21,7 @@ public class TestNotDefined extends TestAnalysis {
 		String src = "./test/input/not_defined/nd_old.js";
 		String dst = "./test/input/not_defined/nd_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
-		expectedAlerts.add(new NotDefinedAlert("ND", "a"));
+		expectedAlerts.add(new GlobalToLocalAlert("GTL", "a"));
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 
@@ -30,7 +30,7 @@ public class TestNotDefined extends TestAnalysis {
 		String src = "./test/input/not_defined/nd_field_old.js";
 		String dst = "./test/input/not_defined/nd_field_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
-		expectedAlerts.add(new NotDefinedAlert("ND", "a"));
+		expectedAlerts.add(new GlobalToLocalAlert("GTL", "a"));
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 
@@ -79,7 +79,7 @@ public class TestNotDefined extends TestAnalysis {
 		String src = "./test/input/not_defined/nd_nested_old.js";
 		String dst = "./test/input/not_defined/nd_nested_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
-		expectedAlerts.add(new NotDefinedAlert("ND", "i"));
+		expectedAlerts.add(new GlobalToLocalAlert("GTL", "i"));
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 
@@ -102,15 +102,5 @@ public class TestNotDefined extends TestAnalysis {
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
-
-	@Test
-	public void testReload() throws Exception {
-		String src = "./test/input/not_defined/Reload_old.js";
-		String dst = "./test/input/not_defined/Reload_new.js";
-		List<Alert> expectedAlerts = new LinkedList<Alert>();
-		expectedAlerts.add(new NotDefinedAlert("ND", "cleanUp"));
-		this.runTest(new String[] {src, dst}, expectedAlerts, false);
-	}
-
 
 }

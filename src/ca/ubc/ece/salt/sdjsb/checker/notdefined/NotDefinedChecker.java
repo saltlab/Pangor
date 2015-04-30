@@ -11,7 +11,7 @@ import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.VariableInitializer;
 
 import ca.ubc.ece.salt.gumtree.ast.ParserASTNode;
-import ca.ubc.ece.salt.sdjsb.alert.NotDefinedAlert;
+import ca.ubc.ece.salt.sdjsb.alert.GlobalToLocalAlert;
 import ca.ubc.ece.salt.sdjsb.checker.AbstractChecker;
 import ca.ubc.ece.salt.sdjsb.checker.CheckerContext;
 
@@ -149,7 +149,7 @@ public class NotDefinedChecker extends AbstractChecker {
 			if(!this.deleted.contains(variable) 
 					&& !this.used.contains(variable) 
 					&& this.variablesUsedInSource.contains(variable)) {
-                this.registerAlert(new NotDefinedAlert(this.getCheckerType(), variable));
+                this.registerAlert(new GlobalToLocalAlert(this.getCheckerType(), variable));
 			}
 
 		}

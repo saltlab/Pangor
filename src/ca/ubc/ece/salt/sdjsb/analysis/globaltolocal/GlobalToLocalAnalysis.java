@@ -1,20 +1,21 @@
-package ca.ubc.ece.salt.sdjsb.analysis.notdefined;
+package ca.ubc.ece.salt.sdjsb.analysis.globaltolocal;
 
 import java.util.LinkedList;
 
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.FunctionNode;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.sdjsb.alert.NotDefinedAlert;
+import ca.ubc.ece.salt.sdjsb.alert.GlobalToLocalAlert;
+import ca.ubc.ece.salt.sdjsb.analysis.globaltolocal.GlobalToLocalFlowAnalysis.GlobalToLocal;
 import ca.ubc.ece.salt.sdjsb.analysis.meta.MetaAnalysis;
-import ca.ubc.ece.salt.sdjsb.analysis.notdefined.NotDefinedDestinationAnalysis.GlobalToLocal;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.Scope;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.ScopeAnalysis;
 
-public class NotDefinedAnalysis extends MetaAnalysis<ScopeAnalysis, NotDefinedDestinationAnalysis> {
+public class GlobalToLocalAnalysis extends MetaAnalysis<ScopeAnalysis, GlobalToLocalFlowAnalysis> {
 
-	public NotDefinedAnalysis() {
-		super(new ScopeAnalysis(), new NotDefinedDestinationAnalysis());
+	public GlobalToLocalAnalysis() {
+		super(new ScopeAnalysis(), new GlobalToLocalFlowAnalysis());
 	}
 
 	/**
@@ -36,11 +37,41 @@ public class NotDefinedAnalysis extends MetaAnalysis<ScopeAnalysis, NotDefinedDe
 				this.dstAnalysis.notDefinedRepairs.remove(gtl);
 			}
 			
+			if(gtl.scope.scope instanceof FunctionNode) {
+
+                /* Check that the variable was previously in the global scope and not previously in the local scope. */
+
+				FunctionNode sourceFunction = (FunctionNode)gtl.scope.scope.getMapping();
+				if(sourceFunction != null) {
+					
+					Scope sourceFunctionScope = srcScope.getFunctionScope(sourceFunction);
+					if(!sourceFunctionScope.isGlobal(gtl.identifier) || sourceFunctionScope.isLocal(gtl.identifier)) {
+						
+						/* The variable was not previously part of the global scope. */
+						this.dstAnalysis.notDefinedRepairs.remove(gtl);
+
+					}
+					
+				}
+			}
+			else {
+				
+                /* Check that the variable was not explicitly declared previously. */
+				if(!srcScope.globals.containsKey(gtl.identifier)) {
+
+					/* The variable did not exist in the global source (maybe it was a field). */
+					this.dstAnalysis.notDefinedRepairs.remove(gtl);
+
+				}
+				
+				
+			}
+			
 		}
 	
 		/* Generate alerts for the remaining GlobalToLocal elements. */
 		for(GlobalToLocal gtl : this.dstAnalysis.notDefinedRepairs) {
-			this.registerAlert(new NotDefinedAlert("ND", gtl.identifier));
+			this.registerAlert(new GlobalToLocalAlert("GTL", gtl.identifier));
 		}
 
 	}

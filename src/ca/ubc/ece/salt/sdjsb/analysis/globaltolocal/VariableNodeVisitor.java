@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.analysis.notdefined;
+package ca.ubc.ece.salt.sdjsb.analysis.globaltolocal;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -41,7 +41,7 @@ public class VariableNodeVisitor implements NodeVisitor {
     		/* Don't visit functions because they aren't part of the CFG. */
     		return false;
     	}
-    	else if(node instanceof Name && NotDefinedAnalysisUtilities.isVariable((Name)node)) {
+    	else if(node instanceof Name && GlobalToLocalAnalysisUtilities.isVariable((Name)node)) {
         
             if(!(node.getParent() instanceof VariableInitializer) && (node.getChangeType() == ChangeType.MOVED || node.getChangeType() == ChangeType.UNCHANGED) ) {
                 this.identifiers.add(((Name)node).getIdentifier());

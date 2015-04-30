@@ -15,7 +15,6 @@ import org.mozilla.javascript.ast.ScriptNode;
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
 import ca.ubc.ece.salt.sdjsb.analysis.Analysis;
 import ca.ubc.ece.salt.sdjsb.analysis.flow.FunctionTreeVisitor;
-import ca.ubc.ece.salt.sdjsb.analysis.flow.ScopeVisitor;
 import ca.ubc.ece.salt.sdjsb.cfg.CFG;
 
 /**
@@ -109,9 +108,8 @@ public class ScopeAnalysis implements Analysis {
          * scope tree. */
         
 		Scope scope = new Scope(parent, function);
-		scope.variables = ScopeVisitor.getLocalScope(function);
-		
 		if(parent != null) parent.children.add(scope);
+		ScopeVisitor.getLocalScope(scope);
 		
 		/* Put the scope in the scope map. */
 		

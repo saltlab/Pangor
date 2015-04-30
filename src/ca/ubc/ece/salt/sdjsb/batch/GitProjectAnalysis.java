@@ -15,7 +15,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.tuple.Pair;
-import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Repository;
@@ -46,8 +45,7 @@ import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
 import ca.ubc.ece.salt.sdjsb.analysis.callbackerror.CallbackErrorAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.callbackparam.CallbackParamAnalysis;
-import ca.ubc.ece.salt.sdjsb.analysis.notdefined.NotDefinedAnalysis;
-import ca.ubc.ece.salt.sdjsb.analysis.notdefined.NotDefinedDestinationAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.globaltolocal.GlobalToLocalAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysis;
 import fr.labri.gumtree.client.DiffOptions;
 
@@ -168,8 +166,9 @@ public class GitProjectAnalysis {
 	private List<Pair<String, String>> getBugFixingCommitPairs() throws IOException, GitAPIException {
 
 		List<Pair<String, String>> bugFixingCommits = new LinkedList<Pair<String, String>>();
-		ObjectId head = this.repository.resolve(Constants.HEAD);
-		Iterable<RevCommit> commits = this.git.log().add(head).all().call();
+		Iterable<RevCommit> commits = git.log().call();
+		System.out.println(repository.getBranch());
+
 		String bugFixingCommit = null;
 		int bfcCnt = 0, cCnt = 0;
 
@@ -238,16 +237,24 @@ public class GitProjectAnalysis {
         }
         
         /* Run the analysis. */ 
-        Set<Alert> alerts;
+        Set<Alert> alerts = new HashSet<Alert>();
         ExecutorService executor = Executors.newSingleThreadExecutor();
         try {
-        	CFDTask task = new CFDTask(cfd, new SpecialTypeAnalysis());
-//        	CFDTask task = new CFDTask(cfd, new NotDefinedAnalysis());
-//        	CFDTask task = new CFDTask(cfd, new CallbackParamAnalysis());
-//        	CFDTask task = new CFDTask(cfd, new CallbackErrorAnalysis());
-        	Future<Set<Alert>> future = executor.submit(task);
+        	List<CFDTask> tasks = new LinkedList<CFDTask>();
+        	List<Future<Set<Alert>>> futures = new LinkedList<Future<Set<Alert>>>();
         	
-        	alerts = future.get(10, TimeUnit.SECONDS);
+        	tasks.add(new CFDTask(cfd, new SpecialTypeAnalysis()));
+        	tasks.add(new CFDTask(cfd, new GlobalToLocalAnalysis()));
+        	tasks.add(new CFDTask(cfd, new CallbackParamAnalysis()));
+        	tasks.add(new CFDTask(cfd, new CallbackErrorAnalysis()));
+        	
+        	for(CFDTask task : tasks) {
+                futures.add(executor.submit(task));
+        	}
+        	
+        	for(Future<Set<Alert>> future : futures) {
+                 alerts.addAll(future.get(10, TimeUnit.SECONDS));
+        	}
 
         }
         catch(TimeoutException e) {

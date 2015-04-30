@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.analysis.notdefined;
+package ca.ubc.ece.salt.sdjsb.analysis.globaltolocal;
 
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
@@ -6,7 +6,7 @@ import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.UnaryExpression;
 
-public class NotDefinedAnalysisUtilities {
+public class GlobalToLocalAnalysisUtilities {
 
 	/**
 	 * Check if the Name (AstNode) is a variable.
