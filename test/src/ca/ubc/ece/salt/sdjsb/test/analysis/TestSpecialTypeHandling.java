@@ -197,16 +197,6 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 
-	/**
-	 * TODO
-	 * This produces a false positive. We can catch it by performing this
-	 * analysis on the source file, except replacing "INSERT" with "DELETE". We
-	 * then filter out any alerts that match for the source and destination.
-	 * 
-	 * This means we need to have some sort of meta analysis that can run an
-	 * analysis on both source and destination files and then compare the 
-	 * results...
-	 */
 	@Test
 	public void testDeleteUpdate() throws Exception {
 		String src = "./test/input/special_type_handling/sth_deleted_old.js";
@@ -247,11 +237,6 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		this.runTest(new String[] {src, dst}, expectedAlerts, true);
 	}
 
-	/**
-	 * This produces a false positive. This is caused by incorrect traversal
-	 * of try/catch statements.
-	 * @throws Exception
-	 */
 	@Test
 	public void testForkMode2() throws Exception {
 		String src = "./test/input/special_type_handling/ForkMode_e_old.js";
@@ -260,11 +245,6 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		this.runTest(new String[] {src, dst}, expectedAlerts, true);
 	}
 
-	/**
-	 * This produces a false positive. This is caused by incorrect traversal
-	 * of try/catch statements.
-	 * @throws Exception
-	 */
 	@Test
 	public void testForkMode3() throws Exception {
 		String src = "./test/input/special_type_handling/ForkMode_e2_old.js";
@@ -273,6 +253,12 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		this.runTest(new String[] {src, dst}, expectedAlerts, true);
 	}
 	
+	/**
+	 * This produces a false positive. This is caused by incorrect GumTree
+	 * differencing. TODO: handle it by inspecting changes at the name
+	 * level instead of the infix expression level. 
+	 * @throws Exception
+	 */
 	@Test
 	public void testMovieFunctions() throws Exception {
 		String src = "./test/input/special_type_handling/movie-functions_old.js";
