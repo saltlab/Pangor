@@ -8,7 +8,7 @@ import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.NodeVisitor;
 
-import ca.ubc.ece.salt.sdjsb.checker.CheckerUtilities;
+import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;
 
 /**
  * Generates a set of identifiers from an "OR" conditional expression. 
@@ -24,7 +24,7 @@ public class IdentifiersTreeVisitor implements NodeVisitor {
     
     public boolean visit(AstNode node) {
 
-        String identifier = CheckerUtilities.getIdentifier(node);
+        String identifier = AnalysisUtilities.getIdentifier(node);
         if(identifier != null) {
             this.variableIdentifiers.add(identifier);
             return false;

@@ -6,12 +6,17 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.ConditionalExpression;
+import org.mozilla.javascript.ast.DoLoop;
+import org.mozilla.javascript.ast.ForLoop;
+import org.mozilla.javascript.ast.IfStatement;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.KeywordLiteral;
 import org.mozilla.javascript.ast.NumberLiteral;
 import org.mozilla.javascript.ast.ParenthesizedExpression;
 import org.mozilla.javascript.ast.StringLiteral;
 import org.mozilla.javascript.ast.UnaryExpression;
+import org.mozilla.javascript.ast.WhileLoop;
 
 import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert.SpecialType;
 import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;
@@ -317,5 +322,47 @@ public class SpecialTypeAnalysisUtilities {
                                          Token.DOT, Token.INC, Token.DEC };
         return ArrayUtils.contains(useOperators, tokenType);
     }
+
+	/**
+	 * Check if the node is part of a conditional expression and is being
+	 * checked if it is truthy or falsey.
+	 * @param node
+	 */
+	public static boolean isFalsey(AstNode node) {
+
+		AstNode parent = node.getParent();
+		String identifier = AnalysisUtilities.getIdentifier(node);
+		
+		if(identifier == null) return false;
+		
+		/* If this is a direct child of a branch statement's condition, it is a
+		 * truthy/falsey identifier. */
+		if(parent instanceof IfStatement
+		   || parent instanceof DoLoop
+		   || parent instanceof ForLoop
+		   || parent instanceof WhileLoop
+		   || parent instanceof ConditionalExpression) {
+			
+			return true;
+		}
+		
+		/* If this is a direct child of an AND or OR operator, it is a
+		 * truthy/falsey identifier. */
+		if(parent instanceof InfixExpression) {
+			InfixExpression ie = (InfixExpression) parent;
+			if(ie.getOperator() == Token.OR || ie.getOperator() == Token.AND) return true;
+		}
+
+		/* If this is part of an equivalence operator that is being compared to
+		 * a special (falsey) type, it is a truthy/falsey identifier. */
+		AstNode comparedTo = AnalysisUtilities.getComparison(node);
+		if(comparedTo != null) {
+            SpecialType specialType = SpecialTypeAnalysisUtilities.getSpecialType(node);
+            if(specialType == null) return false;
+		}
+		
+		return false;
+	}
+
     
 }
