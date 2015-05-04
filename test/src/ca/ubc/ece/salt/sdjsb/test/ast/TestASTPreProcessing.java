@@ -8,6 +8,7 @@ import org.mozilla.javascript.Parser;
 import org.mozilla.javascript.ast.AstRoot;
 
 import ca.ubc.ece.salt.sdjsb.ast.ConditionalPreProcessor;
+import ca.ubc.ece.salt.sdjsb.ast.ShortCircuitPreProcessor;
 import junit.framework.TestCase;
 
 public class TestASTPreProcessing extends TestCase {
@@ -21,6 +22,14 @@ public class TestASTPreProcessing extends TestCase {
 		/* Pre-process the AST. */
 		ConditionalPreProcessor preProc = new ConditionalPreProcessor();
 		preProc.process(original);
+
+        /* Expand the ternary operators. */
+        ConditionalPreProcessor conditionalPreProcessor = new ConditionalPreProcessor();
+        conditionalPreProcessor.process(original);
+
+        /* Expand short circuit operators. */
+        ShortCircuitPreProcessor shortCircuitPreProcessor = new ShortCircuitPreProcessor();
+        shortCircuitPreProcessor.process(original);
 
 		/* Print the new AST. */
 		System.out.println(original.toSource());
@@ -127,6 +136,30 @@ public class TestASTPreProcessing extends TestCase {
 	public void testNestedReturn() throws IOException, CloneNotSupportedException {
 		
 		String file = "./test/input/ast_preproc/return_nested.js";
+		this.runTest(file);
+
+	}
+
+	@Test
+	public void testShortCircuitAnd() throws IOException, CloneNotSupportedException {
+		
+		String file = "./test/input/ast_preproc/short_circuit_and.js";
+		this.runTest(file);
+
+	}
+
+	@Test
+	public void testShortCircuitOr() throws IOException, CloneNotSupportedException {
+		
+		String file = "./test/input/ast_preproc/short_circuit_or.js";
+		this.runTest(file);
+
+	}
+
+	@Test
+	public void testShortCircuitNested() throws IOException, CloneNotSupportedException {
+		
+		String file = "./test/input/ast_preproc/short_circuit_nested.js";
 		this.runTest(file);
 
 	}

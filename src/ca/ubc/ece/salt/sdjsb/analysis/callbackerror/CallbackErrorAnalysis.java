@@ -3,7 +3,6 @@ package ca.ubc.ece.salt.sdjsb.analysis.callbackerror;
 import java.util.Set;
 
 import org.mozilla.javascript.ast.FunctionNode;
-import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.sdjsb.alert.CallbackErrorAlert;
 import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;

@@ -67,17 +67,6 @@ public class CFGFactory {
 	}
 	
 	/**
-	 * Computes the node dominators for the graph.
-	 * 
-	 * This may be needed later for merging results from different paths.
-	 * 
-	 * @param cfg
-	 */
-	private static void computeDominators(CFG cfg) {
-		throw new UnsupportedOperationException();
-	}
-	
-	/**
 	 * Builds a CFG for a function or script.
 	 * @param scriptNode An ASTRoot node or FunctionNode.
 	 * @return The complete CFG.
