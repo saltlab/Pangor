@@ -267,4 +267,20 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		this.runTest(new String[] {src, dst}, expectedAlerts, true);
 	}
 
+	@Test
+	public void testResolveCache() throws Exception {
+		String src = "./test/input/special_type_handling/ResolveCache_old.js";
+		String dst = "./test/input/special_type_handling/ResolveCache_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+	}
+
+	@Test
+	public void testProtectOther() throws Exception {
+		String src = "./test/input/special_type_handling/sth_undefined_protect_other_old.js";
+		String dst = "./test/input/special_type_handling/sth_undefined_protect_other_new.js";
+		List<Alert> expectedAlerts = new LinkedList<Alert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+	}
+
 }

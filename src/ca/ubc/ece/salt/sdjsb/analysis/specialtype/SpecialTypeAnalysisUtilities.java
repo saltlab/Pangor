@@ -133,25 +133,28 @@ public class SpecialTypeAnalysisUtilities {
                     /* Check if this branches on true or false. */
                     BranchesOn branchesOn;
                     
-                    /* The special type. */
-                    boolean isSpecialType = false;
-
                     /* Get the value that this node evaluates to on the branch. */
                     if(ie == condition) branchesOn = BranchesOn.TRUE;
-                    else branchesOn = SpecialTypeAnalysisUtilities.branchesOn(condition, ie.getParent());
+                    else branchesOn = SpecialTypeAnalysisUtilities.evaluatesTo(condition, ie.getParent(), BranchesOn.TRUE);
                     
-                    if(branchesOn == BranchesOn.UNKNOWN) return null;
-
+                    /* If the condition needs to definitely be true or false to branch, return the special type. */
                     if(ie.getOperator() == Token.EQ || ie.getOperator() == Token.SHEQ) {
-                    	isSpecialType = branchesOn == BranchesOn.TRUE ? true : false;
+                    	if(branchesOn == BranchesOn.TRUE || branchesOn == BranchesOn.TRUE_AND){
+                            return new SpecialTypeCheck(identifier, specialType, true);
+                    	}
+                    	else if(branchesOn == BranchesOn.FALSE || branchesOn == BranchesOn.FALSE_AND){
+                            return new SpecialTypeCheck(identifier, specialType, false);
+                    	}
                     }
                     else {
-                    	isSpecialType = branchesOn == BranchesOn.TRUE ? false : true;
+                    	if(branchesOn == BranchesOn.TRUE || branchesOn == BranchesOn.TRUE_AND){
+                            return new SpecialTypeCheck(identifier, specialType, false);
+                    	}
+                    	else if(branchesOn == BranchesOn.FALSE || branchesOn == BranchesOn.FALSE_AND){
+                            return new SpecialTypeCheck(identifier, specialType, true);
+                    	}
                     }
-                    	
-                    if(branchesOn != BranchesOn.UNKNOWN) 
-                    	return new SpecialTypeCheck(identifier, specialType, isSpecialType);
-                    
+
                 }
 				
 			}
@@ -167,12 +170,16 @@ public class SpecialTypeAnalysisUtilities {
 				BranchesOn branchesOn;
 
                 if(node == condition) branchesOn = BranchesOn.TRUE;
-                else branchesOn = SpecialTypeAnalysisUtilities.branchesOn(condition, node.getParent());
+                else branchesOn = SpecialTypeAnalysisUtilities.evaluatesTo(condition, node.getParent(), BranchesOn.TRUE);
 
-                if(branchesOn == BranchesOn.TRUE) 
-                	return new SpecialTypeCheck(identifier, SpecialType.FALSEY, false);
-                else if(branchesOn == BranchesOn.FALSE) 
-                	return new SpecialTypeCheck(identifier, SpecialType.FALSEY, true);
+                /* If the condition needs to definitely be true or false to branch, return the special type. */
+                if(branchesOn == BranchesOn.TRUE || branchesOn == BranchesOn.TRUE_AND){
+                    return new SpecialTypeCheck(identifier, SpecialType.FALSEY, false);
+                }
+                else if(branchesOn == BranchesOn.FALSE || branchesOn == BranchesOn.FALSE_AND){
+                    return new SpecialTypeCheck(identifier, SpecialType.FALSEY, true);
+                }
+
 			}
 			
 		}
@@ -183,87 +190,83 @@ public class SpecialTypeAnalysisUtilities {
 	/**
 	 * Determine what the value of the child node needs to be for this node to
 	 * evaluate to true (i.e., to execute this branch). 
-	 * 
-	 * If the child is part
-	 * of an or expression or an equals expression that does not compare it to
-	 * a boolean, then we cannot reason about the value of the child node on
-	 * this branch and we return {@code BranchesOn.UNKNOWN}.
 	 * @param node the parent of the condition we are evaluating.
 	 * @return the value that the condition must evaluate to in order for the 
 	 * 		   branch to be taken.
 	 */
-	public static BranchesOn branchesOn(AstNode condition, AstNode node) {
+	public static BranchesOn evaluatesTo(AstNode condition, AstNode node, BranchesOn current) {
 		
-		BranchesOn branchesOn = BranchesOn.UNKNOWN;
+		if(node == condition.getParent()) return current;
 		
 		if(node instanceof UnaryExpression) {
 
 			UnaryExpression ue = (UnaryExpression)node;
 			if(ue.getOperator() == Token.NOT) {
-				branchesOn = BranchesOn.FALSE;
-			}
-
-		}
-		
-		else if(node instanceof InfixExpression) {
-			InfixExpression ie = (InfixExpression)node;
-			
-			if(ie.getType() == Token.EQ || ie.getType() == Token.SHEQ) {
-
-                if(ie.getLeft() instanceof KeywordLiteral) {
-
-                    KeywordLiteral kl = (KeywordLiteral)ie.getLeft();
-                    if(kl.getType() == Token.TRUE) {
-                        branchesOn = BranchesOn.TRUE;
-                    }
-                    else if(kl.getType() == Token.FALSE) {
-                        branchesOn = BranchesOn.FALSE;
-                    }
-
-                }
-                
-			}
-
-			else if(ie.getType() == Token.NE || ie.getType() == Token.SHNE) {
-
-                if(ie.getLeft() instanceof KeywordLiteral) {
-
-                    KeywordLiteral kl = (KeywordLiteral)ie.getLeft();
-                    if(kl.getType() == Token.TRUE) {
-                        branchesOn = BranchesOn.FALSE;
-                    }
-                    else if(kl.getType() == Token.FALSE) {
-                        branchesOn = BranchesOn.TRUE;
-                    }
-
-                }
-                
+				
+				switch(current) {
+				case TRUE: 
+					return evaluatesTo(condition, node.getParent(), BranchesOn.FALSE);
+				case FALSE:
+					return evaluatesTo(condition, node.getParent(), BranchesOn.TRUE);
+				case TRUE_AND:
+					return evaluatesTo(condition, node.getParent(), BranchesOn.FALSE_OR);
+				case FALSE_AND:
+					return evaluatesTo(condition, node.getParent(), BranchesOn.TRUE_OR);
+				case TRUE_OR:
+					return evaluatesTo(condition, node.getParent(), BranchesOn.FALSE_AND);
+				case FALSE_OR:
+					return evaluatesTo(condition, node.getParent(), BranchesOn.TRUE_AND);
+				case UNKNOWN:
+					return BranchesOn.UNKNOWN;
+				}
 			}
 			
-			else if(ie.getType() == Token.AND) {
-				
-                branchesOn = BranchesOn.TRUE;
-				
-			}
-
 		}
-		
 		else if(node instanceof ParenthesizedExpression) {
 			
-            branchesOn = BranchesOn.TRUE;
+			return evaluatesTo(condition, node.getParent(), current);
 			
 		}
-		
-		if(node == condition) return branchesOn;
+		else if(node instanceof InfixExpression) {
+			InfixExpression ie = (InfixExpression)node;
 
-		switch(branchesOn) {
-		case TRUE:
-            return branchesOn(condition, node.getParent());
-		case FALSE:
-            return neg(branchesOn(condition, node.getParent()));
-        default:
-            return BranchesOn.UNKNOWN;
+			if(ie.getType() == Token.AND) {
+				
+				switch(current) {
+				case TRUE: 
+				case TRUE_AND:
+					return evaluatesTo(condition, node.getParent(), BranchesOn.TRUE_AND);
+				case FALSE:
+				case FALSE_AND:
+					return evaluatesTo(condition, node.getParent(), BranchesOn.FALSE_AND);
+				case TRUE_OR:
+				case FALSE_OR:
+					return evaluatesTo(condition, node.getParent(), BranchesOn.UNKNOWN);
+				case UNKNOWN:
+					return BranchesOn.UNKNOWN;
+				}
+				
+			}
+			else if(ie.getType() == Token.OR) {
+				
+				switch(current) {
+				case TRUE: 
+				case TRUE_OR:
+					return evaluatesTo(condition, node.getParent(), BranchesOn.TRUE_OR);
+				case FALSE:
+				case FALSE_OR:
+					return evaluatesTo(condition, node.getParent(), BranchesOn.FALSE_OR);
+				case TRUE_AND:
+				case FALSE_AND:
+					return evaluatesTo(condition, node.getParent(), BranchesOn.UNKNOWN);
+				case UNKNOWN:
+					return BranchesOn.UNKNOWN;
+				}
+				
+			}
 		}
+		
+		return BranchesOn.UNKNOWN;
 		
 	}
 	
@@ -286,6 +289,10 @@ public class SpecialTypeAnalysisUtilities {
 	public enum BranchesOn {
 		TRUE,
 		FALSE,
+		TRUE_AND,
+		FALSE_AND,
+		TRUE_OR,
+		FALSE_OR,
 		UNKNOWN
 	}
 	
