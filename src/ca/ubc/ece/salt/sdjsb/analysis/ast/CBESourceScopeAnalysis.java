@@ -11,9 +11,8 @@ import org.mozilla.javascript.ast.IfStatement;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NodeVisitor;
 
-import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.sdjsb.alert.CallbackErrorAlert;
 import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;
+import ca.ubc.ece.salt.sdjsb.analysis.callbackerror.CallbackErrorCheck;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.Scope;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.ScopeAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeCheck;
@@ -26,10 +25,22 @@ import ca.ubc.ece.salt.sdjsb.cfg.CFG;
  * This classifier is used for evaluation purposes only and should not be used
  * in actual data mining. Instead, use the CallbackErrorAnalysis classifier.
  */
-public class CBEScopeAnalysis extends ScopeAnalysis {
+public class CBESourceScopeAnalysis extends ScopeAnalysis {
+
+	/** Stores the possible callback error check repairs. */
+	private Set<CallbackErrorCheck> callbackErrorChecks;
 	
-	public CBEScopeAnalysis() {
+	public CBESourceScopeAnalysis() {
 		super();
+		this.callbackErrorChecks = new HashSet<CallbackErrorCheck>();
+	}
+
+	/**
+	 * @return The set of possible callback error check repairs (or
+	 * anti-patterns if this is the source file analysis.
+	 */
+	public Set<CallbackErrorCheck> getCallbackErrorChecks() {
+		return this.callbackErrorChecks;
 	}
 
 	@Override
@@ -60,7 +71,7 @@ public class CBEScopeAnalysis extends ScopeAnalysis {
 	private void inspectFunctions(Scope scope) {
 
 		/* If this is the script (no parameters) or the function was inserted, there is nothing to do. */
-		if((scope.scope instanceof FunctionNode) && scope.scope.getChangeType() != ChangeType.INSERTED) {
+		if(scope.scope instanceof FunctionNode) {
 		
             /* Look through the parameters to see if there is an unchanged error parameter. */
             Set<String> parameters = new HashSet<String>();
@@ -70,7 +81,7 @@ public class CBEScopeAnalysis extends ScopeAnalysis {
                     
                     /* Match only error parameters for now. */
                     Name name = (Name) parameter;
-                    if(name.getIdentifier().matches("(?i)e(rr(or)?)?") && name.getChangeType() != ChangeType.INSERTED && name.getChangeType() != ChangeType.UPDATED) {
+                    if(name.getIdentifier().matches("(?i)e(rr(or)?)?")) {
                         
                         /* Add the parameter to the set of parameters to look for. */
                         parameters.add(name.getIdentifier());
@@ -81,8 +92,8 @@ public class CBEScopeAnalysis extends ScopeAnalysis {
             }
             
             /* Visit the function and look for CBE patterns. */
-            CBEScopeAnalysisVisitor visitor = new CBEScopeAnalysisVisitor(parameters, function.getName(), AnalysisUtilities.getFunctionSignature(function));
-            scope.scope.visit(visitor);
+            CBEScopeAnalysisVisitor visitor = new CBEScopeAnalysisVisitor(scope, parameters, function.getName(), AnalysisUtilities.getFunctionSignature(function));
+            function.getBody().visit(visitor);
 
 		}
 		
@@ -98,11 +109,13 @@ public class CBEScopeAnalysis extends ScopeAnalysis {
 	 */
 	private class CBEScopeAnalysisVisitor implements NodeVisitor {
 		
+		private Scope scope;
 		private Set<String> parameters;
 		private String function;
 		private String signature;
 		
-		public CBEScopeAnalysisVisitor(Set<String> parameters, String function, String signature) {
+		public CBEScopeAnalysisVisitor(Scope scope, Set<String> parameters, String function, String signature) {
+			this.scope = scope;
 			this.parameters = parameters;
 			this.function = function;
 			this.signature = signature;
@@ -116,14 +129,18 @@ public class CBEScopeAnalysis extends ScopeAnalysis {
 				IfStatement is = (IfStatement) node;
 				
 				/* Get the special type checks in the if statement. */
-				List<SpecialTypeCheck> specialTypeChecks = SpecialTypeVisitor.getSpecialTypeChecks(is.getCondition(), true);
+				List<SpecialTypeCheck> specialTypeChecks = SpecialTypeVisitor.getSpecialTypeChecks(is.getCondition(), false);
 				
 				for(SpecialTypeCheck specialTypeCheck : specialTypeChecks) {
 					if(this.parameters.contains(specialTypeCheck.identifier)) {
-						CBEScopeAnalysis.this.registerAlert(node, new CallbackErrorAlert("AST_CB", this.function, this.signature, specialTypeCheck.identifier));
+						CBESourceScopeAnalysis.this.callbackErrorChecks.add(new CallbackErrorCheck(this.scope, this.function, this.signature, specialTypeCheck.identifier, specialTypeCheck.specialType));
 					}
 				}
 				
+			}
+
+			else if(node instanceof FunctionNode) {
+				return false;
 			}
 			
 			return true;

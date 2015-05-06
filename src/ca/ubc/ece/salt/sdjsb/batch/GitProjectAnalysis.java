@@ -43,8 +43,10 @@ import org.mozilla.javascript.EvaluatorException;
 import ca.ubc.ece.salt.sdjsb.CFDTask;
 import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
-import ca.ubc.ece.salt.sdjsb.analysis.ast.CBEScopeAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.ast.CBEDestinationScopeAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.ast.CBEMetaAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.ast.GTLScopeAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.ast.STHMetaAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.ast.STHScopeAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.callbackerror.CallbackErrorAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.callbackparam.CallbackParamAnalysis;
@@ -250,9 +252,11 @@ public class GitProjectAnalysis {
 //        	tasks.add(new CFDTask(cfd, new GlobalToLocalAnalysis()));
 //        	tasks.add(new CFDTask(cfd, new CallbackParamAnalysis()));
 //        	tasks.add(new CFDTask(cfd, new CallbackErrorAnalysis()));
-        	tasks.add(new CFDTask(cfd, new STHScopeAnalysis()));
-        	tasks.add(new CFDTask(cfd, new CBEScopeAnalysis()));
-        	tasks.add(new CFDTask(cfd, new GTLScopeAnalysis()));
+//        	tasks.add(new CFDTask(cfd, new STHMetaAnalysis()));
+//        	tasks.add(new CFDTask(cfd, new STHScopeAnalysis()));
+        	tasks.add(new CFDTask(cfd, new CBEMetaAnalysis()));
+        	tasks.add(new CFDTask(cfd, new CBEDestinationScopeAnalysis()));
+//        	tasks.add(new CFDTask(cfd, new GTLScopeAnalysis()));
         	
         	for(CFDTask task : tasks) {
                 futures.add(executor.submit(task));

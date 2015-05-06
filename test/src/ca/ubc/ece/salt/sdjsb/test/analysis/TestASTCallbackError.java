@@ -7,12 +7,14 @@ import org.junit.Test;
 
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
 import ca.ubc.ece.salt.sdjsb.alert.CallbackErrorAlert;
-import ca.ubc.ece.salt.sdjsb.analysis.ast.CBEScopeAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.ast.CBEDestinationScopeAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.ast.CBEMetaAnalysis;
 
 public class TestASTCallbackError extends TestAnalysis {
 	
 	private void runTest(String[] args, List<Alert> expectedAlerts, boolean printAlerts) throws Exception {
-		CBEScopeAnalysis analysis = new CBEScopeAnalysis();
+//		CBEDestinationScopeAnalysis analysis = new CBEDestinationScopeAnalysis();
+		CBEMetaAnalysis analysis = new CBEMetaAnalysis();
 		super.runTest(args, expectedAlerts, printAlerts, analysis);
 	}
 
