@@ -44,6 +44,7 @@ import ca.ubc.ece.salt.sdjsb.CFDTask;
 import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
 import ca.ubc.ece.salt.sdjsb.analysis.ast.CBEScopeAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.ast.GTLScopeAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.ast.STHScopeAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.callbackerror.CallbackErrorAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.callbackparam.CallbackParamAnalysis;
@@ -251,6 +252,7 @@ public class GitProjectAnalysis {
 //        	tasks.add(new CFDTask(cfd, new CallbackErrorAnalysis()));
         	tasks.add(new CFDTask(cfd, new STHScopeAnalysis()));
         	tasks.add(new CFDTask(cfd, new CBEScopeAnalysis()));
+        	tasks.add(new CFDTask(cfd, new GTLScopeAnalysis()));
         	
         	for(CFDTask task : tasks) {
                 futures.add(executor.submit(task));
