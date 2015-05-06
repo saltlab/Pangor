@@ -13,7 +13,6 @@ import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ParenthesizedExpression;
 
 import ca.ubc.ece.salt.sdjsb.analysis.flow.IdentifiersTreeVisitor;
-import ca.ubc.ece.salt.sdjsb.analysis.flow.UseTreeVisitor;
 
 public class AnalysisUtilities {
 	

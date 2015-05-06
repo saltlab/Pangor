@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.analysis.flow;
+package ca.ubc.ece.salt.sdjsb.analysis;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,7 +17,6 @@ import org.mozilla.javascript.ast.ObjectProperty;
 import org.mozilla.javascript.ast.VariableInitializer;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysisUtilities;
 
 /**
@@ -30,6 +29,17 @@ import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysisUtilities;
 public class UseTreeVisitor implements NodeVisitor {
     
     private Set<String> usedIdentifiers;
+
+    /**
+     * @param statement The statement or block to find variable uses in.
+     * @return A list of all the identifiers that are used in the statement.
+     */
+    public static Set<String> getSpecialTypeChecks(AstNode statement) {
+    	UseTreeVisitor visitor = new UseTreeVisitor();
+    	if(statement == null) return visitor.usedIdentifiers;
+    	statement.visit(visitor);
+    	return visitor.usedIdentifiers;
+    }
     
     public UseTreeVisitor() {
         this.usedIdentifiers = new HashSet<String>();

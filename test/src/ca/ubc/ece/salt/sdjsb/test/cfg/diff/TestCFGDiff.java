@@ -256,5 +256,22 @@ public class TestCFGDiff extends TestCase {
 		this.runTest(new String[] {src, dst}, null, null, Output.DOT);
 
 	}
+
+	/**
+	 * Too complex to add expected CFGs. We are using it to debug exceptions.
+	 * 
+	 * This shows a special type handling false positive (claims 'e' is falsey checked).
+	 * 
+	 * @throws Exception
+	 */
+	@Test
+	public void testPM2_9() throws Exception {
+		
+		String src = "./test/input/cfg_diff/constants_old.js";
+		String dst = "./test/input/cfg_diff/constants_new.js";
+
+		this.runTest(new String[] {src, dst}, null, null, Output.DOT);
+
+	}
 	
 }

@@ -763,7 +763,15 @@ public class CFGFactory {
             /* Create the clause for branching to the catch. */
             AstNode catchCondition = catchClause.getCatchCondition();
             if(catchCondition == null) {
-                catchCondition = catchClause.getVarName();
+            	
+            	/* Create a special method that contains the exception. */
+            	FunctionCall exception = new FunctionCall();
+            	List<AstNode> args = new LinkedList<AstNode>();
+            	args.add(catchClause.getVarName());
+            	exception.setArguments(args);
+            	exception.setTarget(new Name(0, "~exception"));
+                catchCondition = exception;
+
             }
 			
 			if(catchBlock == null) {

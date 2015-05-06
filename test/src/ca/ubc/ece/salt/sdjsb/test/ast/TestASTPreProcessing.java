@@ -9,6 +9,7 @@ import org.mozilla.javascript.ast.AstRoot;
 
 import ca.ubc.ece.salt.sdjsb.ast.ConditionalPreProcessor;
 import ca.ubc.ece.salt.sdjsb.ast.ShortCircuitPreProcessor;
+import ca.ubc.ece.salt.sdjsb.ast.VarPreProcessor;
 import junit.framework.TestCase;
 
 public class TestASTPreProcessing extends TestCase {
@@ -22,6 +23,10 @@ public class TestASTPreProcessing extends TestCase {
 		/* Pre-process the AST. */
 		ConditionalPreProcessor preProc = new ConditionalPreProcessor();
 		preProc.process(original);
+		
+		/* Expand variable initializers. */
+		VarPreProcessor varPreProcessor = new VarPreProcessor();
+		varPreProcessor.process(original);
 
         /* Expand the ternary operators. */
         ConditionalPreProcessor conditionalPreProcessor = new ConditionalPreProcessor();
@@ -160,6 +165,14 @@ public class TestASTPreProcessing extends TestCase {
 	public void testShortCircuitNested() throws IOException, CloneNotSupportedException {
 		
 		String file = "./test/input/ast_preproc/short_circuit_nested.js";
+		this.runTest(file);
+
+	}
+
+	@Test
+	public void testVariableDeclarations() throws IOException, CloneNotSupportedException {
+		
+		String file = "./test/input/ast_preproc/variable_declarations.js";
 		this.runTest(file);
 
 	}

@@ -13,12 +13,12 @@ public class SpecialTypeAlert extends Alert {
 
 	@Override
 	public String getAlertDescription() {
-		return "A possible TypeError was repaired by adding a " + this.specialType + " check for '" + this.variableIdentifier + "'.";
+		return "A TypeError or incorrect output was repaired by adding a " + this.specialType + " check for '" + this.variableIdentifier + "'.";
 	}
 
 	@Override
 	public String getAlertExplanation() {
-		return "A conditional branch was inserted that checks if a variable has a special type. This could indicate a TypeError is possible in the original code.";
+		return "A conditional branch was inserted that checks if a variable has a special type. This could indicate a TypeError is possible in the original code or that incorrect output is displayed to the user.";
 	}
 
 	@Override
