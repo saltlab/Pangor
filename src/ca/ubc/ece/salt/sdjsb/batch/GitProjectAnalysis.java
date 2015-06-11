@@ -252,11 +252,11 @@ public class GitProjectAnalysis {
 //        	tasks.add(new CFDTask(cfd, new GlobalToLocalAnalysis()));
 //        	tasks.add(new CFDTask(cfd, new CallbackParamAnalysis()));
 //        	tasks.add(new CFDTask(cfd, new CallbackErrorAnalysis()));
-//        	tasks.add(new CFDTask(cfd, new STHMetaAnalysis()));
-//        	tasks.add(new CFDTask(cfd, new STHScopeAnalysis()));
+        	tasks.add(new CFDTask(cfd, new STHMetaAnalysis()));
+        	tasks.add(new CFDTask(cfd, new STHScopeAnalysis()));
         	tasks.add(new CFDTask(cfd, new CBEMetaAnalysis()));
         	tasks.add(new CFDTask(cfd, new CBEDestinationScopeAnalysis()));
-//        	tasks.add(new CFDTask(cfd, new GTLScopeAnalysis()));
+        	tasks.add(new CFDTask(cfd, new GTLScopeAnalysis()));
         	
         	for(CFDTask task : tasks) {
                 futures.add(executor.submit(task));

@@ -14,10 +14,13 @@ import ca.ubc.ece.salt.sdjsb.cfg.CFGEdge;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
 
 /**
- * A path sensitive flow analysis.
+ * A fixed point analysis.
  * 
- * @author qhanam
- *
+ * TODO: This doesn't currently compute a fixed point because loops are only
+ * 		 iterated once (instead of until we reach a fixed point). It's not 
+ * 		 really necessary to do a proper fixed point analysis right now, but
+ * 		 such a change may be necessary for higher precision in the future.
+ * 
  * @param <LE> The type that stores the analysis information.
  */
 public abstract class PathInsensitiveFlowAnalysis<LE extends AbstractLatticeElement> extends FlowAnalysis<LE> {
@@ -28,8 +31,6 @@ public abstract class PathInsensitiveFlowAnalysis<LE extends AbstractLatticeElem
 
 	/**
 	 * Perform a path-sensitive analysis.
-	 * 
-	 * As we discover variable declarations, we add them to the scope.
 	 * 
 	 * @param cfg the control flow graph for the function or script we are analyzing.
 	 * @param scopeStack the scope for the function.

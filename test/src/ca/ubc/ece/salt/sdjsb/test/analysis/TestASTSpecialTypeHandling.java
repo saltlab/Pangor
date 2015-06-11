@@ -22,7 +22,7 @@ public class TestASTSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_undefined_old.js";
 		String dst = "./test/input/special_type_handling/sth_undefined_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
-		expectedAlerts.add(new SpecialTypeAlert("AST_STH", "a", SpecialType.UNDEFINED));
+		expectedAlerts.add(new SpecialTypeAlert("NF_STH", "a", SpecialType.UNDEFINED));
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 
@@ -31,7 +31,7 @@ public class TestASTSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_undefined_typeof_old.js";
 		String dst = "./test/input/special_type_handling/sth_undefined_typeof_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
-		expectedAlerts.add(new SpecialTypeAlert("AST_STH", "a", SpecialType.UNDEFINED));
+		expectedAlerts.add(new SpecialTypeAlert("NF_STH", "a", SpecialType.UNDEFINED));
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 
@@ -40,7 +40,7 @@ public class TestASTSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_undefined_return_old.js";
 		String dst = "./test/input/special_type_handling/sth_undefined_return_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
-		expectedAlerts.add(new SpecialTypeAlert("AST_STH", "a", SpecialType.UNDEFINED));
+		expectedAlerts.add(new SpecialTypeAlert("NF_STH", "a", SpecialType.UNDEFINED));
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 
@@ -49,10 +49,10 @@ public class TestASTSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_falsey_old.js";
 		String dst = "./test/input/special_type_handling/sth_falsey_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
-		expectedAlerts.add(new SpecialTypeAlert("AST_STH", "a", SpecialType.FALSEY));
-		expectedAlerts.add(new SpecialTypeAlert("AST_STH", "b", SpecialType.FALSEY));
-		expectedAlerts.add(new SpecialTypeAlert("AST_STH", "c", SpecialType.FALSEY));
-		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+		expectedAlerts.add(new SpecialTypeAlert("NF_STH", "a", SpecialType.FALSEY));
+		expectedAlerts.add(new SpecialTypeAlert("NF_STH", "b", SpecialType.FALSEY));
+		expectedAlerts.add(new SpecialTypeAlert("NF_STH", "c", SpecialType.FALSEY));
+		this.runTest(new String[] {src, dst}, expectedAlerts, true);
 	}
 
 	@Test
@@ -60,11 +60,11 @@ public class TestASTSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_all_types_old.js";
 		String dst = "./test/input/special_type_handling/sth_all_types_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
-		expectedAlerts.add(new SpecialTypeAlert("AST_STH", "a", SpecialType.UNDEFINED));
-		expectedAlerts.add(new SpecialTypeAlert("AST_STH", "b", SpecialType.NULL));
-		expectedAlerts.add(new SpecialTypeAlert("AST_STH", "c", SpecialType.NAN));
-		expectedAlerts.add(new SpecialTypeAlert("AST_STH", "d", SpecialType.ZERO));
-		expectedAlerts.add(new SpecialTypeAlert("AST_STH", "e", SpecialType.BLANK));
+		expectedAlerts.add(new SpecialTypeAlert("NF_STH", "a", SpecialType.UNDEFINED));
+		expectedAlerts.add(new SpecialTypeAlert("NF_STH", "b", SpecialType.NULL));
+		expectedAlerts.add(new SpecialTypeAlert("NF_STH", "c", SpecialType.NAN));
+		expectedAlerts.add(new SpecialTypeAlert("NF_STH", "d", SpecialType.ZERO));
+		expectedAlerts.add(new SpecialTypeAlert("NF_STH", "e", SpecialType.BLANK));
 		this.runTest(new String[] {src, dst}, expectedAlerts, true);
 	}
 
@@ -73,7 +73,7 @@ public class TestASTSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_undefined_field_old.js";
 		String dst = "./test/input/special_type_handling/sth_undefined_field_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
-		expectedAlerts.add(new SpecialTypeAlert("AST_STH", "a.field.value", SpecialType.UNDEFINED));
+		expectedAlerts.add(new SpecialTypeAlert("NF_STH", "a.field.value", SpecialType.UNDEFINED));
 		this.runTest(new String[] {src, dst}, expectedAlerts, true);
 	}
 
@@ -82,7 +82,7 @@ public class TestASTSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_undefined_elementget_old.js";
 		String dst = "./test/input/special_type_handling/sth_undefined_elementget_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
-		expectedAlerts.add(new SpecialTypeAlert("AST_STH", "a", SpecialType.UNDEFINED));
+		expectedAlerts.add(new SpecialTypeAlert("NF_STH", "a", SpecialType.UNDEFINED));
 		this.runTest(new String[] {src, dst}, expectedAlerts, true);
 	}
 
@@ -91,8 +91,8 @@ public class TestASTSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/tv-functions-old.js";
 		String dst = "./test/input/special_type_handling/tv-functions-new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
-		expectedAlerts.add(new SpecialTypeAlert("AST_STH", "tvShowTitle", SpecialType.UNDEFINED));
-		expectedAlerts.add(new SpecialTypeAlert("AST_STH", "progression", SpecialType.UNDEFINED));
+		expectedAlerts.add(new SpecialTypeAlert("NF_STH", "tvShowTitle", SpecialType.UNDEFINED));
+		expectedAlerts.add(new SpecialTypeAlert("NF_STH", "progression", SpecialType.UNDEFINED));
 		this.runTest(new String[] {src, dst}, expectedAlerts, true);
 	}
 
@@ -141,7 +141,7 @@ public class TestASTSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_undefined_while_old.js";
 		String dst = "./test/input/special_type_handling/sth_undefined_while_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
-		expectedAlerts.add(new SpecialTypeAlert("AST_STH", "a", SpecialType.UNDEFINED));
+		expectedAlerts.add(new SpecialTypeAlert("NF_STH", "a", SpecialType.UNDEFINED));
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 
@@ -150,7 +150,7 @@ public class TestASTSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_undefined_for_old.js";
 		String dst = "./test/input/special_type_handling/sth_undefined_for_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
-		expectedAlerts.add(new SpecialTypeAlert("AST_STH", "a", SpecialType.UNDEFINED));
+		expectedAlerts.add(new SpecialTypeAlert("NF_STH", "a", SpecialType.UNDEFINED));
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 
@@ -159,7 +159,7 @@ public class TestASTSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_undefined_do_old.js";
 		String dst = "./test/input/special_type_handling/sth_undefined_do_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
-		expectedAlerts.add(new SpecialTypeAlert("AST_STH", "a", SpecialType.UNDEFINED));
+		expectedAlerts.add(new SpecialTypeAlert("NF_STH", "a", SpecialType.UNDEFINED));
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 
@@ -168,7 +168,7 @@ public class TestASTSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_undefined_conditional_old.js";
 		String dst = "./test/input/special_type_handling/sth_undefined_conditional_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
-		expectedAlerts.add(new SpecialTypeAlert("AST_STH", "a", SpecialType.UNDEFINED));
+		expectedAlerts.add(new SpecialTypeAlert("NF_STH", "a", SpecialType.UNDEFINED));
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 
@@ -185,7 +185,7 @@ public class TestASTSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sample-conf_old.js";
 		String dst = "./test/input/special_type_handling/sample-conf_new.js";
 		List<Alert> expectedAlerts = new LinkedList<Alert>();
-		expectedAlerts.add(new SpecialTypeAlert("AST_STH", "process.env.PM2_LOG_DATE_FORMAT", SpecialType.UNDEFINED));
+		expectedAlerts.add(new SpecialTypeAlert("NF_STH", "process.env.PM2_LOG_DATE_FORMAT", SpecialType.UNDEFINED));
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 
