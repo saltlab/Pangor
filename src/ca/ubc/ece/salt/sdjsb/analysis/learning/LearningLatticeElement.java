@@ -14,6 +14,8 @@ public class LearningLatticeElement extends AbstractLatticeElement {
 	/**
 	 * Creates a new lattice element.
 	 */
-	public LearningLatticeElement() { }
+	public LearningLatticeElement() { 
+		this.currentPathFragment = null;
+	}
 	
 }

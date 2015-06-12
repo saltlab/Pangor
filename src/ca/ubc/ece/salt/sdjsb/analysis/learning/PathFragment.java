@@ -16,16 +16,24 @@ public class PathFragment {
 	/**
 	 * Stores the path fragment.
 	 */
-	LinkedList<CFGNode> path;
+	public LinkedList<CFGNode> path;
 
 	/** 
 	 * Stores the CFGNode that the path fragment continues at (if 
 	 * applicable).
 	 */
-	CFGNode continuesAt;
+	public CFGNode continuesAt;
 	
 	/**
 	 * The condition under which this path fragment executes.
 	 */
-	AstNode condition;
+	public AstNode condition;
+	
+
+	public PathFragment(CFGNode head) {
+		this.path = new LinkedList<CFGNode>();
+		this.path.add(head);
+		this.continuesAt = null;
+		this.condition = null;
+	}
 }

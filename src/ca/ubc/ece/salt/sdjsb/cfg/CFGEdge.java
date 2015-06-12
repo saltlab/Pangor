@@ -35,6 +35,7 @@ public class CFGEdge {
 	public CFGEdge(ClassifiedASTNode condition, CFGNode from, CFGNode to) {
 		this.condition = condition;
 		this.to = to;
+		this.from = from;
 		this.changeType = ChangeType.UNKNOWN;
 		this.id = CFGEdge.getUniqueId();
 		this.loopEdge = false;
@@ -46,9 +47,9 @@ public class CFGEdge {
 	public CFGEdge(ClassifiedASTNode condition, CFGNode from, CFGNode to, boolean loopEdge) {
 		this.condition = condition;
 		this.to = to;
+		this.from = from;
 		this.changeType = ChangeType.UNKNOWN;
 		this.id = CFGEdge.getUniqueId();
-		//System.out.println(((AstNode)condition).toSource() + ":" + loopEdge);
 		this.loopEdge = loopEdge;
 	}
 	
@@ -71,6 +72,13 @@ public class CFGEdge {
 	 */
 	public CFGNode getTo() {
 		return to;
+	}
+	
+	/**
+	 * @param from the node this edge exits.
+	 */
+	public void setFrom(CFGNode from) {
+		this.from = from;
 	}
 
 	/**

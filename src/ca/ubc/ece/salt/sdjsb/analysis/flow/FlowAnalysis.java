@@ -160,6 +160,7 @@ public abstract class FlowAnalysis<LE extends AbstractLatticeElement> extends Sc
         
         CFG cfg = this.getFunctionCFG(scope.scope, cfgs);
         if(cfg == null) throw new Exception("CFG not found for function.");
+        this.setCurrentCFGIdentity(scope.identity);
         this.analyze(cfg, scope);
 
         /* Analyze the methods of the function. */

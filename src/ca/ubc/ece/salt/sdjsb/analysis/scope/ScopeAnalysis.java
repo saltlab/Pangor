@@ -29,6 +29,17 @@ public class ScopeAnalysis implements Analysis {
 	 */
 	private Map<AstNode, List<Alert>> alerts;
 	
+	/**
+	 * Used to generate unique IDs for anonymous functions.
+	 */
+	private int anonymousIDGen;
+
+	/** 
+	 * Keep track of the identity of the current CFG being analyzed (useful 
+	 * for the analysis functions of analyses that extend ScopeAnalysis.
+	 */
+	private String currentCFGIdentity;
+	
 	protected List<CFG> srcCFGs;
 	protected List<CFG> dstCFGs;
 	
@@ -43,6 +54,8 @@ public class ScopeAnalysis implements Analysis {
 	
 	public ScopeAnalysis() {
 		this.alerts = new HashMap<AstNode, List<Alert>>();
+		this.anonymousIDGen = 0;
+		this.currentCFGIdentity = null;
 	}
 	
 	/**
@@ -80,7 +93,7 @@ public class ScopeAnalysis implements Analysis {
 
 		this.dstScopeMap = new HashMap<ScriptNode, Scope>();
 		this.dstCFGs = cfgs;
-		this.dstScope = this.buildScopeTree(root, null, this.dstScopeMap);
+		this.dstScope = this.buildScopeTree(root, null, this.dstScopeMap, null);
 
 	}
 
@@ -92,8 +105,8 @@ public class ScopeAnalysis implements Analysis {
 		this.dstScopeMap = new HashMap<ScriptNode, Scope>();
 		this.srcCFGs = srcCFGs;
 		this.dstCFGs = dstCFGs;
-		this.srcScope = this.buildScopeTree(srcRoot, null, this.srcScopeMap);
-		this.dstScope = this.buildScopeTree(dstRoot, null, this.dstScopeMap);
+		this.srcScope = this.buildScopeTree(srcRoot, null, this.srcScopeMap, null);
+		this.dstScope = this.buildScopeTree(dstRoot, null, this.dstScopeMap, null);
 
 	}
 
@@ -102,24 +115,29 @@ public class ScopeAnalysis implements Analysis {
 	 * @return the root of the scope tree.
 	 * @throws Exception
 	 */
-	private Scope buildScopeTree(ScriptNode function, Scope parent, Map<ScriptNode, Scope> scopeMap) throws Exception {
+	private Scope buildScopeTree(ScriptNode function, Scope parent, Map<ScriptNode, Scope> scopeMap, String parentIdentity) throws Exception {
+		
+		/* Create a unique identity for the function. */
+		String identity = "Script";
+		if(parentIdentity != null) {
+			assert(function instanceof FunctionNode);
+			String functionName = this.getFunctionName((FunctionNode) function);
+			identity = parentIdentity + "." + functionName;
+		}
 		
         /* Create a new scope for this script or function and add it to the 
          * scope tree. */
-        
-		Scope scope = new Scope(parent, function);
+		Scope scope = new Scope(parent, function, identity);
 		if(parent != null) parent.children.add(scope);
 		ScopeVisitor.getLocalScope(scope);
 		
 		/* Put the scope in the scope map. */
-		
 		scopeMap.put(function, scope);
         
         /* Analyze the methods of the function. */
-
         List<FunctionNode> methods = FunctionTreeVisitor.getFunctions(function);
         for(FunctionNode method : methods) {
-        	buildScopeTree(method, scope, scopeMap);
+        	buildScopeTree(method, scope, scopeMap, identity);
         }
         
         return scope;
@@ -140,6 +158,25 @@ public class ScopeAnalysis implements Analysis {
 		
 		alerts.add(alert);
 	}
+	
+	/** 
+	 * @return the identity of the current CFG being analyzed (useful for the
+	 * analyses that extend this to correlate the results they produce to the
+	 * function they are analyzing).
+	 */
+	protected String getCurrentCFGIdentity() {
+		return this.currentCFGIdentity;
+	}
+	
+	/**
+	 * Sets the identity of the current CFG being analyzed (useful for the
+	 * analyses that extend this to correlate the results they produce to the
+	 * function they are analyzing).
+	 * @param currentCFGIdentity
+	 */
+	protected void setCurrentCFGIdentity(String currentCFGIdentity) {
+		this.currentCFGIdentity = currentCFGIdentity;
+	}
 
 	/**
 	 * @return a list of the alerts from this analysis.
@@ -151,6 +188,27 @@ public class ScopeAnalysis implements Analysis {
 			alerts.addAll(this.alerts.get(node));
 		}
 		return alerts;
+	}
+	
+	/**
+	 * @param function The function to generate a name for.
+	 * @return the function name (if is a named function) or a unique ID if it
+	 * 		   is an anonymous function.
+	 */
+	private String getFunctionName(FunctionNode function) {
+		String functionName = function.getName();
+		if(functionName.isEmpty()) {
+			functionName = "~A" + this.getAnonymousFunctionID() + "~";
+		}
+		return functionName;
+	}
+	
+	/**
+	 * @return A unique ID for anonymous functions.
+	 */
+	private int getAnonymousFunctionID() {
+		this.anonymousIDGen = this.anonymousIDGen + 1;
+		return this.anonymousIDGen;
 	}
 
 }

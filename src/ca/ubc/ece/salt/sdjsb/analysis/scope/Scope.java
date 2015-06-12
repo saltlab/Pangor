@@ -11,18 +11,31 @@ import org.mozilla.javascript.ast.ScriptNode;
 
 public final class Scope {
 	
+	/** The scope above this scope (i.e., the scope for this function's parent). **/
 	public Scope parent;
+	
+	/** The AST node of the script or function of this scope. **/
 	public ScriptNode scope;
+	
+	/** The variables declared in the scope. **/
 	public Map<String, AstNode> variables;
+	
+	/** The globals declared (implicitly if this is not the script scope) in the scope. **/
 	public Map<String, AstNode> globals;
+	
+	/** The scopes of the child functions. **/
 	public List<Scope> children;
 	
-	public Scope(Scope parent, ScriptNode scope) {
+	/** Uniquely identifies each function. **/
+	public String identity;
+	
+	public Scope(Scope parent, ScriptNode scope, String identity) {
 		this.parent = parent;
 		this.scope = scope;
 		this.variables = new HashMap<String, AstNode>();
 		this.globals = new HashMap<String, AstNode>();
 		this.children = new LinkedList<Scope>();
+		this.identity = identity;
 	}
 	
 

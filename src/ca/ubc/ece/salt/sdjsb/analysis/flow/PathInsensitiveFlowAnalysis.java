@@ -24,7 +24,7 @@ import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
  * @param <LE> The type that stores the analysis information.
  */
 public abstract class PathInsensitiveFlowAnalysis<LE extends AbstractLatticeElement> extends FlowAnalysis<LE> {
-
+	
 	public PathInsensitiveFlowAnalysis() {
 		super();
 	}
@@ -63,6 +63,9 @@ public abstract class PathInsensitiveFlowAnalysis<LE extends AbstractLatticeElem
 			
 			/* Join with the lattice element in the node. */
 			LE joined = this.join(state.le, leMap.get(state.edge.getTo()));
+			
+			/* Store the joined LE in the map. TODO: Is this correct? */
+			leMap.put(state.edge.getTo(), joined);
 
 			/* Wait until all the edges have joined to transfer over the node. */
 			if(state.edge.getTo().decrementEdges()) {
