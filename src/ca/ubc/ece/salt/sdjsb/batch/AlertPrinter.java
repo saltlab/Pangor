@@ -92,4 +92,18 @@ public class AlertPrinter {
 
 	}
 	
+	/**
+	 * Prints the alerts in custom format.
+	 */
+	public void printCustom() {
+
+		for(ProjectAnalysisResult analysisResult : this.analysisResults) {
+			List<Alert> alerts = analysisResult.getAlertsOfSubType("FEATURE_VECTOR_BoW");
+			for(Alert alert : alerts) {
+				System.out.println(alert.getCustomDescription());
+			}
+		}
+
+	}
+	
 }

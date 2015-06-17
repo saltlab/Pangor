@@ -19,6 +19,11 @@ public class BatchAlert extends Alert {
 		this.oldFile = oldFile;
 		this.newFile = newFile;
 	}
+	
+	@Override
+	public String getCustomDescription() {
+		return alert.getCustomDescription();
+	}
 
 	@Override
 	public String getIdentifier() {

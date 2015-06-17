@@ -18,6 +18,9 @@ public class ProjectAnalysisOptions {
 	
 	@Option(name="-a", aliases={"--alerts"}, usage="Print individual alert descriptions.")
 	private boolean alerts = false;
+	
+	@Option(name="-c", aliases={"--custom"}, usage="Prints custom alerts.")
+	private boolean custom = false;
 
 	public String getURI() {
 		return this.host;
@@ -37,6 +40,10 @@ public class ProjectAnalysisOptions {
 	
 	public boolean printAlerts() {
 		return this.alerts;
+	}
+	
+	public boolean printCustom() {
+		return this.custom;
 	}
 
 }

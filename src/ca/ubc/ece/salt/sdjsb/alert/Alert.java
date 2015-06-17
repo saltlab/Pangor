@@ -64,6 +64,13 @@ public abstract class Alert {
 	}
 	
 	/**
+	 * A custom description specified by the concrete alert.
+	 */
+	public String getCustomDescription() {
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
 	 * Returns specific details about the alert (e.g., variable names,
 	 * locations, etc.).
 	 * @return The long description of the alert.

@@ -9,6 +9,7 @@ import org.mozilla.javascript.ast.AstNode;
 
 import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.FeatureVector;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningFlowAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.PathFragment;
@@ -35,8 +36,13 @@ public class TestLearning {
 		ControlFlowDifferencing cfd = new ControlFlowDifferencing(args);
         
 		/* Run the analysis. */
-        cfd.analyze(analysis);
-
+        Set<Alert> alerts = cfd.analyze(analysis);
+        
+        /* Print the alerts. */
+        System.out.println(FeatureVector.getHeader());
+        for(Alert alert : alerts) {
+        	System.out.println(alert.getCustomDescription());
+        }
 	}
 
 	@Test

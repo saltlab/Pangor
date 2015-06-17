@@ -51,6 +51,7 @@ import ca.ubc.ece.salt.sdjsb.analysis.ast.STHScopeAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.callbackerror.CallbackErrorAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.callbackparam.CallbackParamAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.globaltolocal.GlobalToLocalAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysis;
 import fr.labri.gumtree.client.DiffOptions;
 
@@ -248,15 +249,21 @@ public class GitProjectAnalysis {
         	List<CFDTask> tasks = new LinkedList<CFDTask>();
         	List<Future<Set<Alert>>> futures = new LinkedList<Future<Set<Alert>>>();
         	
+        	/* These analyses are full analyses. */
 //        	tasks.add(new CFDTask(cfd, new SpecialTypeAnalysis()));
 //        	tasks.add(new CFDTask(cfd, new GlobalToLocalAnalysis()));
 //        	tasks.add(new CFDTask(cfd, new CallbackParamAnalysis()));
 //        	tasks.add(new CFDTask(cfd, new CallbackErrorAnalysis()));
-        	tasks.add(new CFDTask(cfd, new STHMetaAnalysis()));
-        	tasks.add(new CFDTask(cfd, new STHScopeAnalysis()));
-        	tasks.add(new CFDTask(cfd, new CBEMetaAnalysis()));
-        	tasks.add(new CFDTask(cfd, new CBEDestinationScopeAnalysis()));
-        	tasks.add(new CFDTask(cfd, new GTLScopeAnalysis()));
+        	
+        	/* These analyses are AST level only. */
+//        	tasks.add(new CFDTask(cfd, new STHMetaAnalysis()));
+//        	tasks.add(new CFDTask(cfd, new STHScopeAnalysis()));
+//        	tasks.add(new CFDTask(cfd, new CBEMetaAnalysis()));
+//        	tasks.add(new CFDTask(cfd, new CBEDestinationScopeAnalysis()));
+//        	tasks.add(new CFDTask(cfd, new GTLScopeAnalysis()));
+        	
+        	/* This is the learning analysis. */
+        	tasks.add(new CFDTask(cfd, new LearningAnalysis()));
         	
         	for(CFDTask task : tasks) {
                 futures.add(executor.submit(task));
