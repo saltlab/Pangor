@@ -5,3 +5,4 @@ repositories/
 test/output/
 .DS_Store
 *.swp
+output/

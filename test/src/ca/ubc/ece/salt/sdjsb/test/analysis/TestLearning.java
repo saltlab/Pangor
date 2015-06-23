@@ -10,9 +10,9 @@ import org.mozilla.javascript.ast.AstNode;
 import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.FeatureVector;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningFlowAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.PathFragment;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningAnalysis;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
 
 /**

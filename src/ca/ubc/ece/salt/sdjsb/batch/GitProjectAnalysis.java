@@ -51,7 +51,7 @@ import ca.ubc.ece.salt.sdjsb.analysis.ast.STHScopeAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.callbackerror.CallbackErrorAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.callbackparam.CallbackParamAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.globaltolocal.GlobalToLocalAnalysis;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysis;
 import fr.labri.gumtree.client.DiffOptions;
 

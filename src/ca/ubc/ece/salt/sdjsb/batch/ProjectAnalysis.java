@@ -72,7 +72,7 @@ public class ProjectAnalysis {
 		AlertPrinter printer = new AlertPrinter(gitProjectAnalysis.getAnalysisResult());
 		if(!options.printCustom()) printer.printSummary(options.printAlerts());
 		if(options.printLatex()) printer.printLatexTable();
-		if(options.printCustom()) printer.printCustom();
+		if(options.printCustom()) printer.printCustom(options.getOutfile());
 		
 	}
 

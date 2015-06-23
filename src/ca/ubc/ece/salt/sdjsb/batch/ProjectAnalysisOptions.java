@@ -21,6 +21,9 @@ public class ProjectAnalysisOptions {
 	
 	@Option(name="-c", aliases={"--custom"}, usage="Prints custom alerts.")
 	private boolean custom = false;
+	
+	@Option(name="-o", aliases={"--outfile"}, usage="The file path to output to.")
+	private String outFile = null;
 
 	public String getURI() {
 		return this.host;
@@ -44,6 +47,10 @@ public class ProjectAnalysisOptions {
 	
 	public boolean printCustom() {
 		return this.custom;
+	}
+	
+	public String getOutfile() {
+		return this.outFile;
 	}
 
 }
