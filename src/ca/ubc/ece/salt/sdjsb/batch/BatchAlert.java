@@ -21,6 +21,21 @@ public class BatchAlert extends Alert {
 	}
 	
 	@Override
+	public String getID() {
+		return alert.getID();
+	}
+	
+	@Override
+	public String getSourceCode() {
+		return alert.getSourceCode();
+	}
+	
+	@Override
+	public String getDestinationCode() {
+		return alert.getDestinationCode();
+	}
+	
+	@Override
 	public String getFeatureVector(String project, String sourceFile, String destinationFile, String buggyCommit, String repairedCommit) {
 		return alert.getFeatureVector(project, this.oldFile, this.newFile, this.buggyCommit, this.bugFixingCommit);
 	}

@@ -22,6 +22,13 @@ public abstract class Alert {
 	}
 	
 	/**
+	 * @return A unique identifier for the alert.
+	 */
+	public String getID() {
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
 	 * The type of the alert.
 	 * @return
 	 */
@@ -67,6 +74,20 @@ public abstract class Alert {
 	 * A custom description specified by the concrete alert.
 	 */
 	public String getFeatureVector(String uri, String sourceFile, String destinationFile, String buggyCommit, String repairedCommit) {
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 * @return The source code for the alert.
+	 */
+	public String getSourceCode() {
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
+	 * @return The destination code for the alert.
+	 */
+	public String getDestinationCode() {
 		throw new UnsupportedOperationException();
 	}
 	

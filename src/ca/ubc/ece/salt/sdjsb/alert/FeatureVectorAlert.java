@@ -12,6 +12,21 @@ public class FeatureVectorAlert extends Alert {
 		this.featureVector = featureVector;
 	}
 	
+	@Override
+	public String getID() {
+		return String.valueOf(this.featureVector.id);
+	}
+	
+	@Override
+	public String getSourceCode() {
+		return this.featureVector.sourceCode;
+	}
+	
+	@Override
+	public String getDestinationCode() {
+		return this.featureVector.destinationCode;
+	}
+	
 	@Override 
 	public String getFeatureVector(String project, String sourceFile, String destinationFile, String buggyCommit, String repairedCommit) {
 		return this.featureVector.getFeatureVector(project, sourceFile, destinationFile, buggyCommit, repairedCommit);

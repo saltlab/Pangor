@@ -126,7 +126,7 @@ public class ProjectAnalysis {
 		AlertPrinter printer = new AlertPrinter(analysis.getAnalysisResult());
 		if(!options.printCustom()) printer.printSummary(options.printAlerts());
 		if(options.printLatex()) printer.printLatexTable();
-		if(options.printCustom()) printer.printCustom(options.getOutfile(), options.getAppend());
+		if(options.printCustom()) printer.printFeatureVector(options.getOutfile(), options.getSupplementaryFolder(), options.getAppend());
 		
 	}
 

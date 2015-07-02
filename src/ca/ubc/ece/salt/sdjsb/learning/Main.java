@@ -14,13 +14,13 @@ public class Main {
 	public static void main(String[] args) throws Exception {
 		
 		/* Establish a connection to the data file. */
-		DataSource source = new DataSource("./output/run1.arff");
+		DataSource source = new DataSource("./output/run2.arff");
 		Instances data = source.getDataSet();
 		
 		/* Filter out the columns we don't want. */
 		String[] removeOptions = new String[2];
 		removeOptions[0] = "-R";
-		removeOptions[1] = "1,3,4";
+		removeOptions[1] = "1,3-6";
 		Remove remove = new Remove();
 		remove.setOptions(removeOptions);
 		remove.setInputFormat(data);
@@ -32,18 +32,28 @@ public class Main {
 		options[1] = "-S";	// Seed
 		options[2] = "1";
 		options[3] = "-N"; 	// Number of clusters
-		options[4] = "5";
+		options[4] = "10";
 		SimpleKMeans clusterer = new SimpleKMeans();
 		clusterer.setOptions(options);
 		clusterer.buildClusterer(filteredData);
 		
 		/* Print the results. */
 		PrintWriter pw = new PrintWriter(new FileWriter("./output/clusters.csv"));
+		
+		double[] clusterSizes = clusterer.getClusterSizes();
+		for(int i = 0; i < clusterSizes.length; i++) {
+			pw.println("Cluster " + i + " has " + clusterSizes[i] + " instances.");
+		}
+		
 		int[] assignments = clusterer.getAssignments();
 		for(int i = 0; i < filteredData.size(); i++) {
-			pw.print(data.instance(i).stringValue(1));
+			pw.print(data.instance(i).toString(0));
+			pw.print("," + data.instance(i).stringValue(1));
 			pw.print("," + data.instance(i).stringValue(2));
 			pw.print("," + data.instance(i).stringValue(3));
+			pw.print("," + data.instance(i).toString(4));
+			pw.print("," + data.instance(i).toString(5));
+			pw.print("," + data.instance(i).toString(6));
 			pw.print("," + assignments[i]);
 			pw.print("\n");
 		}

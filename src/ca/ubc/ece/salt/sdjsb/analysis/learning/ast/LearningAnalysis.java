@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.mozilla.javascript.ast.ScriptNode;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.sdjsb.alert.FeatureVectorAlert;
 import ca.ubc.ece.salt.sdjsb.analysis.meta.MetaAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.Scope;
@@ -30,7 +31,7 @@ public class LearningAnalysis extends MetaAnalysis<LearningASTAnalysis, Learning
 			
 			/* Get the source scope that maps to the destination scope. */
 			Scope srcScope;
-			if(dstScope.scope.getMapping() == null) {
+			if(dstScope.scope.getMapping() != null) {
 				srcScope = this.srcAnalysis.getDstScope((ScriptNode)dstScope.scope.getMapping());
 			}
 			else {

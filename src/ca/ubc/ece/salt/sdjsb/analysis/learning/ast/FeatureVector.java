@@ -78,7 +78,7 @@ public class FeatureVector {
 	 * @param source The source feature vector.
 	 */
 	public void join(FeatureVector source) {
-		this.sourceCode = source.destinationCode;
+		this.sourceCode = source.sourceCode;
 		this.removedStatementMap = source.removedStatementMap;
 		this.removedKeywordMap = source.removedKeywordMap;
 	}
@@ -202,7 +202,7 @@ public class FeatureVector {
 	 */
 	public static String getHeader() {
 
-		String header = "ID\tURI\tSourceFile\tDestinationFile\tBuggyCommit\tRepairedCommit\tFunction\tSourceCode\tDestinationCode";
+		String header = "ID\tURI\tSourceFile\tDestinationFile\tBuggyCommit\tRepairedCommit\tFunction";
 
 		for(String statementType : FeatureVector.buildStatementMap().keySet()) {
 			header += "\tInserted-" + statementType;
@@ -229,8 +229,7 @@ public class FeatureVector {
 	public String getFeatureVector(String project, String sourceFile, String destinationFile, String buggyCommit, String repairedCommit) {
 
 		String vector = id + "\t" + project + "\t" + sourceFile + "\t" + destinationFile 
-				+ "\t" + buggyCommit + "\t" + repairedCommit + "\t" + this.functionName 
-				+ "\t\"" + this.sourceCode + "\"\t\"" + this.destinationCode + "\"";
+				+ "\t" + buggyCommit + "\t" + repairedCommit + "\t" + this.functionName;
 		
 		for(String statementType : this.insertedStatementMap.keySet()) {
 			vector += "\t" + this.insertedStatementMap.get(statementType);
@@ -246,6 +245,20 @@ public class FeatureVector {
 		
 		return vector;
 
+	}
+	
+	/**
+	 * @return The source code for the alert.
+	 */
+	public String getSource() {
+		return this.sourceCode;
+	}
+	
+	/**
+	 * @return The destination code for the alert.
+	 */
+	public String getDestination() {
+		return this.destinationCode;
 	}
 
 	/**

@@ -15,6 +15,9 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 
 	/** The feature vector for the visited function. **/
 	private FeatureVector featureVector;
+	
+	/** The root of the function or script we are visiting. **/
+	private ScriptNode root;
 
 	/**
 	 * Visits the script or function and returns a feature vector for it.
@@ -24,14 +27,15 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 	public static FeatureVector getFeatureVector(ScriptNode function) {
 		
 		/* Create the feature vector by visiting the function. */
-		LearningAnalysisVisitor visitor = new LearningAnalysisVisitor();
+		LearningAnalysisVisitor visitor = new LearningAnalysisVisitor(function);
 		function.visit(visitor);
 		
 		/* Store the source code for the function. Since we don't know if we
 		 * are analyzing the source function or destination function, store
 		 * it as both. When the source and destination feature vectors are 
 		 * merged. */
-		visitor.featureVector.destinationCode = function.toSource().replaceAll("\"", "&quot;").replaceAll("\n", "<br/>").replaceAll("\t", "&nbsp;&nbsp;");
+		visitor.featureVector.sourceCode = function.toSource();
+		visitor.featureVector.destinationCode = function.toSource();
 		
 		/* Set the function name before we return */
 		if(function instanceof FunctionNode) {
@@ -40,7 +44,7 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 				visitor.featureVector.functionName = "~anonymous~";
 			}
 			else {
-				visitor.featureVector.functionName = ((FunctionNode)function).getName();
+				visitor.featureVector.functionName = name;
 			}
 		}
 		else {
@@ -50,8 +54,9 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		return visitor.featureVector;
 	}
 	
-	private LearningAnalysisVisitor() {
+	private LearningAnalysisVisitor(ScriptNode root) {
 		this.featureVector = new FeatureVector();
+		this.root = root;
 	}
 
 	@Override
@@ -64,7 +69,7 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		this.registerKeyword(node, node.getChangeType());
 		
 		/* Stop if this is a function declaration. */
-		if(node instanceof FunctionNode) {
+		if(node instanceof FunctionNode && node != this.root) {
 			return false;
 		}
 		
@@ -84,7 +89,7 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		
 		this.featureVector.addStatement(statementType, changeType);
 		
-	} 
+	}
 	
 	/**
 	 * Checks if the node contains a keyword that we want to track and

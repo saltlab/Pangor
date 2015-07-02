@@ -1,5 +1,7 @@
 package ca.ubc.ece.salt.sdjsb.batch;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -97,9 +99,10 @@ public class AlertPrinter {
 	}
 	
 	/**
-	 * Prints the alerts in custom format.
+	 * Prints an alert's feature vector and writes the source code to 
+	 * a supplementary file for human inspection.
 	 */
-	public void printCustom(String outFile, boolean append) {
+	public void printFeatureVector(String outFile, String supplementaryFolder, boolean append) {
 		
 		PrintStream stream = System.out;
 		
@@ -112,13 +115,48 @@ public class AlertPrinter {
 			}
 		}
 		
-		stream.println(FeatureVector.getHeader());
+		/* Write the header for the feature vector. */
+		if(!append) {
+			stream.println(FeatureVector.getHeader());
+		}
 
+		/* Write each feature vector from the results. */
 		for(ProjectAnalysisResult analysisResult : this.analysisResults) {
+
 			List<Alert> alerts = analysisResult.getAlertsOfSubType("FEATURE_VECTOR_BoW");
+
 			for(Alert alert : alerts) {
+
+				/* The feature vector as a CSV row. */
 				stream.println(alert.getFeatureVector(analysisResult.getProjectName(), null, null, null, null));
+				
+				/* Write out the source and destination code to supplementary files. */
+				if(supplementaryFolder != null) {
+					
+					/* The path to the supplementary folder may not exist. */
+					File path = new File(supplementaryFolder);
+					path.mkdirs();
+
+					File src = new File(supplementaryFolder, alert.getID() + "_src.js");
+					File dst = new File(supplementaryFolder, alert.getID() + "_dst.js");
+					
+					try (PrintStream srcStream = new PrintStream(new FileOutputStream(src));
+						 PrintStream dstStream = new PrintStream(new FileOutputStream(dst));) {
+
+						srcStream.print(alert.getSourceCode());
+						dstStream.print(alert.getDestinationCode());
+						
+						srcStream.close();
+						dstStream.close();
+						
+					} catch (FileNotFoundException e) {
+						System.err.println(e.getMessage());
+					} 
+					
+				}
+
 			}
+
 		}
 
 	}

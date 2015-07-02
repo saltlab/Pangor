@@ -28,6 +28,9 @@ public class ProjectAnalysisOptions {
 	@Option(name="-o", aliases={"--outfile"}, usage="The file path to output to.")
 	private String outFile = null;
 	
+	@Option(name="-s", aliases={"--supplement"}, usage="The folder path to place any supplementary files.")
+	private String supplement = null;
+	
 	@Option(name="-p", aliases={"--append"}, usage="Appends output to the output file.")
 	private boolean append = false;
 
@@ -61,6 +64,10 @@ public class ProjectAnalysisOptions {
 	
 	public String getOutfile() {
 		return this.outFile;
+	}
+	
+	public String getSupplementaryFolder() {
+		return this.supplement;
 	}
 	
 	public boolean getAppend() {
