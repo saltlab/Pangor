@@ -18,5 +18,6 @@
 	<classpathentry kind="lib" path="lib/slf4j-api-1.7.10.jar"/>
 	<classpathentry kind="lib" path="lib/jsch-0.1.51.jar"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/rhino"/>
+	<classpathentry kind="lib" path="lib/weka.jar" sourcepath="lib/weka-src.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

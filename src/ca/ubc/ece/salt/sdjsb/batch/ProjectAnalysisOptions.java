@@ -22,8 +22,14 @@ public class ProjectAnalysisOptions {
 	@Option(name="-c", aliases={"--custom"}, usage="Prints custom alerts.")
 	private boolean custom = false;
 	
+	@Option(name="-r", aliases={"--repositories"}, usage="The path to the file specifying the repositories to analyze.")
+	private String repoFile = null;
+	
 	@Option(name="-o", aliases={"--outfile"}, usage="The file path to output to.")
 	private String outFile = null;
+	
+	@Option(name="-p", aliases={"--append"}, usage="Appends output to the output file.")
+	private boolean append = false;
 
 	public String getURI() {
 		return this.host;
@@ -49,8 +55,20 @@ public class ProjectAnalysisOptions {
 		return this.custom;
 	}
 	
+	public String getRepoFile() {
+		return this.repoFile;
+	}
+	
 	public String getOutfile() {
 		return this.outFile;
+	}
+	
+	public boolean getAppend() {
+		return this.append;
+	}
+	
+	public void setAppend(boolean append) {
+		this.append = append;
 	}
 
 }

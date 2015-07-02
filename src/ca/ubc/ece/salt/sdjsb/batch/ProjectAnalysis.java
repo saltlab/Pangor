@@ -1,7 +1,12 @@
 package ca.ubc.ece.salt.sdjsb.batch;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
@@ -46,6 +51,8 @@ public class ProjectAnalysis {
                 return;
 			}
 
+			ProjectAnalysis.analyzeAndPrint(gitProjectAnalysis, options);
+
 		}
 		/* A URI was given. */
 		else if(options.getURI() != null) {
@@ -57,7 +64,43 @@ public class ProjectAnalysis {
                 ProjectAnalysis.printUsage(e.getMessage(), parser);
                 return;
 			}
+			
+			ProjectAnalysis.analyzeAndPrint(gitProjectAnalysis, options);
 
+		}
+		/* A list of URIs was given. */
+		else if(options.getRepoFile() != null) {
+			
+			/* Parse the file into a list of URIs. */
+			List<String> uris = new LinkedList<String>();
+			
+			try(BufferedReader br = new BufferedReader(new FileReader(options.getRepoFile()))) {
+			    for(String line; (line = br.readLine()) != null; ) {
+			    	uris.add(line);
+			    }
+			}
+			catch(Exception e) {
+				System.err.println("Error while reading URI file: " + e.getMessage());
+			}
+			
+			/* Analyze all projects. */
+			for(String uri : uris) {
+
+				try {
+					gitProjectAnalysis = GitProjectAnalysis.fromURI(uri, ProjectAnalysis.CHECKOUT_DIR);
+				} 
+				catch(GitProjectAnalysisException e) {
+					ProjectAnalysis.printUsage(e.getMessage(), parser);
+					return;
+				}
+				
+				ProjectAnalysis.analyzeAndPrint(gitProjectAnalysis, options);
+				
+				options.setAppend(true);
+				
+			}
+		
+			
 		}
 		else {
 			System.out.println("No repository given.");
@@ -65,14 +108,25 @@ public class ProjectAnalysis {
 			return;
 		}
 
+	}
+	
+	/**
+	 * Performs the analysis on the project and prints according to the 
+	 * options that are selected.
+	 * @param analysis The analysis to execute.
+	 * @param options The command line options.
+	 * @throws Exception
+	 */
+	private static void analyzeAndPrint(GitProjectAnalysis analysis, ProjectAnalysisOptions options) throws Exception {
+
 		/* Perform the analysis (may take some time). */
-		gitProjectAnalysis.analyze();
+		analysis.analyze();
 		
 		/* Print what we need. */
-		AlertPrinter printer = new AlertPrinter(gitProjectAnalysis.getAnalysisResult());
+		AlertPrinter printer = new AlertPrinter(analysis.getAnalysisResult());
 		if(!options.printCustom()) printer.printSummary(options.printAlerts());
 		if(options.printLatex()) printer.printLatexTable();
-		if(options.printCustom()) printer.printCustom(options.getOutfile());
+		if(options.printCustom()) printer.printCustom(options.getOutfile(), options.getAppend());
 		
 	}
 

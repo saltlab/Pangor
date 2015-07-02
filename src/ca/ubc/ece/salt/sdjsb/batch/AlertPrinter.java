@@ -1,12 +1,13 @@
 package ca.ubc.ece.salt.sdjsb.batch;
 
-import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.FeatureVector;
 
 public class AlertPrinter {
 	
@@ -98,23 +99,25 @@ public class AlertPrinter {
 	/**
 	 * Prints the alerts in custom format.
 	 */
-	public void printCustom(String outFile) {
+	public void printCustom(String outFile, boolean append) {
 		
 		PrintStream stream = System.out;
 		
 		if(outFile != null) {
 			try {
-				stream = new PrintStream(new File(outFile));
+				stream = new PrintStream(new FileOutputStream(outFile, append));
 			}
 			catch (IOException e) {
 				System.err.println(e.getMessage());
 			}
 		}
+		
+		stream.println(FeatureVector.getHeader());
 
 		for(ProjectAnalysisResult analysisResult : this.analysisResults) {
 			List<Alert> alerts = analysisResult.getAlertsOfSubType("FEATURE_VECTOR_BoW");
 			for(Alert alert : alerts) {
-				stream.println(alert.getCustomDescription());
+				stream.println(alert.getFeatureVector(analysisResult.getProjectName(), null, null, null, null));
 			}
 		}
 

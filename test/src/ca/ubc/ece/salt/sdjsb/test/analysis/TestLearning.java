@@ -41,7 +41,7 @@ public class TestLearning {
         /* Print the alerts. */
         System.out.println(FeatureVector.getHeader());
         for(Alert alert : alerts) {
-        	System.out.println(alert.getCustomDescription());
+        	System.out.println(alert.getFeatureVector("tst", null, null, null, null));
         }
 	}
 

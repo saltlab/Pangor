@@ -41,8 +41,17 @@ public class FeatureVector {
 	/** The ID for the commit where the bug is repaired. **/
 	public String repairedCommitID;
 	
+	/** The file path from which this feature vector was constructed. **/
+	public String path;
+	
 	/** The function from which this feature vector was constructed. **/
 	public String functionName;
+	
+	/** The buggy code **/
+	public String sourceCode;
+	
+	/** The repaired code. **/
+	public String destinationCode;
 	
 	/** The statement types in each fragment. **/
 	public Map<String, Integer> insertedStatementMap;
@@ -69,6 +78,7 @@ public class FeatureVector {
 	 * @param source The source feature vector.
 	 */
 	public void join(FeatureVector source) {
+		this.sourceCode = source.destinationCode;
 		this.removedStatementMap = source.removedStatementMap;
 		this.removedKeywordMap = source.removedKeywordMap;
 	}
@@ -192,7 +202,7 @@ public class FeatureVector {
 	 */
 	public static String getHeader() {
 
-		String header = "ID\tBuggy Commit\tRepaired Commit\tFunction";
+		String header = "ID\tURI\tSourceFile\tDestinationFile\tBuggyCommit\tRepairedCommit\tFunction\tSourceCode\tDestinationCode";
 
 		for(String statementType : FeatureVector.buildStatementMap().keySet()) {
 			header += "\tInserted-" + statementType;
@@ -211,12 +221,16 @@ public class FeatureVector {
 	}
 	
 	/**
+	 * @param project The project identifier.
+	 * @param buggyCommit The ID for the commit where the bug is present.
+	 * @param repairedCommit The ID for the commit where the bug is repaired.
 	 * @return the CSV row (the feature vector) as a string.
 	 */
-	@Override
-	public String toString() {
+	public String getFeatureVector(String project, String sourceFile, String destinationFile, String buggyCommit, String repairedCommit) {
 
-		String vector = id + "\t" + buggyCommitID + "\t" + repairedCommitID + "\t" + functionName;
+		String vector = id + "\t" + project + "\t" + sourceFile + "\t" + destinationFile 
+				+ "\t" + buggyCommit + "\t" + repairedCommit + "\t" + this.functionName 
+				+ "\t\"" + this.sourceCode + "\"\t\"" + this.destinationCode + "\"";
 		
 		for(String statementType : this.insertedStatementMap.keySet()) {
 			vector += "\t" + this.insertedStatementMap.get(statementType);

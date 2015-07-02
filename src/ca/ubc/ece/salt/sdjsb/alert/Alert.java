@@ -66,7 +66,7 @@ public abstract class Alert {
 	/**
 	 * A custom description specified by the concrete alert.
 	 */
-	public String getCustomDescription() {
+	public String getFeatureVector(String uri, String sourceFile, String destinationFile, String buggyCommit, String repairedCommit) {
 		throw new UnsupportedOperationException();
 	}
 	

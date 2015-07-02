@@ -27,6 +27,12 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		LearningAnalysisVisitor visitor = new LearningAnalysisVisitor();
 		function.visit(visitor);
 		
+		/* Store the source code for the function. Since we don't know if we
+		 * are analyzing the source function or destination function, store
+		 * it as both. When the source and destination feature vectors are 
+		 * merged. */
+		visitor.featureVector.destinationCode = function.toSource().replaceAll("\"", "&quot;").replaceAll("\n", "<br/>").replaceAll("\t", "&nbsp;&nbsp;");
+		
 		/* Set the function name before we return */
 		if(function instanceof FunctionNode) {
 			String name = ((FunctionNode)function).getName();
@@ -101,9 +107,12 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		}
 		else if(node instanceof NumberLiteral) {
 			NumberLiteral nl = (NumberLiteral) node;
-			if(Double.parseDouble(nl.getValue()) == 0.0) {
-				token = "zero";
+			try { 
+				if(Double.parseDouble(nl.getValue()) == 0.0) {
+					token = "zero";
+				}
 			}
+			catch (NumberFormatException ignore) { }
 		}
 		else if(node instanceof StringLiteral) {
 			StringLiteral sl = (StringLiteral) node;

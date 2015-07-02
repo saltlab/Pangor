@@ -21,8 +21,8 @@ public class BatchAlert extends Alert {
 	}
 	
 	@Override
-	public String getCustomDescription() {
-		return alert.getCustomDescription();
+	public String getFeatureVector(String project, String sourceFile, String destinationFile, String buggyCommit, String repairedCommit) {
+		return alert.getFeatureVector(project, this.oldFile, this.newFile, this.buggyCommit, this.bugFixingCommit);
 	}
 
 	@Override

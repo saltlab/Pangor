@@ -13,8 +13,8 @@ public class FeatureVectorAlert extends Alert {
 	}
 	
 	@Override 
-	public String getCustomDescription() {
-		return this.featureVector.toString();
+	public String getFeatureVector(String project, String sourceFile, String destinationFile, String buggyCommit, String repairedCommit) {
+		return this.featureVector.getFeatureVector(project, sourceFile, destinationFile, buggyCommit, repairedCommit);
 	}
 
 	@Override
