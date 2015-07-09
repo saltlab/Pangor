@@ -10,6 +10,7 @@ import org.mozilla.javascript.ast.ScriptNode;
 import org.mozilla.javascript.ast.StringLiteral;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysisUtilities;
 
 public class LearningAnalysisVisitor implements NodeVisitor {
 
@@ -74,6 +75,7 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		}
 		
 		return true;
+
 	}
 	
 	/**
@@ -99,7 +101,14 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 	private void registerKeyword(AstNode node, ChangeType changeType) {
 
 		String token = "";
+
+		/* Add a falsey keyword if we're checking if this node is truthy or 
+		 * falsey. */
+		if(SpecialTypeAnalysisUtilities.isFalsey(node)) {
+			this.featureVector.addKeyword("~falsey~", changeType);
+		}
 		
+		/* Get the relevant keyword from the node. */
 		if(node instanceof Name) {
 			Name name = (Name) node;
 			token = name.getIdentifier();
@@ -124,8 +133,12 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 			if(sl.getValue().isEmpty()) {
 				token = "blank";
 			}
+			else {
+				token = sl.getValue();
+			}
 		}
 		
+		/* Insert the token into the feature vector if it is a keyword. */
 		this.featureVector.addKeyword(token, changeType);
 		
 	}
