@@ -31,10 +31,15 @@ public class APIFactory {
 
 		List<PackageAPI> packages = buildTopLevelPackages();
 		
-		List<String> methods = Arrays.asList("eval", "hasOwnProperty", "isFinite", "isNaN", 
-				"isPrototypeOf", "toString", "valueOf");
+		/* Methods of the Global class. */
+		List<String> methods = Arrays.asList("eval", "hasOwnProperty", "isFinite", 
+				"isNaN", "isPrototypeOf", "toString", "valueOf", "decodeURI", 
+				"decodeURIComponent", "encodeURI", "encodeURIComponent", "Number", 
+				"parseFloat", "parseInt", "String", "unescape");
 		
-		List<String> fields = Arrays.asList("length", "name", "prototype", "constructor");
+		/* Fields of the Global class. */
+		List<String> fields = Arrays.asList("length", "name", "prototype", 
+				"constructor", "Infinity", "NaN", "undefined");
 		
 		List<String> constants = Arrays.asList();
 		
@@ -61,9 +66,10 @@ public class APIFactory {
 		
 		ClassAPI array = new ClassAPI("Array", /* Class Name */
 				Arrays.asList("concat", "indexOf", "join", "lastIndexOf",
-						"pop", "push", "reverse", "shift", "slice", "sort", 
-						"splice", "toString", "unshift", "valueOf"), /* Methods */
-				Arrays.asList("length"), /* Fields */
+						"pop", "push", "reverse", "shift", "splice", "sort", 
+						"splice", "unshift", "forEach", "every", "some", 
+						"filter", "map", "reduce", "reduceRight"), /* Methods */
+				Arrays.asList(), /* Fields */
 				Arrays.asList(), /* Constants */
 				Arrays.asList(), /* Events */
 				Arrays.asList()); /* Classes */
@@ -86,9 +92,31 @@ public class APIFactory {
 				Arrays.asList(), /* Events */
 				Arrays.asList()); /* Classes */
 		
+		ClassAPI math = new ClassAPI("Math", /* Class Name */
+				Arrays.asList("abs", "acos", "asin", "atan", "atan2", "ceil",
+						"cos", "exp", "floor", "log", "max", "min", "pow",
+						"random", "round", "sin", "sqrt", "tan"), /* Methods */
+				Arrays.asList(), /* Fields */
+				Arrays.asList("E", "LN2", "LN10", "LOG2E", "LOG10E", "PI",
+						"SQRT1_2", "SQRT2"), /* Constants */
+				Arrays.asList(), /* Events */
+				Arrays.asList()); /* Classes */
+
+		/* Note: for Object, we simplify all Object.prototype.[field|method] to Object.[field|method]. */
+		ClassAPI object = new ClassAPI("Object", /* Class Name */
+				Arrays.asList("create", "defineProperty", "defineProperties", "freeze",
+						"getOwnPropertyDescriptor", "getOwnPropertyNames", "getPrototypeOf",
+						"isExtensible", "isFrozen", "isSealed", "keys", "preventExtensions",
+						"seal", "hasOwnProperty", "isPrototypeOf", "propertyIsEnumerable",
+						"toLocalString", "toString"), /* Methods */
+				Arrays.asList("length", "prototype", "constructor"), /* Fields */
+				Arrays.asList(), /* Constants */
+				Arrays.asList(), /* Events */
+				Arrays.asList()); /* Classes */
+		
 		// TODO: "Array", "Date", "Math", "NaN", "Number", "Object", "String";
 		
-		return Arrays.asList(array, date);
+		return Arrays.asList(array, date, math, object);
 
 	}
 	
