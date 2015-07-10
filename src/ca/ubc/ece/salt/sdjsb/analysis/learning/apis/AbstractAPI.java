@@ -57,10 +57,26 @@ public abstract class AbstractAPI {
 	 * @param keyword The name of the token.
 	 * @return True if the keyword/type is present in the API.
 	 */
-	public double isMemberOf(String type, String keyword) { 
-		throw new UnsupportedOperationException(); 
+	public boolean isMemberOf(KeywordType type, String keyword) {
+		// Classes are stored in its own list, so we have to check them manually
+		// TODO: For performance reasons, should we check first keywords list or
+		// classes list?
+
+		if (type == KeywordType.CLASS) {
+			for (ClassAPI klass : classes) {
+				// A ClassAPI hold its own name as a KeywordType.CLASS keyword
+				boolean isMember = klass.keywords.contains(new Keyword(KeywordType.CLASS, keyword));
+				
+				if (isMember)
+					return true;
+			}
+
+			return false;
+		} else {
+			return (keywords.contains(new Keyword(type, keyword)));
+		}
 	}
-	
+
 	/**
 	 * Computes the likelihood that the function repair involved the API.
 	 * @param keywords A map of the keywords that were found in the function. 
