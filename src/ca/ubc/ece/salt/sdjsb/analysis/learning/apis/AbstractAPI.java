@@ -1,5 +1,6 @@
 package ca.ubc.ece.salt.sdjsb.analysis.learning.apis;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,10 +25,13 @@ public abstract class AbstractAPI {
 	 * @param constantNames The constants in the API.
 	 * @param eventNames The events in the API.
 	 */
-	public AbstractAPI(List<String> methodNames, List<String> fieldNames, 
+	public AbstractAPI(List<String> methodNames, List<String> fieldNames,
 			   List<String> constantNames, List<String> eventNames,
 			   List<ClassAPI> classes) {
-		
+		// Initialize lists
+		this.keywords = new ArrayList<>();
+		this.classes = new ArrayList<>();
+
 		for(String methodName : methodNames) {
 			this.keywords.add(new Keyword(KeywordType.METHOD_NAME, methodName));
 		}
@@ -45,7 +49,6 @@ public abstract class AbstractAPI {
 		}
 		
 		this.classes = classes;
-		
 	}
 	
 	/**
