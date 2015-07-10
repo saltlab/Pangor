@@ -1,6 +1,7 @@
 package ca.ubc.ece.salt.sdjsb.analysis.learning.apis;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -32,25 +33,25 @@ public abstract class AbstractAPI {
 		this.keywords = new ArrayList<>();
 		this.classes = new ArrayList<>();
 
-		for(String methodName : methodNames) {
+		for (String methodName : methodNames) {
 			this.keywords.add(new Keyword(KeywordType.METHOD_NAME, methodName));
 		}
-		
-		for(String fieldName : fieldNames) {
+
+		for (String fieldName : fieldNames) {
 			this.keywords.add(new Keyword(KeywordType.FIELD, fieldName));
 		}
-		
-		for(String constantName : constantNames) {
+
+		for (String constantName : constantNames) {
 			this.keywords.add(new Keyword(KeywordType.CONSTANT, constantName));
 		}
-		
-		for(String eventName : eventNames) {
+
+		for (String eventName : eventNames) {
 			this.keywords.add(new Keyword(KeywordType.EVENT, eventName));
 		}
-		
+
 		this.classes = classes;
 	}
-	
+
 	/**
 	 * Checks if the keyword is a member of the API.
 	 * @param type The type of the token.
@@ -58,23 +59,7 @@ public abstract class AbstractAPI {
 	 * @return True if the keyword/type is present in the API.
 	 */
 	public boolean isMemberOf(KeywordType type, String keyword) {
-		// Classes are stored in its own list, so we have to check them manually
-		// TODO: For performance reasons, should we check first keywords list or
-		// classes list?
-
-		if (type == KeywordType.CLASS) {
-			for (ClassAPI klass : classes) {
-				// A ClassAPI hold its own name as a KeywordType.CLASS keyword
-				boolean isMember = klass.keywords.contains(new Keyword(KeywordType.CLASS, keyword));
-				
-				if (isMember)
-					return true;
-			}
-
-			return false;
-		} else {
-			return (keywords.contains(new Keyword(type, keyword)));
-		}
+		return recursiveKeywordSearch(this, new Keyword(type, keyword));
 	}
 
 	/**
@@ -88,7 +73,7 @@ public abstract class AbstractAPI {
 							   Map<Keyword, Integer> removedKeywords,
 							   Map<Keyword, Integer> updatedKeywords,
 							   Map<Keyword, Integer> unchangedKeywords) {
-		throw new UnsupportedOperationException(); 
+		return getUseLikelihood(insertedKeywords, removedKeywords, updatedKeywords, unchangedKeywords);
 	}
 
 	/**
@@ -102,7 +87,53 @@ public abstract class AbstractAPI {
 							   Map<Keyword, Integer> removedKeywords,
 							   Map<Keyword, Integer> updatedKeywords,
 							   Map<Keyword, Integer> unchangedKeywords) {
-		throw new UnsupportedOperationException();
+		/*
+		 * On this first implementation, we assume that if any of the keywords
+		 * inserted, removed, updated or unchanged belongs to this API, the
+		 * likelihood is 1. Otherwise, it is 0
+		 */
+
+		// Merge all maps
+		Map<Keyword, Integer> mergedMap = new HashMap<Keyword, Integer>();
+		if (insertedKeywords != null)
+			mergedMap.putAll(insertedKeywords);
+		if (removedKeywords != null)
+			mergedMap.putAll(removedKeywords);
+		if (updatedKeywords != null)
+			mergedMap.putAll(updatedKeywords);
+		if (unchangedKeywords != null)
+			mergedMap.putAll(unchangedKeywords);
+
+		// Look if any of the keywords given as input is present on this API
+		for (Map.Entry<Keyword, Integer> entry : mergedMap.entrySet()) {
+			if (recursiveKeywordSearch(this, entry.getKey()))
+				return 1;
+		}
+
+		return 0;
 	}
-	
+
+	/**
+	 * Recursively search for keyword on this API
+	 * 
+	 * @param keyword
+	 *            The keyword we are looking for
+	 * @return True if the keyword/type is present in the API.
+	 */
+	private boolean recursiveKeywordSearch(AbstractAPI api, Keyword keyword) {
+		// Check if keyword is on keywords list of API
+		if (api.keywords.contains(keyword))
+			return true;
+		
+		// Otherwise, check if keyword is member of any of the classes of
+		// API, which may have subclasses itself
+		for (ClassAPI klass : api.classes) {
+			if (recursiveKeywordSearch(klass, keyword))
+				return true;
+		}
+		
+		// If keyword was not found anywhere
+		return false;
+	}
+
 }
