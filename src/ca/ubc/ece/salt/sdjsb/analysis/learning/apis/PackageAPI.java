@@ -18,8 +18,7 @@ public class PackageAPI extends AbstractAPI {
 	 */
 	public PackageAPI(String includeName, List<String> methodNames, 
 					  List<String> fieldNames, List<String> constantNames, 
-					  List<String> eventNames, List<PackageAPI> packages,
-					  List<ClassAPI> classes) {
+					  List<String> eventNames, List<ClassAPI> classes) {
 		super(methodNames, fieldNames, constantNames, eventNames, classes);
 		this.keywords.add(new Keyword(KeywordType.PACKAGE, includeName));
 	}

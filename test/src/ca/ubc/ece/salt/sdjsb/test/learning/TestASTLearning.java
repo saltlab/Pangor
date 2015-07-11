@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.test.analysis;
+package ca.ubc.ece.salt.sdjsb.test.learning;
 
 import static org.junit.Assert.*;
 
@@ -69,7 +69,6 @@ public class TestASTLearning {
 
 	@Test
 	public void testUndefinedReturn() throws Exception{
-		// TODO: Something is wrong here. There should be a feature vector for the log(a) function.
 		String src = "./test/input/special_type_handling/sth_undefined_return_old.js";
 		String dst = "./test/input/special_type_handling/sth_undefined_return_new.js";
 		this.runTest(new String[] {src, dst});

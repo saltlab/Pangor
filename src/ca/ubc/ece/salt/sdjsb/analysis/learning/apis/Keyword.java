@@ -39,7 +39,8 @@ public class Keyword {
 	 * The possible types for a keyword.
 	 */
 	public enum KeywordType {
-		KEYWORD,
+		UNKNOWN,
+		RESERVED,
 		PACKAGE,
 		CLASS,
 		METHOD_CALL,

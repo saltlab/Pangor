@@ -52,9 +52,14 @@ public class APIFactory {
 	}
 	
 	public static List<PackageAPI> buildTopLevelPackages() {
-		return null;
-	}
+		
+		PackageAPI fileSystem = buildFileSystemPackage();
+		PackageAPI path = buildPathPackage();
+		
+		return Arrays.asList(fileSystem, path);
 
+	}
+	
 	public static List<ClassAPI> buildTopLevelClasses() {
 
 //		ClassAPI template = new ClassAPI("template", /* Class Name */
@@ -67,8 +72,8 @@ public class APIFactory {
 		ClassAPI array = new ClassAPI("Array", /* Class Name */
 				Arrays.asList("concat", "indexOf", "join", "lastIndexOf",
 						"pop", "push", "reverse", "shift", "splice", "sort", 
-						"splice", "unshift", "forEach", "every", "some", 
-						"filter", "map", "reduce", "reduceRight"), /* Methods */
+						"unshift", "forEach", "every", "some", "filter", 
+						"map", "reduce", "reduceRight"), /* Methods */
 				Arrays.asList(), /* Fields */
 				Arrays.asList(), /* Constants */
 				Arrays.asList(), /* Events */
@@ -113,10 +118,134 @@ public class APIFactory {
 				Arrays.asList(), /* Constants */
 				Arrays.asList(), /* Events */
 				Arrays.asList()); /* Classes */
+
+		/* TODO: There are also other default error constructors that we may want
+		 * 		 to track: EvalError, RangeError, ReferenceError, SyntaxError,
+		 * 		 TypeError and URIError.
+		 */
+		ClassAPI error = new ClassAPI("Error", /* Class Name */
+				Arrays.asList(), /* Methods */
+				Arrays.asList("message", "name"), /* Fields */
+				Arrays.asList(), /* Constants */
+				Arrays.asList(), /* Events */
+				Arrays.asList()); /* Classes */
+
+		ClassAPI number = new ClassAPI("Number", /* Class Name */
+				Arrays.asList("isNaN", "isFinite", "isInteger", "isSafeInteger",
+						"parseFloat", "parseInt", "toExponential", "toFixed",
+						"toPrecision"), /* Methods */
+				Arrays.asList("NaN"), /* Fields */
+				Arrays.asList("MAX_VALUE", "MIN_VALUE", "NEGATIVE_INFINITY", 
+						"POSITIVE_INFINITY"), /* Constants */
+				Arrays.asList(), /* Events */
+				Arrays.asList()); /* Classes */
+
+		ClassAPI string = new ClassAPI("String", /* Class Name */
+				Arrays.asList("fromCharCode", "charAt", "charCodeAt", "concat",
+						"localeCompare", "match", "replace", "search", "slice",
+						"split", "substr", "substring", "toLocaleLowerCase",
+						"toLocaleUpperCase", "toLowerCase", "toUpperCase", 
+						"trim"), /* Methods */
+				Arrays.asList(), /* Fields */
+				Arrays.asList(), /* Constants */
+				Arrays.asList(), /* Events */
+				Arrays.asList()); /* Classes */
 		
-		// TODO: "Array", "Date", "Math", "NaN", "Number", "Object", "String";
+		ClassAPI regexp = new ClassAPI("RegExp", /* Class Name */
+				Arrays.asList("compile", "exec", "test"), /* Methods */
+				Arrays.asList("lastIndex", "global", "ignoreCase", "multiline",
+						"source"), /* Fields */
+				Arrays.asList(), /* Constants */
+				Arrays.asList(), /* Events */
+				Arrays.asList()); /* Classes */
 		
-		return Arrays.asList(array, date, math, object);
+		/* TODO: There are a lot of other classes that we don't have here. I.e., 
+		 * 		 Intl, ArrayBuffer, DataView, JSON, [U]?Int[#]Array, etc. It would
+		 * 		 be good to load all these, but we should automate importing the 
+		 * 		APIs first.
+		 */
+		
+		return Arrays.asList(error, array, date, math, number, string, regexp, object);
+
+	}
+	
+//	public static PackageAPI buildTemplatePackage() {
+//
+//		PackageAPI template = new PackageAPI("template", /* Package Name */
+//				Arrays.asList(), /* Methods */
+//				Arrays.asList(), /* Fields */
+//				Arrays.asList(), /* Constants */
+//				Arrays.asList(), /* Events */
+//				Arrays.asList()); /* Classes */
+//		
+//	}
+
+	public static PackageAPI buildPathPackage() {
+
+		PackageAPI path = new PackageAPI("path", /* Package Name */
+				Arrays.asList("normalize", "join", "resolve", "isAbsolute", 
+						"relative", "dirname", "basename", "extname", "parse",
+						"format"), /* Methods */
+				Arrays.asList("sep", "delimiter", "posix", "win32"), /* Fields */
+				Arrays.asList(), /* Constants */
+				Arrays.asList(), /* Events */
+				Arrays.asList()); /* Classes */
+		
+		return path;
+		
+	}
+
+	public static  PackageAPI buildFileSystemPackage() {
+		
+		ClassAPI stats = new ClassAPI("Stats", /* Class Name */
+				Arrays.asList("isFile", "isDirectory", "isBlockDevice",
+						"isCharacterDevice", "isSymbolicLink", "isFIFO",
+						"isSocket"), /* Methods */
+				Arrays.asList("atime", "mtime", "ctime", "birthtime"), /* Fields */
+				Arrays.asList(), /* Constants */
+				Arrays.asList(), /* Events */
+				Arrays.asList()); /* Classes */
+
+		ClassAPI writeStream = new ClassAPI("WriteStream", /* Class Name */
+				Arrays.asList(), /* Methods */
+				Arrays.asList("bytesWritten"), /* Fields */
+				Arrays.asList(), /* Constants */
+				Arrays.asList("open"), /* Events */
+				Arrays.asList()); /* Classes */
+		
+		ClassAPI readStream = new ClassAPI("ReadStream", /* Class Name */
+				Arrays.asList(), /* Methods */
+				Arrays.asList(), /* Fields */
+				Arrays.asList(), /* Constants */
+				Arrays.asList("open"), /* Events */
+				Arrays.asList()); /* Classes */
+		
+		ClassAPI fsWatcher = new ClassAPI("FSWatcher",
+				Arrays.asList("close"), /* Methods */
+				Arrays.asList(), /* Fields */
+				Arrays.asList(), /* Constants */
+				Arrays.asList("change", "error"), /* Events */
+				Arrays.asList()); /* Classes */
+
+		return new PackageAPI("fs", /* Package Name */
+				Arrays.asList("rename", "renameSync", "ftruncate", "ftruncateSync", 
+						"truncate", "truncateSync", "chown", "chownSync", "lchown", 
+						"lchownSync", "chmod", "chmodSync", "fchmod", "fchmodSync", 
+						"lchmod", "lchmodSync", "stat", "lstat", "fstat", "statSync", 
+						"lstatSync", "fstatSync", "link", "linkSync", "symlink", 
+						"symlinkSync", "readlink", "readlinkSync", "realpath", 
+						"realpathSync", "unlink", "unlinkSync", "rmdir", "rmdirSync", 
+						"mkdir", "mkdirSync", "readdir", "readdirSync", "close", 
+						"closeSync", "open", "openSync", "utimes", "utimesSync", 
+						"futimes", "futimesSync", "fsync", "fsyncSync", "write", 
+						"writeSync", "read", "readSync", "readFile", "readFileSync", 
+						"writeFile", "writeFileSync", "appendFile", "appendFileSync", 
+						"watchFile", "unwatchFile", "watch", "exists", "existsSync", 
+						"access", "accessSync", "createReadStream", "createWriteStream"), /* Methods */
+				Arrays.asList(), /* Fields */
+				Arrays.asList(), /* Constants */
+				Arrays.asList(), /* Events */
+				Arrays.asList(stats, writeStream, readStream, fsWatcher)); /* Classes */
 
 	}
 	

@@ -26,7 +26,7 @@ public class TopLevelAPI extends AbstractAPI {
 		super(methodNames, fieldNames, constantNames, eventNames, classes);
 		
 		for(String keyword : keywords) {
-			this.keywords.add(new Keyword(KeywordType.KEYWORD, keyword));
+			this.keywords.add(new Keyword(KeywordType.RESERVED, keyword));
 		}
 		
 		this.packages = packages;
