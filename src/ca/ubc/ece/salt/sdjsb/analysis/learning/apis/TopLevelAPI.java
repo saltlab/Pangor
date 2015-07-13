@@ -9,9 +9,8 @@ import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
  * we want to include.
  */
 public class TopLevelAPI extends AbstractAPI {
-
 	protected List<PackageAPI> packages;
-	
+
 	/**
 	 * @param keywords The JavaScript keywords.
 	 * @param methodNames The methods in the API.
@@ -28,8 +27,11 @@ public class TopLevelAPI extends AbstractAPI {
 		for(String keyword : keywords) {
 			this.keywords.add(new Keyword(KeywordType.RESERVED, keyword));
 		}
-		
+
 		this.packages = packages;
 	}
-
+	
+	public List<PackageAPI> getPackages() {
+		return packages;
+	}
 }
