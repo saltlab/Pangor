@@ -59,8 +59,18 @@ public abstract class AbstractAPI {
 	 * @return True if the keyword/type is present in the API.
 	 */
 	public boolean isMemberOf(KeywordType type, String keyword) {
-		return recursiveKeywordSearch(this, new Keyword(type, keyword));
+		return isMemberOf(new Keyword(type, keyword));
 	}
+	
+	/**
+	 * Checks if the keyword object is a member of the API.
+	 * @param keyword Keyword object
+	 * @return True if the keyword/type is present in the API.
+	 */
+	public boolean isMemberOf(Keyword keyword) {
+		return recursiveKeywordSearch(this, keyword);
+	}
+	
 
 	/**
 	 * Computes the likelihood that the function repair involved the API.
