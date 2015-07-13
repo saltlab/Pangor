@@ -70,10 +70,7 @@ public class ControlFlowDifferencing {
 	}
 
 	/**
-	 * Perform a control flow differencing analysis. Currently this method only
-	 * analyzes the destination file. Eventually a meta-analysis should be
-	 * implemented that can use the results from analyzing both the source and
-	 * destination files.
+	 * Perform a control flow differencing analysis.
 	 * @param analysis The analysis to run.
 	 * @return The list of alerts from the analysis.
 	 * @throws Exception
@@ -255,11 +252,6 @@ public class ControlFlowDifferencing {
 		
 	}
 
-		/* Difference the CFGs.
-		 * 
-		 * We match source and destination CFGs based on the function node
-		 * mappings from AST differencing. */
-	
 	/**
 	 * Compute changes to CFG elements (nodes, edges and edge labels).
 	 * 

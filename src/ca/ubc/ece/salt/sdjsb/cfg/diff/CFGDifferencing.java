@@ -144,7 +144,8 @@ public class CFGDifferencing {
 	 * Apply labels to all edges on the path.
 	 * 
 	 * The type of the edge will be rewritten if the edge change type is
-	 * unknown or if the change type being applied is unchanged.
+	 * unknown or if the change type being applied is inserted or removed. This
+	 * favours showing paths that have been inserted or removed.
 	 * @param path
 	 * @param changeType The change type to apply to the edge.
 	 */
@@ -157,7 +158,7 @@ public class CFGDifferencing {
             if(edge.changeType == ChangeType.UNKNOWN) {
                 edge.changeType = changeType;
             }
-            else if(changeType == ChangeType.UNCHANGED) {
+            else if(changeType == ChangeType.INSERTED || changeType == ChangeType.REMOVED) {
                 edge.changeType = changeType;
             }
 			
