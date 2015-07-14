@@ -28,11 +28,12 @@ public class PointsToPrediction {
 	}
 
 	/** Returns the most likely API that the keyword points to. **/
-	public PackageAPI getLikelyAPI(Keyword keyword) {
+	public AbstractAPI getLikelyAPI(Keyword keyword) {
 		/*
-		 * On this draft implementation, return the first API which has the keyword
+		 * On this draft implementation, return the first API which 
+		 * has the keyword
 		 */
-		
+
 		for (PackageAPI pack : api.getPackages()) {
 			if (pack.isMemberOf(keyword))
 				return pack;
