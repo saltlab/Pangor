@@ -8,9 +8,13 @@ import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
  * Defines the API of a Node.js class.
  */
 public class ClassAPI extends AbstractAPI {
+	/*
+	 * Class name
+	 */
+	protected String className;
 
 	/**
-	 * @param includeName The keyword that imports the package in "include([package name keyword]);"
+	 * @param className The identifier of the class;"
 	 * @param methodNames The methods in the API.
 	 * @param fieldNames The fields in the API.
 	 * @param constantNames The constants in the API.
@@ -20,7 +24,12 @@ public class ClassAPI extends AbstractAPI {
 					  List<String> fieldNames, List<String> constantNames, 
 					  List<String> eventNames, List<ClassAPI> classes) {
 		super(methodNames, fieldNames, constantNames, eventNames, classes);
+		this.className = className;
 		this.keywords.add(new Keyword(KeywordType.CLASS, className));
 	}
 
+	@Override
+	public String getName() {
+		return className;
+	}
 }

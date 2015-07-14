@@ -8,6 +8,9 @@ import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
  * Defines the API of a Node.js package.
  */
 public class PackageAPI extends AbstractAPI {
+	/*
+	 * Package name
+	 */
 	protected String includeName;
 
 	/**
@@ -25,7 +28,8 @@ public class PackageAPI extends AbstractAPI {
 		this.keywords.add(new Keyword(KeywordType.PACKAGE, includeName));
 	}
 
-	public String getIncludeName() {
+	@Override
+	public String getName() {
 		return includeName;
 	}
 }
