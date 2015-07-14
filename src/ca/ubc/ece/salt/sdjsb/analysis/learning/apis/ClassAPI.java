@@ -8,9 +8,7 @@ import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
  * Defines the API of a Node.js class.
  */
 public class ClassAPI extends AbstractAPI {
-	/*
-	 * Class name
-	 */
+	/** The identifier of the class */
 	protected String className;
 
 	/**
