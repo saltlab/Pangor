@@ -15,7 +15,14 @@ import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
  * events, etc.) based on the use patterns of all the keywords.
  */
 public class PointsToPrediction {
+	/** The top level API where API's are looked for */
 	protected TopLevelAPI api;
+
+	/**
+	 * The likelihood threshold used to assume the prediction was correct.
+	 * TODO: Should this actually be a modifiable field?
+	 */
+	protected final double LIKELIHOOD_THRESHOLD = 0.75;
 
 	/**
 	 * Build the model for predicting points-to relationships.
@@ -27,19 +34,25 @@ public class PointsToPrediction {
 		this.api = api;
 	}
 
-	/** Returns the most likely API that the keyword points to. **/
-	public AbstractAPI getLikelyAPI(Keyword keyword) {
-		/*
-		 * On this draft implementation, return the first API which 
-		 * has the keyword
-		 */
+	/**
+	 * Try to predict to which API this keyword belongs to. If the prediction is
+	 * above LIKELIHOOD_THRESHOLD, the likely API is stored in the Keyword's api
+	 * field and true is returned. Otherwise, false is returned.
+	 *
+	 * @param keyword the keyword used in the prediction
+	 * @return true if prediction is above confidence level and api is stored in
+	 *         keyword
+	 **/
+	public boolean findLikelyAPI(Keyword keyword) {
+		PredictionResults results = predict(keyword);
+		PredictionResult result = results.poll();
 
-		for (PackageAPI pack : api.getPackages()) {
-			if (pack.isMemberOf(keyword))
-				return pack;
+		if (result != null && result.likelihood > LIKELIHOOD_THRESHOLD) {
+			keyword.api = result.api;
+			return true;
+		} else {
+			return false;
 		}
-		
-		return null;
 	}
 
 	/** Returns a list of APIs that are likely used in this method. **/
@@ -52,6 +65,23 @@ public class PointsToPrediction {
 	 **/
 	public List<AbstractAPI> getAPIsInRepair(AstRoot methodRoot) {
 		return null;
+	}
+
+	protected PredictionResults predict(Keyword keyword) {
+		PredictionResults results = new PredictionResults();
+
+		/*
+		 * This is where the actual prediction takes place. Going to be modified
+		 * soon.
+		 */
+		for (PackageAPI pkg : api.getPackages()) {
+			if (pkg.isMemberOf(keyword)) {
+				PredictionResult result = new PredictionResult(pkg, 1);
+				results.add(result);
+			}
+		}
+
+		return results;
 	}
 
 }
