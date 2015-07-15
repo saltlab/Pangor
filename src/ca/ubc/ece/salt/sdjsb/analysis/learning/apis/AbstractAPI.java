@@ -122,6 +122,17 @@ public abstract class AbstractAPI {
 
 		return 0;
 	}
+	
+	/**
+	 * Return the name of this API. Subclasses should override 
+	 * with relevant name (e.g. class name for ClassAPI or package 
+	 * name for PackageAPI).
+	 * 
+	 * @return String relevant identifier for API 
+	 */
+	public String getName() {
+		return null;
+	}
 
 	/**
 	 * Recursively search for keyword on this API

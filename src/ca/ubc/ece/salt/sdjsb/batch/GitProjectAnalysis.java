@@ -265,6 +265,8 @@ public class GitProjectAnalysis {
 //        	tasks.add(new CFDTask(cfd, new GTLScopeAnalysis()));
         	
         	/* This is the learning analysis. */
+        	/* TODO: How should we print the data set? We used to use alerts, 
+        	 *		 but this might not be the best option. */
         	tasks.add(new CFDTask(cfd, new LearningAnalysis(new FeatureVectorManager(Arrays.asList("fs")))));
         	
         	for(CFDTask task : tasks) {

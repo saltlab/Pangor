@@ -1,29 +1,19 @@
 package ca.ubc.ece.salt.sdjsb.test.learning;
 
-import static org.junit.Assert.*;
-
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Test;
 
 import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
-import ca.ubc.ece.salt.sdjsb.alert.Alert;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.FeatureVector;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.FeatureVectorManager;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningAnalysis;
 
-/**
- * TODO
- */
 public class TestASTLearning {
 
 	/**
-	 * Tests flow analysis repair classifiers.
+	 * Tests data mining data set construction.
 	 * @param args The command line arguments (i.e., old and new file names).
-	 * @param expectedAlerts The list of alerts that should be produced.
-	 * @param printAlerts If true, print the alerts to standard output.
 	 * @throws Exception 
 	 */
 	protected void runTest(String[] args) throws Exception {

@@ -3,8 +3,6 @@ package ca.ubc.ece.salt.sdjsb.analysis.prediction;
 import java.util.List;
 import java.util.Map;
 
-import org.mozilla.javascript.ast.AstRoot;
-
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.AbstractAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
@@ -38,7 +36,8 @@ public class PointsToPrediction {
 	public Keyword getKeyword(KeywordType context, String token) {
 
 		/*
-		 * On this draft implementation, return the first API which has the keyword
+		 * On this draft implementation, return the first API which 
+		 * has the keyword
 		 */
 		
 		Keyword keyword = new Keyword(context, token);
@@ -54,7 +53,10 @@ public class PointsToPrediction {
 	}
 
 	/** Returns a list of APIs that are likely used in this method. **/
-	public List<AbstractAPI> getAPIsUsed(List<Keyword> keywords) {
+	public List<AbstractAPI> getAPIsUsed(Map<Keyword, Integer> insertedKeywords,
+			   Map<Keyword, Integer> removedKeywords,
+			   Map<Keyword, Integer> updatedKeywords,
+			   Map<Keyword, Integer> unchangedKeywords) {
 		return null;
 	}
 
