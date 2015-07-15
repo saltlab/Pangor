@@ -34,45 +34,65 @@ public abstract class AbstractAPI {
 		this.classes = new ArrayList<>();
 
 		for (String methodName : methodNames) {
-			this.keywords.add(new Keyword(KeywordType.METHOD_NAME, methodName));
+			this.keywords.add(new Keyword(KeywordType.METHOD_NAME, methodName, this));
 		}
 
 		for (String fieldName : fieldNames) {
-			this.keywords.add(new Keyword(KeywordType.FIELD, fieldName));
+			this.keywords.add(new Keyword(KeywordType.FIELD, fieldName, this));
 		}
 
 		for (String constantName : constantNames) {
-			this.keywords.add(new Keyword(KeywordType.CONSTANT, constantName));
+			this.keywords.add(new Keyword(KeywordType.CONSTANT, constantName, this));
 		}
 
 		for (String eventName : eventNames) {
-			this.keywords.add(new Keyword(KeywordType.EVENT, eventName));
+			this.keywords.add(new Keyword(KeywordType.EVENT, eventName, this));
 		}
 
 		this.classes = classes;
 	}
 
 	/**
-	 * Checks if the keyword is a member of the API.
+	 * Get the first occurrence of the given keyword on the API
 	 *
 	 * @param type The type of the token.
 	 * @param keyword The name of the token.
 	 * @return keyword if the keyword/type is present in the API, otherwise,
 	 *         null
 	 */
-	public Keyword isMemberOf(KeywordType type, String keyword) {
-		return isMemberOf(new Keyword(type, keyword));
+	public Keyword getFirstKeyword(KeywordType type, String keyword) {
+		return getFirstKeyword(new Keyword(type, keyword));
 	}
 
 	/**
-	 * Checks if the keyword object is a member of the API.
+	 * Get the first occurrence of the given keyword on the API
 	 *
 	 * @param keyword Keyword object
 	 * @return keyword if the keyword/type is present in the API, otherwise,
 	 *         null
 	 */
-	public Keyword isMemberOf(Keyword keyword) {
-		return recursiveKeywordSearch(this, keyword);
+	public Keyword getFirstKeyword(Keyword keyword) {
+		List<Keyword> keywordsList = getAllKeywords(keyword);
+
+		if (keywordsList.size() > 0)
+			return keywordsList.get(0);
+		else
+			return null;
+	}
+
+	/**
+	 * Get all occurrences of the given keyword on the API
+	 *
+	 * @param keyword Keyword object
+	 * @return keywords a list with all occurrences of the keyword on the API.
+	 *         if none is found, empty list is returned
+	 */
+	public List<Keyword> getAllKeywords(Keyword keyword) {
+		List<Keyword> keywordsList = new ArrayList<>();
+
+		recursiveKeywordSearch(this, keyword, keywordsList);
+
+		return keywordsList;
 	}
 
 	/**
@@ -118,12 +138,9 @@ public abstract class AbstractAPI {
 			mergedMap.putAll(unchangedKeywords);
 
 		// Look if any of the keywords given as input is present on this API
-		for (Map.Entry<Keyword, Integer> entry : mergedMap.entrySet()) {
-			if (recursiveKeywordSearch(this, entry.getKey()) != null)
-				return 1;
-		}
+		// not implemented yet
 
-		return 0;
+		return 1;
 	}
 
 	/**
@@ -143,27 +160,22 @@ public abstract class AbstractAPI {
 	 * @param keyword The keyword we are looking for
 	 * @return Keyword if the keyword/type is present in the API, null otherwise
 	 */
-	private Keyword recursiveKeywordSearch(AbstractAPI api, Keyword keyword) {
+
+	protected void recursiveKeywordSearch(AbstractAPI api, Keyword keyword, List<Keyword> outputList) {
 		/*
-		 * Check if keyword is present on the keywords list. If it is, return
-		 * the keyword we found, which may contain more information
+		 * Check if keyword is present on the keywords list. If it is, add the
+		 * keyword we found on the list, which may contain more information
 		 */
 		int index = api.keywords.indexOf(keyword);
 		if (index != -1)
-			return api.keywords.get(index);
+			outputList.add(api.keywords.get(index));
 
 		/*
 		 * Otherwise, check if keyword is member of any of the classes of API,
 		 * which may have subclasses itself
 		 */
 		for (ClassAPI klass : api.classes) {
-			Keyword keywordFound = recursiveKeywordSearch(klass, keyword);
-			if (keywordFound != null)
-				return keywordFound;
+			recursiveKeywordSearch(klass, keyword, outputList);
 		}
-
-		// If keyword was not found anywhere
-		return null;
 	}
-
 }

@@ -18,6 +18,12 @@ public class Keyword {
 		this.keyword = keyword;
 	}
 
+	public Keyword(KeywordType type, String keyword, AbstractAPI api) {
+		this.type = type;
+		this.keyword = keyword;
+		this.api = api;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof Keyword) {
@@ -26,13 +32,13 @@ public class Keyword {
 		}
 		return false;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return this.toString().hashCode();
 	}
-	
-	@Override 
+
+	@Override
 	public String toString() {
 		return this.type.toString() + "_" + this.keyword;
 	}

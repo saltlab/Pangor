@@ -7,7 +7,6 @@ import org.mozilla.javascript.ast.AstRoot;
 
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.AbstractAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.PackageAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
 
 /**
@@ -32,6 +31,8 @@ public class PointsToPrediction {
 			   Map<Keyword, Integer> updatedKeywords,
 			   Map<Keyword, Integer> unchangedKeywords) {
 		this.api = api;
+
+		// calculate all the predictions here
 	}
 
 	/**
@@ -71,14 +72,13 @@ public class PointsToPrediction {
 		PredictionResults results = new PredictionResults();
 
 		/*
-		 * This is where the actual prediction takes place. Going to be modified
-		 * soon.
+		 * This is where the actual prediction takes place
 		 */
-		for (PackageAPI pkg : api.getPackages()) {
-			if (pkg.isMemberOf(keyword)) {
-				PredictionResult result = new PredictionResult(pkg, 1);
-				results.add(result);
-			}
+		Keyword keywordFound = api.getFirstKeyword(keyword);
+
+		if (keywordFound != null) {
+			PredictionResult result = new PredictionResult(keywordFound.api, 1);
+			results.add(result);
 		}
 
 		return results;
