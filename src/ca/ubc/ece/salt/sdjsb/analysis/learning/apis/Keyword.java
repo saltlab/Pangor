@@ -11,9 +11,21 @@ public class Keyword {
 	/** The keyword text. **/
 	public String keyword;
 	
+	/** The AbstractAPI which contains this keyword. **/
+	public AbstractAPI pointsto;
+	
 	public Keyword(KeywordType type, String keyword) {
+		this.pointsto = null;
 		this.type = type;
 		this.keyword = keyword;
+	}
+	
+	/**
+	 * Set the package artifact that this keyword points to.
+	 * @param pointsto The package this keyword points to.
+	 */
+	public void setPointsTo(AbstractAPI pointsto) {
+		this.pointsto = pointsto;
 	}
 	
 	@Override

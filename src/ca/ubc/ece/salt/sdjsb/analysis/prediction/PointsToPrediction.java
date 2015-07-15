@@ -7,6 +7,7 @@ import org.mozilla.javascript.ast.AstRoot;
 
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.AbstractAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.PackageAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
 
@@ -19,37 +20,51 @@ public class PointsToPrediction {
 
 	/**
 	 * Build the model for predicting points-to relationships.
+	 * @param insertedKeywords
+	 * @param removedKeywords
+	 * @param updatedKeywords
+	 * @param unchangedKeywords
 	 */
 	public PointsToPrediction(TopLevelAPI api, Map<Keyword, Integer> insertedKeywords,
 			   Map<Keyword, Integer> removedKeywords,
 			   Map<Keyword, Integer> updatedKeywords,
 			   Map<Keyword, Integer> unchangedKeywords) {
+		
+		
 		this.api = api;
 	}
 
 	/** Returns the most likely API that the keyword points to. **/
-	public PackageAPI getLikelyAPI(Keyword keyword) {
+	public Keyword getKeyword(KeywordType context, String token) {
+
 		/*
 		 * On this draft implementation, return the first API which has the keyword
 		 */
 		
+		Keyword keyword = new Keyword(context, token);
+		
 		for (PackageAPI pack : api.getPackages()) {
-			if (pack.isMemberOf(keyword))
-				return pack;
+			if (pack.isMemberOf(keyword)) {
+				keyword.setPointsTo(pack);
+				return keyword;
+			}
 		}
 		
 		return null;
 	}
 
 	/** Returns a list of APIs that are likely used in this method. **/
-	public List<AbstractAPI> getAPIsUsed(AstRoot methodRoot) {
+	public List<AbstractAPI> getAPIsUsed(List<Keyword> keywords) {
 		return null;
 	}
 
 	/**
 	 * Returns a list of APIs that are likely involved in a method's repair.
 	 **/
-	public List<AbstractAPI> getAPIsInRepair(AstRoot methodRoot) {
+	public List<AbstractAPI> getAPIsInRepair(Map<Keyword, Integer> insertedKeywords,
+			   Map<Keyword, Integer> removedKeywords,
+			   Map<Keyword, Integer> updatedKeywords,
+			   Map<Keyword, Integer> unchangedKeywords) {
 		return null;
 	}
 

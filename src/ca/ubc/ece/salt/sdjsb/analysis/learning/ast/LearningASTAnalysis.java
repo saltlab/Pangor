@@ -7,6 +7,8 @@ import java.util.Map;
 import org.mozilla.javascript.ast.AstRoot;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.APIFactory;
+import ca.ubc.ece.salt.sdjsb.analysis.prediction.PointsToPrediction;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.Scope;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.ScopeAnalysis;
 import ca.ubc.ece.salt.sdjsb.cfg.CFG;
@@ -21,8 +23,10 @@ public class LearningASTAnalysis extends ScopeAnalysis {
 	private Map<Scope, FeatureVector> featureVectors;
 	
 	public LearningASTAnalysis(){
+
 		super();
 		this.featureVectors = new HashMap<Scope, FeatureVector>();
+
 	}
 	
 	/**
@@ -61,13 +65,24 @@ public class LearningASTAnalysis extends ScopeAnalysis {
 	 */
 	private void inspectFunctions(Scope scope) {
 
+		/* Initialize the points-to analysis. It may take some time to build the package model.
+		 * 
+		 *  NOTE: In the future, it might be useful to put this inside
+		 *  	  ScopeAnalysis so all analyses have access to detailed 
+		 *   	  points-to info (for APIs at least). */
+
+		FeatureVector classKeywords = LearningAnalysisVisitor.getScriptFeatureVector((AstRoot)this.dstScope.scope);
+		PointsToPrediction packageModel = new PointsToPrediction(APIFactory.buildTopLevelAPI(), 
+				classKeywords.insertedKeywordMap, classKeywords.removedKeywordMap, 
+				classKeywords.updatedKeywordMap, classKeywords.unchangedKeywordMap);
+
 		/* If the function was inserted or deleted, there is nothing to do. We
 		 * only want functions that were repaired. Class-level repairs are left
 		 * for later. */
 		if(scope.scope.getChangeType() != ChangeType.INSERTED && scope.scope.getChangeType() != ChangeType.REMOVED) {
 		
             /* Visit the function to extract features. */
-			FeatureVector featureVector = LearningAnalysisVisitor.getFeatureVector(scope.scope);
+			FeatureVector featureVector = LearningAnalysisVisitor.getFunctionFeatureVector(scope.scope, packageModel);
 			
 			/* Add it to our list if there are features. */
 			this.featureVectors.put(scope, featureVector);

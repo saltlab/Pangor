@@ -1,6 +1,7 @@
 package ca.ubc.ece.salt.sdjsb.analysis.learning.ast;
 
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.KeywordLiteral;
 import org.mozilla.javascript.ast.Name;
@@ -10,8 +11,15 @@ import org.mozilla.javascript.ast.ScriptNode;
 import org.mozilla.javascript.ast.StringLiteral;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
+import ca.ubc.ece.salt.sdjsb.analysis.prediction.PointsToPrediction;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysisUtilities;
 
+/**
+ * TODO: We need to modify this class to extract Keywords. This class should
+ * 		 therefore not return a FeatureVector, but a set of Keywords.
+ */
 public class LearningAnalysisVisitor implements NodeVisitor {
 
 	/** The feature vector for the visited function. **/
@@ -20,15 +28,48 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 	/** The root of the function or script we are visiting. **/
 	private ScriptNode root;
 
+	/** 
+	 * Utility for predicting points-to relationships between keywords and
+	 * methods/fields/events in packages.
+	 */
+	private PointsToPrediction packageModel;
+	
+	/** 
+	 * If true, will visit function signatures and bodies. This should be true
+	 * when doing the initial keyword extraction (at the file level) and false
+	 * when collecting features at the function level.
+	 */
+	private boolean visitFunctions;
+	
+	/**
+	 * Visits the script and returns a feature vector containing only the
+	 * keywords in the script. The feature vector will not contain package
+	 * associations for the keywords. Unlike {@code getFunctionFeatureVector}, 
+	 * this method extracts keywords from the entire script (i.e., it visits 
+	 * function declarations and bodies).
+	 * @param script The script to extract keywords from.
+	 * @return A feature vector containing the keywords extracted from the 
+	 * 		   script.
+	 */
+	public static FeatureVector getScriptFeatureVector(AstRoot script) {
+		
+		/* Create the feature vector by visiting the function. */
+		LearningAnalysisVisitor visitor = new LearningAnalysisVisitor(script, null, true);
+		script.visit(visitor);
+		
+		return visitor.featureVector;
+		
+	}
+
 	/**
 	 * Visits the script or function and returns a feature vector for it.
 	 * @param function the script or function to visit.
 	 * @return the feature vector for the function.
 	 */
-	public static FeatureVector getFeatureVector(ScriptNode function) {
+	public static FeatureVector getFunctionFeatureVector(ScriptNode function, PointsToPrediction packageModel) {
 		
 		/* Create the feature vector by visiting the function. */
-		LearningAnalysisVisitor visitor = new LearningAnalysisVisitor(function);
+		LearningAnalysisVisitor visitor = new LearningAnalysisVisitor(function, packageModel, false);
 		function.visit(visitor);
 		
 		/* Store the source code for the function. Since we don't know if we
@@ -55,22 +96,21 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		return visitor.featureVector;
 	}
 	
-	private LearningAnalysisVisitor(ScriptNode root) {
+	private LearningAnalysisVisitor(ScriptNode root, PointsToPrediction packageModel, boolean visitFunctions) {
+		this.packageModel = packageModel;
 		this.featureVector = new FeatureVector();
 		this.root = root;
+		this.visitFunctions = visitFunctions;
 	}
 
 	@Override
 	public boolean visit(AstNode node) {
 		
-		/* Check for statement types. */
-		this.registerStatement(node, node.getChangeType());
-		
 		/* Check for keywords. */
 		this.registerKeyword(node, node.getChangeType());
 		
 		/* Stop if this is a function declaration. */
-		if(node instanceof FunctionNode && node != this.root) {
+		if(!this.visitFunctions && node instanceof FunctionNode && node != this.root) {
 			return false;
 		}
 		
@@ -79,33 +119,36 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 	}
 	
 	/**
-	 * Checks if the node is a statement that we want to track and increments
-	 * its count in the feature vector if it is.
+	 * If the node is a potential keyword (Name, StringLiteral or NumberLiteral),
+	 * get the node's context and look up the most likely artifact in a package
+	 * that the keyword points to.
+	 * 
 	 * @param node The node to check.
-	 */
-	private void registerStatement(AstNode node, ChangeType changeType) {
-
-		if(node == null) return;
-		
-		String statementType = node.getClass().getSimpleName();
-		
-		this.featureVector.addStatement(statementType, changeType);
-		
-	}
-	
-	/**
-	 * Checks if the node contains a keyword that we want to track and
-	 * increments its count in the feature vector if it is.
-	 * @param node The node to check.
+	 * @param changeType How the node has been modified (inserted, removed, 
+	 * 					 updated, etc.)
 	 */
 	private void registerKeyword(AstNode node, ChangeType changeType) {
 
 		String token = "";
+		
+		KeywordType context = LearningUtilities.getTokenContext(node);
+		
+		if(context == KeywordType.UNKNOWN) return;
 
 		/* Add a falsey keyword if we're checking if this node is truthy or 
 		 * falsey. */
 		if(SpecialTypeAnalysisUtilities.isFalsey(node)) {
-			this.featureVector.addKeyword("~falsey~", changeType);
+
+			Keyword keyword = null;
+			if(this.packageModel != null) {
+				keyword = this.packageModel.getKeyword(context, "~falsey~");
+			}
+			else {
+				keyword = new Keyword(context, "~falsey");
+			}
+
+			if(keyword != null) this.featureVector.addKeyword(keyword, changeType);
+
 		}
 		
 		/* Get the relevant keyword from the node. */
@@ -139,7 +182,16 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		}
 		
 		/* Insert the token into the feature vector if it is a keyword. */
-		this.featureVector.addKeyword(token, changeType);
+		Keyword keyword = null;
+
+		if(this.packageModel != null) {
+			keyword = this.packageModel.getKeyword(context, token);
+		}
+		else {
+			keyword = new Keyword(context, token);
+		}
+
+		if(keyword != null) this.featureVector.addKeyword(keyword, changeType);
 		
 	}
 

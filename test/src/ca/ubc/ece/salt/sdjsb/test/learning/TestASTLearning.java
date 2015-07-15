@@ -2,6 +2,8 @@ package ca.ubc.ece.salt.sdjsb.test.learning;
 
 import static org.junit.Assert.*;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.Test;
@@ -9,6 +11,7 @@ import org.junit.Test;
 import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.FeatureVector;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.FeatureVectorManager;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningAnalysis;
 
 /**
@@ -25,25 +28,30 @@ public class TestASTLearning {
 	 */
 	protected void runTest(String[] args) throws Exception {
 		
+		/* Set up the FeatureVectorManager, which will store all the feature
+		 * vectors produced by our analysis and perform pre-processing tasks
+		 * for data mining. */
+		List<String> packagesToExtract = Arrays.asList("fs");
+		FeatureVectorManager featureVectorManager = new FeatureVectorManager(packagesToExtract);
+		
 		/* Set up the analysis. */
-		LearningAnalysis analysis = new LearningAnalysis();
+		LearningAnalysis analysis = new LearningAnalysis(featureVectorManager);
 		
 		/* Control flow difference the files. */
 		ControlFlowDifferencing cfd = new ControlFlowDifferencing(args);
         
-		/* Run the analysis. */
-        Set<Alert> alerts = cfd.analyze(analysis);
+		/* Run the analysis. There are no alerts produced by the 
+		 * LearningAnalysis... only FeatureVectors stored in the 
+		 * FeatureVectorManager. */
+        cfd.analyze(analysis);
         
-        /* Print the alerts. */
-        System.out.println(FeatureVector.getHeader());
-        for(Alert alert : alerts) {
-        	System.out.println(alert.getFeatureVector("tst", null, null, null, null));
-        }
+        /* Pre-process the alerts. */
+        featureVectorManager.preProcess();
+        
+        /* Print the data set. */
+        System.out.println(featureVectorManager.getFeatureVectorHeader());
+        System.out.println(featureVectorManager.getFeatureVector());
 
-        for(Alert alert : alerts) {
-        	System.out.println(alert.getSourceCode());
-        	System.out.println(alert.getDestinationCode());
-        }
 	}
 
 	@Test
