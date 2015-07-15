@@ -9,8 +9,8 @@ import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
 
 /**
  * Provides functions to extract keywords from APIs and determine which APIs a
- * repair is likely making changes to. 
- * 
+ * repair is likely making changes to.
+ *
  * This is used to build a data mining / machine learning data set by counting
  * the keywords of an API that are discovered in a program.
  */
@@ -54,29 +54,32 @@ public abstract class AbstractAPI {
 
 	/**
 	 * Checks if the keyword is a member of the API.
+	 *
 	 * @param type The type of the token.
 	 * @param keyword The name of the token.
-	 * @return True if the keyword/type is present in the API.
+	 * @return keyword if the keyword/type is present in the API, otherwise,
+	 *         null
 	 */
-	public boolean isMemberOf(KeywordType type, String keyword) {
+	public Keyword isMemberOf(KeywordType type, String keyword) {
 		return isMemberOf(new Keyword(type, keyword));
 	}
-	
+
 	/**
 	 * Checks if the keyword object is a member of the API.
+	 *
 	 * @param keyword Keyword object
-	 * @return True if the keyword/type is present in the API.
+	 * @return keyword if the keyword/type is present in the API, otherwise,
+	 *         null
 	 */
-	public boolean isMemberOf(Keyword keyword) {
+	public Keyword isMemberOf(Keyword keyword) {
 		return recursiveKeywordSearch(this, keyword);
 	}
-	
 
 	/**
 	 * Computes the likelihood that the function repair involved the API.
-	 * @param keywords A map of the keywords that were found in the function. 
+	 * @param keywords A map of the keywords that were found in the function.
 	 * 				   The key for the map is the keyword and the value for the
-	 * 				   map is the number of occurrences of the keyword.	 
+	 * 				   map is the number of occurrences of the keyword.
 	 * @return A likelihood between 0 and 1.
 	 */
 	public double getChangeLikelihood(Map<Keyword, Integer> insertedKeywords,
@@ -88,9 +91,9 @@ public abstract class AbstractAPI {
 
 	/**
 	 * Computes the likelihood that the function being repaired uses the API.
-	 * @param keywords A map of the keywords that were found in the function. 
+	 * @param keywords A map of the keywords that were found in the function.
 	 * 				   The key for the map is the keyword and the value for the
-	 * 				   map is the number of occurrences of the keyword.	 
+	 * 				   map is the number of occurrences of the keyword.
 	 * @return A likelihood between 0 and 1.
 	 */
 	public double getUseLikelihood(Map<Keyword, Integer> insertedKeywords,
@@ -116,19 +119,19 @@ public abstract class AbstractAPI {
 
 		// Look if any of the keywords given as input is present on this API
 		for (Map.Entry<Keyword, Integer> entry : mergedMap.entrySet()) {
-			if (recursiveKeywordSearch(this, entry.getKey()))
+			if (recursiveKeywordSearch(this, entry.getKey()) != null)
 				return 1;
 		}
 
 		return 0;
 	}
-	
+
 	/**
-	 * Return the name of this API. Subclasses should override 
-	 * with relevant name (e.g. class name for ClassAPI or package 
+	 * Return the name of this API. Subclasses should override
+	 * with relevant name (e.g. class name for ClassAPI or package
 	 * name for PackageAPI).
-	 * 
-	 * @return String relevant identifier for API 
+	 *
+	 * @return String relevant identifier for API
 	 */
 	public String getName() {
 		return null;
@@ -136,25 +139,31 @@ public abstract class AbstractAPI {
 
 	/**
 	 * Recursively search for keyword on this API
-	 * 
-	 * @param keyword
-	 *            The keyword we are looking for
-	 * @return True if the keyword/type is present in the API.
+	 *
+	 * @param keyword The keyword we are looking for
+	 * @return Keyword if the keyword/type is present in the API, null otherwise
 	 */
-	private boolean recursiveKeywordSearch(AbstractAPI api, Keyword keyword) {
-		// Check if keyword is on keywords list of API
-		if (api.keywords.contains(keyword))
-			return true;
-		
-		// Otherwise, check if keyword is member of any of the classes of
-		// API, which may have subclasses itself
+	private Keyword recursiveKeywordSearch(AbstractAPI api, Keyword keyword) {
+		/*
+		 * Check if keyword is present on the keywords list. If it is, return
+		 * the keyword we found, which may contain more information
+		 */
+		int index = api.keywords.indexOf(keyword);
+		if (index != -1)
+			return api.keywords.get(index);
+
+		/*
+		 * Otherwise, check if keyword is member of any of the classes of API,
+		 * which may have subclasses itself
+		 */
 		for (ClassAPI klass : api.classes) {
-			if (recursiveKeywordSearch(klass, keyword))
-				return true;
+			Keyword keywordFound = recursiveKeywordSearch(klass, keyword);
+			if (keywordFound != null)
+				return keywordFound;
 		}
-		
+
 		// If keyword was not found anywhere
-		return false;
+		return null;
 	}
 
 }

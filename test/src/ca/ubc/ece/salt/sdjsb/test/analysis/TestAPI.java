@@ -1,6 +1,7 @@
 package ca.ubc.ece.salt.sdjsb.test.analysis;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.util.HashMap;
@@ -19,20 +20,20 @@ public class TestAPI {
 	public void testIsMemberOfWhenIsMember() {
 		TopLevelAPI api = APIFactory.buildTopLevelAPI();
 
-		assertTrue(api.isMemberOf(KeywordType.RESERVED, "double"));
-		assertTrue(api.isMemberOf(KeywordType.METHOD_NAME, "isPrototypeOf"));
-		assertTrue(api.isMemberOf(KeywordType.FIELD, "length"));
-		assertTrue(api.isMemberOf(KeywordType.CLASS, "Array"));
+		assertNotNull(api.isMemberOf(KeywordType.RESERVED, "double"));
+		assertNotNull(api.isMemberOf(KeywordType.METHOD_NAME, "isPrototypeOf"));
+		assertNotNull(api.isMemberOf(KeywordType.FIELD, "length"));
+		assertNotNull(api.isMemberOf(KeywordType.CLASS, "Array"));
 	}
 
 	@Test
 	public void testIsMemberOfWhenIsNotMember() {
 		TopLevelAPI api = APIFactory.buildTopLevelAPI();
 
-		assertFalse(api.isMemberOf(KeywordType.RESERVED, "foo"));
-		assertFalse(api.isMemberOf(KeywordType.METHOD_NAME, "bar"));
-		assertFalse(api.isMemberOf(KeywordType.FIELD, "foo"));
-		assertFalse(api.isMemberOf(KeywordType.CLASS, "Bar"));
+		assertNull(api.isMemberOf(KeywordType.RESERVED, "foo"));
+		assertNull(api.isMemberOf(KeywordType.METHOD_NAME, "bar"));
+		assertNull(api.isMemberOf(KeywordType.FIELD, "foo"));
+		assertNull(api.isMemberOf(KeywordType.CLASS, "Bar"));
 	}
 
 	@Test
