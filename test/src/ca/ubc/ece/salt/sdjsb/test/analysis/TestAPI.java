@@ -48,12 +48,21 @@ public class TestAPI {
 		List<String> APIsNames = extractAPIsFromKeywordList(keywordsList);
 
 		/*
-		 * open event is member of ReadStream and WriteStream class
+		 * 'open' event is member of ReadStream and WriteStream class, but not
+		 * of Math
 		 */
 		assertEquals(2, keywordsList.size());
 		assertTrue(APIsNames.contains("WriteStream"));
 		assertTrue(APIsNames.contains("ReadStream"));
 		assertFalse(APIsNames.contains("Math"));
+	}
+
+	@Test
+	public void testGetAllKeywordsWhenIsNotMember() {
+		AbstractAPI api = APIFactory.buildTopLevelAPI();
+		List<Keyword> keywordsList = api.getAllKeywords(new Keyword(KeywordType.EVENT, "foo-event"));
+
+		assertEquals(0, keywordsList.size());
 	}
 
 	@Test
