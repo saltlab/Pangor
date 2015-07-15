@@ -3,6 +3,7 @@ package ca.ubc.ece.salt.sdjsb.analysis.learning.ast;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword;
@@ -115,7 +116,7 @@ public class FeatureVector {
 	 * @param keywords An ordered list of the keywords to print in the feature vector.
 	 * @return the CSV row (the feature vector) as a string.
 	 */
-	public String getFeatureVector(List<Keyword> keywords) {
+	public String getFeatureVector(Set<Keyword> keywords) {
 
 		String vector = id + "\t" + this.projectID + "\t" + this.buggyFile + "\t" + this.repairedFile 
 				+ "\t" + this.buggyCommitID + "\t" + this.repairedCommitID + "\t" + this.functionName;

@@ -55,7 +55,17 @@ public class FeatureVectorManager {
 	 * @return The feature vector header as a CSV list.
 	 */
 	public String getFeatureVectorHeader() { 
-		throw new UnsupportedOperationException();
+		
+		String header = String.join("\t", "ID", "ProjectID", "BuggyFile", 
+				"RepairedFile", "BuggyCommitID", "RepairedCommitID", 
+				"FunctionName");
+		
+		for(Keyword keyword : this.keywords) {
+			header += "\t" + keyword.toString();
+		}
+		
+		return header;
+
 	}
 	
 	/**
@@ -64,7 +74,15 @@ public class FeatureVectorManager {
 	 * @return The data set as a CSV file.
 	 */
 	public String getFeatureVector() {
-		throw new UnsupportedOperationException();
+		
+		String dataSet = "";
+
+		for(FeatureVector featureVector : this.featureVectors) {
+			dataSet += featureVector.getFeatureVector(keywords) + "\n";
+		}
+
+		return dataSet;
+
 	}
 	
 	/**
