@@ -4,18 +4,20 @@ package ca.ubc.ece.salt.sdjsb.analysis.learning.apis;
  * Stores a keyword and the context under which it is used (which we call its type).
  */
 public class Keyword {
+	
 	/** The context under which the keyword is used. **/
 	public KeywordType type;
 
 	/** The keyword text. **/
 	public String keyword;
 
-	/** The API this keyword associates to */
+	/** The AbstractAPI which contains this keyword. **/
 	public AbstractAPI api;
 
 	public Keyword(KeywordType type, String keyword) {
 		this.type = type;
 		this.keyword = keyword;
+		this.api = null;
 	}
 
 	public Keyword(KeywordType type, String keyword, AbstractAPI api) {

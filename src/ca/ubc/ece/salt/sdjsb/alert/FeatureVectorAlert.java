@@ -29,7 +29,8 @@ public class FeatureVectorAlert extends Alert {
 	
 	@Override 
 	public String getFeatureVector(String project, String sourceFile, String destinationFile, String buggyCommit, String repairedCommit) {
-		return this.featureVector.getFeatureVector(project, sourceFile, destinationFile, buggyCommit, repairedCommit);
+		/* TODO: We need to go through the FeatureVectorManager to print alerts. */
+		throw new UnsupportedOperationException();
 	}
 
 	@Override

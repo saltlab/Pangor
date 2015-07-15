@@ -1,9 +1,7 @@
 package ca.ubc.ece.salt.sdjsb.test.analysis;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,11 +36,9 @@ public class TestPointsToPrediction {
 		PointsToPrediction predictor = new PointsToPrediction(api, insertedKeywords, removedKeywords, updatedKeywords,
 				null);
 
-		Keyword keyword = new Keyword(KeywordType.METHOD_NAME, "parse");
+		Keyword keyword = predictor.getKeyword(KeywordType.METHOD_NAME, "parse");
 
-		boolean predicted = predictor.findLikelyAPI(keyword);
-
-		assertTrue(predicted);
+		assertNotNull(keyword);
 		assertEquals("path", keyword.api.getName());
 	}
 
@@ -67,11 +63,9 @@ public class TestPointsToPrediction {
 		PointsToPrediction predictor = new PointsToPrediction(api, insertedKeywords, removedKeywords, updatedKeywords,
 				null);
 
-		Keyword keyword = new Keyword(KeywordType.METHOD_NAME, "parse");
+		Keyword keyword = predictor.getKeyword(KeywordType.METHOD_NAME, "parse");
 
-		boolean predicted = predictor.findLikelyAPI(keyword);
-
-		assertTrue(predicted);
+		assertNotNull(keyword);
 		assertEquals("Date", keyword.api.getName());
 	}
 
@@ -86,11 +80,9 @@ public class TestPointsToPrediction {
 		TopLevelAPI api = APIFactory.buildTopLevelAPI();
 		PointsToPrediction predictor = new PointsToPrediction(api, insertedKeywords, null, null, null);
 
-		Keyword keyword = new Keyword(KeywordType.FIELD, "win32");
+		Keyword keyword = predictor.getKeyword(KeywordType.FIELD, "win32");
 
-		boolean predicted = predictor.findLikelyAPI(keyword);
-
-		assertTrue(predicted);
+		assertNotNull(keyword);
 		assertEquals("path", keyword.api.getName());
 	}
 
@@ -103,11 +95,6 @@ public class TestPointsToPrediction {
 		TopLevelAPI api = APIFactory.buildTopLevelAPI();
 		PointsToPrediction predictor = new PointsToPrediction(api, null, null, null, null);
 
-		Keyword keyword = new Keyword(KeywordType.METHOD_NAME, "fooMethod");
-
-		boolean predicted = predictor.findLikelyAPI(keyword);
-
-		assertFalse(predicted);
-		assertNull(keyword.api);
+		Keyword keyword = predictor.getKeyword(KeywordType.METHOD_NAME, "fooMethod");
 	}
 }

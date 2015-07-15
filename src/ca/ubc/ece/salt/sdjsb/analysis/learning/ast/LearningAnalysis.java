@@ -4,20 +4,30 @@ import java.util.Map;
 
 import org.mozilla.javascript.ast.ScriptNode;
 
-import ca.ubc.ece.salt.sdjsb.alert.FeatureVectorAlert;
 import ca.ubc.ece.salt.sdjsb.analysis.meta.MetaAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.Scope;
 
+/**
+ * Creates a data set for learning bug and repair patterns related to the use
+ * of Node.js package APIs. This class will produce one feature vector for each
+ * function in the analyzed script with a source and destination function.
+ */
 public class LearningAnalysis extends MetaAnalysis<LearningASTAnalysis, LearningASTAnalysis> {
+	
+	/* The FeatureVectorManager performs pre-processing tasks for data
+	 * mining (i.e., row and column filtering). */
+	private FeatureVectorManager featureVectorManager; 
 
-	public LearningAnalysis() {
+	/**
+	 * @param featureVectorManager the manager that stores the feature vectors produced by this analysis.
+	 */
+	public LearningAnalysis(FeatureVectorManager featureVectorManager) {
 		super(new LearningASTAnalysis(), new LearningASTAnalysis());
+		this.featureVectorManager = featureVectorManager;
 	}
 
 	@Override
 	protected void synthesizeAlerts() {
-		
-		/* TODO: Here would be a good place to initialize the points-to analysis. */
 		
 		/* Source analysis. */
 		Map<Scope, FeatureVector> srcFeatureVectors = this.srcAnalysis.getFeatureVectors();
@@ -45,9 +55,9 @@ public class LearningAnalysis extends MetaAnalysis<LearningASTAnalysis, Learning
 			/* Get the 'removed' statements and keywords from the source feature vector. */
 			dstFeatureVector.join(srcFeatureVector);
 			
-			if(!dstFeatureVector.isEmpty()) {
-				this.registerAlert(new FeatureVectorAlert(dstFeatureVector));
-			}
+			/* Add the feature vector to the FeatureVectorManager. */
+			this.featureVectorManager.registerFeatureVector(dstFeatureVector);
+
 		}
 		
 	}

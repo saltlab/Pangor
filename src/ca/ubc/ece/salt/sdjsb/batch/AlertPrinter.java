@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ca.ubc.ece.salt.sdjsb.alert.Alert;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.FeatureVector;
 
 public class AlertPrinter {
 	
@@ -117,7 +116,8 @@ public class AlertPrinter {
 		
 		/* Write the header for the feature vector. */
 		if(!append) {
-			stream.println(FeatureVector.getHeader());
+			/* TODO: We need to go through FeatureVectorMagager to print the header. */
+			//stream.println(FeatureVector.getHeader());
 		}
 
 		/* Write each feature vector from the results. */

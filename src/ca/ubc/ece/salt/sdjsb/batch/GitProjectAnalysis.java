@@ -2,6 +2,7 @@ package ca.ubc.ece.salt.sdjsb.batch;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,6 +52,7 @@ import ca.ubc.ece.salt.sdjsb.analysis.ast.STHScopeAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.callbackerror.CallbackErrorAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.callbackparam.CallbackParamAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.globaltolocal.GlobalToLocalAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.FeatureVectorManager;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysis;
 import fr.labri.gumtree.client.DiffOptions;
@@ -263,7 +265,9 @@ public class GitProjectAnalysis {
 //        	tasks.add(new CFDTask(cfd, new GTLScopeAnalysis()));
         	
         	/* This is the learning analysis. */
-        	tasks.add(new CFDTask(cfd, new LearningAnalysis()));
+        	/* TODO: How should we print the data set? We used to use alerts, 
+        	 *		 but this might not be the best option. */
+        	tasks.add(new CFDTask(cfd, new LearningAnalysis(new FeatureVectorManager(Arrays.asList("fs")))));
         	
         	for(CFDTask task : tasks) {
                 futures.add(executor.submit(task));

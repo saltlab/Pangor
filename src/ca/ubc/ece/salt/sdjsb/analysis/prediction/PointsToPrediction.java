@@ -3,10 +3,9 @@ package ca.ubc.ece.salt.sdjsb.analysis.prediction;
 import java.util.List;
 import java.util.Map;
 
-import org.mozilla.javascript.ast.AstRoot;
-
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.AbstractAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
 
 /**
@@ -27,6 +26,10 @@ public class PointsToPrediction {
 
 	/**
 	 * Build the model for predicting points-to relationships.
+	 * @param insertedKeywords
+	 * @param removedKeywords
+	 * @param updatedKeywords
+	 * @param unchangedKeywords
 	 */
 	public PointsToPrediction(TopLevelAPI api, Map<Keyword, Integer> insertedKeywords,
 			   Map<Keyword, Integer> removedKeywords,
@@ -44,28 +47,36 @@ public class PointsToPrediction {
 	 * @return true if prediction is above confidence level and api is stored in
 	 *         keyword
 	 **/
-	public boolean findLikelyAPI(Keyword keyword) {
+	public Keyword getKeyword(KeywordType context, String token) {
+		Keyword keyword = new Keyword(context, token);
+
 		PredictionResults results = predictor.predictKeyword(keyword);
 		PredictionResult result = results.poll();
 
 		if (result != null && result.likelihood > LIKELIHOOD_THRESHOLD) {
 			keyword.api = result.api;
-			return true;
-		} else {
-			return false;
+			return keyword;
 		}
+
+		return null;
 	}
 
 
 	/** Returns a list of APIs that are likely used in this method. **/
-	public List<AbstractAPI> getAPIsUsed(AstRoot methodRoot) {
+	public List<AbstractAPI> getAPIsUsed(Map<Keyword, Integer> insertedKeywords,
+			   Map<Keyword, Integer> removedKeywords,
+			   Map<Keyword, Integer> updatedKeywords,
+			   Map<Keyword, Integer> unchangedKeywords) {
 		return null;
 	}
 
 	/**
 	 * Returns a list of APIs that are likely involved in a method's repair.
 	 **/
-	public List<AbstractAPI> getAPIsInRepair(AstRoot methodRoot) {
+	public List<AbstractAPI> getAPIsInRepair(Map<Keyword, Integer> insertedKeywords,
+			   Map<Keyword, Integer> removedKeywords,
+			   Map<Keyword, Integer> updatedKeywords,
+			   Map<Keyword, Integer> unchangedKeywords) {
 		return null;
 	}
 
