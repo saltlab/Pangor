@@ -16,13 +16,13 @@ import ca.ubc.ece.salt.sdjsb.analysis.prediction.PointsToPrediction;
 
 public class TestPointsToPrediction {
 	/*
-	 * 'parse' is present on both 'path' and 'Date' APIs
-	 * 'normalize' and 'posix' are present on 'path'
+	 * 'parse' is present on both 'path' and 'Date' APIs 'normalize' and 'posix'
+	 * are present on 'path'
 	 *
 	 * Expected result: 'path'
 	 */
 	@Test
-	public void testFindLikelyAPIWhenAmbiguousOnPath() {
+	public void testGetKeywordWhenAmbiguousOnPath() {
 		Map<Keyword, Integer> insertedKeywords = new HashMap<>();
 		insertedKeywords.put(new Keyword(KeywordType.METHOD_NAME, "parse"), 1);
 
@@ -49,7 +49,7 @@ public class TestPointsToPrediction {
 	 * Expected result: 'Date'
 	 */
 	@Test
-	public void testFindLikelyAPIWhenAmbiguousOnDate() {
+	public void testGetKeywordWhenAmbiguousOnDate() {
 		Map<Keyword, Integer> insertedKeywords = new HashMap<>();
 		insertedKeywords.put(new Keyword(KeywordType.METHOD_NAME, "parse"), 1);
 
@@ -73,7 +73,7 @@ public class TestPointsToPrediction {
 	 * 'win32' is present only on 'path' API
 	 */
 	@Test
-	public void testGetLikelyAPIWhenNotAmbiguous() {
+	public void testGetKeywordWhenNotAmbiguous() {
 		Map<Keyword, Integer> insertedKeywords = new HashMap<>();
 		insertedKeywords.put(new Keyword(KeywordType.FIELD, "win32"), 1);
 
@@ -91,7 +91,7 @@ public class TestPointsToPrediction {
 	 * keywords
 	 */
 	@Test(expected = RuntimeException.class)
-	public void testGetLikelyAPIOnInvalidInput() {
+	public void testGetKeywordOnInvalidInput() {
 		TopLevelAPI api = APIFactory.buildTopLevelAPI();
 		PointsToPrediction predictor = new PointsToPrediction(api, null, null, null, null);
 
