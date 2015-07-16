@@ -43,6 +43,13 @@ public class TestASTLearning {
         System.out.println(featureVectorManager.getFeatureVector());
 
 	}
+	
+	@Test
+	public void testFileSystem() throws Exception {
+		String src = "./test/input/learning/lrn_fs_old.js";
+		String dst = "./test/input/learning/lrn_fs_new.js";
+		this.runTest(new String[] {src, dst});
+	}
 
 	@Test
 	public void testCallback() throws Exception {

@@ -56,7 +56,7 @@ public class TestAPI {
 	public void testGetPackageNameWhenIsGlobal() {
 		AbstractAPI api = APIFactory.buildTopLevelAPI();
 
-		Keyword keyword = api.getFirstKeyword(KeywordType.METHOD_NAME, "getDate");
+		Keyword keyword = api.getFirstKeyword(KeywordType.METHOD, "getDate");
 		assertEquals("Date", keyword.api.getName());
 		assertEquals("global", keyword.getPackageName());
 	}
@@ -67,7 +67,7 @@ public class TestAPI {
 		AbstractAPI api = APIFactory.buildTopLevelAPI();
 
 		assertNotNull(api.getFirstKeyword(KeywordType.RESERVED, "double"));
-		assertNotNull(api.getFirstKeyword(KeywordType.METHOD_NAME, "isPrototypeOf"));
+		assertNotNull(api.getFirstKeyword(KeywordType.METHOD, "isPrototypeOf"));
 		assertNotNull(api.getFirstKeyword(KeywordType.FIELD, "length"));
 		assertNotNull(api.getFirstKeyword(KeywordType.CLASS, "Array"));
 	}
@@ -77,7 +77,7 @@ public class TestAPI {
 		AbstractAPI api = APIFactory.buildTopLevelAPI();
 
 		assertNull(api.getFirstKeyword(KeywordType.RESERVED, "foo"));
-		assertNull(api.getFirstKeyword(KeywordType.METHOD_NAME, "bar"));
+		assertNull(api.getFirstKeyword(KeywordType.METHOD, "bar"));
 		assertNull(api.getFirstKeyword(KeywordType.FIELD, "foo"));
 		assertNull(api.getFirstKeyword(KeywordType.CLASS, "Bar"));
 	}
@@ -112,7 +112,7 @@ public class TestAPI {
 		AbstractAPI api = APIFactory.buildTopLevelAPI();
 
 		Map<Keyword, Integer> insertedKeywords = new HashMap<>();
-		insertedKeywords.put(new Keyword(KeywordType.METHOD_CALL, "bar"), 3);
+		insertedKeywords.put(new Keyword(KeywordType.METHOD, "bar"), 3);
 		insertedKeywords.put(new Keyword(KeywordType.FIELD, "Infinity"), 2);
 		insertedKeywords.put(new Keyword(KeywordType.FIELD, "foo"), 1);
 
@@ -126,7 +126,7 @@ public class TestAPI {
 		AbstractAPI api = APIFactory.buildTopLevelAPI();
 
 		Map<Keyword, Integer> insertedKeywords = new HashMap<>();
-		insertedKeywords.put(new Keyword(KeywordType.METHOD_CALL, "bar"), 3);
+		insertedKeywords.put(new Keyword(KeywordType.METHOD, "bar"), 3);
 		insertedKeywords.put(new Keyword(KeywordType.CLASS, "Date"), 2);
 		insertedKeywords.put(new Keyword(KeywordType.FIELD, "foo"), 1);
 

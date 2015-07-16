@@ -23,10 +23,10 @@ public class TestPredictor {
 		TopLevelAPI api = APIFactory.buildTopLevelAPI();
 
 		Map<Keyword, Integer> insertedKeywords = new HashMap<>();
-		insertedKeywords.put(new Keyword(KeywordType.METHOD_NAME, "parse"), 1);
+		insertedKeywords.put(new Keyword(KeywordType.METHOD, "parse"), 1);
 		insertedKeywords.put(new Keyword(KeywordType.PACKAGE, "fs"), 1);
 		insertedKeywords.put(new Keyword(KeywordType.PACKAGE, "path"), 1);
-		insertedKeywords.put(new Keyword(KeywordType.METHOD_NAME, "getUTCSeconds"), 1);
+		insertedKeywords.put(new Keyword(KeywordType.METHOD, "getUTCSeconds"), 1);
 
 		Predictor predictor = new CSPredictor(api, insertedKeywords, null, null, null);
 
@@ -43,8 +43,8 @@ public class TestPredictor {
 		TopLevelAPI api = APIFactory.buildTopLevelAPI();
 
 		Map<Keyword, Integer> insertedKeywords = new HashMap<>();
-		insertedKeywords.put(new Keyword(KeywordType.METHOD_NAME, "parse"), 1);
-		insertedKeywords.put(new Keyword(KeywordType.METHOD_NAME, "getUTCSeconds"), 1);
+		insertedKeywords.put(new Keyword(KeywordType.METHOD, "parse"), 1);
+		insertedKeywords.put(new Keyword(KeywordType.METHOD, "getUTCSeconds"), 1);
 
 		Predictor predictor = new CSPredictor(api, insertedKeywords, null, null, null);
 
