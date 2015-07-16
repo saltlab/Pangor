@@ -40,6 +40,7 @@ public class TestPointsToPrediction {
 
 		assertNotNull(keyword);
 		assertEquals("path", keyword.api.getName());
+		assertEquals("path", keyword.getPackageName());
 	}
 
 	/*
@@ -67,6 +68,7 @@ public class TestPointsToPrediction {
 
 		assertNotNull(keyword);
 		assertEquals("Date", keyword.api.getName());
+		assertEquals("global", keyword.getPackageName());
 	}
 
 	/*

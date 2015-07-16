@@ -4,7 +4,7 @@ package ca.ubc.ece.salt.sdjsb.analysis.learning.apis;
  * Stores a keyword and the context under which it is used (which we call its type).
  */
 public class Keyword {
-	
+
 	/** The context under which the keyword is used. **/
 	public KeywordType type;
 
@@ -24,6 +24,19 @@ public class Keyword {
 		this.type = type;
 		this.keyword = keyword;
 		this.api = api;
+	}
+
+	/**
+	 * Return the package name of the API this Keywords belongs to. Just
+	 * delegates the call method to the API.
+	 *
+	 * @return the package name, "global", or null
+	 */
+	public String getPackageName() {
+		if (api != null)
+			return api.getPackageName();
+
+		return null;
 	}
 
 	@Override

@@ -25,7 +25,7 @@ public class TestAPI {
 
 		Keyword keyword = api.getFirstKeyword(KeywordType.FIELD, "bytesWritten");
 		assertEquals("WriteStream", keyword.api.getName());
-		assertEquals("fs", keyword.api.getPackageName());
+		assertEquals("fs", keyword.getPackageName());
 	}
 
 	@Test
@@ -34,7 +34,7 @@ public class TestAPI {
 
 		Keyword keyword = api.getFirstKeyword(KeywordType.PACKAGE, "fs");
 		assertEquals("fs", keyword.api.getName());
-		assertEquals("fs", keyword.api.getPackageName());
+		assertEquals("fs", keyword.getPackageName());
 	}
 
 	@Test
@@ -49,7 +49,7 @@ public class TestAPI {
 		 * which makes sense, as the keyword is stored within the ClassAPI class
 		 */
 		assertEquals("WriteStream", keyword.api.getName());
-		assertEquals("fs", keyword.api.getPackageName());
+		assertEquals("fs", keyword.getPackageName());
 	}
 
 	@Test
@@ -58,7 +58,7 @@ public class TestAPI {
 
 		Keyword keyword = api.getFirstKeyword(KeywordType.METHOD_NAME, "getDate");
 		assertEquals("Date", keyword.api.getName());
-		assertEquals("global", keyword.api.getPackageName());
+		assertEquals("global", keyword.getPackageName());
 	}
 
 
