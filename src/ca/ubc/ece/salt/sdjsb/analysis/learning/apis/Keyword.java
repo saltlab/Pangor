@@ -32,7 +32,8 @@ public class Keyword {
 	public boolean equals(Object obj) {
 		if(obj instanceof Keyword) {
 			Keyword that = (Keyword) obj;
-			if(this.type == that.type && this.keyword == that.keyword) return true;
+			if(this.type == that.type && this.keyword.equals(that.keyword)) 
+				return true;
 		}
 		return false;
 	}

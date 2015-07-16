@@ -1,7 +1,6 @@
 package ca.ubc.ece.salt.sdjsb.analysis.learning.ast;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 

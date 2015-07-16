@@ -17,8 +17,7 @@ import ca.ubc.ece.salt.sdjsb.analysis.prediction.PointsToPrediction;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysisUtilities;
 
 /**
- * TODO: We need to modify this class to extract Keywords. This class should
- * 		 therefore not return a FeatureVector, but a set of Keywords.
+ * Inspects scripts and functions for API keywords. 
  */
 public class LearningAnalysisVisitor implements NodeVisitor {
 

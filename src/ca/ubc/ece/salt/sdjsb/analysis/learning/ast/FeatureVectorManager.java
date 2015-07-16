@@ -61,7 +61,10 @@ public class FeatureVectorManager {
 				"FunctionName");
 		
 		for(Keyword keyword : this.keywords) {
-			header += "\t" + keyword.toString();
+			header += "\tInserted_" + keyword.toString();
+			header += "\tRemoved_" + keyword.toString();
+			header += "\tUpdated_" + keyword.toString();
+			header += "\tUnchanged_" + keyword.toString();
 		}
 		
 		return header;
@@ -76,7 +79,7 @@ public class FeatureVectorManager {
 	public String getFeatureVector() {
 		
 		String dataSet = "";
-
+		
 		for(FeatureVector featureVector : this.featureVectors) {
 			dataSet += featureVector.getFeatureVector(keywords) + "\n";
 		}
