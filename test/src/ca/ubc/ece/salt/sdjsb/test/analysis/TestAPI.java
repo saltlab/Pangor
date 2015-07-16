@@ -19,6 +19,48 @@ import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
 
 public class TestAPI {
+	@Test
+	public void testGetPackageNameWhenHasAPackage() {
+		AbstractAPI api = APIFactory.buildTopLevelAPI();
+
+		Keyword keyword = api.getFirstKeyword(KeywordType.FIELD, "bytesWritten");
+		assertEquals("WriteStream", keyword.api.getName());
+		assertEquals("fs", keyword.api.getPackageName());
+	}
+
+	@Test
+	public void testGetPackageNameWhenIsAPackage() {
+		AbstractAPI api = APIFactory.buildTopLevelAPI();
+
+		Keyword keyword = api.getFirstKeyword(KeywordType.PACKAGE, "fs");
+		assertEquals("fs", keyword.api.getName());
+		assertEquals("fs", keyword.api.getPackageName());
+	}
+
+	@Test
+	public void testGetPackageNameWhenIsAClassOfAPackage() {
+		AbstractAPI api = APIFactory.buildTopLevelAPI();
+
+		Keyword keyword = api.getFirstKeyword(KeywordType.CLASS, "WriteStream");
+
+		/*
+		 * It seems strange that WriteStream api's is WriteStream. However, the
+		 * logic is: the WriteStream keyword points to the WriteStream ClassAPI,
+		 * which makes sense, as the keyword is stored within the ClassAPI class
+		 */
+		assertEquals("WriteStream", keyword.api.getName());
+		assertEquals("fs", keyword.api.getPackageName());
+	}
+
+	@Test
+	public void testGetPackageNameWhenIsGlobal() {
+		AbstractAPI api = APIFactory.buildTopLevelAPI();
+
+		Keyword keyword = api.getFirstKeyword(KeywordType.METHOD_NAME, "getDate");
+		assertEquals("Date", keyword.api.getName());
+		assertEquals("global", keyword.api.getPackageName());
+	}
+
 
 	@Test
 	public void testGetFirstKeywordWhenIsMember() {

@@ -23,11 +23,22 @@ public class PackageAPI extends AbstractAPI {
 					  List<String> eventNames, List<ClassAPI> classes) {
 		super(methodNames, fieldNames, constantNames, eventNames, classes);
 		this.includeName = includeName;
-		this.keywords.add(new Keyword(KeywordType.PACKAGE, includeName));
+		this.keywords.add(new Keyword(KeywordType.PACKAGE, includeName, this));
 	}
 
 	@Override
 	public String getName() {
+		return includeName;
+	}
+
+	@Override
+	public String getPackageName() {
+		/*
+		 * If this is already a package, it makes no sense to go up the tree
+		 * looking for which package this AbstractAPI belongs to (as it is done
+		 * in the AbstractAPI method implementation)
+		 */
+
 		return includeName;
 	}
 }

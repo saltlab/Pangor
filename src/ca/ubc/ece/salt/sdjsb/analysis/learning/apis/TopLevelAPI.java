@@ -94,4 +94,15 @@ public class TopLevelAPI extends AbstractAPI {
 			recursiveKeywordSearch(pkg, keyword, outputList);
 		}
 	}
+
+	@Override
+	public String getPackageName() {
+		return "global";
+	}
+
+	@Override
+	public String getName() {
+		return "global";
+	}
+
 }

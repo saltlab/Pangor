@@ -20,6 +20,12 @@ public abstract class AbstractAPI {
 	protected List<ClassAPI> classes;
 
 	/**
+	 * Pointer to the parent to maintain a tree-like structure. Used to navigate
+	 * the tree from bottom to top to look for which package an API belongs to
+	 */
+	protected AbstractAPI parent;
+
+	/**
 	 * @param includeName The keyword that imports the package in "include([package name keyword]);"
 	 * @param methodNames The methods in the API.
 	 * @param fieldNames The fields in the API.
@@ -50,6 +56,7 @@ public abstract class AbstractAPI {
 		}
 
 		this.classes = classes;
+		addParentToChildren(this.classes);
 	}
 
 	/**
@@ -150,8 +157,20 @@ public abstract class AbstractAPI {
 	 *
 	 * @return String relevant identifier for API
 	 */
-	public String getName() {
-		return null;
+	public abstract String getName();
+
+	public String getPackageName() {
+		/*
+		 * Go up in the tree until we find a package. I know this is hard to
+		 * read, sorry. But it seems to work.
+		 */
+		AbstractAPI lastParent = parent;
+
+		while (lastParent.parent != null) {
+			lastParent = lastParent.parent;
+		}
+
+		return lastParent.getPackageName();
 	}
 
 	/**
@@ -160,7 +179,6 @@ public abstract class AbstractAPI {
 	 * @param keyword The keyword we are looking for
 	 * @return Keyword if the keyword/type is present in the API, null otherwise
 	 */
-
 	protected void recursiveKeywordSearch(AbstractAPI api, Keyword keyword, List<Keyword> outputList) {
 		/*
 		 * Check if keyword is present on the keywords list. If it is, add the
@@ -177,5 +195,15 @@ public abstract class AbstractAPI {
 		for (ClassAPI klass : api.classes) {
 			recursiveKeywordSearch(klass, keyword, outputList);
 		}
+	}
+
+	/**
+	 * Add pointer to this instance on its children
+	 *
+	 * @param children
+	 */
+	protected void addParentToChildren(List<ClassAPI> children) {
+		for (ClassAPI child : children)
+			child.parent = this;
 	}
 }

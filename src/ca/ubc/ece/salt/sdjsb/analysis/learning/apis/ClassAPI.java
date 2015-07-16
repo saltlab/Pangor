@@ -18,12 +18,12 @@ public class ClassAPI extends AbstractAPI {
 	 * @param constantNames The constants in the API.
 	 * @param eventNames The events in the API.
 	 */
-	public ClassAPI(String className, List<String> methodNames, 
-					  List<String> fieldNames, List<String> constantNames, 
+	public ClassAPI(String className, List<String> methodNames,
+					  List<String> fieldNames, List<String> constantNames,
 					  List<String> eventNames, List<ClassAPI> classes) {
 		super(methodNames, fieldNames, constantNames, eventNames, classes);
 		this.className = className;
-		this.keywords.add(new Keyword(KeywordType.CLASS, className));
+		this.keywords.add(new Keyword(KeywordType.CLASS, className, this));
 	}
 
 	@Override
