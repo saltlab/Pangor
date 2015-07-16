@@ -24,7 +24,7 @@ public abstract class Predictor {
 	 * The "required name" of packages that were actually imported on the file
 	 * and will serve as a filter on our predictions
 	 */
-	protected Set<String> requiredAPIsNames;
+	protected Set<String> requiredPackagesNames;
 
 	public Predictor(TopLevelAPI api, Map<Keyword, Integer> insertedKeywords, Map<Keyword, Integer> removedKeywords,
 			Map<Keyword, Integer> updatedKeywords, Map<Keyword, Integer> unchangedKeywords) {
@@ -38,15 +38,24 @@ public abstract class Predictor {
 		 * Look on input for PACKAGEs keywords.
 		 */
 
-		requiredAPIsNames = lookupRequiredAPIs(insertedKeywords, unchangedKeywords);
+		requiredPackagesNames = lookupRequiredPackages(insertedKeywords, unchangedKeywords);
 	}
 
 	public abstract PredictionResults predictKeyword(Keyword keyword);
 
 	/**
+	 * Return a list of names of required packages
+	 *
+	 * @return a list of names of required packages
+	 */
+	public Set<String> getRequiredPackagesNames() {
+		return requiredPackagesNames;
+	}
+
+	/**
 	 * Internal method to look for KeywordType.PACKAGE keywords on the input
 	 */
-	protected Set<String> lookupRequiredAPIs(Map<Keyword, Integer>... keywordsMaps) {
+	protected Set<String> lookupRequiredPackages(Map<Keyword, Integer>... keywordsMaps) {
 		Set<String> outputSet = new HashSet<>();
 
 		/*
@@ -69,7 +78,7 @@ public abstract class Predictor {
 
 			for (Keyword keyword : keywordsMap.keySet()) {
 				if (keyword.type.equals(KeywordType.PACKAGE))
-					outputSet.add(keyword.api.getName());
+					outputSet.add(keyword.keyword);
 			}
 		}
 
