@@ -48,8 +48,15 @@ public class PointsToPrediction {
 	 *         keyword
 	 **/
 	public Keyword getKeyword(KeywordType context, String token) {
+		/*
+		 * Create the keyword object
+		 */
 		Keyword keyword = new Keyword(context, token);
 
+		/*
+		 * Use the predictor and get the result with the highest likelihood of
+		 * being the correct one (stored on the head of PredictionResults queue)
+		 */
 		PredictionResults results = predictor.predictKeyword(keyword);
 		PredictionResult result = results.poll();
 
