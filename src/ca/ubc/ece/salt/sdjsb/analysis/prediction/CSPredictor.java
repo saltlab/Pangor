@@ -61,6 +61,8 @@ public class CSPredictor extends Predictor {
 		List<Keyword> keywordsFound = api.getAllKeywords(keyword);
 		List<AbstractAPI> apis = new ArrayList<>();
 
+		filterKeywordsByPackages(keywordsFound, apisFound);
+
 		for (Keyword k : keywordsFound)
 			apis.add(k.api);
 
@@ -81,10 +83,12 @@ public class CSPredictor extends Predictor {
 	 */
 	protected void calculateScore() {
 		/*
-		 * Then we iterate over them, and look for their APIs
+		 * Iterate over keywords, and look for their APIs
 		 */
 		for (Keyword keyword : mergedKeywordsMap.keySet()) {
 			List<Keyword> keywordsFound = api.getAllKeywords(keyword);
+
+			filterKeywordsByPackagesNames(keywordsFound, requiredPackagesNames);
 
 			/*
 			 * If there is only one occurrence, register it as Confidence

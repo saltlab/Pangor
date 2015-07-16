@@ -87,7 +87,7 @@ public class TopLevelAPI extends AbstractAPI {
 		}
 
 		/*
-		 * Otherwise, check if keyword is member of any of the classes of API,
+		 * Otherwise, check if keyword is member of any of the packages of API,
 		 * which may have subclasses itself
 		 */
 		for (PackageAPI pkg : api.packages) {

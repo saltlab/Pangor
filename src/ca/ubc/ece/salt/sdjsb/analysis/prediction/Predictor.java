@@ -1,9 +1,12 @@
 package ca.ubc.ece.salt.sdjsb.analysis.prediction;
 
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.AbstractAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
@@ -15,16 +18,20 @@ public abstract class Predictor {
 	/** The top level API where API's are looked for */
 	protected TopLevelAPI api;
 
+	/**
+	 * The "required name" of packages that were actually imported on the file
+	 * and will serve as a filter on our predictions. Looked up from the given
+	 * keywords
+	 */
+	protected Set<String> requiredPackagesNames;
+
+	/**
+	 * Given keywords
+	 */
 	protected Map<Keyword, Integer> insertedKeywords;
 	protected Map<Keyword, Integer> removedKeywords;
 	protected Map<Keyword, Integer> updatedKeywords;
 	protected Map<Keyword, Integer> unchangedKeywords;
-
-	/**
-	 * The "required name" of packages that were actually imported on the file
-	 * and will serve as a filter on our predictions
-	 */
-	protected Set<String> requiredPackagesNames;
 
 	public Predictor(TopLevelAPI api, Map<Keyword, Integer> insertedKeywords, Map<Keyword, Integer> removedKeywords,
 			Map<Keyword, Integer> updatedKeywords, Map<Keyword, Integer> unchangedKeywords) {
@@ -83,5 +90,31 @@ public abstract class Predictor {
 		}
 
 		return outputSet;
+	}
+
+	/**
+	 * Given a list of keywords and some packages, remove all keywords from the
+	 * list that do not belong to any of the packages
+	 *
+	 * @param keywords list of keywords
+	 * @param packagesNames list of package names
+	 */
+	protected void filterKeywordsByPackagesNames(List<Keyword> keywords, Set<String> packagesNames) {
+		for (Iterator<Keyword> iterator = keywords.iterator(); iterator.hasNext();) {
+			Keyword keyword = iterator.next();
+
+			if (!packagesNames.contains(keyword.getPackageName()))
+				iterator.remove();
+		}
+	}
+
+	protected void filterKeywordsByPackages(List<Keyword> keywords, Set<AbstractAPI> apis) {
+		Set<String> packagesNames = new HashSet<>();
+
+		for (AbstractAPI api : apis) {
+			packagesNames.add(api.getPackageName());
+		}
+
+		filterKeywordsByPackagesNames(keywords, packagesNames);
 	}
 }
