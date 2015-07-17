@@ -33,6 +33,15 @@ public class KeywordDefinition {
 	}
 
 	/**
+	 * Set the package artifact that this keyword points to.
+	 *
+	 * @param api The package this keyword points to.
+	 */
+	public void setAPI(AbstractAPI api) {
+		this.api = api;
+	}
+
+	/**
 	 * Return the package name of the API this Keywords belongs to. Just
 	 * delegates the call method to the API.
 	 *
