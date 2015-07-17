@@ -26,24 +26,8 @@ public class CSPredictor extends Predictor {
 	Map<AbstractAPI, Integer> supportMap = new HashMap<>();
 	Map<AbstractAPI, Integer> scoreMap = new HashMap<>();
 
-	Map<KeywordUse, Integer> mergedKeywordsMap = new HashMap<KeywordUse, Integer>();
-
-	public CSPredictor(TopLevelAPI api, Map<KeywordUse, Integer> insertedKeywords,
-			Map<KeywordUse, Integer> removedKeywords, Map<KeywordUse, Integer> updatedKeywords,
-			Map<KeywordUse, Integer> unchangedKeywords) {
-		super(api, insertedKeywords, removedKeywords, updatedKeywords, unchangedKeywords);
-
-		/*
-		 * Merge all keywords
-		 */
-		if (insertedKeywords != null)
-			mergedKeywordsMap.putAll(insertedKeywords);
-		if (removedKeywords != null)
-			mergedKeywordsMap.putAll(removedKeywords);
-		if (updatedKeywords != null)
-			mergedKeywordsMap.putAll(updatedKeywords);
-		if (unchangedKeywords != null)
-			mergedKeywordsMap.putAll(unchangedKeywords);
+	public CSPredictor(TopLevelAPI api, Map<KeywordUse, Integer> keywords) {
+		super(api, keywords);
 
 		calculateScore();
 	}
@@ -51,9 +35,9 @@ public class CSPredictor extends Predictor {
 	@Override
 	public PredictionResults predictKeyword(KeywordUse keyword) {
 		/*
-		 * Check if this keyword was on the input
+		 * Check if this keyword was on the input.
 		 */
-		if (! mergedKeywordsMap.containsKey(keyword))
+		if (!isKeywordOnInput(keyword))
 			throw new RuntimeException("Keyword " + keyword + " was not given on input");
 
 		/*
@@ -71,6 +55,22 @@ public class CSPredictor extends Predictor {
 		}
 
 		return results;
+	}
+
+	/**
+	 * Check if keyword is on input. Can not use keywords.containsKey because it
+	 * will try to match the ChangeType, and we do not care for it right now
+	 *
+	 * @param keyword
+	 * @return
+	 */
+	private boolean isKeywordOnInput(KeywordUse keyword) {
+		for (KeywordUse k : keywords.keySet()) {
+			if (k.type == keyword.type && k.keyword.equals(keyword.keyword))
+				return true;
+		}
+
+		return false;
 	}
 
 	@Override
@@ -94,7 +94,7 @@ public class CSPredictor extends Predictor {
 		/*
 		 * Iterate over keywords, and look for their APIs
 		 */
-		for (KeywordUse keyword : mergedKeywordsMap.keySet()) {
+		for (KeywordUse keyword : keywords.keySet()) {
 			List<KeywordDefinition> keywordsFound = api.getAllKeywords(keyword);
 
 			filterKeywordsByPackagesNames(keywordsFound, requiredPackagesNames);

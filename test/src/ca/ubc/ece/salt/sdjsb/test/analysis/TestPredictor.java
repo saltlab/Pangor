@@ -10,9 +10,11 @@ import java.util.Set;
 
 import org.junit.Test;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.APIFactory;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.prediction.CSPredictor;
 import ca.ubc.ece.salt.sdjsb.analysis.prediction.Predictor;
@@ -22,13 +24,14 @@ public class TestPredictor {
 	public void testPredictorRequiredPackagesWhenHasPackages() {
 		TopLevelAPI api = APIFactory.buildTopLevelAPI();
 
-		Map<KeywordUse, Integer> insertedKeywords = new HashMap<>();
-		insertedKeywords.put(new KeywordUse(KeywordType.METHOD, "parse"), 1);
-		insertedKeywords.put(new KeywordUse(KeywordType.PACKAGE, "fs"), 1);
-		insertedKeywords.put(new KeywordUse(KeywordType.PACKAGE, "path"), 1);
-		insertedKeywords.put(new KeywordUse(KeywordType.METHOD, "getUTCSeconds"), 1);
+		Map<KeywordUse, Integer> keywords = new HashMap<>();
+		keywords.put(new KeywordUse(KeywordType.METHOD, KeywordContext.UNKNOWN, "parse", ChangeType.INSERTED), 1);
+		keywords.put(new KeywordUse(KeywordType.METHOD, KeywordContext.UNKNOWN, "getUTCSeconds", ChangeType.INSERTED),
+				1);
+		keywords.put(new KeywordUse(KeywordType.PACKAGE, KeywordContext.UNKNOWN, "fs", ChangeType.INSERTED), 1);
+		keywords.put(new KeywordUse(KeywordType.PACKAGE, KeywordContext.UNKNOWN, "path", ChangeType.INSERTED), 1);
 
-		Predictor predictor = new CSPredictor(api, insertedKeywords, null, null, null);
+		Predictor predictor = new CSPredictor(api, keywords);
 
 		Set<String> packages = predictor.getRequiredPackagesNames();
 
@@ -42,11 +45,12 @@ public class TestPredictor {
 	public void testPredictorRequiredPackagesWhenHasNoPackages() {
 		TopLevelAPI api = APIFactory.buildTopLevelAPI();
 
-		Map<KeywordUse, Integer> insertedKeywords = new HashMap<>();
-		insertedKeywords.put(new KeywordUse(KeywordType.METHOD, "parse"), 1);
-		insertedKeywords.put(new KeywordUse(KeywordType.METHOD, "getUTCSeconds"), 1);
+		Map<KeywordUse, Integer> keywords = new HashMap<>();
+		keywords.put(new KeywordUse(KeywordType.METHOD, KeywordContext.UNKNOWN, "parse", ChangeType.INSERTED), 1);
+		keywords.put(new KeywordUse(KeywordType.METHOD, KeywordContext.UNKNOWN, "getUTCSeconds", ChangeType.INSERTED),
+				1);
 
-		Predictor predictor = new CSPredictor(api, insertedKeywords, null, null, null);
+		Predictor predictor = new CSPredictor(api, keywords);
 
 		Set<String> packages = predictor.getRequiredPackagesNames();
 

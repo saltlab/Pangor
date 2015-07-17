@@ -28,22 +28,9 @@ public class PointsToPrediction {
 
 	/**
 	 * Build the model for predicting points-to relationships.
-	 * @param insertedKeywords
-	 * @param removedKeywords
-	 * @param updatedKeywords
-	 * @param unchangedKeywords
 	 */
-	public PointsToPrediction(TopLevelAPI api, Map<KeywordUse, Integer> insertedKeywords,
-			Map<KeywordUse, Integer> removedKeywords, Map<KeywordUse, Integer> updatedKeywords,
-			Map<KeywordUse, Integer> unchangedKeywords) {
-		this.predictor = new CSPredictor(api, insertedKeywords, removedKeywords, updatedKeywords, unchangedKeywords);
-	}
-
 	public PointsToPrediction(TopLevelAPI api, Map<KeywordUse, Integer> keywords) {
-		this.predictor = new CSPredictor(api, KeywordUse.filterMapByChangeType(keywords, ChangeType.INSERTED),
-				KeywordUse.filterMapByChangeType(keywords, ChangeType.REMOVED),
-				KeywordUse.filterMapByChangeType(keywords, ChangeType.UPDATED),
-				KeywordUse.filterMapByChangeType(keywords, ChangeType.UNCHANGED));
+		this.predictor = new CSPredictor(api, keywords);
 	}
 
 	/**

@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.AbstractAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
@@ -29,25 +30,19 @@ public abstract class Predictor {
 	/**
 	 * Given keywords
 	 */
-	protected Map<KeywordUse, Integer> insertedKeywords;
-	protected Map<KeywordUse, Integer> removedKeywords;
-	protected Map<KeywordUse, Integer> updatedKeywords;
-	protected Map<KeywordUse, Integer> unchangedKeywords;
+	protected Map<KeywordUse, Integer> keywords;
 
-	public Predictor(TopLevelAPI api, Map<KeywordUse, Integer> insertedKeywords,
-			Map<KeywordUse, Integer> removedKeywords, Map<KeywordUse, Integer> updatedKeywords,
-			Map<KeywordUse, Integer> unchangedKeywords) {
+	public Predictor(TopLevelAPI api, Map<KeywordUse, Integer> keywords) {
 		this.api = api;
-		this.insertedKeywords = insertedKeywords;
-		this.removedKeywords = removedKeywords;
-		this.updatedKeywords = updatedKeywords;
-		this.unchangedKeywords = unchangedKeywords;
+		this.keywords = keywords;
 
 		/*
 		 * Look on input for PACKAGEs keywords.
 		 */
 
-		requiredPackagesNames = lookupRequiredPackages(insertedKeywords, unchangedKeywords);
+		this.requiredPackagesNames = lookupRequiredPackages(
+				KeywordUse.filterMapByChangeType(keywords, ChangeType.INSERTED),
+				KeywordUse.filterMapByChangeType(keywords, ChangeType.UNCHANGED));
 	}
 
 
