@@ -42,8 +42,6 @@ public class PointsToPrediction {
 		
 		KeywordUse keyword = new KeywordUse(type, context, token, changeType);
 		
-		System.out.println(keyword);
-		
 		for (PackageAPI pack : api.getPackages()) {
 			if (pack.isMemberOf(keyword)) {
 				keyword.setPointsTo(pack);
