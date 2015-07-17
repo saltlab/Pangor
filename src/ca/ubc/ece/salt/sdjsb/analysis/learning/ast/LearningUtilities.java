@@ -95,11 +95,11 @@ public class LearningUtilities {
 		
 		if(parent == null || token == null) return KeywordType.UNKNOWN;
 		
+		/* Check for class, method and parameter declarations. */
 		if (parent instanceof FunctionNode) {
 
 			FunctionNode function = (FunctionNode) parent;
 			
-			/* Is this a class declaration? */
 			if(function.getFunctionName() == token && Character.isUpperCase(function.getName().charAt(0))) {
 				return KeywordType.CLASS;
 			}
@@ -111,17 +111,23 @@ public class LearningUtilities {
 			}
 
 		} 
+		/* Check for variable declarations. */
+		else if(parent instanceof VariableInitializer) {
+			
+			VariableInitializer initializer = (VariableInitializer) parent;
+			if(initializer.getTarget() == token) return KeywordType.VARIABLE;
+			
+		}
+		/* Check for function call related keywords. */
 		else if(parent instanceof FunctionCall) {
 			
 			FunctionCall call = (FunctionCall) parent;
 
+			/* Check for packages. */
 			if(call.getTarget() instanceof Name) {
 
 				Name target = (Name)call.getTarget();
-				if(target == token) {
-					return KeywordType.METHOD;
-				}
-				else if(target.getIdentifier().equals("require") && call.getArguments().size() == 1) {
+				if(target.getIdentifier().equals("require") && call.getArguments().size() == 1) {
 					AstNode pack = call.getArguments().get(0);
 					if(pack instanceof StringLiteral && pack == token) {
 						return KeywordType.PACKAGE;
@@ -129,11 +135,9 @@ public class LearningUtilities {
 				}
 				
 			}
+			/* Check for events. */
 			else if(call.getTarget() instanceof PropertyGet) {
 				
-				/* Should we differentiate between event registrations and 
-				 * event removals? Not needed for determining which API it's
-				 * from but could be useful for clustering. */
 				PropertyGet target = (PropertyGet) call.getTarget();
 
 				if(target.getProperty().getIdentifier().equals("on") && call.getArguments().size() == 2) {
@@ -157,27 +161,6 @@ public class LearningUtilities {
 				
 			}
 
-			if(call.getArguments().contains(token)) {
-				return KeywordType.VARIABLE;
-			}
-
-		}
-		else if(parent instanceof PropertyGet) {
-			
-			/* Should we differentiate between field accesses and field 
-			 * assignments? Currently we do not. */
-			PropertyGet access = (PropertyGet) parent;
-			if(token instanceof Name && access.getProperty() == token) {
-				Name name = (Name)token;
-				
-				if(name.getIdentifier().equals(name.getIdentifier().toUpperCase())) {
-					return KeywordType.CONSTANT;
-				}
-				else {
-					return KeywordType.FIELD;
-				}
-			}
-			
 		}
 		else if(parent instanceof CatchClause) {
 			
@@ -186,6 +169,9 @@ public class LearningUtilities {
 				return KeywordType.EXCEPTION;
 			}
 			
+		}
+		else if(token instanceof Name) {
+			return getVariableOrFieldType(token, (Name)token);
 		}
 		
 		return KeywordType.UNKNOWN;
@@ -245,9 +231,6 @@ public class LearningUtilities {
 			/* Check for event uses. */
 			else if(call.getTarget() instanceof PropertyGet) {
 				
-				/* Should we differentiate between event registrations and 
-				 * event removals? Not needed for determining which API it's
-				 * from but could be useful for clustering. */
 				PropertyGet target = (PropertyGet) call.getTarget();
 
 				if(target.getProperty().getIdentifier().equals("on") && call.getArguments().size() == 2) {
@@ -286,6 +269,44 @@ public class LearningUtilities {
 		 * field or reserved word use. */
 		return getVariableOrFieldContext(token);
 
+	}
+
+	/**
+	 * Finds the type of a variable or field (field or method).
+	 * @param vf The variable or field.
+	 * @return The type of the keyword.
+	 */
+	private static KeywordType getVariableOrFieldType(AstNode vf, Name node) {
+
+		/* This access is part of another access. Recursively find the context. */
+
+		if(vf.getParent() instanceof PropertyGet) {
+			return getVariableOrFieldType((PropertyGet) vf.getParent(), node);
+		}
+		
+		/* We can now determine if the variable is a field or method. */
+
+		if(vf.getParent() instanceof FunctionCall) {
+			FunctionCall call = (FunctionCall) vf.getParent();
+			if(call.getTarget() == vf) {
+				return KeywordType.METHOD;
+			}
+		}
+		
+		if(vf instanceof PropertyGet) {
+
+			if(node.getIdentifier().equals(node.getIdentifier().toUpperCase())) {
+				return KeywordType.CONSTANT;
+			}
+			else {
+				return KeywordType.FIELD;
+			}
+
+		}
+		else {
+			return KeywordType.VARIABLE;
+		}
+		
 	}
 	
 	/**
