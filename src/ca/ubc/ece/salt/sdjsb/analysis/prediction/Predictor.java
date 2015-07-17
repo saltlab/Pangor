@@ -41,8 +41,7 @@ public abstract class Predictor {
 		 */
 
 		this.requiredPackagesNames = lookupRequiredPackages(
-				KeywordUse.filterMapByChangeType(keywords, ChangeType.INSERTED),
-				KeywordUse.filterMapByChangeType(keywords, ChangeType.UNCHANGED));
+				KeywordUse.filterMapByChangeType(keywords, ChangeType.INSERTED, ChangeType.UNCHANGED));
 	}
 
 

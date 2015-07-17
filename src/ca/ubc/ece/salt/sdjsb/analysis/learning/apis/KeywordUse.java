@@ -110,7 +110,7 @@ public class KeywordUse extends KeywordDefinition {
 		Map<KeywordUse, Integer> newList = new HashMap<KeywordUse, Integer>();
 
 		for (Entry<KeywordUse, Integer> keywordEntry : keywordsMap.entrySet()) {
-			if (!Arrays.asList(changeTypes).contains(keywordEntry.getKey().changeType))
+			if (Arrays.asList(changeTypes).contains(keywordEntry.getKey().changeType))
 				newList.put(keywordEntry.getKey(), keywordEntry.getValue());
 		}
 
