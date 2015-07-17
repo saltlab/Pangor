@@ -1,9 +1,9 @@
 package ca.ubc.ece.salt.sdjsb.analysis.learning.apis;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 
@@ -119,18 +119,17 @@ public class Keyword {
 	 * TODO: Should this be on this class or should we create a
 	 * KeywordListHelper or something?
 	 *
-	 * @param keywords list of keywords
+	 * @param keywordsMap list of keywords
 	 * @param changeTypes types of keywords that should stay
 	 * @return a new list
 	 */
-	public static List<Keyword> filterListByChangeType(List<Keyword> keywords, ChangeType... changeTypes) {
-		List<Keyword> newList = new ArrayList<Keyword>(keywords);
+	public static Map<Keyword, Integer> filterMapByChangeType(Map<Keyword, Integer> keywordsMap,
+			ChangeType... changeTypes) {
+		Map<Keyword, Integer> newList = new HashMap<Keyword, Integer>();
 
-		for (Iterator<Keyword> iterator = newList.iterator(); iterator.hasNext();) {
-			Keyword keyword = iterator.next();
-
-			if (!Arrays.asList(changeTypes).contains(keyword.changeType))
-				iterator.remove();
+		for (Entry<Keyword, Integer> keywordEntry : keywordsMap.entrySet()) {
+			if (!Arrays.asList(changeTypes).contains(keywordEntry.getKey().changeType))
+				newList.put(keywordEntry.getKey(), keywordEntry.getValue());
 		}
 
 		return newList;

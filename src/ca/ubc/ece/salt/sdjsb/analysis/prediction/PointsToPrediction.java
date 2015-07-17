@@ -3,6 +3,7 @@ package ca.ubc.ece.salt.sdjsb.analysis.prediction;
 import java.util.Map;
 import java.util.Set;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.AbstractAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
@@ -77,6 +78,12 @@ public class PointsToPrediction {
 		return predictor.predictKeywords(insertedKeywords, unchangedKeywords);
 	}
 
+	/** Returns a set of APIs that are likely used in this method. **/
+	public Set<AbstractAPI> getAPIsUsed(Map<Keyword, Integer> keywords) {
+		return predictor
+				.predictKeywords(Keyword.filterMapByChangeType(keywords, ChangeType.INSERTED, ChangeType.UNCHANGED));
+	}
+
 	/**
 	 * Returns a set of APIs that are likely involved in a method's repair.
 	 **/
@@ -85,6 +92,12 @@ public class PointsToPrediction {
 			   Map<Keyword, Integer> updatedKeywords,
 			   Map<Keyword, Integer> unchangedKeywords) {
 		return predictor.predictKeywords(updatedKeywords, removedKeywords);
+	}
+
+	/** Returns a set of APIs that are likely used in this method. **/
+	public Set<AbstractAPI> getAPIsInRepair(Map<Keyword, Integer> keywords) {
+		return predictor
+				.predictKeywords(Keyword.filterMapByChangeType(keywords, ChangeType.UPDATED, ChangeType.REMOVED));
 	}
 
 }
