@@ -68,17 +68,17 @@ public class TestASTLearning {
 		
 		/* Create the expected keywords. */
 		KeywordUse openSync = new KeywordUse(KeywordType.METHOD, KeywordContext.METHOD_CALL, "openSync", ChangeType.UNCHANGED);
-		openSync.setPointsTo(fs);
+		openSync.setAPI(fs);
 		KeywordUse closeSync = new KeywordUse(KeywordType.METHOD, KeywordContext.METHOD_CALL, "closeSync", ChangeType.INSERTED);
-		closeSync.setPointsTo(fs);
+		closeSync.setAPI(fs);
 		KeywordUse existsSync = new KeywordUse(KeywordType.METHOD, KeywordContext.METHOD_CALL, "existsSync", ChangeType.UNCHANGED);
-		existsSync.setPointsTo(fs);
+		existsSync.setAPI(fs);
 		KeywordUse writeSync = new KeywordUse(KeywordType.METHOD, KeywordContext.METHOD_CALL, "writeSync", ChangeType.UNCHANGED);
-		writeSync.setPointsTo(fs);
+		writeSync.setAPI(fs);
 		KeywordUse fsU = new KeywordUse(KeywordType.PACKAGE, KeywordContext.REQUIRE, "fs", ChangeType.UNCHANGED);
-		fsU.setPointsTo(fs);
+		fsU.setAPI(fs);
 		KeywordUse fsI = new KeywordUse(KeywordType.PACKAGE, KeywordContext.REQUIRE, "fs", ChangeType.INSERTED);
-		fsI.setPointsTo(fs);
+		fsI.setAPI(fs);
 		
 		/* Create the expected feature vectors. */
 		MockFeatureVector fv1 = new MockFeatureVector("writeHello");

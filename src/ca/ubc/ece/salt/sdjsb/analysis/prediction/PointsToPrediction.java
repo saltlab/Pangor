@@ -1,15 +1,13 @@
 package ca.ubc.ece.salt.sdjsb.analysis.prediction;
 
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.AbstractAPI;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.PackageAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
 
 /**
@@ -17,57 +15,86 @@ import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
  * events, etc.) based on the use patterns of all the keywords.
  */
 public class PointsToPrediction {
-	protected TopLevelAPI api;
+	/**
+	 * The likelihood threshold used to assume the prediction was correct.
+	 * TODO: Should this actually be a modifiable field?
+	 */
+	protected final double LIKELIHOOD_THRESHOLD = 0;
+
+	/**
+	 * The Predictor used in the predictions
+	 */
+	protected Predictor predictor;
 
 	/**
 	 * Build the model for predicting points-to relationships.
-	 * @param insertedKeywords
-	 * @param removedKeywords
-	 * @param updatedKeywords
-	 * @param unchangedKeywords
 	 */
 	public PointsToPrediction(TopLevelAPI api, Map<KeywordUse, Integer> keywords) {
-		
-		this.api = api;
-	}
-
-	/** Returns the most likely API that the keyword points to. **/
-	public KeywordUse getKeyword(KeywordType type, KeywordContext context, 
-			String token, ChangeType changeType) {
-
-		/*
-		 * On this draft implementation, return the first API which 
-		 * has the keyword
-		 */
-		
-		KeywordUse keyword = new KeywordUse(type, context, token, changeType);
-		
-		for (PackageAPI pack : api.getPackages()) {
-			if (pack.isMemberOf(keyword)) {
-				keyword.setPointsTo(pack);
-				return keyword;
-			}
-		}
-		
-		return null;
-	}
-
-	/** Returns a list of APIs that are likely used in this method. **/
-	public List<AbstractAPI> getAPIsUsed(Map<KeywordDefinition, Integer> insertedKeywords,
-			   Map<KeywordDefinition, Integer> removedKeywords,
-			   Map<KeywordDefinition, Integer> updatedKeywords,
-			   Map<KeywordDefinition, Integer> unchangedKeywords) {
-		return null;
+		this.predictor = new CSPredictor(api, keywords);
 	}
 
 	/**
-	 * Returns a list of APIs that are likely involved in a method's repair.
+	 * Try to predict to which API this keyword belongs to. If the prediction is
+	 * above LIKELIHOOD_THRESHOLD, the most likely API is stored in the
+	 * Keyword's api field and true is returned. Otherwise, false is returned.
+	 *
+	 * @param keyword the keyword used in the prediction
+	 * @return true if prediction is above confidence level and api is stored in
+	 *         keyword
 	 **/
-	public List<AbstractAPI> getAPIsInRepair(Map<KeywordDefinition, Integer> insertedKeywords,
-			   Map<KeywordDefinition, Integer> removedKeywords,
-			   Map<KeywordDefinition, Integer> updatedKeywords,
-			   Map<KeywordDefinition, Integer> unchangedKeywords) {
+	public KeywordUse getKeyword(KeywordType type, KeywordContext context,
+			String token, ChangeType changeType) {
+		/*
+		 * Create the keyword object
+		 */
+		KeywordUse keyword = new KeywordUse(type, context, token, changeType);
+
+		/*
+		 * Use the predictor and get the result with the highest likelihood of
+		 * being the correct one (stored on the head of PredictionResults queue)
+		 */
+		PredictionResults results = predictor.predictKeyword(keyword);
+		PredictionResult result = results.poll();
+
+		if (result != null && result.likelihood > LIKELIHOOD_THRESHOLD) {
+			keyword.api = result.api;
+			return keyword;
+		}
+
 		return null;
+	}
+
+	public KeywordUse getKeyword(KeywordType type, String token) {
+		return getKeyword(type, KeywordContext.UNKNOWN, token, ChangeType.UNKNOWN);
+	}
+
+
+	/** Returns a set of APIs that are likely used in this method. **/
+	public Set<AbstractAPI> getAPIsUsed(Map<KeywordUse, Integer> insertedKeywords,
+			Map<KeywordUse, Integer> removedKeywords, Map<KeywordUse, Integer> updatedKeywords,
+			Map<KeywordUse, Integer> unchangedKeywords) {
+		return predictor.predictKeywords(insertedKeywords, unchangedKeywords);
+	}
+
+	/** Returns a set of APIs that are likely used in this method. **/
+	public Set<AbstractAPI> getAPIsUsed(Map<KeywordUse, Integer> keywords) {
+		return predictor
+				.predictKeywords(KeywordUse.filterMapByChangeType(keywords, ChangeType.INSERTED, ChangeType.UNCHANGED));
+	}
+
+	/**
+	 * Returns a set of APIs that are likely involved in a method's repair.
+	 **/
+	public Set<AbstractAPI> getAPIsInRepair(Map<KeywordUse, Integer> insertedKeywords,
+			Map<KeywordUse, Integer> removedKeywords, Map<KeywordUse, Integer> updatedKeywords,
+			Map<KeywordUse, Integer> unchangedKeywords) {
+		return predictor.predictKeywords(updatedKeywords, removedKeywords);
+	}
+
+	/** Returns a set of APIs that are likely used in this method. **/
+	public Set<AbstractAPI> getAPIsInRepair(Map<KeywordUse, Integer> keywords) {
+		return predictor
+				.predictKeywords(KeywordUse.filterMapByChangeType(keywords, ChangeType.UPDATED, ChangeType.REMOVED));
 	}
 
 }
