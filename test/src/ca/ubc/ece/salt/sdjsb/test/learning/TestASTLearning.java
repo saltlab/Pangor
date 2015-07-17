@@ -11,10 +11,12 @@ import org.junit.Test;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.APIFactory;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.AbstractAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.PackageAPI;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.FeatureVectorManager;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningAnalysis;
 
@@ -30,7 +32,7 @@ public class TestASTLearning {
 		/* Set up the FeatureVectorManager, which will store all the feature
 		 * vectors produced by our analysis and perform pre-processing tasks
 		 * for data mining. */
-		List<String> packagesToExtract = Arrays.asList("fs", "path");
+		List<String> packagesToExtract = Arrays.asList("fs", "path", "Date");
 		FeatureVectorManager featureVectorManager = new FeatureVectorManager(packagesToExtract);
 
 		/* Set up the analysis. */
@@ -55,6 +57,29 @@ public class TestASTLearning {
         for(MockFeatureVector fv : expected) {
         	Assert.assertTrue(featureVectorManager.contains(fv.functionName, fv.expectedKeywords));
         }
+	}
+
+	/*
+	 * Tests if predictor actually realize that parse() belongs to "Date" which
+	 * is globally available. To make things more interesting, "path" is also
+	 * imported (and also has method parse()), but we use other keywords from
+	 * Date to help the predictor
+	 */
+	@Test
+	public void testDate() throws Exception {
+		String src = "./test/input/learning/date_old.js";
+		String dst = "./test/input/learning/date_new.js";
+
+		TopLevelAPI topLevelAPI = APIFactory.buildTopLevelAPI();
+		AbstractAPI DateAPI = topLevelAPI.getFirstKeyword(KeywordType.CLASS, "Date").api;
+
+		KeywordUse parse = new KeywordUse(KeywordType.METHOD, KeywordContext.METHOD_CALL, "parse", ChangeType.INSERTED,
+				DateAPI);
+
+		MockFeatureVector function = new MockFeatureVector("testFunction");
+		function.expectedKeywords.add(Pair.of(parse, 1));
+
+		this.runTest(new String[] { src, dst }, Arrays.asList(function));
 	}
 
 	/*

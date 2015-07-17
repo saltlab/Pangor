@@ -46,7 +46,7 @@ public class KeywordUse extends KeywordDefinition {
 	}
 
 	public KeywordUse(KeywordType type, KeywordContext context, String keyword, ChangeType changeType,
-			PackageAPI path) {
+			AbstractAPI path) {
 		this(type, context, keyword, changeType);
 		setAPI(path);
 	}
