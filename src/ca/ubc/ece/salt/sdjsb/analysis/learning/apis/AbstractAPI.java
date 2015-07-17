@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
 
 /**
  * Provides functions to extract keywords from APIs and determine which APIs a
@@ -16,7 +16,7 @@ import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
  */
 public abstract class AbstractAPI {
 
-	protected List<Keyword> keywords;
+	protected List<KeywordDefinition> keywords;
 	protected List<ClassAPI> classes;
 
 	/**
@@ -34,19 +34,19 @@ public abstract class AbstractAPI {
 		this.classes = new ArrayList<>();
 
 		for (String methodName : methodNames) {
-			this.keywords.add(new Keyword(KeywordType.METHOD, methodName));
+			this.keywords.add(new KeywordDefinition(KeywordType.METHOD, methodName));
 		}
 
 		for (String fieldName : fieldNames) {
-			this.keywords.add(new Keyword(KeywordType.FIELD, fieldName));
+			this.keywords.add(new KeywordDefinition(KeywordType.FIELD, fieldName));
 		}
 
 		for (String constantName : constantNames) {
-			this.keywords.add(new Keyword(KeywordType.CONSTANT, constantName));
+			this.keywords.add(new KeywordDefinition(KeywordType.CONSTANT, constantName));
 		}
 
 		for (String eventName : eventNames) {
-			this.keywords.add(new Keyword(KeywordType.EVENT, eventName));
+			this.keywords.add(new KeywordDefinition(KeywordType.EVENT, eventName));
 		}
 
 		this.classes = classes;
@@ -59,7 +59,7 @@ public abstract class AbstractAPI {
 	 * @return True if the keyword/type is present in the API.
 	 */
 	public boolean isMemberOf(KeywordType type, String keyword) {
-		return isMemberOf(new Keyword(type, keyword));
+		return isMemberOf(new KeywordDefinition(type, keyword));
 	}
 	
 	/**
@@ -67,7 +67,7 @@ public abstract class AbstractAPI {
 	 * @param keyword Keyword object
 	 * @return True if the keyword/type is present in the API.
 	 */
-	public boolean isMemberOf(Keyword keyword) {
+	public boolean isMemberOf(KeywordDefinition keyword) {
 		return recursiveKeywordSearch(this, keyword);
 	}
 	
@@ -79,10 +79,10 @@ public abstract class AbstractAPI {
 	 * 				   map is the number of occurrences of the keyword.	 
 	 * @return A likelihood between 0 and 1.
 	 */
-	public double getChangeLikelihood(Map<Keyword, Integer> insertedKeywords,
-							   Map<Keyword, Integer> removedKeywords,
-							   Map<Keyword, Integer> updatedKeywords,
-							   Map<Keyword, Integer> unchangedKeywords) {
+	public double getChangeLikelihood(Map<KeywordDefinition, Integer> insertedKeywords,
+							   Map<KeywordDefinition, Integer> removedKeywords,
+							   Map<KeywordDefinition, Integer> updatedKeywords,
+							   Map<KeywordDefinition, Integer> unchangedKeywords) {
 		return getUseLikelihood(insertedKeywords, removedKeywords, updatedKeywords, unchangedKeywords);
 	}
 
@@ -93,10 +93,10 @@ public abstract class AbstractAPI {
 	 * 				   map is the number of occurrences of the keyword.	 
 	 * @return A likelihood between 0 and 1.
 	 */
-	public double getUseLikelihood(Map<Keyword, Integer> insertedKeywords,
-							   Map<Keyword, Integer> removedKeywords,
-							   Map<Keyword, Integer> updatedKeywords,
-							   Map<Keyword, Integer> unchangedKeywords) {
+	public double getUseLikelihood(Map<KeywordDefinition, Integer> insertedKeywords,
+							   Map<KeywordDefinition, Integer> removedKeywords,
+							   Map<KeywordDefinition, Integer> updatedKeywords,
+							   Map<KeywordDefinition, Integer> unchangedKeywords) {
 		/*
 		 * On this first implementation, we assume that if any of the keywords
 		 * inserted, removed, updated or unchanged belongs to this API, the
@@ -104,7 +104,7 @@ public abstract class AbstractAPI {
 		 */
 
 		// Merge all maps
-		Map<Keyword, Integer> mergedMap = new HashMap<Keyword, Integer>();
+		Map<KeywordDefinition, Integer> mergedMap = new HashMap<KeywordDefinition, Integer>();
 		if (insertedKeywords != null)
 			mergedMap.putAll(insertedKeywords);
 		if (removedKeywords != null)
@@ -115,7 +115,7 @@ public abstract class AbstractAPI {
 			mergedMap.putAll(unchangedKeywords);
 
 		// Look if any of the keywords given as input is present on this API
-		for (Map.Entry<Keyword, Integer> entry : mergedMap.entrySet()) {
+		for (Map.Entry<KeywordDefinition, Integer> entry : mergedMap.entrySet()) {
 			if (recursiveKeywordSearch(this, entry.getKey()))
 				return 1;
 		}
@@ -141,7 +141,7 @@ public abstract class AbstractAPI {
 	 *            The keyword we are looking for
 	 * @return True if the keyword/type is present in the API.
 	 */
-	private boolean recursiveKeywordSearch(AbstractAPI api, Keyword keyword) {
+	private boolean recursiveKeywordSearch(AbstractAPI api, KeywordDefinition keyword) {
 		// Check if keyword is on keywords list of API
 		if (api.keywords.contains(keyword))
 			return true;

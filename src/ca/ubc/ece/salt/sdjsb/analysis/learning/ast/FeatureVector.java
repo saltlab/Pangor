@@ -5,7 +5,8 @@ import java.util.Map;
 import java.util.Set;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
 
 /**
  * Stores a feature vector (a row) of the repair pattern learning data set.
@@ -51,17 +52,11 @@ public class FeatureVector {
 	public String destinationCode;
 	
 	/** The keyword counts in each fragment. **/
-	public Map<Keyword, Integer> insertedKeywordMap;
-	public Map<Keyword, Integer> removedKeywordMap;
-	public Map<Keyword, Integer> updatedKeywordMap;
-	public Map<Keyword, Integer> unchangedKeywordMap;
+	public Map<KeywordUse, Integer> keywordMap;
 	
 	public FeatureVector() {
 		this.id = FeatureVector.getNextID();
-		this.insertedKeywordMap = new HashMap<Keyword, Integer>();
-		this.removedKeywordMap = new HashMap<Keyword, Integer>();
-		this.updatedKeywordMap = new HashMap<Keyword, Integer>();
-		this.unchangedKeywordMap = new HashMap<Keyword, Integer>();
+		this.keywordMap = new HashMap<KeywordUse, Integer>();
 	}
 	
 	/**
@@ -70,7 +65,14 @@ public class FeatureVector {
 	 */
 	public void join(FeatureVector source) {
 		this.sourceCode = source.sourceCode;
-		this.removedKeywordMap = source.removedKeywordMap;
+		
+		/* Insert the keywords form the source feature vector with change type
+		 * REMOVED into this feature vector. */
+		for(KeywordUse keyword : source.keywordMap.keySet()) {
+			if(keyword.changeType == ChangeType.REMOVED) {
+				this.keywordMap.put(keyword, source.keywordMap.get(keyword));
+			}
+		}
 	}
 	
 	/**
@@ -78,36 +80,11 @@ public class FeatureVector {
 	 * one.
 	 * @param token The string to check against the keyword list.
 	 */
-	@SuppressWarnings("incomplete-switch")
-	public void addKeyword(Keyword keyword) {
+	public void addKeyword(KeywordUse keyword) {
 
-		Integer count = 0;
-
-		switch(keyword.changeType) {
-
-		case INSERTED:
-			count = this.insertedKeywordMap.containsKey(keyword) ? this.insertedKeywordMap.get(keyword) + 1 : 1;
-			this.insertedKeywordMap.put(keyword,  count);
-			break;
-
-		case REMOVED:
-			count = this.removedKeywordMap.containsKey(keyword) ? this.removedKeywordMap.get(keyword) + 1 : 1;
-			this.removedKeywordMap.put(keyword, count);
-			break;
-
-		case UPDATED:
-			count = this.updatedKeywordMap.containsKey(keyword) ? this.updatedKeywordMap.get(keyword) + 1 : 1;
-			this.updatedKeywordMap.put(keyword, count);
-			break;
-
-		case MOVED:
-		case UNCHANGED:
-			count = this.unchangedKeywordMap.containsKey(keyword) ? this.unchangedKeywordMap.get(keyword) + 1 : 1;
-			this.unchangedKeywordMap.put(keyword, count);
-			break;
-
-		}
-
+		Integer count = this.keywordMap.containsKey(keyword) ? this.keywordMap.get(keyword) + 1 : 1;
+		this.keywordMap.put(keyword,  count);
+		
 	}
 	
 	/**
@@ -115,19 +92,13 @@ public class FeatureVector {
 	 * @param keywords An ordered list of the keywords to print in the feature vector.
 	 * @return the CSV row (the feature vector) as a string.
 	 */
-	public String getFeatureVector(Set<Keyword> keywords) {
+	public String getFeatureVector(Set<KeywordDefinition> keywords) {
 
 		String vector = id + "\t" + this.projectID + "\t" + this.buggyFile + "\t" + this.repairedFile 
 				+ "\t" + this.buggyCommitID + "\t" + this.repairedCommitID + "\t" + this.functionName;
 		
-		for(Keyword keyword : keywords) {
-			if(this.insertedKeywordMap.containsKey(keyword)) vector += "\t" + this.insertedKeywordMap.get(keyword);
-			else vector += "\t0";
-			if(this.removedKeywordMap.containsKey(keyword)) vector += "\t" + this.removedKeywordMap.get(keyword);
-			else vector += "\t0";
-			if(this.updatedKeywordMap.containsKey(keyword)) vector += "\t" + this.updatedKeywordMap.get(keyword);
-			else vector += "\t0";
-			if(this.unchangedKeywordMap.containsKey(keyword)) vector += "\t" + this.unchangedKeywordMap.get(keyword);
+		for(KeywordDefinition keyword : keywords) {
+			if(this.keywordMap.containsKey(keyword)) vector += "\t" + this.keywordMap.get(keyword).toString();
 			else vector += "\t0";
 		}
 		

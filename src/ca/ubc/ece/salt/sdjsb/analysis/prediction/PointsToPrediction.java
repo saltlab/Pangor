@@ -5,9 +5,10 @@ import java.util.Map;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.AbstractAPI;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordContext;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.PackageAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
 
@@ -25,17 +26,13 @@ public class PointsToPrediction {
 	 * @param updatedKeywords
 	 * @param unchangedKeywords
 	 */
-	public PointsToPrediction(TopLevelAPI api, Map<Keyword, Integer> insertedKeywords,
-			   Map<Keyword, Integer> removedKeywords,
-			   Map<Keyword, Integer> updatedKeywords,
-			   Map<Keyword, Integer> unchangedKeywords) {
-		
+	public PointsToPrediction(TopLevelAPI api, Map<KeywordUse, Integer> keywords) {
 		
 		this.api = api;
 	}
 
 	/** Returns the most likely API that the keyword points to. **/
-	public Keyword getKeyword(KeywordType type, KeywordContext context, 
+	public KeywordUse getKeyword(KeywordType type, KeywordContext context, 
 			String token, ChangeType changeType) {
 
 		/*
@@ -43,7 +40,7 @@ public class PointsToPrediction {
 		 * has the keyword
 		 */
 		
-		Keyword keyword = new Keyword(type, context, token, changeType);
+		KeywordUse keyword = new KeywordUse(type, context, token, changeType);
 		
 		for (PackageAPI pack : api.getPackages()) {
 			if (pack.isMemberOf(keyword)) {
@@ -56,20 +53,20 @@ public class PointsToPrediction {
 	}
 
 	/** Returns a list of APIs that are likely used in this method. **/
-	public List<AbstractAPI> getAPIsUsed(Map<Keyword, Integer> insertedKeywords,
-			   Map<Keyword, Integer> removedKeywords,
-			   Map<Keyword, Integer> updatedKeywords,
-			   Map<Keyword, Integer> unchangedKeywords) {
+	public List<AbstractAPI> getAPIsUsed(Map<KeywordDefinition, Integer> insertedKeywords,
+			   Map<KeywordDefinition, Integer> removedKeywords,
+			   Map<KeywordDefinition, Integer> updatedKeywords,
+			   Map<KeywordDefinition, Integer> unchangedKeywords) {
 		return null;
 	}
 
 	/**
 	 * Returns a list of APIs that are likely involved in a method's repair.
 	 **/
-	public List<AbstractAPI> getAPIsInRepair(Map<Keyword, Integer> insertedKeywords,
-			   Map<Keyword, Integer> removedKeywords,
-			   Map<Keyword, Integer> updatedKeywords,
-			   Map<Keyword, Integer> unchangedKeywords) {
+	public List<AbstractAPI> getAPIsInRepair(Map<KeywordDefinition, Integer> insertedKeywords,
+			   Map<KeywordDefinition, Integer> removedKeywords,
+			   Map<KeywordDefinition, Integer> updatedKeywords,
+			   Map<KeywordDefinition, Integer> unchangedKeywords) {
 		return null;
 	}
 

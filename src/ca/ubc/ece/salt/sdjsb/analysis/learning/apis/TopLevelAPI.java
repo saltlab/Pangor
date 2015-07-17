@@ -2,7 +2,7 @@ package ca.ubc.ece.salt.sdjsb.analysis.learning.apis;
 
 import java.util.List;
 
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
 
 /**
  * Defines the default JavaScript API and stores all Node.js packages that
@@ -25,7 +25,7 @@ public class TopLevelAPI extends AbstractAPI {
 		super(methodNames, fieldNames, constantNames, eventNames, classes);
 		
 		for(String keyword : keywords) {
-			this.keywords.add(new Keyword(KeywordType.RESERVED, keyword));
+			this.keywords.add(new KeywordDefinition(KeywordType.RESERVED, keyword));
 		}
 
 		this.packages = packages;

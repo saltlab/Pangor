@@ -2,20 +2,11 @@ package ca.ubc.ece.salt.sdjsb.analysis.learning.apis;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 
-/**
- * Stores a keyword and the context under which it is used (which we call its type).
- */
-public class Keyword {
-	
-	/** The type of the keyword (i.e., package, method, field, constant or event). **/
-	public KeywordType type;
+public class KeywordUse extends KeywordDefinition {
 
 	/** The context under which the keyword is used. **/
 	public KeywordContext context;
-	
-	/** The keyword text. **/
-	public String keyword;
-	
+
 	/** How this keyword was modified from the source to the destination file. **/
 	public ChangeType changeType;
 	
@@ -28,11 +19,12 @@ public class Keyword {
 	 * @param keyword
 	 * @param changeType
 	 */
-	public Keyword(KeywordType type, KeywordContext context, String keyword, ChangeType changeType) {
+	public KeywordUse(KeywordType type, KeywordContext context, String keyword,
+			ChangeType changeType) {
+		super(type, keyword);
+
 		this.pointsto = null;
-		this.type = type;
 		this.context = context;
-		this.keyword = keyword;
 		this.changeType = changeType;
 	}
 	
@@ -40,11 +32,11 @@ public class Keyword {
 	 * @param type
 	 * @param keyword
 	 */
-	public Keyword(KeywordType type, String keyword) {
+	public KeywordUse(KeywordType type, String keyword) {
+		super(type, keyword);
+
 		this.pointsto = null;
-		this.type = type;
 		this.context = KeywordContext.UNKNOWN;
-		this.keyword = keyword;
 		this.changeType = ChangeType.UNKNOWN;
 	}
 	
@@ -55,11 +47,21 @@ public class Keyword {
 	public void setPointsTo(AbstractAPI pointsto) {
 		this.pointsto = pointsto;
 	}
-	
+
 	@Override
 	public boolean equals(Object obj) {
-		if(obj instanceof Keyword) {
-			Keyword that = (Keyword) obj;
+		
+		if(obj instanceof KeywordUse) {
+			KeywordUse that = (KeywordUse) obj;
+			
+			if(this.type == that.type && this.context == that.context &&
+					this.keyword.equals(that.keyword) && 
+					this.changeType == that.changeType) {
+				return true;
+			}
+		}
+		else if(obj instanceof KeywordDefinition) {
+			KeywordDefinition that = (KeywordDefinition) obj;
 			
 			if(this.type == that.type && this.keyword.equals(that.keyword)) 
 				return true;
@@ -69,29 +71,13 @@ public class Keyword {
 	
 	@Override
 	public int hashCode() {
-		return this.toString().hashCode();
+		return (this.type.toString() + "_" + this.keyword).hashCode();
 	}
 	
 	@Override 
 	public String toString() {
-		return this.type.toString() + "_" + this.keyword;
-	}
-	
-	/**
-	 * The possible types for a keyword. Reads like "The keyword is a ... ".
-	 */
-	public enum KeywordType {
-		UNKNOWN,
-		RESERVED,
-		PACKAGE,
-		CLASS,
-		METHOD,
-		FIELD,
-		CONSTANT,
-		VARIABLE,
-		PARAMETER,
-		EXCEPTION,
-		EVENT
+		return this.type.toString() + "_" + this.context.toString() + "_" + 
+			   this.changeType.toString() + "_" + this.keyword;
 	}
 
 	/**

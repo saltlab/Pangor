@@ -73,8 +73,7 @@ public class LearningASTAnalysis extends ScopeAnalysis {
 
 		FeatureVector classKeywords = LearningAnalysisVisitor.getScriptFeatureVector((AstRoot)this.dstScope.scope);
 		PointsToPrediction packageModel = new PointsToPrediction(APIFactory.buildTopLevelAPI(), 
-				classKeywords.insertedKeywordMap, classKeywords.removedKeywordMap, 
-				classKeywords.updatedKeywordMap, classKeywords.unchangedKeywordMap);
+				classKeywords.keywordMap);
 
 		/* If the function was inserted or deleted, there is nothing to do. We
 		 * only want functions that were repaired. Class-level repairs are left
