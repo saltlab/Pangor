@@ -1,6 +1,5 @@
 package ca.ubc.ece.salt.sdjsb.analysis.prediction;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -58,13 +57,7 @@ public class CSPredictor extends Predictor {
 		/*
 		 * Get all APIs from TopLevelAPI which contain this keyword
 		 */
-		List<Keyword> keywordsFound = api.getAllKeywords(keyword);
-		List<AbstractAPI> apis = new ArrayList<>();
-
-		filterKeywordsByPackages(keywordsFound, apisFound);
-
-		for (Keyword k : keywordsFound)
-			apis.add(k.api);
+		Set<AbstractAPI> apis = getAPIsFromKeyword(keyword);
 
 		/*
 		 * Create a PredictionResults object with their scores
@@ -76,6 +69,20 @@ public class CSPredictor extends Predictor {
 		}
 
 		return results;
+	}
+
+	@Override
+	public Set<AbstractAPI> predictKeywords(Map<Keyword, Integer>... keywords) {
+		Set<AbstractAPI> allAPIs = new HashSet<>();
+
+		for (Map<Keyword, Integer> keywordMap : keywords) {
+			for (Keyword keyword : keywordMap.keySet()) {
+				allAPIs.addAll(getAPIsFromKeyword(keyword));
+			}
+
+		}
+
+		return allAPIs;
 	}
 
 	/**
@@ -144,5 +151,17 @@ public class CSPredictor extends Predictor {
 		} else {
 			map.put(keyword.api, 1);
 		}
+	}
+
+	protected Set<AbstractAPI> getAPIsFromKeyword(Keyword keyword) {
+		List<Keyword> keywordsFound = api.getAllKeywords(keyword);
+		Set<AbstractAPI> apis = new HashSet<>();
+
+		filterKeywordsByPackages(keywordsFound, apisFound);
+
+		for (Keyword k : keywordsFound)
+			apis.add(k.api);
+
+		return apis;
 	}
 }

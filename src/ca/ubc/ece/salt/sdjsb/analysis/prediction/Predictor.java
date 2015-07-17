@@ -48,7 +48,10 @@ public abstract class Predictor {
 		requiredPackagesNames = lookupRequiredPackages(insertedKeywords, unchangedKeywords);
 	}
 
+
 	public abstract PredictionResults predictKeyword(Keyword keyword);
+
+	public abstract Set<AbstractAPI> predictKeywords(Map<Keyword, Integer>... keywords);
 
 	/**
 	 * Return a list of names of required packages
@@ -58,6 +61,7 @@ public abstract class Predictor {
 	public Set<String> getRequiredPackagesNames() {
 		return requiredPackagesNames;
 	}
+
 
 	/**
 	 * Internal method to look for KeywordType.PACKAGE keywords on the input
