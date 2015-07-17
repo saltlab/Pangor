@@ -3,8 +3,10 @@ package ca.ubc.ece.salt.sdjsb.analysis.prediction;
 import java.util.List;
 import java.util.Map;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.AbstractAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordContext;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.PackageAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
@@ -33,14 +35,15 @@ public class PointsToPrediction {
 	}
 
 	/** Returns the most likely API that the keyword points to. **/
-	public Keyword getKeyword(KeywordType context, String token) {
+	public Keyword getKeyword(KeywordType type, KeywordContext context, 
+			String token, ChangeType changeType) {
 
 		/*
 		 * On this draft implementation, return the first API which 
 		 * has the keyword
 		 */
 		
-		Keyword keyword = new Keyword(context, token);
+		Keyword keyword = new Keyword(type, context, token, changeType);
 		
 		for (PackageAPI pack : api.getPackages()) {
 			if (pack.isMemberOf(keyword)) {

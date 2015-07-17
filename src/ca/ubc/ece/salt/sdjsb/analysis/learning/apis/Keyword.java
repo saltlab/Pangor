@@ -22,12 +22,30 @@ public class Keyword {
 	/** The AbstractAPI which contains this keyword. **/
 	public AbstractAPI pointsto;
 	
+	/**
+	 * @param type
+	 * @param context
+	 * @param keyword
+	 * @param changeType
+	 */
 	public Keyword(KeywordType type, KeywordContext context, String keyword, ChangeType changeType) {
 		this.pointsto = null;
 		this.type = type;
 		this.context = context;
 		this.keyword = keyword;
 		this.changeType = changeType;
+	}
+	
+	/**
+	 * @param type
+	 * @param keyword
+	 */
+	public Keyword(KeywordType type, String keyword) {
+		this.pointsto = null;
+		this.type = type;
+		this.context = KeywordContext.UNKNOWN;
+		this.keyword = keyword;
+		this.changeType = ChangeType.UNKNOWN;
 	}
 	
 	/**
@@ -71,6 +89,7 @@ public class Keyword {
 		FIELD,
 		CONSTANT,
 		VARIABLE,
+		PARAMETER,
 		EXCEPTION,
 		EVENT
 	}
@@ -82,14 +101,20 @@ public class Keyword {
 	public enum KeywordContext {
 		UNKNOWN,
 		CONDITION,
+		EXPRESSION,
+		ASSIGNMENT_LHS,
+		ASSIGNMENT_RHS,
 		REQUIRE,
+		CLASS_DECLARATION,
+		METHOD_DECLARATION,
+		PARAMETER_DECLARATION,
+		VARIABLE_DECLARATION,
 		METHOD_CALL,
-		FIELD_ACCESS,
-		CONSTANT_ACCESS,
 		ARGUMENT,
 		PARAMETER,
-		EXCEPTION,
-		EVENT
+		EXCEPTION_CATCH,
+		EVENT_REGISTER,
+		EVENT_REMOVE
 	}
 
 }

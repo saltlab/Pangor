@@ -62,9 +62,6 @@ public class FeatureVectorManager {
 		
 		for(Keyword keyword : this.keywords) {
 			header += "\tInserted_" + keyword.toString();
-			header += "\tRemoved_" + keyword.toString();
-			header += "\tUpdated_" + keyword.toString();
-			header += "\tUnchanged_" + keyword.toString();
 		}
 		
 		return header;

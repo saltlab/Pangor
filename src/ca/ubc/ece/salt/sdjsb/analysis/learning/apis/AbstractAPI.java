@@ -34,7 +34,7 @@ public abstract class AbstractAPI {
 		this.classes = new ArrayList<>();
 
 		for (String methodName : methodNames) {
-			this.keywords.add(new Keyword(KeywordType.METHOD_NAME, methodName));
+			this.keywords.add(new Keyword(KeywordType.METHOD, methodName));
 		}
 
 		for (String fieldName : fieldNames) {

@@ -79,11 +79,11 @@ public class FeatureVector {
 	 * @param token The string to check against the keyword list.
 	 */
 	@SuppressWarnings("incomplete-switch")
-	public void addKeyword(Keyword keyword, ChangeType changeType) {
+	public void addKeyword(Keyword keyword) {
 
 		Integer count = 0;
 
-		switch(changeType) {
+		switch(keyword.changeType) {
 
 		case INSERTED:
 			count = this.insertedKeywordMap.containsKey(keyword) ? this.insertedKeywordMap.get(keyword) + 1 : 1;
