@@ -7,8 +7,9 @@ import java.util.Map;
 import java.util.Set;
 
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.AbstractAPI;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
 
 /**
@@ -28,13 +29,14 @@ public abstract class Predictor {
 	/**
 	 * Given keywords
 	 */
-	protected Map<Keyword, Integer> insertedKeywords;
-	protected Map<Keyword, Integer> removedKeywords;
-	protected Map<Keyword, Integer> updatedKeywords;
-	protected Map<Keyword, Integer> unchangedKeywords;
+	protected Map<KeywordUse, Integer> insertedKeywords;
+	protected Map<KeywordUse, Integer> removedKeywords;
+	protected Map<KeywordUse, Integer> updatedKeywords;
+	protected Map<KeywordUse, Integer> unchangedKeywords;
 
-	public Predictor(TopLevelAPI api, Map<Keyword, Integer> insertedKeywords, Map<Keyword, Integer> removedKeywords,
-			Map<Keyword, Integer> updatedKeywords, Map<Keyword, Integer> unchangedKeywords) {
+	public Predictor(TopLevelAPI api, Map<KeywordUse, Integer> insertedKeywords,
+			Map<KeywordUse, Integer> removedKeywords, Map<KeywordUse, Integer> updatedKeywords,
+			Map<KeywordUse, Integer> unchangedKeywords) {
 		this.api = api;
 		this.insertedKeywords = insertedKeywords;
 		this.removedKeywords = removedKeywords;
@@ -49,9 +51,9 @@ public abstract class Predictor {
 	}
 
 
-	public abstract PredictionResults predictKeyword(Keyword keyword);
+	public abstract PredictionResults predictKeyword(KeywordUse keyword);
 
-	public abstract Set<AbstractAPI> predictKeywords(Map<Keyword, Integer>... keywords);
+	public abstract Set<AbstractAPI> predictKeywords(Map<KeywordUse, Integer>... keywords);
 
 	/**
 	 * Return a list of names of required packages
@@ -66,7 +68,7 @@ public abstract class Predictor {
 	/**
 	 * Internal method to look for KeywordType.PACKAGE keywords on the input
 	 */
-	protected Set<String> lookupRequiredPackages(Map<Keyword, Integer>... keywordsMaps) {
+	protected Set<String> lookupRequiredPackages(Map<KeywordUse, Integer>... keywordsMaps) {
 		Set<String> outputSet = new HashSet<>();
 
 		/*
@@ -80,14 +82,14 @@ public abstract class Predictor {
 		if (keywordsMaps.length == 0)
 			return outputSet;
 
-		for (Map<Keyword, Integer> keywordsMap : keywordsMaps) {
+		for (Map<KeywordUse, Integer> keywordsMap : keywordsMaps) {
 			/*
 			 * If null map is given, skip it
 			 */
 			if (keywordsMap == null)
 				continue;
 
-			for (Keyword keyword : keywordsMap.keySet()) {
+			for (KeywordUse keyword : keywordsMap.keySet()) {
 				if (keyword.type.equals(KeywordType.PACKAGE))
 					outputSet.add(keyword.keyword);
 			}
@@ -103,16 +105,16 @@ public abstract class Predictor {
 	 * @param keywords list of keywords
 	 * @param packagesNames list of package names
 	 */
-	protected void filterKeywordsByPackagesNames(List<Keyword> keywords, Set<String> packagesNames) {
-		for (Iterator<Keyword> iterator = keywords.iterator(); iterator.hasNext();) {
-			Keyword keyword = iterator.next();
+	protected void filterKeywordsByPackagesNames(List<KeywordDefinition> keywords, Set<String> packagesNames) {
+		for (Iterator<KeywordDefinition> iterator = keywords.iterator(); iterator.hasNext();) {
+			KeywordDefinition keyword = iterator.next();
 
 			if (!packagesNames.contains(keyword.getPackageName()))
 				iterator.remove();
 		}
 	}
 
-	protected void filterKeywordsByPackages(List<Keyword> keywords, Set<AbstractAPI> apis) {
+	protected void filterKeywordsByPackages(List<KeywordDefinition> keywords, Set<AbstractAPI> apis) {
 		Set<String> packagesNames = new HashSet<>();
 
 		for (AbstractAPI api : apis) {

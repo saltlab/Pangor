@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
 
 /**
  * Provides functions to extract keywords from APIs and determine which APIs a
@@ -16,7 +16,7 @@ import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
  */
 public abstract class AbstractAPI {
 
-	protected List<Keyword> keywords;
+	protected List<KeywordDefinition> keywords;
 	protected List<ClassAPI> classes;
 
 	/**
@@ -40,19 +40,19 @@ public abstract class AbstractAPI {
 		this.classes = new ArrayList<>();
 
 		for (String methodName : methodNames) {
-			this.keywords.add(new Keyword(KeywordType.METHOD, methodName, this));
+			this.keywords.add(new KeywordDefinition(KeywordType.METHOD, methodName, this));
 		}
 
 		for (String fieldName : fieldNames) {
-			this.keywords.add(new Keyword(KeywordType.FIELD, fieldName, this));
+			this.keywords.add(new KeywordDefinition(KeywordType.FIELD, fieldName, this));
 		}
 
 		for (String constantName : constantNames) {
-			this.keywords.add(new Keyword(KeywordType.CONSTANT, constantName, this));
+			this.keywords.add(new KeywordDefinition(KeywordType.CONSTANT, constantName, this));
 		}
 
 		for (String eventName : eventNames) {
-			this.keywords.add(new Keyword(KeywordType.EVENT, eventName, this));
+			this.keywords.add(new KeywordDefinition(KeywordType.EVENT, eventName, this));
 		}
 
 		this.classes = classes;
@@ -67,8 +67,8 @@ public abstract class AbstractAPI {
 	 * @return keyword if the keyword/type is present in the API, otherwise,
 	 *         null
 	 */
-	public Keyword getFirstKeyword(KeywordType type, String keyword) {
-		return getFirstKeyword(new Keyword(type, keyword));
+	public KeywordDefinition getFirstKeyword(KeywordType type, String keyword) {
+		return getFirstKeyword(new KeywordDefinition(type, keyword));
 	}
 
 	/**
@@ -78,8 +78,8 @@ public abstract class AbstractAPI {
 	 * @return keyword if the keyword/type is present in the API, otherwise,
 	 *         null
 	 */
-	public Keyword getFirstKeyword(Keyword keyword) {
-		List<Keyword> keywordsList = getAllKeywords(keyword);
+	public KeywordDefinition getFirstKeyword(KeywordDefinition keyword) {
+		List<KeywordDefinition> keywordsList = getAllKeywords(keyword);
 
 		if (keywordsList.size() > 0)
 			return keywordsList.get(0);
@@ -94,8 +94,8 @@ public abstract class AbstractAPI {
 	 * @return keywords a list with all occurrences of the keyword on the API.
 	 *         if none is found, empty list is returned
 	 */
-	public List<Keyword> getAllKeywords(Keyword keyword) {
-		List<Keyword> keywordsList = new ArrayList<>();
+	public List<KeywordDefinition> getAllKeywords(KeywordDefinition keyword) {
+		List<KeywordDefinition> keywordsList = new ArrayList<>();
 
 		recursiveKeywordSearch(this, keyword, keywordsList);
 
@@ -109,10 +109,10 @@ public abstract class AbstractAPI {
 	 * 				   map is the number of occurrences of the keyword.
 	 * @return A likelihood between 0 and 1.
 	 */
-	public double getChangeLikelihood(Map<Keyword, Integer> insertedKeywords,
-							   Map<Keyword, Integer> removedKeywords,
-							   Map<Keyword, Integer> updatedKeywords,
-							   Map<Keyword, Integer> unchangedKeywords) {
+	public double getChangeLikelihood(Map<KeywordDefinition, Integer> insertedKeywords,
+							   Map<KeywordDefinition, Integer> removedKeywords,
+							   Map<KeywordDefinition, Integer> updatedKeywords,
+							   Map<KeywordDefinition, Integer> unchangedKeywords) {
 		return getUseLikelihood(insertedKeywords, removedKeywords, updatedKeywords, unchangedKeywords);
 	}
 
@@ -123,10 +123,10 @@ public abstract class AbstractAPI {
 	 * 				   map is the number of occurrences of the keyword.
 	 * @return A likelihood between 0 and 1.
 	 */
-	public double getUseLikelihood(Map<Keyword, Integer> insertedKeywords,
-							   Map<Keyword, Integer> removedKeywords,
-							   Map<Keyword, Integer> updatedKeywords,
-							   Map<Keyword, Integer> unchangedKeywords) {
+	public double getUseLikelihood(Map<KeywordDefinition, Integer> insertedKeywords,
+							   Map<KeywordDefinition, Integer> removedKeywords,
+							   Map<KeywordDefinition, Integer> updatedKeywords,
+							   Map<KeywordDefinition, Integer> unchangedKeywords) {
 		/*
 		 * On this first implementation, we assume that if any of the keywords
 		 * inserted, removed, updated or unchanged belongs to this API, the
@@ -134,7 +134,7 @@ public abstract class AbstractAPI {
 		 */
 
 		// Merge all maps
-		Map<Keyword, Integer> mergedMap = new HashMap<Keyword, Integer>();
+		Map<KeywordDefinition, Integer> mergedMap = new HashMap<KeywordDefinition, Integer>();
 		if (insertedKeywords != null)
 			mergedMap.putAll(insertedKeywords);
 		if (removedKeywords != null)
@@ -179,7 +179,8 @@ public abstract class AbstractAPI {
 	 * @param keyword The keyword we are looking for
 	 * @return Keyword if the keyword/type is present in the API, null otherwise
 	 */
-	protected void recursiveKeywordSearch(AbstractAPI api, Keyword keyword, List<Keyword> outputList) {
+	protected void recursiveKeywordSearch(AbstractAPI api, KeywordDefinition keyword,
+			List<KeywordDefinition> outputList) {
 		/*
 		 * Check if keyword is present on the keywords list. If it is, add the
 		 * keyword we found on the list, which may contain more information

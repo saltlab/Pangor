@@ -7,7 +7,8 @@ import java.util.Map;
 import java.util.Set;
 
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.AbstractAPI;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
 
 /**
@@ -25,10 +26,11 @@ public class CSPredictor extends Predictor {
 	Map<AbstractAPI, Integer> supportMap = new HashMap<>();
 	Map<AbstractAPI, Integer> scoreMap = new HashMap<>();
 
-	Map<Keyword, Integer> mergedKeywordsMap = new HashMap<Keyword, Integer>();
+	Map<KeywordUse, Integer> mergedKeywordsMap = new HashMap<KeywordUse, Integer>();
 
-	public CSPredictor(TopLevelAPI api, Map<Keyword, Integer> insertedKeywords, Map<Keyword, Integer> removedKeywords,
-			Map<Keyword, Integer> updatedKeywords, Map<Keyword, Integer> unchangedKeywords) {
+	public CSPredictor(TopLevelAPI api, Map<KeywordUse, Integer> insertedKeywords,
+			Map<KeywordUse, Integer> removedKeywords, Map<KeywordUse, Integer> updatedKeywords,
+			Map<KeywordUse, Integer> unchangedKeywords) {
 		super(api, insertedKeywords, removedKeywords, updatedKeywords, unchangedKeywords);
 
 		/*
@@ -47,7 +49,7 @@ public class CSPredictor extends Predictor {
 	}
 
 	@Override
-	public PredictionResults predictKeyword(Keyword keyword) {
+	public PredictionResults predictKeyword(KeywordUse keyword) {
 		/*
 		 * Check if this keyword was on the input
 		 */
@@ -72,11 +74,11 @@ public class CSPredictor extends Predictor {
 	}
 
 	@Override
-	public Set<AbstractAPI> predictKeywords(Map<Keyword, Integer>... keywords) {
+	public Set<AbstractAPI> predictKeywords(Map<KeywordUse, Integer>... keywords) {
 		Set<AbstractAPI> allAPIs = new HashSet<>();
 
-		for (Map<Keyword, Integer> keywordMap : keywords) {
-			for (Keyword keyword : keywordMap.keySet()) {
+		for (Map<KeywordUse, Integer> keywordMap : keywords) {
+			for (KeywordUse keyword : keywordMap.keySet()) {
 				allAPIs.addAll(getAPIsFromKeyword(keyword));
 			}
 
@@ -92,8 +94,8 @@ public class CSPredictor extends Predictor {
 		/*
 		 * Iterate over keywords, and look for their APIs
 		 */
-		for (Keyword keyword : mergedKeywordsMap.keySet()) {
-			List<Keyword> keywordsFound = api.getAllKeywords(keyword);
+		for (KeywordUse keyword : mergedKeywordsMap.keySet()) {
+			List<KeywordDefinition> keywordsFound = api.getAllKeywords(keyword);
 
 			filterKeywordsByPackagesNames(keywordsFound, requiredPackagesNames);
 
@@ -109,7 +111,7 @@ public class CSPredictor extends Predictor {
 			 * If there are more than one, register it as Support
 			 */
 			if (keywordsFound.size() > 1) {
-				for (Keyword k : keywordsFound) {
+				for (KeywordDefinition k : keywordsFound) {
 					apisFound.add(k.api);
 					addOrIncrement(k, supportMap);
 				}
@@ -145,7 +147,7 @@ public class CSPredictor extends Predictor {
 	 * @param keyword
 	 * @param map
 	 */
-	private void addOrIncrement(Keyword keyword, Map<AbstractAPI, Integer> map) {
+	private void addOrIncrement(KeywordDefinition keyword, Map<AbstractAPI, Integer> map) {
 		if (map.containsKey(keyword.api)) {
 			map.put(keyword.api, map.get(keyword.api) + 1);
 		} else {
@@ -153,13 +155,13 @@ public class CSPredictor extends Predictor {
 		}
 	}
 
-	protected Set<AbstractAPI> getAPIsFromKeyword(Keyword keyword) {
-		List<Keyword> keywordsFound = api.getAllKeywords(keyword);
+	protected Set<AbstractAPI> getAPIsFromKeyword(KeywordDefinition keyword) {
+		List<KeywordDefinition> keywordsFound = api.getAllKeywords(keyword);
 		Set<AbstractAPI> apis = new HashSet<>();
 
 		filterKeywordsByPackages(keywordsFound, apisFound);
 
-		for (Keyword k : keywordsFound)
+		for (KeywordDefinition k : keywordsFound)
 			apis.add(k.api);
 
 		return apis;

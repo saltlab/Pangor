@@ -2,7 +2,7 @@ package ca.ubc.ece.salt.sdjsb.analysis.learning.apis;
 
 import java.util.List;
 
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
 
 /**
  * Defines the API of a Node.js package.
@@ -23,7 +23,7 @@ public class PackageAPI extends AbstractAPI {
 					  List<String> eventNames, List<ClassAPI> classes) {
 		super(methodNames, fieldNames, constantNames, eventNames, classes);
 		this.includeName = includeName;
-		this.keywords.add(new Keyword(KeywordType.PACKAGE, includeName, this));
+		this.keywords.add(new KeywordDefinition(KeywordType.PACKAGE, includeName, this));
 	}
 
 	@Override

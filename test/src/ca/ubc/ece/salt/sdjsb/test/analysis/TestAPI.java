@@ -15,15 +15,15 @@ import org.junit.Test;
 
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.APIFactory;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.AbstractAPI;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
 
 public class TestAPI {
 	@Test
 	public void testGetPackageNameWhenHasAPackage() {
 		AbstractAPI api = APIFactory.buildTopLevelAPI();
 
-		Keyword keyword = api.getFirstKeyword(KeywordType.FIELD, "bytesWritten");
+		KeywordDefinition keyword = api.getFirstKeyword(KeywordType.FIELD, "bytesWritten");
 		assertEquals("WriteStream", keyword.api.getName());
 		assertEquals("fs", keyword.getPackageName());
 	}
@@ -32,7 +32,7 @@ public class TestAPI {
 	public void testGetPackageNameWhenIsAPackage() {
 		AbstractAPI api = APIFactory.buildTopLevelAPI();
 
-		Keyword keyword = api.getFirstKeyword(KeywordType.PACKAGE, "fs");
+		KeywordDefinition keyword = api.getFirstKeyword(KeywordType.PACKAGE, "fs");
 		assertEquals("fs", keyword.api.getName());
 		assertEquals("fs", keyword.getPackageName());
 	}
@@ -41,7 +41,7 @@ public class TestAPI {
 	public void testGetPackageNameWhenIsAClassOfAPackage() {
 		AbstractAPI api = APIFactory.buildTopLevelAPI();
 
-		Keyword keyword = api.getFirstKeyword(KeywordType.CLASS, "WriteStream");
+		KeywordDefinition keyword = api.getFirstKeyword(KeywordType.CLASS, "WriteStream");
 
 		/*
 		 * It seems strange that WriteStream api's is WriteStream. However, the
@@ -56,7 +56,7 @@ public class TestAPI {
 	public void testGetPackageNameWhenIsGlobal() {
 		AbstractAPI api = APIFactory.buildTopLevelAPI();
 
-		Keyword keyword = api.getFirstKeyword(KeywordType.METHOD, "getDate");
+		KeywordDefinition keyword = api.getFirstKeyword(KeywordType.METHOD, "getDate");
 		assertEquals("Date", keyword.api.getName());
 		assertEquals("global", keyword.getPackageName());
 	}
@@ -86,7 +86,7 @@ public class TestAPI {
 	public void testGetAllKeywordsWhenIsMemberOnDifferentAPIs() {
 		AbstractAPI api = APIFactory.buildTopLevelAPI();
 
-		List<Keyword> keywordsList = api.getAllKeywords(new Keyword(KeywordType.EVENT, "open"));
+		List<KeywordDefinition> keywordsList = api.getAllKeywords(new KeywordDefinition(KeywordType.EVENT, "open"));
 		List<String> APIsNames = extractAPIsFromKeywordList(keywordsList);
 
 		/*
@@ -102,7 +102,8 @@ public class TestAPI {
 	@Test
 	public void testGetAllKeywordsWhenIsNotMember() {
 		AbstractAPI api = APIFactory.buildTopLevelAPI();
-		List<Keyword> keywordsList = api.getAllKeywords(new Keyword(KeywordType.EVENT, "foo-event"));
+		List<KeywordDefinition> keywordsList = api
+				.getAllKeywords(new KeywordDefinition(KeywordType.EVENT, "foo-event"));
 
 		assertEquals(0, keywordsList.size());
 	}
@@ -111,10 +112,10 @@ public class TestAPI {
 	public void testUseLikelihoodWhenFieldIsUsed() {
 		AbstractAPI api = APIFactory.buildTopLevelAPI();
 
-		Map<Keyword, Integer> insertedKeywords = new HashMap<>();
-		insertedKeywords.put(new Keyword(KeywordType.METHOD, "bar"), 3);
-		insertedKeywords.put(new Keyword(KeywordType.FIELD, "Infinity"), 2);
-		insertedKeywords.put(new Keyword(KeywordType.FIELD, "foo"), 1);
+		Map<KeywordDefinition, Integer> insertedKeywords = new HashMap<>();
+		insertedKeywords.put(new KeywordDefinition(KeywordType.METHOD, "bar"), 3);
+		insertedKeywords.put(new KeywordDefinition(KeywordType.FIELD, "Infinity"), 2);
+		insertedKeywords.put(new KeywordDefinition(KeywordType.FIELD, "foo"), 1);
 
 		double likelihood = api.getUseLikelihood(insertedKeywords, null, null, null);
 
@@ -125,10 +126,10 @@ public class TestAPI {
 	public void testUseLikelihoodWhenClassIsUsed() {
 		AbstractAPI api = APIFactory.buildTopLevelAPI();
 
-		Map<Keyword, Integer> insertedKeywords = new HashMap<>();
-		insertedKeywords.put(new Keyword(KeywordType.METHOD, "bar"), 3);
-		insertedKeywords.put(new Keyword(KeywordType.CLASS, "Date"), 2);
-		insertedKeywords.put(new Keyword(KeywordType.FIELD, "foo"), 1);
+		Map<KeywordDefinition, Integer> insertedKeywords = new HashMap<>();
+		insertedKeywords.put(new KeywordDefinition(KeywordType.METHOD, "bar"), 3);
+		insertedKeywords.put(new KeywordDefinition(KeywordType.CLASS, "Date"), 2);
+		insertedKeywords.put(new KeywordDefinition(KeywordType.FIELD, "foo"), 1);
 
 		double likelihood = api.getUseLikelihood(insertedKeywords, null, null, null);
 
@@ -138,10 +139,10 @@ public class TestAPI {
 	/*
 	 * Test helper
 	 */
-	private List<String> extractAPIsFromKeywordList(List<Keyword> keywordsList) {
+	private List<String> extractAPIsFromKeywordList(List<KeywordDefinition> keywordsList) {
 		List<String> APIsNames = new ArrayList<>();
 
-		for (Keyword keyword : keywordsList) {
+		for (KeywordDefinition keyword : keywordsList) {
 			APIsNames.add(keyword.api.getName());
 		}
 

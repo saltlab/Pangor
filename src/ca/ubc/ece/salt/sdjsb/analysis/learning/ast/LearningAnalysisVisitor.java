@@ -11,8 +11,9 @@ import org.mozilla.javascript.ast.ScriptNode;
 import org.mozilla.javascript.ast.StringLiteral;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.sdjsb.analysis.prediction.PointsToPrediction;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysisUtilities;
 
@@ -130,23 +131,24 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 
 		String token = "";
 		
-		KeywordType context = LearningUtilities.getTokenContext(node);
+		KeywordType type = LearningUtilities.getTokenType(node);
+		KeywordContext context = LearningUtilities.getTokenContext(node);
 		
-		if(context == KeywordType.UNKNOWN) return;
+		if(type == KeywordType.UNKNOWN || context == KeywordContext.UNKNOWN) return;
 
 		/* Add a falsey keyword if we're checking if this node is truthy or 
 		 * falsey. */
 		if(SpecialTypeAnalysisUtilities.isFalsey(node)) {
 
-			Keyword keyword = null;
+			KeywordUse keyword = null;
 			if(this.packageModel != null) {
-				keyword = this.packageModel.getKeyword(context, "~falsey~");
+				keyword = this.packageModel.getKeyword(type, context, "~falsey~", changeType);
 			}
 			else {
-				keyword = new Keyword(context, "~falsey");
+				keyword = new KeywordUse(type, context, "~falsey", changeType);
 			}
 
-			if(keyword != null) this.featureVector.addKeyword(keyword, changeType);
+			if(keyword != null) this.featureVector.addKeyword(keyword);
 
 		}
 		
@@ -181,16 +183,16 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		}
 		
 		/* Insert the token into the feature vector if it is a keyword. */
-		Keyword keyword = null;
+		KeywordUse keyword = null;
 
 		if(this.packageModel != null) {
-			keyword = this.packageModel.getKeyword(context, token);
+			keyword = this.packageModel.getKeyword(type, context, token, changeType);
 		}
 		else {
-			keyword = new Keyword(context, token);
+			keyword = new KeywordUse(type, context, token, changeType);
 		}
 
-		if(keyword != null) this.featureVector.addKeyword(keyword, changeType);
+		if(keyword != null) this.featureVector.addKeyword(keyword);
 		
 	}
 

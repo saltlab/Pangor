@@ -18,13 +18,13 @@ import org.mozilla.javascript.ast.TryStatement;
 import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.VariableInitializer;
 
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningUtilities;
 
 public class TestLearningUtilities {
 	
 	public void runTest(AstNode token, KeywordType expected) {
-		KeywordType context = LearningUtilities.getTokenContext(token);
+		KeywordType context = LearningUtilities.getTokenType(token);
 		Assert.assertEquals("getTokenContext returned an incorrect value.", expected, context);
 	}
 
@@ -50,7 +50,7 @@ public class TestLearningUtilities {
 		AstRoot root = new AstRoot();
 		root.addChild(node);
 
-		runTest(name, KeywordType.METHOD_NAME);
+		runTest(name, KeywordType.METHOD);
 		
 	}
 
@@ -114,7 +114,7 @@ public class TestLearningUtilities {
 		AstRoot root = new AstRoot();
 		root.addChild(statement);
 		
-		runTest(target, KeywordType.METHOD_CALL);
+		runTest(target, KeywordType.METHOD);
 		
 	}
 
@@ -184,7 +184,7 @@ public class TestLearningUtilities {
 		AstRoot root = new AstRoot();
 		root.addChild(statement);
 		
-		runTest(file, KeywordType.ARGUMENT);
+		runTest(file, KeywordType.VARIABLE);
 		
 	}
 

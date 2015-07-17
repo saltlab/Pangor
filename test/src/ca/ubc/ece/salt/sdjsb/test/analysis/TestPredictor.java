@@ -11,8 +11,8 @@ import java.util.Set;
 import org.junit.Test;
 
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.APIFactory;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.prediction.CSPredictor;
 import ca.ubc.ece.salt.sdjsb.analysis.prediction.Predictor;
@@ -22,11 +22,11 @@ public class TestPredictor {
 	public void testPredictorRequiredPackagesWhenHasPackages() {
 		TopLevelAPI api = APIFactory.buildTopLevelAPI();
 
-		Map<Keyword, Integer> insertedKeywords = new HashMap<>();
-		insertedKeywords.put(new Keyword(KeywordType.METHOD, "parse"), 1);
-		insertedKeywords.put(new Keyword(KeywordType.PACKAGE, "fs"), 1);
-		insertedKeywords.put(new Keyword(KeywordType.PACKAGE, "path"), 1);
-		insertedKeywords.put(new Keyword(KeywordType.METHOD, "getUTCSeconds"), 1);
+		Map<KeywordUse, Integer> insertedKeywords = new HashMap<>();
+		insertedKeywords.put(new KeywordUse(KeywordType.METHOD, "parse"), 1);
+		insertedKeywords.put(new KeywordUse(KeywordType.PACKAGE, "fs"), 1);
+		insertedKeywords.put(new KeywordUse(KeywordType.PACKAGE, "path"), 1);
+		insertedKeywords.put(new KeywordUse(KeywordType.METHOD, "getUTCSeconds"), 1);
 
 		Predictor predictor = new CSPredictor(api, insertedKeywords, null, null, null);
 
@@ -42,9 +42,9 @@ public class TestPredictor {
 	public void testPredictorRequiredPackagesWhenHasNoPackages() {
 		TopLevelAPI api = APIFactory.buildTopLevelAPI();
 
-		Map<Keyword, Integer> insertedKeywords = new HashMap<>();
-		insertedKeywords.put(new Keyword(KeywordType.METHOD, "parse"), 1);
-		insertedKeywords.put(new Keyword(KeywordType.METHOD, "getUTCSeconds"), 1);
+		Map<KeywordUse, Integer> insertedKeywords = new HashMap<>();
+		insertedKeywords.put(new KeywordUse(KeywordType.METHOD, "parse"), 1);
+		insertedKeywords.put(new KeywordUse(KeywordType.METHOD, "getUTCSeconds"), 1);
 
 		Predictor predictor = new CSPredictor(api, insertedKeywords, null, null, null);
 

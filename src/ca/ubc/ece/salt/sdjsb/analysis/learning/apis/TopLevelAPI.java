@@ -3,7 +3,7 @@ package ca.ubc.ece.salt.sdjsb.analysis.learning.apis;
 import java.util.ArrayList;
 import java.util.List;
 
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
 
 /**
  * Defines the default JavaScript API and stores all Node.js packages that
@@ -26,7 +26,7 @@ public class TopLevelAPI extends AbstractAPI {
 		super(methodNames, fieldNames, constantNames, eventNames, classes);
 
 		for(String keyword : keywords) {
-			this.keywords.add(new Keyword(KeywordType.RESERVED, keyword));
+			this.keywords.add(new KeywordDefinition(KeywordType.RESERVED, keyword));
 		}
 
 		this.packages = packages;
@@ -48,8 +48,8 @@ public class TopLevelAPI extends AbstractAPI {
 	 * refactored as soon as possible.
 	 */
 	@Override
-	public List<Keyword> getAllKeywords(Keyword keyword) {
-		List<Keyword> keywordsList = new ArrayList<>();
+	public List<KeywordDefinition> getAllKeywords(KeywordDefinition keyword) {
+		List<KeywordDefinition> keywordsList = new ArrayList<>();
 
 		recursiveKeywordSearch(this, keyword, keywordsList);
 
@@ -69,7 +69,8 @@ public class TopLevelAPI extends AbstractAPI {
 	 * AbstractAPI and TopLevelAPI, only difference is that TopLevelAPI also has
 	 * to include its own packages on the search
 	 */
-	protected void recursiveKeywordSearch(TopLevelAPI api, Keyword keyword, List<Keyword> outputList) {
+	protected void recursiveKeywordSearch(TopLevelAPI api, KeywordDefinition keyword,
+			List<KeywordDefinition> outputList) {
 		/*
 		 * Check if keyword is present on the keywords list. If it is, add the
 		 * keyword we found on the list, which may contain more information

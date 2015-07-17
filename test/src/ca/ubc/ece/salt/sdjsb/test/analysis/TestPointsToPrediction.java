@@ -10,8 +10,8 @@ import java.util.Map;
 import org.junit.Test;
 
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.APIFactory;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.Keyword.KeywordType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.prediction.PointsToPrediction;
 
@@ -24,20 +24,20 @@ public class TestPointsToPrediction {
 	 */
 	@Test
 	public void testGetKeywordWhenAmbiguousOnPathButPathIsNotImported() {
-		Map<Keyword, Integer> insertedKeywords = new HashMap<>();
-		insertedKeywords.put(new Keyword(KeywordType.METHOD, "parse"), 1);
+		Map<KeywordUse, Integer> insertedKeywords = new HashMap<>();
+		insertedKeywords.put(new KeywordUse(KeywordType.METHOD, "parse"), 1);
 
-		Map<Keyword, Integer> removedKeywords = new HashMap<>();
-		insertedKeywords.put(new Keyword(KeywordType.METHOD, "normalize"), 1);
+		Map<KeywordUse, Integer> removedKeywords = new HashMap<>();
+		insertedKeywords.put(new KeywordUse(KeywordType.METHOD, "normalize"), 1);
 
-		Map<Keyword, Integer> updatedKeywords = new HashMap<>();
-		insertedKeywords.put(new Keyword(KeywordType.FIELD, "posix"), 1);
+		Map<KeywordUse, Integer> updatedKeywords = new HashMap<>();
+		insertedKeywords.put(new KeywordUse(KeywordType.FIELD, "posix"), 1);
 
 		TopLevelAPI api = APIFactory.buildTopLevelAPI();
 		PointsToPrediction predictor = new PointsToPrediction(api, insertedKeywords, removedKeywords, updatedKeywords,
 				null);
 
-		Keyword keyword = predictor.getKeyword(KeywordType.METHOD, "parse");
+		KeywordUse keyword = predictor.getKeyword(KeywordType.METHOD, "parse");
 
 		assertNotNull(keyword);
 		assertEquals("Date", keyword.api.getName());
@@ -52,21 +52,21 @@ public class TestPointsToPrediction {
 	 */
 	@Test
 	public void testGetKeywordWhenAmbiguousOnPath() {
-		Map<Keyword, Integer> insertedKeywords = new HashMap<>();
-		insertedKeywords.put(new Keyword(KeywordType.METHOD, "parse"), 1);
-		insertedKeywords.put(new Keyword(KeywordType.PACKAGE, "path"), 1);
+		Map<KeywordUse, Integer> insertedKeywords = new HashMap<>();
+		insertedKeywords.put(new KeywordUse(KeywordType.METHOD, "parse"), 1);
+		insertedKeywords.put(new KeywordUse(KeywordType.PACKAGE, "path"), 1);
 
-		Map<Keyword, Integer> removedKeywords = new HashMap<>();
-		insertedKeywords.put(new Keyword(KeywordType.METHOD, "normalize"), 1);
+		Map<KeywordUse, Integer> removedKeywords = new HashMap<>();
+		insertedKeywords.put(new KeywordUse(KeywordType.METHOD, "normalize"), 1);
 
-		Map<Keyword, Integer> updatedKeywords = new HashMap<>();
-		insertedKeywords.put(new Keyword(KeywordType.FIELD, "posix"), 1);
+		Map<KeywordUse, Integer> updatedKeywords = new HashMap<>();
+		insertedKeywords.put(new KeywordUse(KeywordType.FIELD, "posix"), 1);
 
 		TopLevelAPI api = APIFactory.buildTopLevelAPI();
 		PointsToPrediction predictor = new PointsToPrediction(api, insertedKeywords, removedKeywords, updatedKeywords,
 				null);
 
-		Keyword keyword = predictor.getKeyword(KeywordType.METHOD, "parse");
+		KeywordUse keyword = predictor.getKeyword(KeywordType.METHOD, "parse");
 
 		assertNotNull(keyword);
 		assertEquals("path", keyword.api.getName());
@@ -81,21 +81,21 @@ public class TestPointsToPrediction {
 	 */
 	@Test
 	public void testGetKeywordWhenAmbiguousOnDate() {
-		Map<Keyword, Integer> insertedKeywords = new HashMap<>();
-		insertedKeywords.put(new Keyword(KeywordType.METHOD, "parse"), 1);
-		insertedKeywords.put(new Keyword(KeywordType.PACKAGE, "path"), 1);
+		Map<KeywordUse, Integer> insertedKeywords = new HashMap<>();
+		insertedKeywords.put(new KeywordUse(KeywordType.METHOD, "parse"), 1);
+		insertedKeywords.put(new KeywordUse(KeywordType.PACKAGE, "path"), 1);
 
-		Map<Keyword, Integer> removedKeywords = new HashMap<>();
-		insertedKeywords.put(new Keyword(KeywordType.METHOD, "getMinutes"), 1);
+		Map<KeywordUse, Integer> removedKeywords = new HashMap<>();
+		insertedKeywords.put(new KeywordUse(KeywordType.METHOD, "getMinutes"), 1);
 
-		Map<Keyword, Integer> updatedKeywords = new HashMap<>();
-		insertedKeywords.put(new Keyword(KeywordType.METHOD, "getUTCSeconds"), 1);
+		Map<KeywordUse, Integer> updatedKeywords = new HashMap<>();
+		insertedKeywords.put(new KeywordUse(KeywordType.METHOD, "getUTCSeconds"), 1);
 
 		TopLevelAPI api = APIFactory.buildTopLevelAPI();
 		PointsToPrediction predictor = new PointsToPrediction(api, insertedKeywords, removedKeywords, updatedKeywords,
 				null);
 
-		Keyword keyword = predictor.getKeyword(KeywordType.METHOD, "parse");
+		KeywordUse keyword = predictor.getKeyword(KeywordType.METHOD, "parse");
 
 		assertNotNull(keyword);
 		assertEquals("Date", keyword.api.getName());
@@ -107,14 +107,14 @@ public class TestPointsToPrediction {
 	 */
 	@Test
 	public void testGetKeywordWhenNotAmbiguous() {
-		Map<Keyword, Integer> insertedKeywords = new HashMap<>();
-		insertedKeywords.put(new Keyword(KeywordType.FIELD, "win32"), 1);
-		insertedKeywords.put(new Keyword(KeywordType.PACKAGE, "path"), 1);
+		Map<KeywordUse, Integer> insertedKeywords = new HashMap<>();
+		insertedKeywords.put(new KeywordUse(KeywordType.FIELD, "win32"), 1);
+		insertedKeywords.put(new KeywordUse(KeywordType.PACKAGE, "path"), 1);
 
 		TopLevelAPI api = APIFactory.buildTopLevelAPI();
 		PointsToPrediction predictor = new PointsToPrediction(api, insertedKeywords, null, null, null);
 
-		Keyword keyword = predictor.getKeyword(KeywordType.FIELD, "win32");
+		KeywordUse keyword = predictor.getKeyword(KeywordType.FIELD, "win32");
 
 		assertNotNull(keyword);
 		assertEquals("path", keyword.api.getName());
@@ -125,13 +125,13 @@ public class TestPointsToPrediction {
 	 */
 	@Test
 	public void testGetKeywordWhenNotAmbiguousButNotImported() {
-		Map<Keyword, Integer> insertedKeywords = new HashMap<>();
-		insertedKeywords.put(new Keyword(KeywordType.FIELD, "win32"), 1);
+		Map<KeywordUse, Integer> insertedKeywords = new HashMap<>();
+		insertedKeywords.put(new KeywordUse(KeywordType.FIELD, "win32"), 1);
 
 		TopLevelAPI api = APIFactory.buildTopLevelAPI();
 		PointsToPrediction predictor = new PointsToPrediction(api, insertedKeywords, null, null, null);
 
-		Keyword keyword = predictor.getKeyword(KeywordType.FIELD, "win32");
+		KeywordUse keyword = predictor.getKeyword(KeywordType.FIELD, "win32");
 
 		assertNull(keyword);
 	}
@@ -145,6 +145,6 @@ public class TestPointsToPrediction {
 		TopLevelAPI api = APIFactory.buildTopLevelAPI();
 		PointsToPrediction predictor = new PointsToPrediction(api, null, null, null, null);
 
-		Keyword keyword = predictor.getKeyword(KeywordType.METHOD, "fooMethod");
+		KeywordUse keyword = predictor.getKeyword(KeywordType.METHOD, "fooMethod");
 	}
 }
