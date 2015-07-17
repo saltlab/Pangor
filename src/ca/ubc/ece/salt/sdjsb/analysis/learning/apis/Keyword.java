@@ -1,5 +1,10 @@
 package ca.ubc.ece.salt.sdjsb.analysis.learning.apis;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 
 /**
@@ -106,6 +111,29 @@ public class Keyword {
 		PARAMETER,
 		EXCEPTION,
 		EVENT
+	}
+
+	/**
+	 * Helper method to filter a list of keywords by ChangeType. It returns a
+	 * new list with the filtered elements. Original list is kept untouched.
+	 * TODO: Should this be on this class or should we create a
+	 * KeywordListHelper or something?
+	 *
+	 * @param keywords list of keywords
+	 * @param changeTypes types of keywords that should stay
+	 * @return a new list
+	 */
+	public static List<Keyword> filterListByChangeType(List<Keyword> keywords, ChangeType... changeTypes) {
+		List<Keyword> newList = new ArrayList<Keyword>(keywords);
+
+		for (Iterator<Keyword> iterator = newList.iterator(); iterator.hasNext();) {
+			Keyword keyword = iterator.next();
+
+			if (!Arrays.asList(changeTypes).contains(keyword.changeType))
+				iterator.remove();
+		}
+
+		return newList;
 	}
 
 }
