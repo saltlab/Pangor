@@ -5,6 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.tuple.Pair;
+
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
 
@@ -129,6 +131,26 @@ public class FeatureVectorManager {
 		for(KeywordUse keyword : keywords) {
 			if (this.packagesToExtract.contains(keyword.api.getName()))
 				return true;
+		}
+		return false;
+	}
+	
+	/**
+	 * Checks if the feature vector manager contains the keyword inside a
+	 * feature vector. Used for testing.
+	 * @param function The name of the function.
+	 * @param keywords The keywords to look for.
+	 * @return True if the list of keywords matches the list of keywords form
+	 * 		   one or more functions.
+	 */
+	public boolean contains(String function, List<Pair<KeywordUse, Integer>> keywords) {
+		outer: 
+		for(FeatureVector featureVector : this.featureVectors) {
+			for(Pair<KeywordUse, Integer> keyword : keywords) {
+				if(keyword.getRight() > 0 && !featureVector.keywordMap.containsKey(keyword.getLeft())) continue outer;
+				if(keyword.getRight() > 0 && !featureVector.keywordMap.get(keyword.getLeft()).equals(keyword.getRight())) continue outer;
+			}
+			return true;
 		}
 		return false;
 	}

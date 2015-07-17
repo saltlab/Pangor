@@ -7,6 +7,11 @@ import java.util.Map.Entry;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 
+/**
+ * Stores the use of a keyword in a source code file. This includes the context
+ * under which it is used and the type of change that occurred on the keyword
+ * from the source to the destination code.
+ */
 public class KeywordUse extends KeywordDefinition {
 
 	/** The context under which the keyword is used. **/
@@ -16,6 +21,7 @@ public class KeywordUse extends KeywordDefinition {
 	public ChangeType changeType;
 
 	/**
+	 * To be used when investigating a single function.
 	 * @param type
 	 * @param context
 	 * @param keyword
@@ -30,6 +36,8 @@ public class KeywordUse extends KeywordDefinition {
 	}
 
 	/**
+	 * To be used in the initial scan of the entire script for the purpose of
+	 * building the API model for the class.
 	 * @param type
 	 * @param keyword
 	 */
@@ -38,6 +46,15 @@ public class KeywordUse extends KeywordDefinition {
 
 		this.context = KeywordContext.UNKNOWN;
 		this.changeType = ChangeType.UNKNOWN;
+	}
+
+	/**
+	 * Set the package artifact that this keyword points to.
+	 * 
+	 * @param pointsto The package this keyword points to.
+	 */
+	public void setAPI(AbstractAPI api) {
+		this.api = api;
 	}
 
 	@Override
@@ -68,8 +85,15 @@ public class KeywordUse extends KeywordDefinition {
 
 	@Override
 	public String toString() {
+
+		if(this.type == KeywordType.PACKAGE) {
+			/* Don't print the package twice if the keyword type is a package. */
+			return this.type.toString() + "_" + this.context.toString() + "_" +
+				   this.changeType.toString() + "_" + this.keyword;
+		}
 		return this.type.toString() + "_" + this.context.toString() + "_" +
-			   this.changeType.toString() + "_" + this.keyword;
+			   this.changeType.toString() + "_" + this.api.getName() + "_" + this.keyword;
+
 	}
 
 	/**

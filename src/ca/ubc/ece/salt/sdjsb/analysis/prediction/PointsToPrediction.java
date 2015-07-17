@@ -49,8 +49,6 @@ public class PointsToPrediction {
 		 */
 		KeywordUse keyword = new KeywordUse(type, context, token, changeType);
 
-		System.out.println(keyword);
-
 		/*
 		 * Use the predictor and get the result with the highest likelihood of
 		 * being the correct one (stored on the head of PredictionResults queue)
