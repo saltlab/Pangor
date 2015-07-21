@@ -29,6 +29,17 @@ public class AnalysisMetaInformation {
 	/** The repaired source code. **/
 	public String repairedCode;
 	
+	/**
+	 * @param totalCommits
+	 * @param bugFixingCommits
+	 * @param projectID
+	 * @param buggyFile
+	 * @param repairedFile
+	 * @param buggyCommitID
+	 * @param repairedCommitID
+	 * @param buggyCode
+	 * @param repairedCode
+	 */
 	public AnalysisMetaInformation(int totalCommits, int bugFixingCommits,
 			String projectID, 
 			String buggyFile, String repairedFile, 

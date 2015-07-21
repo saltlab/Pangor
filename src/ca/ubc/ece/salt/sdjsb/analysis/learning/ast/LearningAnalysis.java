@@ -6,6 +6,7 @@ import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.sdjsb.analysis.meta.MetaAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.Scope;
+import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
 
 /**
  * Creates a data set for learning bug and repair patterns related to the use
@@ -19,13 +20,21 @@ public class LearningAnalysis extends MetaAnalysis<LearningASTAnalysis, Learning
 	 * mining (i.e., row and column filtering). 
 	 */
 	private LearningDataSet featureVectorManager; 
+	
+	/**
+	 * The meta info for the analysis (i.e., project id, file paths, commit IDs, etc.).
+	 */
+	private AnalysisMetaInformation ami;
+	
 
 	/**
 	 * @param featureVectorManager the manager that stores the feature vectors produced by this analysis.
+	 * @param ami The meta info for the analysis (i.e., project id, file paths, commit IDs, etc.).
 	 */
-	public LearningAnalysis(LearningDataSet featureVectorManager) {
+	public LearningAnalysis(LearningDataSet featureVectorManager, AnalysisMetaInformation ami) {
 		super(new LearningASTAnalysis(), new LearningASTAnalysis());
 		this.featureVectorManager = featureVectorManager;
+		this.ami = ami;
 	}
 
 	@Override
@@ -56,6 +65,15 @@ public class LearningAnalysis extends MetaAnalysis<LearningASTAnalysis, Learning
 			
 			/* Get the 'removed' statements and keywords from the source feature vector. */
 			dstFeatureVector.join(srcFeatureVector);
+			
+			/* Set the meta info for the feature vector. */
+			dstFeatureVector.projectID = ami.projectID;
+			dstFeatureVector.buggyFile = ami.buggyFile;
+			dstFeatureVector.repairedFile = ami.repairedFile;
+			dstFeatureVector.buggyCommitID = ami.buggyCommitID;
+			dstFeatureVector.repairedCommitID = ami.repairedCommitID;
+			dstFeatureVector.sourceCode = ami.buggyCode;
+			dstFeatureVector.destinationCode = ami.repairedCode;
 			
 			/* Add the feature vector to the FeatureVectorManager. */
 			this.featureVectorManager.registerFeatureVector(dstFeatureVector);

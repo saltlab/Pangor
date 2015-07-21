@@ -29,7 +29,7 @@ public class LearningAnalysisRunner extends AnalysisRunner {
 	@Override
 	protected void analyze(ControlFlowDifferencing cfd, AnalysisMetaInformation ami) throws Exception {
 
-		LearningAnalysis analysis = new LearningAnalysis(this.dataset);
+		LearningAnalysis analysis = new LearningAnalysis(this.dataset, ami);
 		cfd.analyze(analysis);
 
 	}
