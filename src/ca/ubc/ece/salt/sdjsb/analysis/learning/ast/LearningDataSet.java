@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
 
@@ -121,6 +122,25 @@ public class LearningDataSet {
 			this.featureVectors.remove(featureVector);
 		}
 
+		/* Remove rows that do not fall within the desired change score. */
+
+		toRemove = new LinkedList<FeatureVector>();
+		for(FeatureVector featureVector : this.featureVectors) {
+
+			/* Check if the feature vector references the any of the interesting packages. */
+			if(getChangeScore(featureVector.keywordMap.keySet()) == 0) {
+
+				/* Schedule this FeatureVector for removal. */
+				toRemove.add(featureVector);
+
+			}
+
+		}
+
+		for(FeatureVector featureVector : toRemove) {
+			this.featureVectors.remove(featureVector);
+		}
+
 		/* Get the set of keywords from all the feature vectors. */
 
 		for(FeatureVector featureVector : this.featureVectors) {
@@ -140,6 +160,29 @@ public class LearningDataSet {
 				return true;
 		}
 		return false;
+	}
+	
+	/**
+	 * Computes a score to determine how much a function has changed (using the
+	 * number of inserted/removed/updated keywords).
+	 * @param keywords The keywords from a feature vector.
+	 * @return A score that represents how much the function has changed with
+	 * 		   respect to its keywords. A score of zero means no keywords 
+	 * 		   changed.
+	 */
+	private int getChangeScore(Set<KeywordUse> keywords) {
+		
+		int score = 0;
+		
+		for(KeywordUse keyword : keywords) {
+			if(keyword.changeType != ChangeType.UNCHANGED && 
+					keyword.changeType != ChangeType.UNKNOWN) {
+				score++;
+			}
+		}
+		
+		return score;
+		
 	}
 	
 	/**

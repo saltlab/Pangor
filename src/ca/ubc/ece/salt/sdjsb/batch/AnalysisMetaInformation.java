@@ -52,6 +52,7 @@ public class AnalysisMetaInformation {
 		this.buggyFile = buggyFile;
 		this.repairedFile = repairedFile;
 		this.buggyCommitID = buggyCommitID;
+		this.repairedCommitID = repairedCommitID;
 		this.buggyCode = buggyCode;
 		this.repairedCode = repairedCode;
 		

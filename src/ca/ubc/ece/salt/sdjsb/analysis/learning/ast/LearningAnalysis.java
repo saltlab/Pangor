@@ -72,8 +72,6 @@ public class LearningAnalysis extends MetaAnalysis<LearningASTAnalysis, Learning
 			dstFeatureVector.repairedFile = ami.repairedFile;
 			dstFeatureVector.buggyCommitID = ami.buggyCommitID;
 			dstFeatureVector.repairedCommitID = ami.repairedCommitID;
-			dstFeatureVector.sourceCode = ami.buggyCode;
-			dstFeatureVector.destinationCode = ami.repairedCode;
 			
 			/* Add the feature vector to the FeatureVectorManager. */
 			this.featureVectorManager.registerFeatureVector(dstFeatureVector);
