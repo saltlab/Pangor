@@ -3,7 +3,6 @@ package ca.ubc.ece.salt.sdjsb.test.learning;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.Assert;
@@ -16,7 +15,7 @@ import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.PackageAPI;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.FeatureVectorManager;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningDataSet;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningAnalysis;
 
 public class TestASTLearning {
@@ -32,7 +31,7 @@ public class TestASTLearning {
 		 * vectors produced by our analysis and perform pre-processing tasks
 		 * for data mining. */
 		List<String> packagesToExtract = Arrays.asList("fs");
-		FeatureVectorManager featureVectorManager = new FeatureVectorManager(packagesToExtract);
+		LearningDataSet featureVectorManager = new LearningDataSet(packagesToExtract);
 		
 		/* Set up the analysis. */
 		LearningAnalysis analysis = new LearningAnalysis(featureVectorManager);

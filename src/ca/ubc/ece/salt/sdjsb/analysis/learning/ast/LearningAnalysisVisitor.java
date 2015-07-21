@@ -137,27 +137,29 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		if(type == KeywordType.UNKNOWN || context == KeywordContext.UNKNOWN) return;
 
 		/* Add a falsey keyword if we're checking if this node is truthy or 
-		 * falsey. */
-		if(SpecialTypeAnalysisUtilities.isFalsey(node)) {
-
-			KeywordUse keyword = null;
-			if(this.packageModel != null) {
-				keyword = this.packageModel.getKeyword(type, context, "~falsey~", changeType);
-			}
-			else {
-				keyword = new KeywordUse(type, context, "~falsey", changeType);
-			}
-
-			if(keyword != null) this.featureVector.addKeyword(keyword);
-
-		}
+		 * falsey. 
+		 * 
+		 * TODO: PointsToPrediction throws a runtime exception when we register this. Need to fix. */
+//		if(SpecialTypeAnalysisUtilities.isFalsey(node)) {
+//
+//			KeywordUse keyword = null;
+//			if(this.packageModel != null) {
+//				keyword = this.packageModel.getKeyword(type, context, "~falsey~", changeType);
+//			}
+//			else {
+//				keyword = new KeywordUse(type, context, "~falsey", changeType);
+//			}
+//
+//			if(keyword != null) this.featureVector.addKeyword(keyword);
+//
+//		}
 		
 		/* Get the relevant keyword from the node. */
 		if(node instanceof Name) {
 			Name name = (Name) node;
 			token = name.getIdentifier();
-			if(token.matches("e|err")) token = "error";
-			else if(token.matches("cb|callb")) token = "callback";
+			//if(token.matches("e|err")) token = "error"; TODO
+			//else if(token.matches("cb|callb")) token = "callback"; TODO
 		}
 		else if(node instanceof KeywordLiteral) {
 			KeywordLiteral kl = (KeywordLiteral) node;
@@ -167,7 +169,7 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 			NumberLiteral nl = (NumberLiteral) node;
 			try { 
 				if(Double.parseDouble(nl.getValue()) == 0.0) {
-					token = "zero";
+					//token = "zero"; TODO
 				}
 			}
 			catch (NumberFormatException ignore) { }
@@ -175,7 +177,7 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		else if(node instanceof StringLiteral) {
 			StringLiteral sl = (StringLiteral) node;
 			if(sl.getValue().isEmpty()) {
-				token = "blank";
+				//token = "blank"; TODO
 			}
 			else {
 				token = sl.getValue();

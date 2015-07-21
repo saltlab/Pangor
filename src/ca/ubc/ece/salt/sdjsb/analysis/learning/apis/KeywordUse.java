@@ -91,8 +91,12 @@ public class KeywordUse extends KeywordDefinition {
 			return this.type.toString() + "_" + this.context.toString() + "_" +
 				   this.changeType.toString() + "_" + this.keyword;
 		}
+		else if(this.api != null) {
+			return this.type.toString() + "_" + this.context.toString() + "_" +
+				   this.changeType.toString() + "_" + this.api.getName() + "_" + this.keyword;
+		}
 		return this.type.toString() + "_" + this.context.toString() + "_" +
-			   this.changeType.toString() + "_" + this.api.getName() + "_" + this.keyword;
+			   this.changeType.toString() + "_unknownapi_" + this.keyword;
 
 	}
 

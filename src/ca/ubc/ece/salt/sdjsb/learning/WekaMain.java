@@ -13,8 +13,13 @@ import weka.clusterers.SimpleKMeans;
 import weka.filters.Filter;
 import weka.filters.unsupervised.attribute.Remove;
 
-public class Main {
+public class WekaMain {
 	
+	/**
+	 * Clusters the learning dataset using Weka.
+	 * @param args
+	 * @throws Exception
+	 */
 	public static void main(String[] args) throws Exception {
 		
 		/* Establish a connection to the data file. */
