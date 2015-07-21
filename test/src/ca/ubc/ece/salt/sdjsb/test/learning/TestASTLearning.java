@@ -17,8 +17,8 @@ import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.PackageAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.FeatureVectorManager;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningDataSet;
 
 public class TestASTLearning {
 
@@ -33,7 +33,7 @@ public class TestASTLearning {
 		 * vectors produced by our analysis and perform pre-processing tasks
 		 * for data mining. */
 		List<String> packagesToExtract = Arrays.asList("fs", "path", "Date");
-		FeatureVectorManager featureVectorManager = new FeatureVectorManager(packagesToExtract);
+		LearningDataSet featureVectorManager = new LearningDataSet(packagesToExtract);
 
 		/* Set up the analysis. */
 		LearningAnalysis analysis = new LearningAnalysis(featureVectorManager);

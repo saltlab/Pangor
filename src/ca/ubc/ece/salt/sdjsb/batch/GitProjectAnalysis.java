@@ -2,16 +2,8 @@ package ca.ubc.ece.salt.sdjsb.batch;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,45 +29,32 @@ import org.eclipse.jgit.api.errors.TransportException;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
-import org.kohsuke.args4j.CmdLineException;
-import org.kohsuke.args4j.CmdLineParser;
-import org.mozilla.javascript.EvaluatorException;
-
-import ca.ubc.ece.salt.sdjsb.CFDTask;
-import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
-import ca.ubc.ece.salt.sdjsb.alert.Alert;
-import ca.ubc.ece.salt.sdjsb.analysis.ast.CBEDestinationScopeAnalysis;
-import ca.ubc.ece.salt.sdjsb.analysis.ast.CBEMetaAnalysis;
-import ca.ubc.ece.salt.sdjsb.analysis.ast.GTLScopeAnalysis;
-import ca.ubc.ece.salt.sdjsb.analysis.ast.STHMetaAnalysis;
-import ca.ubc.ece.salt.sdjsb.analysis.ast.STHScopeAnalysis;
-import ca.ubc.ece.salt.sdjsb.analysis.callbackerror.CallbackErrorAnalysis;
-import ca.ubc.ece.salt.sdjsb.analysis.callbackparam.CallbackParamAnalysis;
-import ca.ubc.ece.salt.sdjsb.analysis.globaltolocal.GlobalToLocalAnalysis;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.FeatureVectorManager;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningAnalysis;
-import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysis;
-import fr.labri.gumtree.client.DiffOptions;
 
 public class GitProjectAnalysis {
 	
+	/** The Git instance. **/
 	private Git git;
+	
+	/** The repository instance. **/
 	private Repository repository;
 	
-	private ProjectAnalysisResult analysisResult;
+	/** Runs an analysis on a source file. **/
+	private AnalysisRunner runner;
 	
-	GitProjectAnalysis(Git git, Repository repository, String name) {
+	/** The repository name. **/
+	private String projectID;
+	
+	/** The number of bug fixing commits analyzed. **/
+	private int bugFixingCommits;
+	
+	/** The total number of commits inspected. **/
+	private int totalCommits;
+	
+	GitProjectAnalysis(Git git, Repository repository, String name, AnalysisRunner runner) {
 		this.git = git;
 		this.repository = repository;
-		
-		this.analysisResult = new ProjectAnalysisResult(name);
-	}
-	
-	/**
-	 * @return The results of the analysis.
-	 */
-	public ProjectAnalysisResult getAnalysisResult() {
-		return this.analysisResult;
+		this.projectID = name;
+		this.runner = runner;
 	}
 	
 	/**
@@ -98,9 +77,7 @@ public class GitProjectAnalysis {
 	}
 
 	/**
-	 * Extract the source files from Git and run SDJSB on them.
-	 * @param git The project git instance.
-	 * @param repository The project git repository.
+	 * Extract the source files from Git and analyze them with the analysis runner.
 	 * @param buggyRevision The hash that identifies the buggy revision.
 	 * @param bugFixingRevision The hash that identifies the fixed revision.
 	 * @throws IOException
@@ -139,10 +116,13 @@ public class GitProjectAnalysis {
                 String newFile = this.fetchBlob(bugFixingRevision, diff.getOldPath());
                 
                 try {
-                	Set<Alert> alertsFromAnalysis = GitProjectAnalysis.runSDJSB(oldFile, newFile);
-                	for(Alert alertFromAnalysis : alertsFromAnalysis) {
-                		this.analysisResult.insert(new BatchAlert(alertFromAnalysis, bugFixingRevision, buggyRevision, diff.getOldPath(), diff.getNewPath()));
-                	}
+                	AnalysisMetaInformation ami = new AnalysisMetaInformation(
+                			this.totalCommits, this.bugFixingCommits, 
+                			this.projectID, 
+                			diff.getOldPath(), diff.getNewPath(), 
+                			buggyRevision, bugFixingRevision, 
+                			oldFile, newFile);
+                	runner.analyzeFile(ami);
                 }
                 catch(Exception ignore) { 
                 	System.err.println("Ignoring exception in ProjectAnalysis.runSDJSB.\nBuggy Revision: " + buggyRevision + "\nOld File: " + diff.getOldPath() + "\nBug Fixing Revision: " + bugFixingRevision + "\nNew File:" + diff.getNewPath());
@@ -202,103 +182,19 @@ public class GitProjectAnalysis {
 		}
 		
 		/* Keep track of the number of commits for metrics reporting. */
-		this.analysisResult.setBugFixingCommits(bfcCnt);
-		this.analysisResult.setTotalCommits(cCnt);
+		this.bugFixingCommits = bfcCnt;
+		this.totalCommits = cCnt;
 		
 		return bugFixingCommits;
 	}
-
-	/**
-	 * Runs SDJSB and prints out the alerts it generates.
-	 * @param oldFile The buggy source code.
-	 * @param newFile The repaired source code.
-	 */
-	private static Set<Alert> runSDJSB(String oldFile, String newFile) throws Exception {
-
-        /* Analyze the files using SDJSB. */
-        DiffOptions options = new DiffOptions();
-        CmdLineParser parser = new CmdLineParser(options);
-
-        try {
-            parser.parseArgument(new String[] { oldFile, newFile });
-        } catch (CmdLineException e) {
-            System.err.println("Usage:\nSDJSB /path/to/src /path/to/dst");
-            e.printStackTrace();
-            return null;
-        }
-        
-        /* Control flow difference the files. */
-        ControlFlowDifferencing cfd = null;
-        try {
-            cfd = new ControlFlowDifferencing(new String[] {"", ""}, oldFile, newFile);
-        }
-        catch(ArrayIndexOutOfBoundsException e) {
-        	System.err.println("ArrayIndexOutOfBoundsException: possibly caused by empty file.");
-        	return new HashSet<Alert>();
-        }
-        catch(EvaluatorException e) {
-        	System.err.println("Evaluator exception: " + e.getMessage());
-        	return new HashSet<Alert>();
-        }
-        catch(Exception e) {
-        	throw e;
-        }
-        
-        /* Run the analysis. */ 
-        Set<Alert> alerts = new HashSet<Alert>();
-        ExecutorService executor = Executors.newSingleThreadExecutor();
-        try {
-        	List<CFDTask> tasks = new LinkedList<CFDTask>();
-        	List<Future<Set<Alert>>> futures = new LinkedList<Future<Set<Alert>>>();
-        	
-        	/* These analyses are full analyses. */
-//        	tasks.add(new CFDTask(cfd, new SpecialTypeAnalysis()));
-//        	tasks.add(new CFDTask(cfd, new GlobalToLocalAnalysis()));
-//        	tasks.add(new CFDTask(cfd, new CallbackParamAnalysis()));
-//        	tasks.add(new CFDTask(cfd, new CallbackErrorAnalysis()));
-        	
-        	/* These analyses are AST level only. */
-//        	tasks.add(new CFDTask(cfd, new STHMetaAnalysis()));
-//        	tasks.add(new CFDTask(cfd, new STHScopeAnalysis()));
-//        	tasks.add(new CFDTask(cfd, new CBEMetaAnalysis()));
-//        	tasks.add(new CFDTask(cfd, new CBEDestinationScopeAnalysis()));
-//        	tasks.add(new CFDTask(cfd, new GTLScopeAnalysis()));
-        	
-        	/* This is the learning analysis. */
-        	/* TODO: How should we print the data set? We used to use alerts, 
-        	 *		 but this might not be the best option. */
-        	tasks.add(new CFDTask(cfd, new LearningAnalysis(new FeatureVectorManager(Arrays.asList("fs")))));
-        	
-        	for(CFDTask task : tasks) {
-                futures.add(executor.submit(task));
-        	}
-        	
-        	for(Future<Set<Alert>> future : futures) {
-                 alerts.addAll(future.get(10, TimeUnit.SECONDS));
-        	}
-
-        }
-        catch(TimeoutException e) {
-        	System.err.println("Timeout occurred.");
-        	throw e;
-        }
-        catch(Exception e) {
-        	throw e;
-        }
-        finally {
-        	executor.shutdownNow();
-        }
-        
-        return alerts;
-	}
-	
+		
 	/**
 	 * Creates a new GitProjectAnalysis instance from a git project directory.
 	 * @param directory The base directory for the project.
 	 * @return An instance of GitProjectAnalysis.
 	 * @throws GitProjectAnalysisException
 	 */
-	public static GitProjectAnalysis fromDirectory(String directory, String name) throws GitProjectAnalysisException {
+	public static GitProjectAnalysis fromDirectory(String directory, String name, AnalysisRunner runner) throws GitProjectAnalysisException {
         Git git;
         Repository repository;
 
@@ -309,7 +205,7 @@ public class GitProjectAnalysis {
 			throw new GitProjectAnalysisException("The git project was not found in the directory " + directory + ".");
 		}
 
-        return new GitProjectAnalysis(git, repository, getGitProjectName(repository.getConfig().getString("remote", "origin", "url")));
+        return new GitProjectAnalysis(git, repository, getGitProjectName(repository.getConfig().getString("remote", "origin", "url")), runner);
 	}
 	
 	/**
@@ -321,7 +217,7 @@ public class GitProjectAnalysis {
 	 * @throws TransportException 
 	 * @throws InvalidRemoteException 
 	 */
-	public static GitProjectAnalysis fromURI(String uri, String directory) throws GitProjectAnalysisException, InvalidRemoteException, TransportException, GitAPIException {
+	public static GitProjectAnalysis fromURI(String uri, String directory, AnalysisRunner runner) throws GitProjectAnalysisException, InvalidRemoteException, TransportException, GitAPIException {
 		
 		Git git;
 		Repository repository;
@@ -358,7 +254,7 @@ public class GitProjectAnalysis {
             repository = git.getRepository();
         }
         
-        return new GitProjectAnalysis(git, repository, getGitProjectName(uri));
+        return new GitProjectAnalysis(git, repository, getGitProjectName(uri), runner);
 	}
 	
 	/**

@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.batch;
+package ca.ubc.ece.salt.sdjsb.classify;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -10,7 +10,10 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
-public class ProjectAnalysis {
+import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysis;
+import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysisException;
+
+public class ClassifyMain {
 	
 	public static final String CHECKOUT_DIR =  new String("repositories");
 
@@ -22,19 +25,20 @@ public class ProjectAnalysis {
 	 */
 	public static void main(String[] args) throws Exception {
 
-		ProjectAnalysisOptions options = new ProjectAnalysisOptions();
+		ClassifyAnalysisRunner runner = new ClassifyAnalysisRunner();
+		ClassifyOptions options = new ClassifyOptions();
 		CmdLineParser parser = new CmdLineParser(options);
 
 		try {
 			parser.parseArgument(args);
 		} catch (CmdLineException e) {
-			ProjectAnalysis.printUsage(e.getMessage(), parser);
+			ClassifyMain.printUsage(e.getMessage(), parser);
 			return;
 		}
 		
 		/* Print the help page. */
 		if(options.getHelp()) {
-			ProjectAnalysis.printHelp(parser);
+			ClassifyMain.printHelp(parser);
 			return;
 		}
 		
@@ -44,28 +48,28 @@ public class ProjectAnalysis {
 		if(options.getGitDirectory() != null) {
 
 			try {
-                gitProjectAnalysis = GitProjectAnalysis.fromDirectory(options.getGitDirectory(), "Unknown");
+                gitProjectAnalysis = GitProjectAnalysis.fromDirectory(options.getGitDirectory(), "Unknown", runner);
 			} 
 			catch(GitProjectAnalysisException e) {
-                ProjectAnalysis.printUsage(e.getMessage(), parser);
+                ClassifyMain.printUsage(e.getMessage(), parser);
                 return;
 			}
 
-			ProjectAnalysis.analyzeAndPrint(gitProjectAnalysis, options);
+			ClassifyMain.analyzeAndPrint(gitProjectAnalysis, options);
 
 		}
 		/* A URI was given. */
 		else if(options.getURI() != null) {
 
 			try {
-                gitProjectAnalysis = GitProjectAnalysis.fromURI(options.getURI(), ProjectAnalysis.CHECKOUT_DIR);
+                gitProjectAnalysis = GitProjectAnalysis.fromURI(options.getURI(), ClassifyMain.CHECKOUT_DIR, runner);
 			} 
 			catch(GitProjectAnalysisException e) {
-                ProjectAnalysis.printUsage(e.getMessage(), parser);
+                ClassifyMain.printUsage(e.getMessage(), parser);
                 return;
 			}
 			
-			ProjectAnalysis.analyzeAndPrint(gitProjectAnalysis, options);
+			ClassifyMain.analyzeAndPrint(gitProjectAnalysis, options);
 
 		}
 		/* A list of URIs was given. */
@@ -87,14 +91,14 @@ public class ProjectAnalysis {
 			for(String uri : uris) {
 
 				try {
-					gitProjectAnalysis = GitProjectAnalysis.fromURI(uri, ProjectAnalysis.CHECKOUT_DIR);
+					gitProjectAnalysis = GitProjectAnalysis.fromURI(uri, ClassifyMain.CHECKOUT_DIR, runner);
 				} 
 				catch(GitProjectAnalysisException e) {
-					ProjectAnalysis.printUsage(e.getMessage(), parser);
+					ClassifyMain.printUsage(e.getMessage(), parser);
 					return;
 				}
 				
-				ProjectAnalysis.analyzeAndPrint(gitProjectAnalysis, options);
+				ClassifyMain.analyzeAndPrint(gitProjectAnalysis, options);
 				
 				options.setAppend(true);
 				
@@ -104,7 +108,7 @@ public class ProjectAnalysis {
 		}
 		else {
 			System.out.println("No repository given.");
-			ProjectAnalysis.printUsage("No repository given.", parser);
+			ClassifyMain.printUsage("No repository given.", parser);
 			return;
 		}
 
@@ -117,16 +121,16 @@ public class ProjectAnalysis {
 	 * @param options The command line options.
 	 * @throws Exception
 	 */
-	private static void analyzeAndPrint(GitProjectAnalysis analysis, ProjectAnalysisOptions options) throws Exception {
+	private static void analyzeAndPrint(GitProjectAnalysis analysis, ClassifyOptions options) throws Exception {
 
 		/* Perform the analysis (may take some time). */
 		analysis.analyze();
 		
 		/* Print what we need. */
-		AlertPrinter printer = new AlertPrinter(analysis.getAnalysisResult());
-		if(!options.printCustom()) printer.printSummary(options.printAlerts());
-		if(options.printLatex()) printer.printLatexTable();
-		if(options.printCustom()) printer.printFeatureVector(options.getOutfile(), options.getSupplementaryFolder(), options.getAppend());
+//		AlertPrinter printer = new AlertPrinter(analysis.getAnalysisResult());
+//		if(!options.printCustom()) printer.printSummary(options.printAlerts());
+//		if(options.printLatex()) printer.printLatexTable();
+//		if(options.printCustom()) printer.printFeatureVector(options.getOutfile(), options.getSupplementaryFolder(), options.getAppend());
 		
 	}
 

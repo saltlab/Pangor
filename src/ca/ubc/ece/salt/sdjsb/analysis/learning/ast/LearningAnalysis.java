@@ -14,14 +14,16 @@ import ca.ubc.ece.salt.sdjsb.analysis.scope.Scope;
  */
 public class LearningAnalysis extends MetaAnalysis<LearningASTAnalysis, LearningASTAnalysis> {
 	
-	/* The FeatureVectorManager performs pre-processing tasks for data
-	 * mining (i.e., row and column filtering). */
-	private FeatureVectorManager featureVectorManager; 
+	/** 
+	 * The FeatureVectorManager performs pre-processing tasks for data
+	 * mining (i.e., row and column filtering). 
+	 */
+	private LearningDataSet featureVectorManager; 
 
 	/**
 	 * @param featureVectorManager the manager that stores the feature vectors produced by this analysis.
 	 */
-	public LearningAnalysis(FeatureVectorManager featureVectorManager) {
+	public LearningAnalysis(LearningDataSet featureVectorManager) {
 		super(new LearningASTAnalysis(), new LearningASTAnalysis());
 		this.featureVectorManager = featureVectorManager;
 	}

@@ -11,7 +11,7 @@ public class BatchAlert extends Alert {
     public String oldFile;
     public String newFile;
 	
-	public BatchAlert(Alert alert, String bugFixingCommit, String buggyCommit, String oldFile, String newFile) {
+	public BatchAlert(Alert alert, String buggyCommit, String bugFixingCommit, String oldFile, String newFile) {
 		super(alert.getType(), alert.getSubType());
 		this.alert = alert;
 		this.bugFixingCommit = bugFixingCommit;
