@@ -9,6 +9,7 @@ import java.util.List;
 
 import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.FeatureVector;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.KeywordFilter;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningDataSet;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningAnalysis;
 import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
@@ -22,8 +23,8 @@ public class LearningAnalysisRunner extends AnalysisRunner {
 	/**
 	 * @param packages The list of packages we want to learn repair patterns for.
 	 */
-	public LearningAnalysisRunner(List<String> packages) {
-		this.dataset = new LearningDataSet(packages);
+	public LearningAnalysisRunner(List<KeywordFilter> filters) {
+		this.dataset = new LearningDataSet(filters);
 	}
 
 	@Override

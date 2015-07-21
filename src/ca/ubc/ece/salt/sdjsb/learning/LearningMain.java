@@ -9,6 +9,11 @@ import java.util.List;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.KeywordFilter;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.KeywordFilter.FilterType;
 import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysis;
 import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysisException;
 
@@ -23,8 +28,12 @@ public class LearningMain {
 	 * @throws Exception 
 	 */
 	public static void main(String[] args) throws Exception {
+		
+		KeywordFilter prototypeFilter = new KeywordFilter(FilterType.INCLUDE, 
+				KeywordType.RESERVED, KeywordContext.UNKNOWN, ChangeType.REMOVED, 
+				"", "prototype");
 
-		LearningAnalysisRunner runner = new LearningAnalysisRunner(Arrays.asList("fs"));
+		LearningAnalysisRunner runner = new LearningAnalysisRunner(Arrays.asList(prototypeFilter));
 		LearningOptions options = new LearningOptions();
 		CmdLineParser parser = new CmdLineParser(options);
 
