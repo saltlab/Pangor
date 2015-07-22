@@ -18,7 +18,6 @@ import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.PackageAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.KeywordFilter;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.KeywordFilter.FilterType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningDataSet;
 import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
@@ -35,14 +34,14 @@ public class TestASTLearning {
 		AnalysisMetaInformation ami = new AnalysisMetaInformation(0, 0, "test",
 				"na", "na", "na", "na", "na", "na");
 
-		KeywordFilter fsFilter = new KeywordFilter(FilterType.INCLUDE,
-				KeywordType.UNKNOWN, KeywordContext.UNKNOWN, ChangeType.UNKNOWN,
-				"fs", "");
+		KeywordFilter fsFilter = KeywordFilter.buildPackageFilter("fs");
+		KeywordFilter pathFilter = KeywordFilter.buildPackageFilter("path");
+		KeywordFilter DateFilter = KeywordFilter.buildPackageFilter("global");
 
 		/* Set up the FeatureVectorManager, which will store all the feature
 		 * vectors produced by our analysis and perform pre-processing tasks
 		 * for data mining. */
-		List<KeywordFilter> filters = Arrays.asList(fsFilter);
+		List<KeywordFilter> filters = Arrays.asList(fsFilter, pathFilter, DateFilter);
 		LearningDataSet featureVectorManager = new LearningDataSet(filters);
 
 		/* Set up the analysis. */
