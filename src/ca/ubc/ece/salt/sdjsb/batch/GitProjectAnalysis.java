@@ -113,7 +113,7 @@ public class GitProjectAnalysis {
 
                 System.err.println("Exploring:\nBuggy Revision: " + buggyRevision + "\nOld File: " + diff.getOldPath() + "\nBug Fixing Revision: " + bugFixingRevision + "\nNew File:" + diff.getNewPath());
                 String oldFile = this.fetchBlob(buggyRevision, diff.getOldPath());
-                String newFile = this.fetchBlob(bugFixingRevision, diff.getOldPath());
+                String newFile = this.fetchBlob(bugFixingRevision, diff.getNewPath());
                 
                 try {
                 	AnalysisMetaInformation ami = new AnalysisMetaInformation(

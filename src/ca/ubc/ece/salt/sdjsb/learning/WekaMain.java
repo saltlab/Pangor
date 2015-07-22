@@ -23,7 +23,7 @@ public class WekaMain {
 	public static void main(String[] args) throws Exception {
 		
 		/* Establish a connection to the data file. */
-		DataSource source = new DataSource("./output/bulk1.arff");
+		DataSource source = new DataSource("./output/run5.arff");
 		Instances data = source.getDataSet();
 		
 		/* Filter out the columns we don't want. */
@@ -48,7 +48,7 @@ public class WekaMain {
 		distanceFunction.setOptions(distanceFunctionOptions);
 				
 		SimpleKMeans kMeansClusterer = new SimpleKMeans();
-		String[] kMeansClustererOptions = "-init 0 -max-candidates 100 -periodic-pruning 10000 -min-density 2.0 -t1 -1.25 -t2 -1.0 -N 50 -I 500 -O -num-slots 1 -S 10".split("\\s");
+		String[] kMeansClustererOptions = "-init 0 -max-candidates 100 -periodic-pruning 10000 -min-density 2.0 -t1 -1.25 -t2 -1.0 -N 40 -I 500 -O -num-slots 1 -S 10".split("\\s");
 		kMeansClusterer.setOptions(kMeansClustererOptions);
 		kMeansClusterer.setDistanceFunction(distanceFunction);
 		kMeansClusterer.buildClusterer(filteredData);

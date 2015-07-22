@@ -17,8 +17,11 @@ import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.PackageAPI;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.KeywordFilter;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.KeywordFilter.FilterType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningDataSet;
+import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
 
 public class TestASTLearning {
 
@@ -29,14 +32,21 @@ public class TestASTLearning {
 	 */
 	protected void runTest(String[] args, List<MockFeatureVector> expected) throws Exception {
 
+		AnalysisMetaInformation ami = new AnalysisMetaInformation(0, 0, "test",
+				"na", "na", "na", "na", "na", "na");
+
+		KeywordFilter fsFilter = new KeywordFilter(FilterType.INCLUDE,
+				KeywordType.UNKNOWN, KeywordContext.UNKNOWN, ChangeType.UNKNOWN,
+				"fs", "");
+
 		/* Set up the FeatureVectorManager, which will store all the feature
 		 * vectors produced by our analysis and perform pre-processing tasks
 		 * for data mining. */
-		List<String> packagesToExtract = Arrays.asList("fs", "path", "Date");
-		LearningDataSet featureVectorManager = new LearningDataSet(packagesToExtract);
+		List<KeywordFilter> filters = Arrays.asList(fsFilter);
+		LearningDataSet featureVectorManager = new LearningDataSet(filters);
 
 		/* Set up the analysis. */
-		LearningAnalysis analysis = new LearningAnalysis(featureVectorManager);
+		LearningAnalysis analysis = new LearningAnalysis(featureVectorManager, ami);
 
 		/* Control flow difference the files. */
 		ControlFlowDifferencing cfd = new ControlFlowDifferencing(args);

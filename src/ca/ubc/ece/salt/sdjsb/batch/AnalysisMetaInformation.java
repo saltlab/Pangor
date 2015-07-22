@@ -29,6 +29,17 @@ public class AnalysisMetaInformation {
 	/** The repaired source code. **/
 	public String repairedCode;
 	
+	/**
+	 * @param totalCommits
+	 * @param bugFixingCommits
+	 * @param projectID
+	 * @param buggyFile
+	 * @param repairedFile
+	 * @param buggyCommitID
+	 * @param repairedCommitID
+	 * @param buggyCode
+	 * @param repairedCode
+	 */
 	public AnalysisMetaInformation(int totalCommits, int bugFixingCommits,
 			String projectID, 
 			String buggyFile, String repairedFile, 
@@ -41,6 +52,7 @@ public class AnalysisMetaInformation {
 		this.buggyFile = buggyFile;
 		this.repairedFile = repairedFile;
 		this.buggyCommitID = buggyCommitID;
+		this.repairedCommitID = repairedCommitID;
 		this.buggyCode = buggyCode;
 		this.repairedCode = repairedCode;
 		
