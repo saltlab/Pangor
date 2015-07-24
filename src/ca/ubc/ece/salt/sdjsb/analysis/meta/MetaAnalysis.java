@@ -64,8 +64,9 @@ public abstract class MetaAnalysis<S extends Analysis, D extends Analysis> imple
 	/**
 	 * Create the set of alerts from the alerts produced by the source and
 	 * destination analyses.
+	 * @throws Exception 
 	 */
-	protected abstract void synthesizeAlerts();
+	protected abstract void synthesizeAlerts() throws Exception;
 	
 	/**
 	 * Registers an alert to be reported to the user.

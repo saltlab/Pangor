@@ -48,6 +48,11 @@ public abstract class AnalysisRunner {
 	/**
 	 * Output the results of the analysis. The analysis should be finished when
 	 * this method is called.
+	 * @deprecated To preserve memory, analysis results should be written to
+	 * 			   disk (in the {@code dataSetPath} location) as they are 
+	 * 			   received from the analysis engine. More specifically, the
+	 * 			   {@code registerFeatureVector} method of the {@code DataSet}
+	 * 			   class should write the feature vector to disk.
 	 */
 	public abstract void printResults(String outFile, String supplementaryFolder);
 	

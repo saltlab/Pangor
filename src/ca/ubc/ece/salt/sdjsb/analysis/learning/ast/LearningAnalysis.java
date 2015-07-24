@@ -38,7 +38,7 @@ public class LearningAnalysis extends MetaAnalysis<LearningASTAnalysis, Learning
 	}
 
 	@Override
-	protected void synthesizeAlerts() {
+	protected void synthesizeAlerts() throws Exception {
 		
 		/* Source analysis. */
 		Map<Scope, FeatureVector> srcFeatureVectors = this.srcAnalysis.getFeatureVectors();
@@ -74,7 +74,7 @@ public class LearningAnalysis extends MetaAnalysis<LearningASTAnalysis, Learning
 			dstFeatureVector.repairedCommitID = ami.repairedCommitID;
 			
 			/* Add the feature vector to the FeatureVectorManager. */
-			this.featureVectorManager.registerFeatureVector(dstFeatureVector);
+			this.featureVectorManager.storeFeatureVector(dstFeatureVector);
 
 		}
 		

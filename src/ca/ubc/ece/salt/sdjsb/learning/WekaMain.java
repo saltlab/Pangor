@@ -4,6 +4,7 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 
 import weka.core.EuclideanDistance;
+import weka.core.Instance;
 import weka.core.Instances;
 import weka.core.ManhattanDistance;
 import weka.core.converters.ConverterUtils.DataSource;

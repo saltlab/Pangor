@@ -19,12 +19,13 @@ public class LearningAnalysisRunner extends AnalysisRunner {
 	
 	/** Stores the feature vectors that make up the data set. **/
 	LearningDataSet dataset;
-	
+
 	/**
 	 * @param packages The list of packages we want to learn repair patterns for.
+	 * @param dataSetPath The file path to store the data set.
 	 */
-	public LearningAnalysisRunner(List<KeywordFilter> filters) {
-		this.dataset = new LearningDataSet(filters);
+	public LearningAnalysisRunner(List<KeywordFilter> filters, String dataSetPath, String supplementaryPath) {
+		this.dataset = new LearningDataSet(filters, dataSetPath, supplementaryPath);
 	}
 
 	@Override
@@ -35,6 +36,13 @@ public class LearningAnalysisRunner extends AnalysisRunner {
 
 	}
 
+	/**
+	 * @deprecated To preserve memory, analysis results should be written to
+	 * 			   disk (in the {@code dataSetPath} location) as they are 
+	 * 			   received from the analysis engine. More specifically, the
+	 * 			   {@code registerFeatureVector} method of the {@code DataSet}
+	 * 			   class should write the feature vector to disk.
+	 */
 	@Override
 	public void printResults(String outFile, String supplementaryFolder) {
 		

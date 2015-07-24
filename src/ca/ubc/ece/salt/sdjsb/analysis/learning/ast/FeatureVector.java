@@ -88,6 +88,35 @@ public class FeatureVector {
 	}
 	
 	/**
+	 * This method serializes the feature vector. This is useful when writing
+	 * a data set to the disk.
+	 * @return The serialized version of the feature vector.
+	 */
+	public String serialize() {
+
+		String serialized = id + "," + this.projectID + "," + this.buggyFile + "," + this.repairedFile 
+				+ "," + this.buggyCommitID + "," + this.repairedCommitID + "," + this.functionName;
+		
+		for(KeywordUse keyword : this.keywordMap.keySet()) {
+			Integer uses = this.keywordMap.get(keyword);
+			serialized += "," + keyword.type + ":" + keyword.context + ":" + keyword.changeType + ":" + keyword.api.getName() + ":" + keyword.keyword + ":" + uses;
+		}
+		
+		return serialized;
+		
+	}
+	
+	/**
+	 * This method de-serializes a feature vector. This is useful when reading 
+	 * a data set from the disk.
+	 * @param serialized The serialized version of a feature vector.
+	 * @return The feature vector represented by {@code serialized}.
+	 */
+	public static FeatureVector deSerialize(String serialized) {
+		throw new UnsupportedOperationException();
+	}
+	
+	/**
 	 * Prints the meta features and the specified keyword values in the order they are provided.
 	 * @param keywords An ordered list of the keywords to print in the feature vector.
 	 * @return the CSV row (the feature vector) as a string.

@@ -21,6 +21,12 @@ public class LearningMain {
 
 	/** The directory where repositories are checked out. **/
 	public static final String CHECKOUT_DIR =  new String("repositories");
+	
+	/** The file where we will save the data set from our analysis. **/
+	public static final String DATA_SET_PATH = new String("./output/dataset.csv");
+	
+	/** The folder where we will store the supplementary files from our analysis. **/
+	public static final String SUPPLEMENTARY_PATH = new String("./output/supplementary/");
 
 	/**
 	 * Creates the learning data set for extracting repair patterns.
@@ -30,10 +36,10 @@ public class LearningMain {
 	public static void main(String[] args) throws Exception {
 		
 		KeywordFilter prototypeFilter = new KeywordFilter(FilterType.INCLUDE, 
-				KeywordType.RESERVED, KeywordContext.UNKNOWN, ChangeType.REMOVED, 
+				KeywordType.UNKNOWN, KeywordContext.UNKNOWN, ChangeType.REMOVED, 
 				"", "prototype");
 
-		LearningAnalysisRunner runner = new LearningAnalysisRunner(Arrays.asList(prototypeFilter));
+		LearningAnalysisRunner runner = new LearningAnalysisRunner(Arrays.asList(prototypeFilter), DATA_SET_PATH, SUPPLEMENTARY_PATH);
 		LearningOptions options = new LearningOptions();
 		CmdLineParser parser = new CmdLineParser(options);
 
