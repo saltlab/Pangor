@@ -23,7 +23,7 @@ public class LearningDataSetMain {
 		
 		KeywordFilter prototypeFilter = new KeywordFilter(FilterType.INCLUDE, 
 				KeywordType.UNKNOWN, KeywordContext.UNKNOWN, ChangeType.REMOVED, 
-				"", "prototype");
+				"", "");
 
 		LearningDataSetOptions options = new LearningDataSetOptions();
 		CmdLineParser parser = new CmdLineParser(options);

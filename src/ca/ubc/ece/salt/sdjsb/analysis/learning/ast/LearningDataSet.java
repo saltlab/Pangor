@@ -175,8 +175,13 @@ public class LearningDataSet {
 		/* Include this row in the output if it passes the filters. */
 		if(LearningDataSet.includeRow(featureVector.keywordMap.keySet(), filters)) {
 		
+			/* The path to the file may not exist. Create it if needed. */
+			File path = new File(this.dataSetPath);
+			path.getParentFile().mkdirs();
+			path.createNewFile();
+			
 			/* May throw IOException if the path does not exist. */
-			PrintStream stream = new PrintStream(new FileOutputStream(this.dataSetPath, true));
+			PrintStream stream = new PrintStream(new FileOutputStream(path, true));
 			
 			/* Write the data set. */
 			stream.println(featureVector.serialize());
