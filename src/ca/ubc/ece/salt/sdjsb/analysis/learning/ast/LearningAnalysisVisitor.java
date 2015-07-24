@@ -139,16 +139,10 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		 * ChangeType.MOVED is causing a lot of noise, specially because when a
 		 * function is inserted in a file, all functions "below" it are tagged
 		 * as MOVED, and all keywords within this function are also marked as
-		 * MOVED. For now, we ignore MOVED change types
+		 * MOVED. For now, we relabel MOVED change types as UNCHANGED.
 		 */
 		if (changeType == ChangeType.MOVED)
-			return;
-
-		/*
-		 * The same for UNCHANGED
-		 */
-		if (changeType == ChangeType.UNCHANGED)
-			return;
+			changeType = ChangeType.UNCHANGED;
 
 		/* Add a falsey keyword if we're checking if this node is truthy or
 		 * falsey.
