@@ -5,14 +5,14 @@ import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordTyp
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
 
 public class KeywordFilter {
-	
+
 	public FilterType filterType;
 	public KeywordType type;
 	public KeywordContext context;
 	public ChangeType changeType;
 	public String pack;
 	public String keyword;
-	
+
 	/**
 	 * The default filter includes all keywords.
 	 */
@@ -24,7 +24,7 @@ public class KeywordFilter {
 		this.pack = "";
 		this.keyword = "";
 	}
-	
+
 	/**
 	 * Create a new filter with all options.
 	 * @param filterType
@@ -34,19 +34,19 @@ public class KeywordFilter {
 	 * @param pack
 	 * @param keyword
 	 */
-	public KeywordFilter(FilterType filterType, KeywordType type, 
+	public KeywordFilter(FilterType filterType, KeywordType type,
 			KeywordContext context, ChangeType changeType, String pack,
 			String keyword) {
-		
+
 		this.filterType = filterType;
 		this.type = type;
 		this.context = context;
 		this.changeType = changeType;
 		this.pack = pack;
 		this.keyword = keyword;
-		
+
 	}
-	
+
 	/**
 	 * INCLUDE includes all rows that match the filter.
 	 * EXCLUDE excludes all rows that match the filter.
@@ -54,6 +54,17 @@ public class KeywordFilter {
 	public enum FilterType {
 		INCLUDE,
 		EXCLUDE
+	}
+
+	/**
+	 * Factory method for building a package filter
+	 *
+	 * @param packageName
+	 * @return a KeywordFilter
+	 */
+	public static KeywordFilter buildPackageFilter(String packageName) {
+		return new KeywordFilter(FilterType.INCLUDE, KeywordType.UNKNOWN, KeywordContext.UNKNOWN, ChangeType.UNKNOWN,
+				packageName, "");
 	}
 
 }

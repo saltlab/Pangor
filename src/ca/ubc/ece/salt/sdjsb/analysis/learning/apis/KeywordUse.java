@@ -42,19 +42,13 @@ public class KeywordUse extends KeywordDefinition {
 	 * @param keyword
 	 */
 	public KeywordUse(KeywordType type, String keyword) {
-		super(type, keyword);
-
-		this.context = KeywordContext.UNKNOWN;
-		this.changeType = ChangeType.UNKNOWN;
+		this(type, KeywordContext.UNKNOWN, keyword, ChangeType.UNKNOWN);
 	}
 
-	/**
-	 * Set the package artifact that this keyword points to.
-	 * 
-	 * @param pointsto The package this keyword points to.
-	 */
-	public void setAPI(AbstractAPI api) {
-		this.api = api;
+	public KeywordUse(KeywordType type, KeywordContext context, String keyword, ChangeType changeType,
+			AbstractAPI path) {
+		this(type, context, keyword, changeType);
+		setAPI(path);
 	}
 
 	@Override
