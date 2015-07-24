@@ -19,6 +19,28 @@ public class KeywordUse extends KeywordDefinition {
 
 	/** How this keyword was modified from the source to the destination file. **/
 	public ChangeType changeType;
+	
+	/** 
+	 * Stores the api as a string if the AbstractAPI object is not available
+	 * (i.e., after de-serialization).
+	 */
+	public String apiString;
+
+	/**
+	 * To be used when investigating a single function.
+	 * @param type
+	 * @param context
+	 * @param keyword
+	 * @param changeType
+	 */
+	public KeywordUse(KeywordType type, KeywordContext context, String keyword,
+			ChangeType changeType, String apiString) {
+		super(type, keyword);
+
+		this.context = context;
+		this.changeType = changeType;
+		this.apiString = apiString;
+	}
 
 	/**
 	 * To be used when investigating a single function.
@@ -33,6 +55,7 @@ public class KeywordUse extends KeywordDefinition {
 
 		this.context = context;
 		this.changeType = changeType;
+		this.apiString = "_unknownapi_";
 	}
 
 	/**
@@ -90,7 +113,7 @@ public class KeywordUse extends KeywordDefinition {
 				   this.changeType.toString() + "_" + this.api.getName() + "_" + this.keyword;
 		}
 		return this.type.toString() + "_" + this.context.toString() + "_" +
-			   this.changeType.toString() + "_unknownapi_" + this.keyword;
+			   this.changeType.toString() + "_" + this.apiString + "_" + this.keyword;
 
 	}
 
@@ -125,7 +148,7 @@ public class KeywordUse extends KeywordDefinition {
 	 *
 	 * @param keywordsMap list of keywords
 	 * @param changeTypes types of keywords that should stay
-	 * @return a new list
+	 * @return a new list with elements matching the filter.
 	 */
 	public static Map<KeywordUse, Integer> filterMapByChangeType(Map<KeywordUse, Integer> keywordsMap,
 			ChangeType... changeTypes) {

@@ -2,7 +2,7 @@ package ca.ubc.ece.salt.sdjsb.learning;
 
 import org.kohsuke.args4j.Option;
 
-public class LearningOptions {
+public class LearningAnalysisOptions {
 
 	@Option(name="-u", aliases={"--uri"}, usage="The uri of the public repository (e.g., https://github.com/qhanam/JSRepairClass.git).")
 	private String host = null;
@@ -16,8 +16,8 @@ public class LearningOptions {
 	@Option(name="-r", aliases={"--repositories"}, usage="The path to the file specifying the repositories to analyze.")
 	private String repoFile = null;
 	
-	@Option(name="-o", aliases={"--outfile"}, usage="The file path to output to.")
-	private String outFile = null;
+	@Option(name="-ds", aliases={"--dataset"}, usage="The data set file to read.")
+	private String dataSetPath = null;
 	
 	@Option(name="-s", aliases={"--supplement"}, usage="The folder path to place any supplementary files.")
 	private String supplement = null;
@@ -38,8 +38,8 @@ public class LearningOptions {
 		return this.repoFile;
 	}
 	
-	public String getOutfile() {
-		return this.outFile;
+	public String getDataSetPath() {
+		return this.dataSetPath;
 	}
 	
 	public String getSupplementaryFolder() {

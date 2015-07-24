@@ -5,11 +5,9 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.List;
 
 import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.FeatureVector;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.KeywordFilter;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningDataSet;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningAnalysis;
 import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
@@ -24,8 +22,8 @@ public class LearningAnalysisRunner extends AnalysisRunner {
 	 * @param packages The list of packages we want to learn repair patterns for.
 	 * @param dataSetPath The file path to store the data set.
 	 */
-	public LearningAnalysisRunner(List<KeywordFilter> filters, String dataSetPath, String supplementaryPath) {
-		this.dataset = new LearningDataSet(filters, dataSetPath, supplementaryPath);
+	public LearningAnalysisRunner(String dataSetPath, String supplementaryPath) {
+		this.dataset = new LearningDataSet(dataSetPath, supplementaryPath);
 	}
 
 	@Override

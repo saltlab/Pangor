@@ -6,7 +6,9 @@ import java.util.Set;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
 
 /**
  * Stores a feature vector (a row) of the repair pattern learning data set.
@@ -86,6 +88,16 @@ public class FeatureVector {
 		this.keywordMap.put(keyword,  count);
 		
 	}
+
+	/**
+	 * Add the keyword to the feature vector and set its count.
+	 * @param token The string to check against the keyword list.
+	 */
+	public void addKeyword(KeywordUse keyword, Integer count) {
+
+		this.keywordMap.put(keyword,  count);
+		
+	}
 	
 	/**
 	 * This method serializes the feature vector. This is useful when writing
@@ -112,8 +124,33 @@ public class FeatureVector {
 	 * @param serialized The serialized version of a feature vector.
 	 * @return The feature vector represented by {@code serialized}.
 	 */
-	public static FeatureVector deSerialize(String serialized) {
-		throw new UnsupportedOperationException();
+	public static FeatureVector deSerialize(String serialized) throws Exception {
+		
+		String[] features = serialized.split(",");
+
+		if(features.length < 7) throw new Exception("De-serialization exception. Serial format not recognized.");
+		
+		FeatureVector featureVector = new FeatureVector();
+		featureVector.id = Integer.parseInt(features[0]);
+		featureVector.projectID = features[1];
+		featureVector.buggyFile = features[2];
+		featureVector.repairedFile = features[3];
+		featureVector.buggyCommitID = features[4];
+		featureVector.repairedCommitID = features[5];
+		featureVector.functionName = features[6];
+		
+		for(int i = 7; i < features.length; i++) {
+			String[] feature = features[i].split(":");
+			if(feature.length < 6) throw new Exception("De-serialization exception. Serial format not recognized.");
+			KeywordUse keyword = new KeywordUse(KeywordType.valueOf(feature[0]), 
+												KeywordContext.valueOf(feature[1]),
+												feature[4], 
+												ChangeType.valueOf(feature[2]), feature[3]);
+			featureVector.addKeyword(keyword, Integer.parseInt(feature[5]));
+		}
+
+		return featureVector;
+		
 	}
 	
 	/**
@@ -123,12 +160,12 @@ public class FeatureVector {
 	 */
 	public String getFeatureVector(Set<KeywordDefinition> keywords) {
 
-		String vector = id + "\t" + this.projectID + "\t" + this.buggyFile + "\t" + this.repairedFile 
-				+ "\t" + this.buggyCommitID + "\t" + this.repairedCommitID + "\t" + this.functionName;
+		String vector = id + "," + this.projectID + "," + this.buggyFile + "," + this.repairedFile 
+				+ "," + this.buggyCommitID + "," + this.repairedCommitID + "," + this.functionName;
 		
 		for(KeywordDefinition keyword : keywords) {
-			if(this.keywordMap.containsKey(keyword)) vector += "\t" + this.keywordMap.get(keyword).toString();
-			else vector += "\t0";
+			if(this.keywordMap.containsKey(keyword)) vector += "," + this.keywordMap.get(keyword).toString();
+			else vector += ",0";
 		}
 		
 		return vector;

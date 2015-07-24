@@ -1,8 +1,11 @@
 package ca.ubc.ece.salt.sdjsb.analysis.learning.ast;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -62,41 +65,102 @@ public class LearningDataSet {
 	private List<FeatureVector> featureVectors;
 	
 	/**
+	 * Used to produce a Weka data set. Create a {@code LearningDataSet} from 
+	 * a file on disk. This {@code LearningDataSet} can pre-process the data 
+	 * set and create a data set file for Weka.
 	 * @param filters Filters out rows by requiring keywords to be present.
+	 * @throws Exception Throws an exception when the {@code dataSetPath} 
+	 * 					 cannot be read.
 	 */
-	public LearningDataSet(List<KeywordFilter> filters) {
+	public LearningDataSet(String dataSetPath, List<KeywordFilter> filters) throws Exception {
 		this.filters = filters;
 		this.keywords = new HashSet<KeywordDefinition>();
 		this.featureVectors = new LinkedList<FeatureVector>();
-		this.dataSetPath = null;
+		this.dataSetPath = dataSetPath;
 		this.supplementaryPath = null;
+		
+		/* Read the data set file and de-serialize the feature vectors. */
+		this.importDataSet(dataSetPath);
 	}
 
 	/**
-	 * @param filters Filters out rows by requiring keywords to be present.
+	 * Used for keyword analysis. Create a {@code LearningDataSet} to write 
+	 * the analysis results to disk.
 	 * @param dataSetPath The file path to store the data set.
+	 * @param supplementaryPath The folder path to store supplementary files.
 	 */
-	public LearningDataSet(List<KeywordFilter> filters, String dataSetPath, String supplementaryPath) {
-		this.filters = filters;
+	public LearningDataSet(String dataSetPath, String supplementaryPath) {
+		this.filters = null;
 		this.keywords = new HashSet<KeywordDefinition>();
 		this.featureVectors = new LinkedList<FeatureVector>();
 		this.dataSetPath = dataSetPath;
 		this.supplementaryPath = supplementaryPath;
 	}
+	
+	/**
+	 * Used for testing. Creates a {@code LearningDataSet} that will add 
+	 * features directly to the data set (instead of writing them to a file). 
+	 * @param filters Filters out rows by requiring keywords to be present.
+	 */
+	public LearningDataSet(List<KeywordFilter> filters) {
+
+		this.filters = filters;
+		this.keywords = new HashSet<KeywordDefinition>();
+		this.featureVectors = new LinkedList<FeatureVector>();
+		this.dataSetPath = null;
+		this.supplementaryPath = null;
+		
+	}
+	
+	/**
+	 * Import a data set from a file to this {@code LearningDataSet}.
+	 * @param dataSetPath The file path where the data set is stored.
+	 * @throws Exception Occurs when the data set file cannot be read.
+	 */
+	public void importDataSet(String dataSetPath) throws Exception {
+		
+		try(BufferedReader reader = new BufferedReader(new FileReader(dataSetPath))) {
+		
+			for (String serialFeatureVector = reader.readLine(); 
+					serialFeatureVector != null; 
+					serialFeatureVector = reader.readLine()) {
+				
+				FeatureVector featureVector = FeatureVector.deSerialize(serialFeatureVector);
+				
+				this.featureVectors.add(featureVector);
+				
+			}
+
+		}
+		catch(Exception e) {
+			throw e;
+		}
+		
+	}
 
 	/**
-	 * Adds a feature vector.
+	 * Adds a feature vector to the data set. If a data set file exists
+	 * ({@code dataSetPath}), serializes the feature vector and writes it to
+	 * the file. Otherwise, the feature vector is stored in memory in
+	 * {@code LearningDataSet}.
 	 * @param featureVector The feature vector to be managed by this class.
 	 */
-	public void registerFeatureVector(FeatureVector featureVector) {
-		this.featureVectors.add(featureVector);
+	public void registerFeatureVector(FeatureVector featureVector) throws Exception {
+		
+		if(this.dataSetPath != null) {
+			this.storeFeatureVector(featureVector);
+		}
+		else {
+			this.featureVectors.add(featureVector);
+		}
+
 	}
 	
 	/**
 	 * Stores the feature vector in the file specified by {@code dataSetPath}.
 	 * @param featureVector The feature vector to be managed by this class.
 	 */
-	public void storeFeatureVector(FeatureVector featureVector) throws Exception {
+	private void storeFeatureVector(FeatureVector featureVector) throws Exception {
 		
 		/* The KeywordFilter that will filter out unwanted feature vectors. */
 		KeywordFilter insertedFilter = new KeywordFilter(FilterType.INCLUDE, 
@@ -134,12 +198,12 @@ public class LearningDataSet {
 	 */
 	public String getFeatureVectorHeader() {
 
-		String header = String.join("\t", "ID", "ProjectID", "BuggyFile",
+		String header = String.join(",", "ID", "ProjectID", "BuggyFile",
 				"RepairedFile", "BuggyCommitID", "RepairedCommitID",
 				"FunctionName");
 
 		for(KeywordDefinition keyword : this.keywords) {
-			header += "\t" + keyword.toString();
+			header += "," + keyword.toString();
 		}
 
 		return header;
@@ -220,6 +284,40 @@ public class LearningDataSet {
 		for(FeatureVector featureVector : this.featureVectors) {
 			for(KeywordDefinition keyword : featureVector.keywordMap.keySet()) keywords.add(keyword);
 		}
+
+	}
+
+	/**
+	 * Print the data set to a file. The filtered data set will be in a CSV 
+	 * format that can be imported directly into Weka. 
+	 * @param outFile The file to write the filtered data set to.
+	 */
+	public void writeFilteredDataSet(String outFile) {
+
+		/* Open the file stream for writing if a file has been given. */
+		PrintStream stream = System.out;
+
+		if(outFile != null) {
+			try {
+				/*
+				 * The path to the output folder may not exist. Create it if
+				 * needed.
+				 */
+				File path = new File(outFile);
+				path.getParentFile().mkdirs();
+
+				stream = new PrintStream(new FileOutputStream(outFile));
+			}
+			catch (IOException e) {
+				System.err.println(e.getMessage());
+			}
+		}
+
+		/* Write the header for the feature vector. */
+		stream.println(this.getFeatureVectorHeader());
+
+		/* Write the data set. */
+		stream.println(this.getFeatureVector());
 
 	}
 	
