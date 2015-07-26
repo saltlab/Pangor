@@ -1,7 +1,6 @@
 https://github.com/Unitech/PM2.git
 https://github.com/bower/bower.git
 https://github.com/strongloop/express.git
-https://github.com/jansmolders86/mediacenterjs.git
 https://github.com/substack/node-browserify.git
 https://github.com/npm/npm.git
 https://github.com/karma-runner/karma.git

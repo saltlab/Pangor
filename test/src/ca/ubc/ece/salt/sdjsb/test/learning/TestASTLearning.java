@@ -26,7 +26,7 @@ public class TestASTLearning {
 
 	/** The file where we will save the data set from our analysis. **/
 	public static final String DATA_SET_PATH = new String("./output/dataset.csv");
-	
+
 	/** The folder where we will store the supplementary files from our analysis. **/
 	public static final String SUPPLEMENTARY_PATH = new String("./output/supplementary/");
 
@@ -119,6 +119,24 @@ public class TestASTLearning {
 		script.expectedKeywords.add(Pair.of(pkg, 1));
 
 		this.runTest(new String[] { src, dst }, Arrays.asList(function, script));
+	}
+
+	/*
+	 * Tests if predictor recognizes JS reserved words.
+	 */
+	@Test
+	public void testReservedWords() throws Exception {
+		String src = "./test/input/learning/keyword_old.js";
+		String dst = "./test/input/learning/keyword_new.js";
+
+		TopLevelAPI api = APIFactory.buildTopLevelAPI();
+
+		KeywordUse typeof = new KeywordUse(KeywordType.RESERVED, KeywordContext.CONDITION, "typeof", ChangeType.INSERTED, api);
+
+		MockFeatureVector script = new MockFeatureVector("~script~");
+		script.expectedKeywords.add(Pair.of(typeof, 1));
+
+		this.runTest(new String[] { src, dst }, Arrays.asList(script));
 	}
 
 	@Test
