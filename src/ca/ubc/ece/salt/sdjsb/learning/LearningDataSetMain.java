@@ -11,6 +11,8 @@ import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.KeywordFilter;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.KeywordFilter.FilterType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningDataSet;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningMetrics;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningMetrics.KeywordFrequency;
 
 public class LearningDataSetMain {
 
@@ -43,6 +45,14 @@ public class LearningDataSetMain {
 
 		/* Re-construct the data set. */
 		LearningDataSet dataSet = new LearningDataSet(options.getDataSetPath(), Arrays.asList(prototypeFilter));
+
+		/* Print the metrics from the data set. */
+		if(options.getPrintMetrics()) {
+			LearningMetrics metrics = dataSet.getMetrics();
+			for(KeywordFrequency frequency : metrics.changedKeywordFrequency) {
+				System.out.println(frequency.keyword + " : " + frequency.frequency);
+			}
+		}
 
 		/* Pre-process the file. */
 		dataSet.preProcess();
