@@ -2,34 +2,39 @@ package ca.ubc.ece.salt.sdjsb.test.learning;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.Assignment;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.Block;
 import org.mozilla.javascript.ast.CatchClause;
+import org.mozilla.javascript.ast.EmptyStatement;
 import org.mozilla.javascript.ast.ExpressionStatement;
 import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.FunctionNode;
+import org.mozilla.javascript.ast.IfStatement;
+import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NumberLiteral;
 import org.mozilla.javascript.ast.PropertyGet;
 import org.mozilla.javascript.ast.StringLiteral;
 import org.mozilla.javascript.ast.TryStatement;
+import org.mozilla.javascript.ast.UnaryExpression;
 import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.VariableInitializer;
 
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningUtilities;
 
-public class TestLearningUtilities {
+public class TestLearningUtilitiesContext {
 
-	public void runTest(AstNode token, KeywordType expected) {
-		KeywordType type = LearningUtilities.getTokenType(token);
-		Assert.assertEquals("getTokenType returned an incorrect value.", expected, type);
+	public void runTest(AstNode token, KeywordContext expected) {
+		KeywordContext context = LearningUtilities.getTokenContext(token);
+		Assert.assertEquals("getTokenContext returned an incorrect value.", expected, context);
 	}
 
 	@Test
-	public void testClassTokenType() {
+	public void testClassTokenContext() {
 
 		Name name = new Name(0, "Bear");
 		FunctionNode node = new FunctionNode(0, name);
@@ -37,12 +42,12 @@ public class TestLearningUtilities {
 		AstRoot root = new AstRoot();
 		root.addChild(node);
 
-		runTest(name, KeywordType.CLASS);
+		runTest(name, KeywordContext.CLASS_DECLARATION);
 
 	}
 
 	@Test
-	public void testMethodNameTokenType() {
+	public void testMethodNameTokenContext() {
 
 		Name name = new Name(0, "getName");
 		FunctionNode node = new FunctionNode(0, name);
@@ -50,12 +55,12 @@ public class TestLearningUtilities {
 		AstRoot root = new AstRoot();
 		root.addChild(node);
 
-		runTest(name, KeywordType.METHOD);
+		runTest(name, KeywordContext.METHOD_DECLARATION);
 
 	}
 
 	@Test
-	public void testKeywordTokenType() {
+	public void testKeywordTokenContext() {
 
 		Name right = new Name(0, "null");
 		Name left = new Name(0, "a");
@@ -65,12 +70,12 @@ public class TestLearningUtilities {
 		AstRoot root = new AstRoot();
 		root.addChild(assignment);
 
-		runTest(right, KeywordType.RESERVED);
+		runTest(right, KeywordContext.ASSIGNMENT_RHS);
 
 	}
 
 	@Test
-	public void testPackageTokenType() {
+	public void testPackageTokenContext() {
 
 		StringLiteral pack = new StringLiteral();
 		pack.setQuoteCharacter('"');
@@ -92,12 +97,56 @@ public class TestLearningUtilities {
 		AstRoot root = new AstRoot();
 		root.addChild(statement);
 
-		runTest(pack, KeywordType.PACKAGE);
+		runTest(pack, KeywordContext.REQUIRE);
 
 	}
 
 	@Test
-	public void testMethodCallTokenType() {
+	public void testTypeOfContext() {
+
+		Name target = new Name(0, "user");
+		UnaryExpression lhs = new UnaryExpression(Token.TYPEOF, 0, target);
+		Name rhs = new Name(0, "undefined");
+
+		InfixExpression condition = new InfixExpression(Token.SHEQ, lhs, rhs, 0);
+
+		IfStatement ifs = new IfStatement();
+		ifs.setCondition(condition);
+		ifs.setThenPart(new EmptyStatement());
+
+		AstRoot root = new AstRoot();
+		root.addChild(ifs);
+
+		System.out.println(root.toSource());
+
+		runTest(lhs, KeywordContext.CONDITION);
+
+	}
+
+	@Test
+	public void testContextOfInfixContext() {
+
+		Name target = new Name(0, "user");
+		UnaryExpression lhs = new UnaryExpression(Token.TYPEOF, 0, target);
+		Name rhs = new Name(0, "undefined");
+
+		InfixExpression condition = new InfixExpression(Token.SHEQ, lhs, rhs, 0);
+
+		IfStatement ifs = new IfStatement();
+		ifs.setCondition(condition);
+		ifs.setThenPart(new EmptyStatement());
+
+		AstRoot root = new AstRoot();
+		root.addChild(ifs);
+
+		System.out.println(root.toSource());
+
+		runTest(condition, KeywordContext.CONDITION);
+
+	}
+
+	@Test
+	public void testMethodCallTokenContext() {
 
 		StringLiteral file = new StringLiteral();
 		file.setQuoteCharacter('"');
@@ -114,12 +163,12 @@ public class TestLearningUtilities {
 		AstRoot root = new AstRoot();
 		root.addChild(statement);
 
-		runTest(target, KeywordType.METHOD);
+		runTest(target, KeywordContext.METHOD_CALL);
 
 	}
 
 	@Test
-	public void testFieldTokenType() {
+	public void testFieldTokenContext() {
 
 		Name target = new Name(0, "path");
 		Name field = new Name(0, "delimiter");
@@ -138,12 +187,12 @@ public class TestLearningUtilities {
 		AstRoot root = new AstRoot();
 		root.addChild(statement);
 
-		runTest(field, KeywordType.FIELD);
+		runTest(field, KeywordContext.ASSIGNMENT_RHS);
 
 	}
 
 	@Test
-	public void testConstantTokenType() {
+	public void testConstantTokenContext() {
 
 		Name target = new Name(0, "buffer");
 		Name field = new Name(0, "INSPECT_MAX_BYTES");
@@ -162,12 +211,12 @@ public class TestLearningUtilities {
 		AstRoot root = new AstRoot();
 		root.addChild(statement);
 
-		runTest(field, KeywordType.CONSTANT);
+		runTest(field, KeywordContext.ASSIGNMENT_RHS);
 
 	}
 
 	@Test
-	public void testArgumentTokenType() {
+	public void testArgumentTokenContext() {
 
 		StringLiteral file = new StringLiteral();
 		file.setQuoteCharacter('"');
@@ -184,12 +233,12 @@ public class TestLearningUtilities {
 		AstRoot root = new AstRoot();
 		root.addChild(statement);
 
-		runTest(file, KeywordType.UNKNOWN);
+		runTest(file, KeywordContext.ARGUMENT);
 
 	}
 
 	@Test
-	public void testParameterTokenType() {
+	public void testParameterTokenContext() {
 
 		StringLiteral file = new StringLiteral();
 		file.setQuoteCharacter('"');
@@ -209,14 +258,14 @@ public class TestLearningUtilities {
 		AstRoot root = new AstRoot();
 		root.addChild(function);
 
-		runTest(file, KeywordType.PARAMETER);
-		runTest(num, KeywordType.PARAMETER);
-		runTest(var, KeywordType.PARAMETER);
+		runTest(file, KeywordContext.PARAMETER_DECLARATION);
+		runTest(num, KeywordContext.PARAMETER_DECLARATION);
+		runTest(var, KeywordContext.PARAMETER_DECLARATION);
 
 	}
 
 	@Test
-	public void testExceptionTokenType() {
+	public void testExceptionTokenContext() {
 
 		Name exception = new Name(0, "err");
 
@@ -231,12 +280,12 @@ public class TestLearningUtilities {
 		AstRoot root = new AstRoot();
 		root.addChild(tryStatement);
 
-		runTest(exception, KeywordType.EXCEPTION);
+		runTest(exception, KeywordContext.EXCEPTION_CATCH);
 
 	}
 
 	@Test
-	public void testEventTokenType() {
+	public void testEventTokenContext() {
 
 		/* Register the event listener. */
 
@@ -312,9 +361,9 @@ public class TestLearningUtilities {
 		root.addChild(removeAllStatement);
 
 		System.out.println(root.toSource());
-		runTest(registerEvent, KeywordType.EVENT);
-		runTest(removeListenerEvent, KeywordType.EVENT);
-		runTest(removeAllListenerEvent, KeywordType.EVENT);
+		runTest(registerEvent, KeywordContext.EVENT_REGISTER);
+		runTest(removeListenerEvent, KeywordContext.EVENT_REMOVE);
+		runTest(removeAllListenerEvent, KeywordContext.EVENT_REMOVE);
 
 	}
 

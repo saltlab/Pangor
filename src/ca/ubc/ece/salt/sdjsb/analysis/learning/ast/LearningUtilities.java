@@ -18,6 +18,7 @@ import org.mozilla.javascript.ast.VariableInitializer;
 
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
+import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysisUtilities;
 
 /**
  * Provides AST utilities to help collect feature information (i.e., keyword
@@ -62,7 +63,7 @@ public class LearningUtilities {
 	/**
 	 * @return True if the token is a JavaScript reserved word.
 	 */
-	private static boolean isJavaScriptReserved(AstNode token) {
+	private static boolean isJavaScriptReservedLiteral(AstNode token) {
 
 		List<String> JAVASCRIPT_RESERVED_WORDS = Arrays.asList( "abstract",
 				"arguments", "boolean", "break", "byte", "case", "catch",
@@ -188,8 +189,19 @@ public class LearningUtilities {
 
 		if(parent == null || token == null) return KeywordContext.UNKNOWN;
 
+		/* Special case: infix expression that compares a falsey keyword? */
+		if(token instanceof InfixExpression) {
+			InfixExpression ie = (InfixExpression) token;
+			if(ie.getType() == Token.SHEQ || ie.getType() == Token.SHNE) {
+				if(SpecialTypeAnalysisUtilities.getSpecialType(ie.getLeft()) != null ||
+				   SpecialTypeAnalysisUtilities.getSpecialType(ie.getRight()) != null) {
+					/* Then we consider it a 'typeof' keyword. */
+					return KeywordContext.CONDITION;
+				}
+			}
+		}
 		/* Check for class, method and parameter declarations. */
-		if (parent instanceof FunctionNode) {
+		else if (parent instanceof FunctionNode) {
 
 			FunctionNode function = (FunctionNode) parent;
 
@@ -335,6 +347,10 @@ public class LearningUtilities {
 			}
 
 		}
+		else if(vfr.getParent() instanceof VariableInitializer) {
+			VariableInitializer initializer = (VariableInitializer) vfr.getParent();
+			if(initializer.getInitializer() == vfr) return KeywordContext.ASSIGNMENT_RHS;
+		}
 		else if(vfr.getParent() instanceof Assignment ||
 				vfr.getParent() instanceof ObjectProperty) {
 			InfixExpression assignment = (InfixExpression) vfr.getParent();
@@ -349,6 +365,45 @@ public class LearningUtilities {
 
 		return KeywordContext.UNKNOWN;
 
+	}
+
+	/**
+	 * Gets the type of artifact the keyword refers to.
+	 * @param token The AST node that may be a keyword.
+	 * @return The artifact type.
+	 */
+	public static boolean isJavaScriptReserved(AstNode token) {
+
+		/* If the token is a reserved word, we can already infer it's type. */
+		if(isJavaScriptReservedLiteral(token)) return true;
+
+		/* UnaryExpression or KeywordLiteral? */
+		switch(token.getType()) {
+		case Token.TYPEOF:
+		case Token.DELPROP:
+		case Token.DEL_REF:
+		case Token.INC:
+		case Token.DEC:
+		case Token.NULL:
+		case Token.THIS:
+		case Token.TRUE:
+		case Token.FALSE:
+			return true;
+		}
+
+		/* Infix expression that compares a falsey keyword? */
+		if(token instanceof InfixExpression) {
+			InfixExpression ie = (InfixExpression) token;
+			if(ie.getType() == Token.SHEQ || ie.getType() == Token.SHNE) {
+				if(SpecialTypeAnalysisUtilities.getSpecialType(ie.getLeft()) != null ||
+				   SpecialTypeAnalysisUtilities.getSpecialType(ie.getRight()) != null) {
+					/* Then we consider it a 'typeof' keyword. */
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 
 	/**

@@ -19,8 +19,8 @@ public class KeywordUse extends KeywordDefinition {
 
 	/** How this keyword was modified from the source to the destination file. **/
 	public ChangeType changeType;
-	
-	/** 
+
+	/**
 	 * Stores the api as a string if the AbstractAPI object is not available
 	 * (i.e., after de-serialization).
 	 */
@@ -134,7 +134,6 @@ public class KeywordUse extends KeywordDefinition {
 		VARIABLE_DECLARATION,
 		METHOD_CALL,
 		ARGUMENT,
-		PARAMETER,
 		EXCEPTION_CATCH,
 		EVENT_REGISTER,
 		EVENT_REMOVE
