@@ -145,6 +145,11 @@ public class TestLearningUtilitiesType {
 
 	}
 
+	/*
+	 * existsSync("/etc/init.d/httpd")
+	 *
+	 * expected: existsSync = METHOD
+	 */
 	@Test
 	public void testMethodCallTokenType() {
 
@@ -165,6 +170,92 @@ public class TestLearningUtilitiesType {
 
 		runTest(target, KeywordType.METHOD);
 
+	}
+
+	/*
+	 * fs.existsSync("/etc/init.d/httpd")
+	 *
+	 * expected: fs = VARIABLE
+	 * expected: existsSync = METHOD
+	 */
+	@Test
+	public void testMethodCallFromObjectTokenType() {
+		StringLiteral argument = new StringLiteral();
+		argument.setQuoteCharacter('"');
+		argument.setValue("/etc/init.d/httpd");
+
+		Name object = new Name(0, "fs");
+		Name method = new Name(0, "existsSync");
+
+		/*
+		 * fs.existsSync
+		 */
+		PropertyGet propertyGet = new PropertyGet();
+		propertyGet.setTarget(object);
+		propertyGet.setProperty(method);
+
+		/*
+		 * fs.existsSync("/etc/init.d/httpd");
+		 */
+		FunctionCall call = new FunctionCall();
+		call.setTarget(propertyGet);
+		call.addArgument(argument);
+
+		ExpressionStatement statement = new ExpressionStatement(call);
+
+		AstRoot root = new AstRoot();
+		root.addChild(statement);
+
+		runTest(object, KeywordType.VARIABLE);
+		runTest(method, KeywordType.METHOD);
+	}
+
+	/*
+	 * forever.config.set("foo")
+	 *
+	 * expected: forever = VARIABLE
+	 * expected: config = FIELD
+	 * expected: set = METHOD
+	 */
+	@Test
+	public void testMethodCallFromFieldFromObjectTokenType() {
+		StringLiteral argument = new StringLiteral();
+		argument.setQuoteCharacter('"');
+		argument.setValue("foo");
+
+		Name object = new Name(0, "forever");
+		Name field = new Name(0, "config");
+		Name method = new Name(0, "set");
+
+		/*
+		 * forever.config
+		 */
+		PropertyGet innerPropertyGet = new PropertyGet();
+		innerPropertyGet.setTarget(object);
+		innerPropertyGet.setProperty(field);
+
+		/*
+		 * forever.config.set
+		 */
+		PropertyGet outterPropertyGet = new PropertyGet();
+		outterPropertyGet.setTarget(innerPropertyGet);
+		outterPropertyGet.setProperty(method);
+
+		/*
+		 * forever.config.set("foo")
+		 */
+		FunctionCall call = new FunctionCall();
+		call.setTarget(outterPropertyGet);
+		call.addArgument(argument);
+
+		ExpressionStatement statement = new ExpressionStatement(call);
+
+		AstRoot root = new AstRoot();
+		root.addChild(statement);
+
+		runTest(object, KeywordType.VARIABLE);
+		runTest(field, KeywordType.FIELD);
+		runTest(method, KeywordType.METHOD);
 	}
 
 	@Test

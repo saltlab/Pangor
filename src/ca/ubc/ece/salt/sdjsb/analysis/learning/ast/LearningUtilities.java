@@ -119,7 +119,12 @@ public class LearningUtilities {
 			if(initializer.getTarget() == token) return KeywordType.VARIABLE;
 
 		}
-		/* Check for function call related keywords. */
+
+		/*
+		 * Check for direct function call related keywords, like
+		 *   require("package");
+		 *   method("foo");
+		 */
 		else if(parent instanceof FunctionCall) {
 
 			FunctionCall call = (FunctionCall) parent;
@@ -128,14 +133,24 @@ public class LearningUtilities {
 			if(call.getTarget() instanceof Name) {
 
 				Name target = (Name)call.getTarget();
+
 				if(target.getIdentifier().equals("require") && call.getArguments().size() == 1) {
 					AstNode pack = call.getArguments().get(0);
 					if(pack instanceof StringLiteral && pack == token) {
 						return KeywordType.PACKAGE;
 					}
+				} else if (target == token) {
+					/*
+					 * If is not require("package"), but this is exactly the
+					 * target from the function call, it is a method
+					 *
+					 * Ex: method("foo");
+					 */
+					return KeywordType.METHOD;
 				}
 
 			}
+
 			/* Check for events. */
 			else if(call.getTarget() instanceof PropertyGet) {
 
@@ -163,6 +178,31 @@ public class LearningUtilities {
 			}
 
 		}
+		/*
+		 * Check for object property function calls, like
+		 *   variable.method();
+		 *
+		 * If parent is PropertyGet and parent of parent is FunctionCall, this is
+		 * either the variable, or the method, so we check for each one of these
+		 * cases
+		 *
+		 * Special cases of variable.field.method() and variable.field.field.method()
+		 * are handled in getVariableOrFieldType()
+		 */
+		else if (parent instanceof PropertyGet
+				&& parent.getParent() instanceof FunctionCall) {
+
+			PropertyGet propertyGet = (PropertyGet) token.getParent();
+
+			if (propertyGet.getTarget() == token)
+				return KeywordType.VARIABLE;
+			else if (propertyGet.getProperty() == token)
+				return KeywordType.METHOD;
+		}
+
+		/*
+		 * Catch clauses
+		 */
 		else if(parent instanceof CatchClause) {
 
 			CatchClause catchClause = (CatchClause) parent;
@@ -172,7 +212,10 @@ public class LearningUtilities {
 
 		}
 
-		if(token instanceof Name) {
+		/*
+		 * Check for variable or field
+		 */
+		else if(token instanceof Name) {
 			return getVariableOrFieldType(token, (Name)token);
 		}
 
@@ -297,12 +340,23 @@ public class LearningUtilities {
 			return getVariableOrFieldType(vf.getParent(), node);
 		}
 
-		/* We can now determine if the variable is a field or method. */
+		/*
+		 * Handles variable.field.field.method()
+		 * 
+		 * If we went up the tree, we are a direct child of a property get and
+		 * we found a function in our way up
+		 */
+		if (vf != node 
+				&& node.getParent() instanceof PropertyGet 
+				&& vf.getParent() instanceof FunctionCall) {
+			PropertyGet property = (PropertyGet) node.getParent();
 
-		if(vf.getParent() instanceof FunctionCall) {
-			FunctionCall call = (FunctionCall) vf.getParent();
-			if(call.getTarget() == vf) {
-				return KeywordType.METHOD;
+			/*
+			 * And we are the target of our parent property get, this must be a
+			 * variable
+			 */
+			if (property.getTarget() == node) {
+				return KeywordType.VARIABLE;
 			}
 		}
 

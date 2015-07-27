@@ -38,6 +38,15 @@ public class TestAPI {
 	}
 
 	@Test
+	public void testGetPackageNameWhenIsReservedKeyword() {
+		AbstractAPI api = APIFactory.buildTopLevelAPI();
+
+		KeywordDefinition keyword = api.getFirstKeyword(KeywordType.RESERVED, "typeof");
+		assertEquals("global", keyword.api.getName());
+		assertEquals("global", keyword.getPackageName());
+	}
+
+	@Test
 	public void testGetPackageNameWhenIsAClassOfAPackage() {
 		AbstractAPI api = APIFactory.buildTopLevelAPI();
 
