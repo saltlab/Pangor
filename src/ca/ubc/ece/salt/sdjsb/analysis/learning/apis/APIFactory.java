@@ -4,62 +4,62 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * Builds the APIs. Right now APIs are hard coded into this class. In the 
- * future we may want to automatically extract APIs from source code or 
+ * Builds the APIs. Right now APIs are hard coded into this class. In the
+ * future we may want to automatically extract APIs from source code or
  * documentation.
  */
 public class APIFactory {
-	
+
 	/**
 	 * Builds the abstract representation of the JavaScript keywords and API.
 	 * Also builds the abstract API representations of all the Node.js
 	 * packages we want to include.
-	 * 
+	 *
 	 * Note: The APIs are currently hard coded. This is tedious, so if we want
 	 * to include all the Node.js APIs, we should automate the building of
 	 * abstract APIs.
-	 * 
+	 *
 	 * @return The root of the abstract API tree.
 	 */
 	public static TopLevelAPI buildTopLevelAPI() {
-		
-		List<String> keywords = Arrays.asList("arguments", "boolean", "byte", 
-			"char", "class", "debugger", "default", "delete", "double", "enum", 
-			"export", "false", "float", "instanceof", "int", "long", "native", 
-			"null", "short", "super", "this", "transient", "true", "typeof", 
+
+		List<String> keywords = Arrays.asList("arguments", "boolean", "byte",
+			"char", "class", "debugger", "default", "delete", "double", "enum",
+			"export", "false", "float", "instanceof", "int", "long", "native",
+			"null", "short", "super", "this", "transient", "true", "typeof",
 			"volatile");
 
 		List<PackageAPI> packages = buildTopLevelPackages();
-		
+
 		/* Methods of the Global class. */
-		List<String> methods = Arrays.asList("eval", "hasOwnProperty", "isFinite", 
-				"isNaN", "isPrototypeOf", "toString", "valueOf", "decodeURI", 
-				"decodeURIComponent", "encodeURI", "encodeURIComponent", "Number", 
+		List<String> methods = Arrays.asList("eval", "hasOwnProperty", "isFinite",
+				"isNaN", "isPrototypeOf", "toString", "valueOf", "decodeURI",
+				"decodeURIComponent", "encodeURI", "encodeURIComponent", "Number",
 				"parseFloat", "parseInt", "String", "unescape");
-		
+
 		/* Fields of the Global class. */
-		List<String> fields = Arrays.asList("length", "name", "prototype", 
+		List<String> fields = Arrays.asList("length", "name", "prototype",
 				"constructor", "Infinity", "NaN", "undefined");
-		
+
 		List<String> constants = Arrays.asList();
-		
+
 		List<String> events = Arrays.asList();
-		
+
 		List<ClassAPI> classes = buildTopLevelClasses();
-		
+
 		return new TopLevelAPI(keywords, packages, methods, fields, constants, events, classes);
 
 	}
-	
+
 	public static List<PackageAPI> buildTopLevelPackages() {
-		
+
 		PackageAPI fileSystem = buildFileSystemPackage();
 		PackageAPI path = buildPathPackage();
-		
-		return Arrays.asList(fileSystem, path);
+
+		return Arrays.asList(/* fileSystem, path */);
 
 	}
-	
+
 	public static List<ClassAPI> buildTopLevelClasses() {
 
 //		ClassAPI template = new ClassAPI("template", /* Class Name */
@@ -68,11 +68,11 @@ public class APIFactory {
 //				Arrays.asList(), /* Constants */
 //				Arrays.asList(), /* Events */
 //				Arrays.asList()); /* Classes */
-		
+
 		ClassAPI array = new ClassAPI("Array", /* Class Name */
 				Arrays.asList("concat", "indexOf", "join", "lastIndexOf",
-						"pop", "push", "reverse", "shift", "splice", "sort", 
-						"unshift", "forEach", "every", "some", "filter", 
+						"pop", "push", "reverse", "shift", "splice", "sort",
+						"unshift", "forEach", "every", "some", "filter",
 						"map", "reduce", "reduceRight"), /* Methods */
 				Arrays.asList(), /* Fields */
 				Arrays.asList(), /* Constants */
@@ -87,16 +87,16 @@ public class APIFactory {
 						"getUTCMinutes", "getUTCMonth", "getUTCSeconds", "getYear",
 						"parse", "setDate", "setFullYear", "setHours", "setMilliseconds",
 						"setMinutes", "setMonth", "setSeconds", "setTime", "setUTCDate",
-						"setUTCFullYear", "setUTCHours", "setUTCMilliseconds", 
+						"setUTCFullYear", "setUTCHours", "setUTCMilliseconds",
 						"setUTCMinutes", "setUTCMonth", "setUTCSeconds", "setYear",
-						"toDateString", "toGMTString", "toISOString", "toJSON", 
+						"toDateString", "toGMTString", "toISOString", "toJSON",
 						"toLocaleDateString", "toLocaleTimeString", "toLocaleString",
 						"toTimeString", "toUTCString", "UTC"), /* Methods */
 				Arrays.asList(), /* Fields */
 				Arrays.asList(), /* Constants */
 				Arrays.asList(), /* Events */
 				Arrays.asList()); /* Classes */
-		
+
 		ClassAPI math = new ClassAPI("Math", /* Class Name */
 				Arrays.asList("abs", "acos", "asin", "atan", "atan2", "ceil",
 						"cos", "exp", "floor", "log", "max", "min", "pow",
@@ -135,7 +135,7 @@ public class APIFactory {
 						"parseFloat", "parseInt", "toExponential", "toFixed",
 						"toPrecision"), /* Methods */
 				Arrays.asList("NaN"), /* Fields */
-				Arrays.asList("MAX_VALUE", "MIN_VALUE", "NEGATIVE_INFINITY", 
+				Arrays.asList("MAX_VALUE", "MIN_VALUE", "NEGATIVE_INFINITY",
 						"POSITIVE_INFINITY"), /* Constants */
 				Arrays.asList(), /* Events */
 				Arrays.asList()); /* Classes */
@@ -144,13 +144,13 @@ public class APIFactory {
 				Arrays.asList("fromCharCode", "charAt", "charCodeAt", "concat",
 						"localeCompare", "match", "replace", "search", "slice",
 						"split", "substr", "substring", "toLocaleLowerCase",
-						"toLocaleUpperCase", "toLowerCase", "toUpperCase", 
+						"toLocaleUpperCase", "toLowerCase", "toUpperCase",
 						"trim"), /* Methods */
 				Arrays.asList(), /* Fields */
 				Arrays.asList(), /* Constants */
 				Arrays.asList(), /* Events */
 				Arrays.asList()); /* Classes */
-		
+
 		ClassAPI regexp = new ClassAPI("RegExp", /* Class Name */
 				Arrays.asList("compile", "exec", "test"), /* Methods */
 				Arrays.asList("lastIndex", "global", "ignoreCase", "multiline",
@@ -158,17 +158,17 @@ public class APIFactory {
 				Arrays.asList(), /* Constants */
 				Arrays.asList(), /* Events */
 				Arrays.asList()); /* Classes */
-		
-		/* TODO: There are a lot of other classes that we don't have here. I.e., 
+
+		/* TODO: There are a lot of other classes that we don't have here. I.e.,
 		 * 		 Intl, ArrayBuffer, DataView, JSON, [U]?Int[#]Array, etc. It would
-		 * 		 be good to load all these, but we should automate importing the 
+		 * 		 be good to load all these, but we should automate importing the
 		 * 		APIs first.
 		 */
-		
+
 		return Arrays.asList(error, array, date, math, number, string, regexp, object);
 
 	}
-	
+
 //	public static PackageAPI buildTemplatePackage() {
 //
 //		PackageAPI template = new PackageAPI("template", /* Package Name */
@@ -177,26 +177,26 @@ public class APIFactory {
 //				Arrays.asList(), /* Constants */
 //				Arrays.asList(), /* Events */
 //				Arrays.asList()); /* Classes */
-//		
+//
 //	}
 
 	public static PackageAPI buildPathPackage() {
 
 		PackageAPI path = new PackageAPI("path", /* Package Name */
-				Arrays.asList("normalize", "join", "resolve", "isAbsolute", 
+				Arrays.asList("normalize", "join", "resolve", "isAbsolute",
 						"relative", "dirname", "basename", "extname", "parse",
 						"format"), /* Methods */
 				Arrays.asList("sep", "delimiter", "posix", "win32"), /* Fields */
 				Arrays.asList(), /* Constants */
 				Arrays.asList(), /* Events */
 				Arrays.asList()); /* Classes */
-		
+
 		return path;
-		
+
 	}
 
 	public static  PackageAPI buildFileSystemPackage() {
-		
+
 		ClassAPI stats = new ClassAPI("Stats", /* Class Name */
 				Arrays.asList("isFile", "isDirectory", "isBlockDevice",
 						"isCharacterDevice", "isSymbolicLink", "isFIFO",
@@ -212,14 +212,14 @@ public class APIFactory {
 				Arrays.asList(), /* Constants */
 				Arrays.asList("open"), /* Events */
 				Arrays.asList()); /* Classes */
-		
+
 		ClassAPI readStream = new ClassAPI("ReadStream", /* Class Name */
 				Arrays.asList(), /* Methods */
 				Arrays.asList(), /* Fields */
 				Arrays.asList(), /* Constants */
 				Arrays.asList("open"), /* Events */
 				Arrays.asList()); /* Classes */
-		
+
 		ClassAPI fsWatcher = new ClassAPI("FSWatcher",
 				Arrays.asList("close"), /* Methods */
 				Arrays.asList(), /* Fields */
@@ -228,19 +228,19 @@ public class APIFactory {
 				Arrays.asList()); /* Classes */
 
 		return new PackageAPI("fs", /* Package Name */
-				Arrays.asList("rename", "renameSync", "ftruncate", "ftruncateSync", 
-						"truncate", "truncateSync", "chown", "chownSync", "lchown", 
-						"lchownSync", "chmod", "chmodSync", "fchmod", "fchmodSync", 
-						"lchmod", "lchmodSync", "stat", "lstat", "fstat", "statSync", 
-						"lstatSync", "fstatSync", "link", "linkSync", "symlink", 
-						"symlinkSync", "readlink", "readlinkSync", "realpath", 
-						"realpathSync", "unlink", "unlinkSync", "rmdir", "rmdirSync", 
-						"mkdir", "mkdirSync", "readdir", "readdirSync", "close", 
-						"closeSync", "open", "openSync", "utimes", "utimesSync", 
-						"futimes", "futimesSync", "fsync", "fsyncSync", "write", 
-						"writeSync", "read", "readSync", "readFile", "readFileSync", 
-						"writeFile", "writeFileSync", "appendFile", "appendFileSync", 
-						"watchFile", "unwatchFile", "watch", "exists", "existsSync", 
+				Arrays.asList("rename", "renameSync", "ftruncate", "ftruncateSync",
+						"truncate", "truncateSync", "chown", "chownSync", "lchown",
+						"lchownSync", "chmod", "chmodSync", "fchmod", "fchmodSync",
+						"lchmod", "lchmodSync", "stat", "lstat", "fstat", "statSync",
+						"lstatSync", "fstatSync", "link", "linkSync", "symlink",
+						"symlinkSync", "readlink", "readlinkSync", "realpath",
+						"realpathSync", "unlink", "unlinkSync", "rmdir", "rmdirSync",
+						"mkdir", "mkdirSync", "readdir", "readdirSync", "close",
+						"closeSync", "open", "openSync", "utimes", "utimesSync",
+						"futimes", "futimesSync", "fsync", "fsyncSync", "write",
+						"writeSync", "read", "readSync", "readFile", "readFileSync",
+						"writeFile", "writeFileSync", "appendFile", "appendFileSync",
+						"watchFile", "unwatchFile", "watch", "exists", "existsSync",
 						"access", "accessSync", "createReadStream", "createWriteStream"), /* Methods */
 				Arrays.asList(), /* Fields */
 				Arrays.asList(), /* Constants */
@@ -248,5 +248,5 @@ public class APIFactory {
 				Arrays.asList(stats, writeStream, readStream, fsWatcher)); /* Classes */
 
 	}
-	
+
 }

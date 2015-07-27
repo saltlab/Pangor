@@ -1,0 +1,11 @@
+https://github.com/jansmolders86/mediacenterjs.git
+https://github.com/millermedeiros/Hasher.git
+https://github.com/marcusvy/the-old-man
+https://github.com/kevva/parse-import.git
+https://github.com/jonschlinkert/parse-gitignore.git
+https://github.com/benmonro/android.git
+https://github.com/joncasey/my-server.git
+https://github.com/weixiyen/messenger.js.git
+https://github.com/dylang/logging.git
+https://github.com/Planeshifter/text-miner.git
+https://github.com/vesln/package.git

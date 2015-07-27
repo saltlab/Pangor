@@ -1,5 +1,6 @@
 package ca.ubc.ece.salt.sdjsb.analysis.learning.ast;
 
+import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.FunctionNode;
@@ -9,12 +10,14 @@ import org.mozilla.javascript.ast.NodeVisitor;
 import org.mozilla.javascript.ast.NumberLiteral;
 import org.mozilla.javascript.ast.ScriptNode;
 import org.mozilla.javascript.ast.StringLiteral;
+import org.mozilla.javascript.ast.UnaryExpression;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.sdjsb.analysis.prediction.PointsToPrediction;
+import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysisUtilities;
 
 /**
  * Inspects scripts and functions for API keywords.
@@ -144,23 +147,25 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		if (changeType == ChangeType.MOVED)
 			changeType = ChangeType.UNCHANGED;
 
-		/* Add a falsey keyword if we're checking if this node is truthy or
+		/* Add a typeof keyword if we're checking if this node is truthy or
 		 * falsey.
 		 *
-		 * TODO: PointsToPrediction throws a runtime exception when we register this. Need to fix. */
-//		if(SpecialTypeAnalysisUtilities.isFalsey(node)) {
-//
-//			KeywordUse keyword = null;
-//			if(this.packageModel != null) {
-//				keyword = this.packageModel.getKeyword(type, context, "~falsey~", changeType);
-//			}
-//			else {
-//				keyword = new KeywordUse(type, context, "~falsey", changeType);
-//			}
-//
-//			if(keyword != null) this.featureVector.addKeyword(keyword);
-//
-//		}
+		 * TODO: PointsToPrediction throws a runtime exception when we register
+		 * 		 the "~falsey~" keyword. Need to fix. */
+		if(SpecialTypeAnalysisUtilities.isFalsey(node)) {
+
+			KeywordUse keyword = null;
+			if(this.packageModel != null) {
+				keyword = this.packageModel.getKeyword(type, context, "typeof", changeType);
+			}
+			else {
+				keyword = new KeywordUse(type, context, "typeof", changeType);
+				keyword.apiString = "global";
+			}
+
+			if(keyword != null) this.featureVector.addKeyword(keyword);
+
+		}
 
 		/* Get the relevant keyword from the node. */
 		if(node instanceof Name) {
@@ -191,6 +196,14 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 				token = sl.getValue();
 			}
 		}
+		else if(node instanceof UnaryExpression) {
+			UnaryExpression ue = (UnaryExpression) node;
+			switch (ue.getOperator()) {
+			case Token.TYPEOF:
+				token = "typeof";
+				break;
+			}
+		}
 
 		/* Insert the token into the feature vector if it is a keyword. */
 		KeywordUse keyword = null;
@@ -202,7 +215,23 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 			keyword = new KeywordUse(type, context, token, changeType);
 		}
 
-		if(keyword != null) this.featureVector.addKeyword(keyword);
+		if(keyword != null) {
+
+			this.featureVector.addKeyword(keyword);
+
+			/* Is the keyword a 'falsey' keyword? Are we using it in a comparison?
+			 * Register a 'typeof' keyword if this is the case. */
+			if(keyword.keyword.equals("undefined") || keyword.keyword.equals("null")) {
+				if(node.getParent().getType() == Token.SHEQ || node.getParent().getType() == Token.SHNE) {
+					KeywordUse typeof = new KeywordUse(KeywordType.RESERVED,
+							KeywordContext.CONDITION, "typeof",
+							node.getParent().getChangeType());
+					typeof.apiString = "global";
+					this.featureVector.addKeyword(typeof);
+				}
+			}
+
+		}
 
 	}
 
