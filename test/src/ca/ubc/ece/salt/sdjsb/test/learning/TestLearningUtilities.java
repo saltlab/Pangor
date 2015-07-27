@@ -22,27 +22,27 @@ import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordTyp
 import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningUtilities;
 
 public class TestLearningUtilities {
-	
+
 	public void runTest(AstNode token, KeywordType expected) {
-		KeywordType context = LearningUtilities.getTokenType(token);
-		Assert.assertEquals("getTokenContext returned an incorrect value.", expected, context);
+		KeywordType type = LearningUtilities.getTokenType(token);
+		Assert.assertEquals("getTokenType returned an incorrect value.", expected, type);
 	}
 
 	@Test
-	public void testClassTokenContext() {
+	public void testClassTokenType() {
 
 		Name name = new Name(0, "Bear");
 		FunctionNode node = new FunctionNode(0, name);
 
 		AstRoot root = new AstRoot();
 		root.addChild(node);
-		
+
 		runTest(name, KeywordType.CLASS);
-		
+
 	}
-	
+
 	@Test
-	public void testMethodNameTokenContext() {
+	public void testMethodNameTokenType() {
 
 		Name name = new Name(0, "getName");
 		FunctionNode node = new FunctionNode(0, name);
@@ -51,12 +51,12 @@ public class TestLearningUtilities {
 		root.addChild(node);
 
 		runTest(name, KeywordType.METHOD);
-		
+
 	}
 
 	@Test
-	public void testKeywordTokenContext() {
-		
+	public void testKeywordTokenType() {
+
 		Name right = new Name(0, "null");
 		Name left = new Name(0, "a");
 
@@ -64,14 +64,14 @@ public class TestLearningUtilities {
 
 		AstRoot root = new AstRoot();
 		root.addChild(assignment);
-		
+
 		runTest(right, KeywordType.RESERVED);
-		
+
 	}
 
 	@Test
-	public void testPackageTokenContext() {
-		
+	public void testPackageTokenType() {
+
 		StringLiteral pack = new StringLiteral();
 		pack.setQuoteCharacter('"');
 		pack.setValue("fs");
@@ -79,171 +79,171 @@ public class TestLearningUtilities {
 		FunctionCall call = new FunctionCall();
 		call.setTarget(new Name(0, "require"));
 		call.addArgument(pack);
-		
+
 		VariableInitializer initializer = new VariableInitializer();
 		initializer.setTarget(new Name(0, "fs"));
 		initializer.setInitializer(call);
-		
+
 		VariableDeclaration declaration = new VariableDeclaration();
 		declaration.addVariable(initializer);
-		
+
 		ExpressionStatement statement = new ExpressionStatement(declaration);
 
 		AstRoot root = new AstRoot();
 		root.addChild(statement);
-		
+
 		runTest(pack, KeywordType.PACKAGE);
-		
+
 	}
 
 	@Test
-	public void testMethodCallTokenContext() {
-		
+	public void testMethodCallTokenType() {
+
 		StringLiteral file = new StringLiteral();
 		file.setQuoteCharacter('"');
 		file.setValue("/etc/init.d/httpd");
-		
+
 		Name target = new Name(0, "existsSync");
 
 		FunctionCall call = new FunctionCall();
 		call.setTarget(target);
 		call.addArgument(file);
-		
+
 		ExpressionStatement statement = new ExpressionStatement(call);
 
 		AstRoot root = new AstRoot();
 		root.addChild(statement);
-		
+
 		runTest(target, KeywordType.METHOD);
-		
+
 	}
 
 	@Test
-	public void testFieldTokenContext() {
-		
+	public void testFieldTokenType() {
+
 		Name target = new Name(0, "path");
 		Name field = new Name(0, "delimiter");
-		
+
 		PropertyGet access = new PropertyGet(target, field);
 
 		VariableInitializer initializer = new VariableInitializer();
 		initializer.setTarget(new Name(0, "delim"));
 		initializer.setInitializer(access);
-		
+
 		VariableDeclaration declaration = new VariableDeclaration();
 		declaration.addVariable(initializer);
-		
+
 		ExpressionStatement statement = new ExpressionStatement(declaration);
 
 		AstRoot root = new AstRoot();
 		root.addChild(statement);
-		
+
 		runTest(field, KeywordType.FIELD);
-		
+
 	}
 
 	@Test
-	public void testConstantTokenContext() {
-		
+	public void testConstantTokenType() {
+
 		Name target = new Name(0, "buffer");
 		Name field = new Name(0, "INSPECT_MAX_BYTES");
-		
+
 		PropertyGet access = new PropertyGet(target, field);
 
 		VariableInitializer initializer = new VariableInitializer();
 		initializer.setTarget(new Name(0, "max"));
 		initializer.setInitializer(access);
-		
+
 		VariableDeclaration declaration = new VariableDeclaration();
 		declaration.addVariable(initializer);
-		
+
 		ExpressionStatement statement = new ExpressionStatement(declaration);
 
 		AstRoot root = new AstRoot();
 		root.addChild(statement);
-		
+
 		runTest(field, KeywordType.CONSTANT);
-		
+
 	}
 
 	@Test
-	public void testArgumentTokenContext() {
-		
+	public void testArgumentTokenType() {
+
 		StringLiteral file = new StringLiteral();
 		file.setQuoteCharacter('"');
 		file.setValue("/etc/init.d/httpd");
-		
+
 		Name target = new Name(0, "existsSync");
 
 		FunctionCall call = new FunctionCall();
 		call.setTarget(target);
 		call.addArgument(file);
-		
+
 		ExpressionStatement statement = new ExpressionStatement(call);
 
 		AstRoot root = new AstRoot();
 		root.addChild(statement);
-		
-		runTest(file, KeywordType.VARIABLE);
-		
+
+		runTest(file, KeywordType.UNKNOWN);
+
 	}
 
 	@Test
-	public void testParameterTokenContext() {
+	public void testParameterTokenType() {
 
 		StringLiteral file = new StringLiteral();
 		file.setQuoteCharacter('"');
 		file.setValue("/etc/init.d/httpd");
-		
+
 		NumberLiteral num = new NumberLiteral(5.0);
-		
+
 		Name var = new Name(0, "x");
 		Name name = new Name(0, "open");
-		
+
 		FunctionNode function = new FunctionNode(0, name);
 		function.addParam(file);
 		function.addParam(num);
 		function.addParam(var);
 		function.setBody(new Block());
-		
+
 		AstRoot root = new AstRoot();
 		root.addChild(function);
-		
+
 		runTest(file, KeywordType.PARAMETER);
 		runTest(num, KeywordType.PARAMETER);
 		runTest(var, KeywordType.PARAMETER);
-		
+
 	}
 
 	@Test
-	public void testExceptionTokenContext() {
+	public void testExceptionTokenType() {
 
 		Name exception = new Name(0, "err");
-		
+
 		CatchClause catchClause = new CatchClause();
 		catchClause.setBody(new Block());
 		catchClause.setVarName(exception);
-		
+
 		TryStatement tryStatement = new TryStatement();
 		tryStatement.setTryBlock(new Block());
 		tryStatement.addCatchClause(catchClause);
-		
+
 		AstRoot root = new AstRoot();
 		root.addChild(tryStatement);
-		
+
 		runTest(exception, KeywordType.EXCEPTION);
-		
+
 	}
 
 	@Test
-	public void testEventTokenContext() {
-		
+	public void testEventTokenType() {
+
 		/* Register the event listener. */
-		
+
 		StringLiteral registerEvent = new StringLiteral();
 		registerEvent.setQuoteCharacter('\'');
 		registerEvent.setValue("open");
-		
+
 		Name registerObject = new Name(0, "frontDoor");
 		Name on = new Name(0, "on");
 		Name registerAction = new Name(0, "ring");
@@ -255,7 +255,7 @@ public class TestLearningUtilities {
 		registerCall.setTarget(registerTarget);
 		registerCall.addArgument(registerEvent);
 		registerCall.addArgument(registerAction);
-		
+
 		ExpressionStatement registerStatement = new ExpressionStatement(registerCall);
 
 		/* Remove the event listener. */
@@ -267,7 +267,7 @@ public class TestLearningUtilities {
 		StringLiteral removeEvent = new StringLiteral();
 		removeEvent.setQuoteCharacter('\'');
 		removeEvent.setValue("open");
-		
+
 		Name removeObject = new Name(0, "frontDoor");
 		Name removeListener = new Name(0, "removeListener");
 		Name removeAction = new Name(0, "ring");
@@ -279,7 +279,7 @@ public class TestLearningUtilities {
 		removeCall.setTarget(removeTarget);
 		removeCall.addArgument(removeListenerEvent);
 		removeCall.addArgument(removeAction);
-		
+
 		ExpressionStatement removeStatement = new ExpressionStatement(removeCall);
 
 		/* Remove all event listeners. */
@@ -291,7 +291,7 @@ public class TestLearningUtilities {
 		StringLiteral removeAllEvent = new StringLiteral();
 		removeAllEvent.setQuoteCharacter('\'');
 		removeAllEvent.setValue("open");
-		
+
 		Name removeAllObject = new Name(0, "frontDoor");
 		Name removeAllListener = new Name(0, "removeAllListeners");
 		PropertyGet removeAllTarget = new PropertyGet();
@@ -301,21 +301,21 @@ public class TestLearningUtilities {
 		FunctionCall removeAllCall = new FunctionCall();
 		removeAllCall.setTarget(removeAllTarget);
 		removeAllCall.addArgument(removeAllListenerEvent);
-		
+
 		ExpressionStatement removeAllStatement = new ExpressionStatement(removeAllCall);
-		
+
 		/* Add the call to the script. */
 
 		AstRoot root = new AstRoot();
 		root.addChild(registerStatement);
 		root.addChild(removeStatement);
 		root.addChild(removeAllStatement);
-		
+
 		System.out.println(root.toSource());
 		runTest(registerEvent, KeywordType.EVENT);
 		runTest(removeListenerEvent, KeywordType.EVENT);
 		runTest(removeAllListenerEvent, KeywordType.EVENT);
-		
+
 	}
 
 }

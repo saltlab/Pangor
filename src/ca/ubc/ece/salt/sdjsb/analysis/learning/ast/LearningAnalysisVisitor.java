@@ -10,6 +10,7 @@ import org.mozilla.javascript.ast.NodeVisitor;
 import org.mozilla.javascript.ast.NumberLiteral;
 import org.mozilla.javascript.ast.ScriptNode;
 import org.mozilla.javascript.ast.StringLiteral;
+import org.mozilla.javascript.ast.UnaryExpression;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
@@ -146,10 +147,10 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		if (changeType == ChangeType.MOVED)
 			changeType = ChangeType.UNCHANGED;
 
-		/* Add a typeof keyword if we're checking if this node is truthy or 
+		/* Add a typeof keyword if we're checking if this node is truthy or
 		 * falsey.
-		 * 
-		 * TODO: PointsToPrediction throws a runtime exception when we register 
+		 *
+		 * TODO: PointsToPrediction throws a runtime exception when we register
 		 * 		 the "~falsey~" keyword. Need to fix. */
 		if(SpecialTypeAnalysisUtilities.isFalsey(node)) {
 
@@ -195,6 +196,14 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 				token = sl.getValue();
 			}
 		}
+		else if(node instanceof UnaryExpression) {
+			UnaryExpression ue = (UnaryExpression) node;
+			switch (ue.getOperator()) {
+			case Token.TYPEOF:
+				token = "typeof";
+				break;
+			}
+		}
 
 		/* Insert the token into the feature vector if it is a keyword. */
 		KeywordUse keyword = null;
@@ -209,12 +218,12 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		if(keyword != null) {
 
 			this.featureVector.addKeyword(keyword);
-		
-			/* Is the keyword a 'falsey' keyword? Are we using it in a comparison? 
-			 * Register a 'typeof' keyword if this is the case. */ 
+
+			/* Is the keyword a 'falsey' keyword? Are we using it in a comparison?
+			 * Register a 'typeof' keyword if this is the case. */
 			if(keyword.keyword.equals("undefined") || keyword.keyword.equals("null")) {
 				if(node.getParent().getType() == Token.SHEQ || node.getParent().getType() == Token.SHNE) {
-					KeywordUse typeof = new KeywordUse(KeywordType.RESERVED, 
+					KeywordUse typeof = new KeywordUse(KeywordType.RESERVED,
 							KeywordContext.CONDITION, "typeof",
 							node.getParent().getChangeType());
 					typeof.apiString = "global";

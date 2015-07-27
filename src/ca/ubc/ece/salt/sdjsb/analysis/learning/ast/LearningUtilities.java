@@ -16,15 +16,15 @@ import org.mozilla.javascript.ast.PropertyGet;
 import org.mozilla.javascript.ast.StringLiteral;
 import org.mozilla.javascript.ast.VariableInitializer;
 
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
 
 /**
- * Provides AST utilities to help collect feature information (i.e., keyword 
+ * Provides AST utilities to help collect feature information (i.e., keyword
  * info) from the source code analysis.
  */
 public class LearningUtilities {
-	
+
 	/**
 	 * Gets the type of artifact the keyword refers to.
 	 * @param token The AST node that may be a keyword.
@@ -34,55 +34,55 @@ public class LearningUtilities {
 
 		/* If the token is a reserved word, we can already infer it's type. */
 		if(isJavaScriptReserved(token)) return KeywordType.RESERVED;
-		
+
 		KeywordType type = KeywordType.UNKNOWN;
 		type = typeSwitch(token);
 
 		return type;
 	}
-	
+
 	/**
-	 * Gets the context under which the artifact is being used (e.g., as an 
+	 * Gets the context under which the artifact is being used (e.g., as an
 	 * argument, parameter, exception, etc. see @code{Keyword}.
 	 * @param token the AST node that may be a keyword.
-	 * @return The context in which the artifact is being used. 
+	 * @return The context in which the artifact is being used.
 	 */
 	public static KeywordContext getTokenContext(AstNode token) {
-		
-		/* Look at the token's parent to determine the context in which it is 
+
+		/* Look at the token's parent to determine the context in which it is
 		 * used. */
-		
+
 		KeywordContext context = KeywordContext.UNKNOWN;
 		context = contextSwitch(token);
-		
+
 		return context;
 
 	}
-	
+
 	/**
 	 * @return True if the token is a JavaScript reserved word.
 	 */
 	private static boolean isJavaScriptReserved(AstNode token) {
-		
+
 		List<String> JAVASCRIPT_RESERVED_WORDS = Arrays.asList( "abstract",
 				"arguments", "boolean", "break", "byte", "case", "catch",
 				"char", "class", "const", "continue", "debugger", "default",
 				"delete", "do", "double", "else", "enum", "eval", "export",
-				"extends", "false", "final", "finally", "float", "for", 
+				"extends", "false", "final", "finally", "float", "for",
 				"function", "goto", "if", "implements", "import", "in",
 				"instanceof", "int", "interface", "let", "long", "native",
 				"new", "null", "package", "private", "protected", "public",
 				"return", "short", "static", "super", "switch", "synchronized",
 				"this", "throw", "throws", "transient", "true", "try", "typeof",
 				"var", "void", "volatile", "while", "with", "yield");
-		
+
 		if(token instanceof Name) {
 			Name name = (Name) token;
 			if(JAVASCRIPT_RESERVED_WORDS.contains(name.getIdentifier())) {
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -90,16 +90,16 @@ public class LearningUtilities {
 	 * Switches on the ancestor of an AstNode to determine the keyword type.
 	 */
 	private static KeywordType typeSwitch(AstNode token) {
-		
+
 		AstNode parent = token.getParent();
-		
+
 		if(parent == null || token == null) return KeywordType.UNKNOWN;
-		
+
 		/* Check for class, method and parameter declarations. */
 		if (parent instanceof FunctionNode) {
 
 			FunctionNode function = (FunctionNode) parent;
-			
+
 			if(function.getFunctionName() == token && Character.isUpperCase(function.getName().charAt(0))) {
 				return KeywordType.CLASS;
 			}
@@ -110,17 +110,17 @@ public class LearningUtilities {
 				return KeywordType.PARAMETER;
 			}
 
-		} 
+		}
 		/* Check for variable declarations. */
 		else if(parent instanceof VariableInitializer) {
-			
+
 			VariableInitializer initializer = (VariableInitializer) parent;
 			if(initializer.getTarget() == token) return KeywordType.VARIABLE;
-			
+
 		}
 		/* Check for function call related keywords. */
 		else if(parent instanceof FunctionCall) {
-			
+
 			FunctionCall call = (FunctionCall) parent;
 
 			/* Check for packages. */
@@ -133,11 +133,11 @@ public class LearningUtilities {
 						return KeywordType.PACKAGE;
 					}
 				}
-				
+
 			}
 			/* Check for events. */
 			else if(call.getTarget() instanceof PropertyGet) {
-				
+
 				PropertyGet target = (PropertyGet) call.getTarget();
 
 				if(target.getProperty().getIdentifier().equals("on") && call.getArguments().size() == 2) {
@@ -158,22 +158,23 @@ public class LearningUtilities {
 						return KeywordType.EVENT;
 					}
 				}
-				
+
 			}
 
 		}
 		else if(parent instanceof CatchClause) {
-			
+
 			CatchClause catchClause = (CatchClause) parent;
 			if(catchClause.getVarName() == token) {
 				return KeywordType.EXCEPTION;
 			}
-			
+
 		}
-		else if(token instanceof Name) {
+
+		if(token instanceof Name) {
 			return getVariableOrFieldType(token, (Name)token);
 		}
-		
+
 		return KeywordType.UNKNOWN;
 
 	}
@@ -182,16 +183,16 @@ public class LearningUtilities {
 	 * Switches on the ancestor of an AstNode to determine the keyword context.
 	 */
 	private static KeywordContext contextSwitch(AstNode token) {
-		
+
 		AstNode parent = token.getParent();
-		
+
 		if(parent == null || token == null) return KeywordContext.UNKNOWN;
-		
+
 		/* Check for class, method and parameter declarations. */
 		if (parent instanceof FunctionNode) {
 
 			FunctionNode function = (FunctionNode) parent;
-			
+
 			/* Is this a class declaration? */
 			if(function.getFunctionName() == token && Character.isUpperCase(function.getName().charAt(0))) {
 				return KeywordContext.CLASS_DECLARATION;
@@ -203,17 +204,17 @@ public class LearningUtilities {
 				return KeywordContext.PARAMETER_DECLARATION;
 			}
 
-		} 
+		}
 		/* Check for variable declarations. */
 		else if(parent instanceof VariableInitializer) {
-			
+
 			VariableInitializer initializer = (VariableInitializer) parent;
 			if(initializer.getTarget() == token) return KeywordContext.VARIABLE_DECLARATION;
-			
+
 		}
 		/* Check for function call related uses. */
 		else if(parent instanceof FunctionCall) {
-			
+
 			FunctionCall call = (FunctionCall) parent;
 
 			/* Check for the require use. */
@@ -226,11 +227,11 @@ public class LearningUtilities {
 						return KeywordContext.REQUIRE;
 					}
 				}
-				
+
 			}
 			/* Check for event uses. */
 			else if(call.getTarget() instanceof PropertyGet) {
-				
+
 				PropertyGet target = (PropertyGet) call.getTarget();
 
 				if(target.getProperty().getIdentifier().equals("on") && call.getArguments().size() == 2) {
@@ -251,20 +252,20 @@ public class LearningUtilities {
 						return KeywordContext.EVENT_REMOVE;
 					}
 				}
-				
+
 			}
 
 		}
 		/* Check for exception catching. */
 		else if(parent instanceof CatchClause) {
-			
+
 			CatchClause catchClause = (CatchClause) parent;
 			if(catchClause.getVarName() == token) {
 				return KeywordContext.EXCEPTION_CATCH;
 			}
-			
+
 		}
-		
+
 		/* Since it's not any of the above contexts, it is likely a variable,
 		 * field or reserved word use. */
 		return getVariableOrFieldContext(token);
@@ -281,9 +282,9 @@ public class LearningUtilities {
 		/* This access is part of another access. Recursively find the context. */
 
 		if(vf.getParent() instanceof PropertyGet) {
-			return getVariableOrFieldType((PropertyGet) vf.getParent(), node);
+			return getVariableOrFieldType(vf.getParent(), node);
 		}
-		
+
 		/* We can now determine if the variable is a field or method. */
 
 		if(vf.getParent() instanceof FunctionCall) {
@@ -292,7 +293,7 @@ public class LearningUtilities {
 				return KeywordType.METHOD;
 			}
 		}
-		
+
 		if(vf instanceof PropertyGet) {
 
 			if(node.getIdentifier().equals(node.getIdentifier().toUpperCase())) {
@@ -306,9 +307,9 @@ public class LearningUtilities {
 		else {
 			return KeywordType.VARIABLE;
 		}
-		
+
 	}
-	
+
 	/**
 	 * Finds the context in which a field is being used.
 	 * @param vfr The variable, field or reserved word.
@@ -319,9 +320,9 @@ public class LearningUtilities {
 		/* This access is part of another access. Recursively find the context. */
 
 		if(vfr.getParent() instanceof PropertyGet) {
-			return getVariableOrFieldContext((PropertyGet) vfr.getParent());
+			return getVariableOrFieldContext(vfr.getParent());
 		}
-		
+
 		/* We can now determine how the field is being used. */
 
 		if(vfr.getParent() instanceof FunctionCall) {
@@ -345,19 +346,19 @@ public class LearningUtilities {
 			if(isConditionalComparator(ie.getOperator())) return KeywordContext.CONDITION;
 			return KeywordContext.EXPRESSION;
 		}
-		
+
 		return KeywordContext.UNKNOWN;
 
 	}
-	
+
 	/**
-	 * Determines whether or not the boolean operator is a conditional 
+	 * Determines whether or not the boolean operator is a conditional
 	 * comparator.
 	 * @param tokenType The Token type.
 	 * @return True if the token is a conditional comparator (e.g., === or >).
 	 */
 	private static boolean isConditionalComparator(int tokenType) {
-		switch(tokenType) { 
+		switch(tokenType) {
 		case Token.EQ:
 		case Token.NE:
 		case Token.LT:
