@@ -17,13 +17,13 @@ public class LearningDataSetMain {
 	/**
 	 * Creates the learning data set for extracting repair patterns.
 	 * @param args
-	 * @throws Exception 
+	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
-		
-		KeywordFilter prototypeFilter = new KeywordFilter(FilterType.INCLUDE, 
-				KeywordType.UNKNOWN, KeywordContext.UNKNOWN, ChangeType.REMOVED, 
-				"", "");
+
+		KeywordFilter prototypeFilter = new KeywordFilter(FilterType.INCLUDE,
+				KeywordType.UNKNOWN, KeywordContext.UNKNOWN, ChangeType.INSERTED,
+				"global", "typeof");
 
 		LearningDataSetOptions options = new LearningDataSetOptions();
 		CmdLineParser parser = new CmdLineParser(options);
@@ -34,19 +34,19 @@ public class LearningDataSetMain {
 			LearningDataSetMain.printUsage(e.getMessage(), parser);
 			return;
 		}
-		
+
 		/* Print the help page. */
 		if(options.getHelp()) {
 			LearningDataSetMain.printHelp(parser);
 			return;
 		}
-		
+
 		/* Re-construct the data set. */
 		LearningDataSet dataSet = new LearningDataSet(options.getDataSetPath(), Arrays.asList(prototypeFilter));
-		
+
 		/* Pre-process the file. */
 		dataSet.preProcess();
-		
+
 		/* Print the data set. */
 		dataSet.writeFilteredDataSet(options.getFilteredPath());
 
@@ -65,7 +65,7 @@ public class LearningDataSetMain {
         System.out.println("");
         return;
 	}
-	
+
 	/**
 	 * Prints the usage of main.
 	 * @param error The error message that triggered the usage message.

@@ -74,6 +74,19 @@ public class KeywordUse extends KeywordDefinition {
 		setAPI(path);
 	}
 
+	/**
+	 * Return the package name of the API this Keywords belongs to.
+	 *
+	 * @return the package name, "global", or null
+	 */
+	@Override
+	public String getPackageName() {
+		if (api != null)
+			return api.getPackageName();
+
+		return this.apiString;
+	}
+
 	@Override
 	public boolean equals(Object obj) {
 

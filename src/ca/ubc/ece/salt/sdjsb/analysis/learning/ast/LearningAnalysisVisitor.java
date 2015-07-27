@@ -4,6 +4,7 @@ import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.FunctionNode;
+import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.KeywordLiteral;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.NodeVisitor;
@@ -204,6 +205,16 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 				break;
 			}
 		}
+		else if(node instanceof InfixExpression) {
+			InfixExpression ie = (InfixExpression) node;
+			if(ie.getType() == Token.SHEQ || ie.getType() == Token.SHNE) {
+				if(SpecialTypeAnalysisUtilities.getSpecialType(ie.getLeft()) != null ||
+				   SpecialTypeAnalysisUtilities.getSpecialType(ie.getRight()) != null) {
+					/* Then we consider it a 'typeof' keyword. */
+					token = "typeof";
+				}
+			}
+		}
 
 		/* Insert the token into the feature vector if it is a keyword. */
 		KeywordUse keyword = null;
@@ -215,22 +226,9 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 			keyword = new KeywordUse(type, context, token, changeType);
 		}
 
+		/* Add the keyword to the feature vector. */
 		if(keyword != null) {
-
 			this.featureVector.addKeyword(keyword);
-
-			/* Is the keyword a 'falsey' keyword? Are we using it in a comparison?
-			 * Register a 'typeof' keyword if this is the case. */
-			if(keyword.keyword.equals("undefined") || keyword.keyword.equals("null")) {
-				if(node.getParent().getType() == Token.SHEQ || node.getParent().getType() == Token.SHNE) {
-					KeywordUse typeof = new KeywordUse(KeywordType.RESERVED,
-							KeywordContext.CONDITION, "typeof",
-							node.getParent().getChangeType());
-					typeof.apiString = "global";
-					this.featureVector.addKeyword(typeof);
-				}
-			}
-
 		}
 
 	}
