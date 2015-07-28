@@ -2,8 +2,11 @@ package ca.ubc.ece.salt.sdjsb.git;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -15,6 +18,7 @@ import org.eclipse.jgit.api.PullResult;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.TransportException;
+import org.eclipse.jgit.lib.PersonIdent;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
 import org.eclipse.jgit.lib.StoredConfig;
@@ -23,6 +27,9 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysis;
 import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysisException;
 
+/**
+ * Represents a Git project and some metrics
+ */
 public class GitProject {
 	/** The Git instance. **/
 	protected Git git;
@@ -33,25 +40,99 @@ public class GitProject {
 	/** The repository name. **/
 	protected String projectID;
 
+	/** The URI **/
+	protected String URI;
+
 	/** The number of bug fixing commits analyzed. **/
-	protected int bugFixingCommits;
+	protected Integer bugFixingCommits;
 
 	/** The total number of commits inspected. **/
-	protected int totalCommits;
+	protected Integer totalCommits;
 
-	protected GitProject(Git git, Repository repository, String name) {
+	/** The number of commit authors (uniquely identified by their emails) */
+	protected Integer numberAuthors;
+
+	/** Dates of last (most recent) and first commit */
+	protected Date lastCommitDate, firstCommitDate;
+
+	/**
+	 * Constructor that is used by our static factory methods.
+	 */
+	protected GitProject(Git git, Repository repository, String URI) {
 		this.git = git;
 		this.repository = repository;
-		this.projectID = name;
+		this.URI = URI;
+
+		try {
+			this.projectID = getGitProjectName(URI);
+		} catch (GitProjectAnalysisException e) {
+			e.printStackTrace();
+		}
 	}
 
+	/**
+	 * Constructor that clones another Git Project. Particularly useful for
+	 * subclasses
+	 */
 	protected GitProject(GitProject project) {
-		this(project.git, project.repository, project.projectID);
+		this(project.git, project.repository, project.URI);
+	}
+
+	/*
+	 * Getters for the metrics
+	 */
+	public String getName() {
+		return this.projectID;
+	}
+
+	public String getURI() {
+		return this.URI;
+	}
+
+	public Integer getTotalCommits() {
+		if (this.totalCommits == null)
+			getBugFixingCommitPairs();
+
+		return this.totalCommits;
+	}
+
+	public Integer getBugFixingCommits() {
+		if (this.bugFixingCommits == null)
+			getBugFixingCommitPairs();
+
+		return this.bugFixingCommits;
+	}
+
+	public Integer getNumberAuthors() {
+		if (this.numberAuthors == null)
+			getBugFixingCommitPairs();
+
+		return this.numberAuthors;
+	}
+
+	public Date getLastCommitDate() {
+		if (this.lastCommitDate == null)
+			getBugFixingCommitPairs();
+
+		return this.lastCommitDate;
+	}
+
+	public Date getFirstCommitDate() {
+		if (this.firstCommitDate == null)
+			getBugFixingCommitPairs();
+
+		return this.firstCommitDate;
 	}
 
 	/**
 	 * Extracts revision identifier pairs from bug fixing commits. The pair
 	 * includes the bug fixing commit and the previous (buggy) commit.
+	 *
+	 * TODO:
+	 * This method is also the main method for calculating metrics. Ideally we
+	 * would have different methods for metrics and for returning the bug fixing
+	 * commit pairs, but we would have to iterate over all commits twice, so for
+	 * now, everything is done on this method.
 	 *
 	 * @param git The project git instance.
 	 * @param repository The project git repository.
@@ -60,28 +141,48 @@ public class GitProject {
 	 * @throws IOException
 	 * @throws GitAPIException
 	 */
-	protected List<Pair<String, String>> getBugFixingCommitPairs() throws IOException, GitAPIException {
-
+	protected List<Pair<String, String>> getBugFixingCommitPairs() {
 		List<Pair<String, String>> bugFixingCommits = new LinkedList<Pair<String, String>>();
-		Iterable<RevCommit> commits = git.log().call();
-		System.out.println(repository.getBranch());
-
 		String bugFixingCommit = null;
-		int bfcCnt = 0, cCnt = 0;
+		int bugFixingCommitCounter = 0, commitCounter = 0;
+
+		Set<String> authorsEmails = new HashSet<>();
+
+		Date lastCommitDate = null;
+		Date firstCommitDate = null;
+
+		/*
+		 * Call git log command
+		 */
+		Iterable<RevCommit> commits;
+		try {
+			commits = git.log().call();
+		} catch (GitAPIException e) {
+			e.printStackTrace();
+			return bugFixingCommits;
+		}
 
 		/* Starts with the most recent commit and goes back in time. */
 		for (RevCommit commit : commits) {
+			/*
+			 * Add author to authors list
+			 */
+			PersonIdent authorIdent = commit.getAuthorIdent();
+			authorsEmails.add(authorIdent.getEmailAddress());
 
+			/*
+			 * If last commit was a bug fixing one, add it and current to list
+			 */
 			if (bugFixingCommit != null) {
 				bugFixingCommits.add(Pair.of(commit.name(), bugFixingCommit));
 				bugFixingCommit = null;
-				bfcCnt++;
+				bugFixingCommitCounter++;
 			}
 
 			String message = commit.getFullMessage();
 			Pattern p = Pattern.compile("fix|repair", Pattern.CASE_INSENSITIVE);
 			Matcher m = p.matcher(message);
-			cCnt++;
+			commitCounter++;
 
 			/*
 			 * If the commit message contains one of our fix keywords, store it.
@@ -90,11 +191,26 @@ public class GitProject {
 				bugFixingCommit = commit.name();
 			}
 
+			/*
+			 * First commit on iteration is most recent one (what we call "last")
+			 */
+			if (commitCounter == 1)
+				lastCommitDate = authorIdent.getWhen();
+
+			/*
+			 * Store the date of this commit. When iteration is over, we have
+			 * the date for first one
+			 */
+			firstCommitDate = authorIdent.getWhen();
+
 		}
 
-		/* Keep track of the number of commits for metrics reporting. */
-		this.bugFixingCommits = bfcCnt;
-		this.totalCommits = cCnt;
+		/* Keep track of the number of commits and other metrics for reporting. */
+		this.bugFixingCommits = bugFixingCommitCounter;
+		this.totalCommits = commitCounter;
+		this.numberAuthors = authorsEmails.size();
+		this.lastCommitDate = lastCommitDate;
+		this.firstCommitDate = firstCommitDate;
 
 		return bugFixingCommits;
 	}
@@ -154,8 +270,7 @@ public class GitProject {
 			throw new GitProjectAnalysisException("The git project was not found in the directory " + directory + ".");
 		}
 
-		return new GitProject(git, repository,
-				getGitProjectName(repository.getConfig().getString("remote", "origin", "url")));
+		return new GitProject(git, repository, repository.getConfig().getString("remote", "origin", "url"));
 	}
 
 	/**
@@ -209,7 +324,7 @@ public class GitProject {
 			repository = git.getRepository();
 		}
 
-		GitProject gitProject = new GitProject(git, repository, getGitProjectName(uri));
+		GitProject gitProject = new GitProject(git, repository, uri);
 
 		return gitProject;
 	}

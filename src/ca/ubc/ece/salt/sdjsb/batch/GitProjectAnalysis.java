@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jgit.api.DiffCommand;
-import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.api.errors.InvalidRemoteException;
 import org.eclipse.jgit.api.errors.TransportException;
@@ -14,7 +13,6 @@ import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.lib.ObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
-import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
@@ -23,53 +21,24 @@ import org.eclipse.jgit.treewalk.TreeWalk;
 
 import ca.ubc.ece.salt.sdjsb.git.GitProject;
 
+/**
+ * Performs analysis on a Git project using an AnalysisRunner
+ */
 public class GitProjectAnalysis extends GitProject {
 	/** Runs an analysis on a source file. **/
 	private AnalysisRunner runner;
 
-	GitProjectAnalysis(Git git, Repository repository, String name, AnalysisRunner runner) {
-		super(git, repository, name);
-		this.runner = runner;
-	}
-
-	GitProjectAnalysis(GitProject gitProject, AnalysisRunner runner) {
+	/**
+	 * Constructor that is used by our static factory methods.
+	 */
+	protected GitProjectAnalysis(GitProject gitProject, AnalysisRunner runner) {
 		super(gitProject);
 		this.runner = runner;
 	}
 
 	/**
-	 * Creates a new GitProjectAnalysis instance from a git project directory.
-	 *
-	 * @param directory The base directory for the project.
-	 * @return An instance of GitProjectAnalysis.
-	 * @throws GitProjectAnalysisException
-	 */
-	public static GitProjectAnalysis fromDirectory(String directory, String name, AnalysisRunner runner)
-			throws GitProjectAnalysisException {
-		GitProject gitProject = GitProject.fromDirectory(directory, name);
-
-		return new GitProjectAnalysis(gitProject, runner);
-	}
-
-	/**
-	 * Creates a new GitProjectAnalysis instance from a URI.
-	 *
-	 * @param uri The remote .git address.
-	 * @param directory The directory that stores the cloned repositories.
-	 * @return An instance of GitProjectAnalysis.
-	 * @throws GitAPIException
-	 * @throws TransportException
-	 * @throws InvalidRemoteException
-	 */
-	public static GitProjectAnalysis fromURI(String uri, String directory, AnalysisRunner runner)
-			throws GitProjectAnalysisException, InvalidRemoteException, TransportException, GitAPIException {
-		GitProject gitProject = GitProject.fromURI(uri, directory);
-
-		return new GitProjectAnalysis(gitProject, runner);
-	}
-
-	/**
 	 * Analyze the repository (extract repairs).
+	 *
 	 * @throws GitAPIException
 	 * @throws IOException
 	 */
@@ -88,7 +57,9 @@ public class GitProjectAnalysis extends GitProject {
 	}
 
 	/**
-	 * Extract the source files from Git and analyze them with the analysis runner.
+	 * Extract the source files from Git and analyze them with the analysis
+	 * runner.
+	 *
 	 * @param buggyRevision The hash that identifies the buggy revision.
 	 * @param bugFixingRevision The hash that identifies the fixed revision.
 	 * @throws IOException
@@ -153,8 +124,9 @@ public class GitProjectAnalysis extends GitProject {
 	}
 
 	/**
-	 * Fetches the string contents of a file from a specific revision.
-	 * 	from http://stackoverflow.com/questions/1685228/how-to-cat-a-file-in-jgit
+	 * Fetches the string contents of a file from a specific revision. from
+	 * http://stackoverflow.com/questions/1685228/how-to-cat-a-file-in-jgit
+	 *
 	 * @param repo The repository to fetch the file from.
 	 * @param revSpec The commit id.
 	 * @param path The path to the file.
@@ -192,5 +164,40 @@ public class GitProjectAnalysis extends GitProject {
             reader.release();
         }
     }
+
+	/*
+	 * Static factory methods
+	 */
+
+	/**
+	 * Creates a new GitProjectAnalysis instance from a git project directory.
+	 *
+	 * @param directory The base directory for the project.
+	 * @return An instance of GitProjectAnalysis.
+	 * @throws GitProjectAnalysisException
+	 */
+	public static GitProjectAnalysis fromDirectory(String directory, String name, AnalysisRunner runner)
+			throws GitProjectAnalysisException {
+		GitProject gitProject = GitProject.fromDirectory(directory, name);
+
+		return new GitProjectAnalysis(gitProject, runner);
+	}
+
+	/**
+	 * Creates a new GitProjectAnalysis instance from a URI.
+	 *
+	 * @param uri The remote .git address.
+	 * @param directory The directory that stores the cloned repositories.
+	 * @return An instance of GitProjectAnalysis.
+	 * @throws GitAPIException
+	 * @throws TransportException
+	 * @throws InvalidRemoteException
+	 */
+	public static GitProjectAnalysis fromURI(String uri, String directory, AnalysisRunner runner)
+			throws GitProjectAnalysisException, InvalidRemoteException, TransportException, GitAPIException {
+		GitProject gitProject = GitProject.fromURI(uri, directory);
+
+		return new GitProjectAnalysis(gitProject, runner);
+	}
 
 }
