@@ -18,7 +18,7 @@ SUPPLEMENTARY_FOLDER=../output/supplementary/
 attributes=($(cat $ARFF_FILE | grep attribute | awk -F " " '{print $2}'))
 
 # Get ids of instances
-ids=$(cat $ARFF_FILE | grep "cluster"$1 | grep -v attribute | awk -F "," '{print $2}')
+ids=$(cat $ARFF_FILE | grep -w "cluster"$1 | grep -v attribute | awk -F "," '{print $2}')
 
 # Iterate over instances
 for id in $ids;
@@ -26,7 +26,7 @@ do
     echo "----------------"
 
     # Get feature vector
-    vector=$(cat $ARFF_FILE | grep "cluster"$1 | grep -v attribute | awk -F "," '$2=='$id)
+    vector=$(cat $ARFF_FILE | grep -w "cluster"$1 | grep -v attribute | awk -F "," '$2=='$id)
 
     # Iterate over features
     # If is not 0, print attribute name and value
