@@ -15,10 +15,10 @@ import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysisException;
 
 /**
  * Executable class for calculating metrics of a list of repositories
- * 
+ *
  * Usage:
  * -i <file with 1 repository per line> -o <output CSV file with metrics>
- * 
+ *
  * Check GitMetricsExtratorOptions for default values
  */
 public class GitMetricsExtractorMain {
@@ -55,7 +55,7 @@ public class GitMetricsExtractorMain {
 			System.out.println("* Accessing repository: " + uri);
 			GitProject project = GitProject.fromURI(uri, CHECKOUT_DIR);
 
-			System.out.println("** Getting and writing metrics to output file");
+			/* Get and write metrics to output file */
 			metricsOutput.output(project);
 		}
 
@@ -73,6 +73,10 @@ public class GitMetricsExtractorMain {
 
 		try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
 		    for(String line; (line = br.readLine()) != null; ) {
+				// Ignore comments (starting with #) and blank lines
+				if (line.isEmpty() || line.charAt(0) == '#')
+		    		continue;
+
 		    	uris.add(line);
 		    }
 		}
