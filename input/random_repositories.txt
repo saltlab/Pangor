@@ -1,9 +1,0 @@
-https://github.com/jansmolders86/mediacenterjs.git
-https://github.com/Strider-CD/strider.git
-https://github.com/prawnsalad/KiwiIRC.git
-https://github.com/alanshaw/david-www.git
-https://github.com/badges/shields.git
-https://github.com/Jermolene/TiddlyWiki5.git
-https://github.com/NodeOS/NodeOS.git
-https://github.com/nwjs/nw.js.git
-https://github.com/crcn/nexe.git
