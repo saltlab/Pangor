@@ -175,9 +175,10 @@ public class GitProject {
 				GitHub github = GitHub.connectAnonymously();
 
 				// Really dirty way of getting username/reponame from URI
-				GHRepository repository = github.getRepository(this.URI.split("github.com/")[1].split(".git")[0]);
+				GHRepository repository = github.getRepository(this.URI.split("github\\.com/")[1].split("\\.git")[0]);
 				this.stargazers = repository.getWatchers();
 			} catch (IOException e) {
+				System.err.println("Error while accessing GitHub API: " + e.getMessage());
 				return -1;
 			}
 		}
