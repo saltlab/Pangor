@@ -1,7 +1,9 @@
 package ca.ubc.ece.salt.sdjsb.git;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -23,6 +25,8 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.lib.RepositoryBuilder;
 import org.eclipse.jgit.lib.StoredConfig;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.kohsuke.github.GHRepository;
+import org.kohsuke.github.GitHub;
 
 import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysis;
 import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysisException;
@@ -51,6 +55,18 @@ public class GitProject {
 
 	/** The number of commit authors (uniquely identified by their emails) */
 	protected Integer numberAuthors;
+
+	/** The number of javascript files */
+	protected Integer numberOfFiles;
+
+	/** The number of javascript lines of code */
+	protected Integer numberOfLines;
+
+	/** The number of downloads over the last month */
+	protected Integer downloadsLastMonth = -1;
+
+	/** The number of stargazers on GitHub */
+	protected Integer stargazers = -1;
 
 	/** Dates of last (most recent) and first commit */
 	protected Date lastCommitDate, firstCommitDate;
@@ -122,6 +138,90 @@ public class GitProject {
 			getBugFixingCommitPairs();
 
 		return this.firstCommitDate;
+	}
+
+
+	public Integer getNumberOfFiles() {
+		if (this.numberOfFiles == null)
+			getFilesMetrics();
+
+		return this.numberOfFiles;
+	}
+
+	public Integer getNumberOfLines() {
+		if (this.numberOfFiles == null)
+			getFilesMetrics();
+
+		return numberOfLines;
+	}
+
+	public Integer getDownloadsLastMonth() {
+		return this.downloadsLastMonth;
+	}
+
+	public void setDownloadsLastMonth(Integer downloadsLastMonth) {
+		this.downloadsLastMonth = downloadsLastMonth;
+	}
+
+	public Integer getStargazers() {
+		// Not a github project
+		if (!this.URI.contains("github.com"))
+			return -1;
+
+		// Value not cached
+		if (this.stargazers == -1) {
+
+			try {
+				GitHub github = GitHub.connectAnonymously();
+
+				// Really dirty way of getting username/reponame from URI
+				GHRepository repository = github.getRepository(this.URI.split("github.com/")[1].split(".git")[0]);
+				this.stargazers = repository.getWatchers();
+			} catch (IOException e) {
+				return -1;
+			}
+		}
+
+		return this.stargazers;
+	}
+
+	/**
+	 * Uses the command line tool "ohcount" to get the number of javascript
+	 * files and the number of javascript lines of code on the repository
+	 */
+	protected void getFilesMetrics() {
+		Runtime runtime = Runtime.getRuntime();
+		Process process;
+
+		String[] command = { "/bin/sh", "-c", "ohcount " + repository.getDirectory().getParent().toString()
+				+ " | grep javascript | tr -s ' ' | cut -d ' ' -f 2,3" };
+
+		try {
+			/* Check if ohcount is available */
+			process = runtime.exec("which ohcount");
+			process.waitFor();
+			if (process.exitValue() != 0)
+				throw new RuntimeException("Could not find ohcount command tool. Perphaphs not installed?");
+
+
+			/* Run command */
+			process = runtime.exec(command);
+			process.waitFor();
+
+			/* Get the output */
+			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+			String[] output = bufferedReader.readLine().split(" ");
+
+			this.numberOfFiles = Integer.parseInt(output[0]);
+			this.numberOfLines = Integer.parseInt(output[1]);
+
+			bufferedReader.close();
+		} catch (IOException | InterruptedException e) {
+			e.printStackTrace();
+
+			this.numberOfFiles = 0;
+			this.numberOfLines = 0;
+		}
 	}
 
 	/**

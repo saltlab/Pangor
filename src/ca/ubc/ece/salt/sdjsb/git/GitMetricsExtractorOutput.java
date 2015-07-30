@@ -37,13 +37,15 @@ public class GitMetricsExtractorOutput {
 		String totalCommits = gitProject.getTotalCommits().toString();
 		String totalBugFixingCommits = gitProject.getBugFixingCommits().toString();
 		String numberAuthors = gitProject.getNumberAuthors().toString();
-		String numberFiles = "";
-		String linesOfCode = "";
+		String numberFiles = gitProject.getNumberOfFiles().toString();
+		String linesOfCode = gitProject.getNumberOfLines().toString();
+		String stargazers = gitProject.getStargazers().toString();
+		String downloadsLastMonth = gitProject.getDownloadsLastMonth().toString();
 		String lastCommit = gitProject.getLastCommitDate().toString();
 		String firstCommit = gitProject.getFirstCommitDate().toString();
 
 		String row = String.join(",", name, URI, totalCommits, totalBugFixingCommits, numberAuthors, numberFiles,
-				linesOfCode, lastCommit, firstCommit);
+				linesOfCode, stargazers, downloadsLastMonth, lastCommit, firstCommit);
 
 		stream.println(row);
 	}
@@ -54,7 +56,7 @@ public class GitMetricsExtractorOutput {
 
 	private void writeHeaders() {
 		String header = String.join(",", "Name", "URI", "TotalCommits", "BugFixingCommits", "NumberAuthors",
-				"NumberFiles", "LinesOfCode", "LastCommit", "FirstCommit");
+				"NumberFiles", "LinesOfCode", "Stargazers", "DownloadsLastMonth", "LastCommit", "FirstCommit");
 
 		stream.println(header);
 	}
