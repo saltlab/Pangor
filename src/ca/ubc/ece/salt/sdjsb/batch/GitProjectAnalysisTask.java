@@ -19,8 +19,14 @@ public class GitProjectAnalysisTask implements Callable<Void> {
 
 	@Override
 	public Void call() throws Exception {
-		gitProjectAnalysis.analyze();
-		latch.countDown();
+		try {
+			gitProjectAnalysis.analyze();
+		} catch (Exception e) {
+			System.err.println("[ERR] Exception on GitProjectAnalysisTask");
+			e.printStackTrace();
+		} finally {
+			latch.countDown();
+		}
 
 		return null;
 	}
