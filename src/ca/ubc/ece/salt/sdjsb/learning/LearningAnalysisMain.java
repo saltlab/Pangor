@@ -9,7 +9,6 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
 import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysis;
-import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysisException;
 
 public class LearningAnalysisMain {
 
@@ -21,7 +20,7 @@ public class LearningAnalysisMain {
 	 * @param args
 	 * @throws Exception
 	 */
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) {
 
 		LearningAnalysisOptions options = new LearningAnalysisOptions();
 		CmdLineParser parser = new CmdLineParser(options);
@@ -49,13 +48,12 @@ public class LearningAnalysisMain {
 
 			try {
                 gitProjectAnalysis = GitProjectAnalysis.fromURI(options.getURI(), CHECKOUT_DIR, runner);
-			}
-			catch(GitProjectAnalysisException e) {
-                LearningAnalysisMain.printUsage(e.getMessage(), parser);
-                return;
-			}
 
-			gitProjectAnalysis.analyze();
+				gitProjectAnalysis.analyze();
+			} catch (Exception e) {
+				e.printStackTrace(System.err);
+				return;
+			}
 
 		}
 		/* A list of URIs was given. */
@@ -78,16 +76,15 @@ public class LearningAnalysisMain {
 			for(String uri : uris) {
 
 				try {
+					/* Build git repository object */
 					gitProjectAnalysis = GitProjectAnalysis.fromURI(uri, LearningAnalysisMain.CHECKOUT_DIR, runner);
-				}
-				catch(GitProjectAnalysisException e) {
+
+					/* Perform the analysis (this may take some time) */
+					gitProjectAnalysis.analyze();
+				} catch (Exception e) {
 					e.printStackTrace(System.err);
 					continue;
 				}
-
-				/* Perform the analysis (this may take some time) */
-				gitProjectAnalysis.analyze();
-
 			}
 
 		}
