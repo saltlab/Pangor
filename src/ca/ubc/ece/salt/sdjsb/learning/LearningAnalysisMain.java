@@ -4,13 +4,19 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
 import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysis;
+import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysisTask;
 
 public class LearningAnalysisMain {
+	/** The size of the thread pool */
+	private static final int THREAD_POOL_SIZE = 8;
 
 	/** The directory where repositories are checked out. **/
 	public static final String CHECKOUT_DIR =  new String("repositories");
@@ -72,6 +78,21 @@ public class LearningAnalysisMain {
 				return;
 			}
 
+			/*
+			 * Create a pool of threads and use a CountDownLatch to check when
+			 * all threads are done.
+			 * http://stackoverflow.com/questions/1250643/how-to-wait-for-all-
+			 * threads-to-finish-using-executorservice
+			 *
+			 * I was going to create a list of Callable objects and use
+			 * executor.invokeAll, but this would remove the start of the
+			 * execution of the tasks from the loop to outside the loop, which
+			 * would mean all git project initializations would have to happen
+			 * before starting the analysis.
+			 */
+			ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+			CountDownLatch latch = new CountDownLatch(uris.size());
+
 			/* Analyze all projects. */
 			for(String uri : uris) {
 
@@ -80,11 +101,19 @@ public class LearningAnalysisMain {
 					gitProjectAnalysis = GitProjectAnalysis.fromURI(uri, LearningAnalysisMain.CHECKOUT_DIR, runner);
 
 					/* Perform the analysis (this may take some time) */
-					gitProjectAnalysis.analyze();
+					executor.submit(new GitProjectAnalysisTask(gitProjectAnalysis, latch));
 				} catch (Exception e) {
 					e.printStackTrace(System.err);
 					continue;
 				}
+			}
+
+			/* Wait for all threads to finish their work */
+			try {
+				latch.await();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				return;
 			}
 
 		}
