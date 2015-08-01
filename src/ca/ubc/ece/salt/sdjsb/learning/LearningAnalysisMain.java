@@ -8,6 +8,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.log4j.PropertyConfigurator;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
@@ -16,7 +17,7 @@ import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysisTask;
 
 public class LearningAnalysisMain {
 	/** The size of the thread pool */
-	private static final int THREAD_POOL_SIZE = 8;
+	private static final int THREAD_POOL_SIZE = 7;
 
 	/** The directory where repositories are checked out. **/
 	public static final String CHECKOUT_DIR =  new String("repositories");
@@ -27,6 +28,7 @@ public class LearningAnalysisMain {
 	 * @throws Exception
 	 */
 	public static void main(String[] args) {
+		PropertyConfigurator.configure("log4j.properties");
 
 		LearningAnalysisOptions options = new LearningAnalysisOptions();
 		CmdLineParser parser = new CmdLineParser(options);
