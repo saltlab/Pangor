@@ -48,6 +48,8 @@ public class GitProjectAnalysis extends GitProject {
 		/* Get the list of bug fixing commits from version history. */
 		List<Pair<String, String>> bugFixingCommits = this.getBugFixingCommitPairs();
 
+		logger.info(" [ANALYZING] {} bug fixing commits", bugFixingCommits.size());
+
 		/* Analyze the changes made in each bug fixing commit. */
 		for(Pair<String, String> bugFixingCommit : bugFixingCommits) {
 
