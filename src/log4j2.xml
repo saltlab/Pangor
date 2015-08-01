@@ -6,12 +6,13 @@
         </Console>
         <File name="FILE" fileName="log.log" append="false">
             <!-- <PatternLayout pattern="%d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/> -->
+            <PatternLayout pattern="%d %-5p [%t] %C{2} (%F:%L) - %m%n"/>
         </File>
     </Appenders>
     <Loggers>
     <Logger name="org.apache.log4j.xml" />
         <Root level="info">
-            <!-- <AppenderRef ref="STDOUT"/> -->
+            <AppenderRef ref="STDOUT"/>
             <AppenderRef ref="FILE"/>
         </Root>
     </Loggers>
