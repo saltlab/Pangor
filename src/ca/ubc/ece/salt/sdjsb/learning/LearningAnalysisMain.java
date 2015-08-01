@@ -9,6 +9,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.PropertyConfigurator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
@@ -16,6 +18,8 @@ import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysis;
 import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysisTask;
 
 public class LearningAnalysisMain {
+	protected static final Logger logger = LogManager.getLogger(LearningAnalysisMain.class);
+
 	/** The size of the thread pool */
 	private static final int THREAD_POOL_SIZE = 7;
 
@@ -106,6 +110,8 @@ public class LearningAnalysisMain {
 					executor.submit(new GitProjectAnalysisTask(gitProjectAnalysis, latch));
 				} catch (Exception e) {
 					e.printStackTrace(System.err);
+					logger.error("[IMPORTANT] Project {} throwed an exception", uri);
+					logger.error(e);
 					continue;
 				}
 			}

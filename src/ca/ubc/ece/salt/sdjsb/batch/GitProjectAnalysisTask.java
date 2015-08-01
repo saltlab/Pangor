@@ -30,7 +30,7 @@ public class GitProjectAnalysisTask implements Callable<Void> {
 			System.err.println("[ERR] Exception on GitProjectAnalysisTask");
 			e.printStackTrace();
 		} finally {
-			logger.info("Finalizing task");
+			logger.info(" [TASK FINALIZED] {} tasks left", latch.getCount());
 
 			latch.countDown();
 		}
