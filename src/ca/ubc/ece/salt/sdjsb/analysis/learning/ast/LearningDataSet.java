@@ -160,9 +160,13 @@ public class LearningDataSet {
 
 	/**
 	 * Stores the feature vector in the file specified by {@code dataSetPath}.
+	 * This method is synchronized because it may be used by several
+	 * GitProjectAnalysis thread at the same time, which may cause race
+	 * conditions when writing to the output file.
+	 *
 	 * @param featureVector The feature vector to be managed by this class.
 	 */
-	private void storeFeatureVector(FeatureVector featureVector) throws Exception {
+	private synchronized void storeFeatureVector(FeatureVector featureVector) throws Exception {
 
 		/* The KeywordFilter that will filter out unwanted feature vectors. */
 		KeywordFilter insertedFilter = new KeywordFilter(FilterType.INCLUDE,

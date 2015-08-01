@@ -187,9 +187,12 @@ public class FeatureVector {
 	}
 
 	/**
+	 * Generates unique IDs for feature vectors. Synchronized because it may be
+	 * called by several GitProjectAnalysis threads.
+	 *
 	 * @return The next unique ID for a feature vector alert.
 	 */
-	private static int getNextID() {
+	private synchronized static int getNextID() {
 		idCounter++;
 		return idCounter;
 	}

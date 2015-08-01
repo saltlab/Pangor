@@ -13,6 +13,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.tuple.Pair;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.PullCommand;
@@ -35,6 +37,8 @@ import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysisException;
  * Represents a Git project and some metrics
  */
 public class GitProject {
+	protected final Logger logger = LogManager.getLogger(GitProject.class);
+
 	/** The Git instance. **/
 	protected Git git;
 

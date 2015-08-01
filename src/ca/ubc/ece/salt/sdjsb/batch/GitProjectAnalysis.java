@@ -43,6 +43,7 @@ public class GitProjectAnalysis extends GitProject {
 	 * @throws IOException
 	 */
 	public void analyze() throws GitAPIException, IOException, Exception {
+		logger.info("[START ANALYSIS] {}", this.getURI());
 
 		/* Get the list of bug fixing commits from version history. */
 		List<Pair<String, String>> bugFixingCommits = this.getBugFixingCommitPairs();
@@ -51,9 +52,9 @@ public class GitProjectAnalysis extends GitProject {
 		for(Pair<String, String> bugFixingCommit : bugFixingCommits) {
 
 			this.analyzeDiff(bugFixingCommit.getLeft(), bugFixingCommit.getRight());
-
 		}
 
+		logger.info("[END ANALYSIS] {}", this.getURI());
 	}
 
 	/**
@@ -93,7 +94,9 @@ public class GitProjectAnalysis extends GitProject {
                 	continue;
                 }
 
-                System.err.println("Exploring:\nBuggy Revision: " + buggyRevision + "\nOld File: " + diff.getOldPath() + "\nBug Fixing Revision: " + bugFixingRevision + "\nNew File:" + diff.getNewPath());
+				logger.debug("Exploring diff \n {} \n {} - {} \n {} - {}", getURI(), buggyRevision, diff.getOldPath(),
+						bugFixingRevision, diff.getNewPath());
+
                 String oldFile = this.fetchBlob(buggyRevision, diff.getOldPath());
                 String newFile = this.fetchBlob(bugFixingRevision, diff.getNewPath());
 

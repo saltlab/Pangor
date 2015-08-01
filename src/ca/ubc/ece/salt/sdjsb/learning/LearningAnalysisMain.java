@@ -4,25 +4,32 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import org.apache.log4j.PropertyConfigurator;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
 import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysis;
-import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysisException;
+import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysisTask;
 
 public class LearningAnalysisMain {
+	/** The size of the thread pool */
+	private static final int THREAD_POOL_SIZE = 7;
 
 	/** The directory where repositories are checked out. **/
 	public static final String CHECKOUT_DIR =  new String("repositories");
-	
+
 	/**
 	 * Creates the learning data set for extracting repair patterns.
 	 * @param args
-	 * @throws Exception 
+	 * @throws Exception
 	 */
-	public static void main(String[] args) throws Exception {
-		
+	public static void main(String[] args) {
+		PropertyConfigurator.configure("log4j.properties");
+
 		LearningAnalysisOptions options = new LearningAnalysisOptions();
 		CmdLineParser parser = new CmdLineParser(options);
 
@@ -32,16 +39,16 @@ public class LearningAnalysisMain {
 			LearningAnalysisMain.printUsage(e.getMessage(), parser);
 			return;
 		}
-		
+
 		/* Print the help page. */
 		if(options.getHelp()) {
 			LearningAnalysisMain.printHelp(parser);
 			return;
 		}
-		
+
 		/* Create the runner that will run the analysis. */
 		LearningAnalysisRunner runner = new LearningAnalysisRunner(options.getDataSetPath(), options.getSupplementaryFolder());
-		
+
         GitProjectAnalysis gitProjectAnalysis;
 
 		/* A URI was given. */
@@ -49,21 +56,20 @@ public class LearningAnalysisMain {
 
 			try {
                 gitProjectAnalysis = GitProjectAnalysis.fromURI(options.getURI(), CHECKOUT_DIR, runner);
-			} 
-			catch(GitProjectAnalysisException e) {
-                LearningAnalysisMain.printUsage(e.getMessage(), parser);
-                return;
+
+				gitProjectAnalysis.analyze();
+			} catch (Exception e) {
+				e.printStackTrace(System.err);
+				return;
 			}
-			
-			gitProjectAnalysis.analyze();
 
 		}
 		/* A list of URIs was given. */
 		else if(options.getRepoFile() != null) {
-			
+
 			/* Parse the file into a list of URIs. */
 			List<String> uris = new LinkedList<String>();
-			
+
 			try(BufferedReader br = new BufferedReader(new FileReader(options.getRepoFile()))) {
 			    for(String line; (line = br.readLine()) != null; ) {
 			    	uris.add(line);
@@ -71,24 +77,47 @@ public class LearningAnalysisMain {
 			}
 			catch(Exception e) {
 				System.err.println("Error while reading URI file: " + e.getMessage());
+				return;
 			}
-			
+
+			/*
+			 * Create a pool of threads and use a CountDownLatch to check when
+			 * all threads are done.
+			 * http://stackoverflow.com/questions/1250643/how-to-wait-for-all-
+			 * threads-to-finish-using-executorservice
+			 *
+			 * I was going to create a list of Callable objects and use
+			 * executor.invokeAll, but this would remove the start of the
+			 * execution of the tasks from the loop to outside the loop, which
+			 * would mean all git project initializations would have to happen
+			 * before starting the analysis.
+			 */
+			ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+			CountDownLatch latch = new CountDownLatch(uris.size());
+
 			/* Analyze all projects. */
 			for(String uri : uris) {
 
 				try {
+					/* Build git repository object */
 					gitProjectAnalysis = GitProjectAnalysis.fromURI(uri, LearningAnalysisMain.CHECKOUT_DIR, runner);
-				} 
-				catch(GitProjectAnalysisException e) {
-					LearningAnalysisMain.printUsage(e.getMessage(), parser);
-					return;
+
+					/* Perform the analysis (this may take some time) */
+					executor.submit(new GitProjectAnalysisTask(gitProjectAnalysis, latch));
+				} catch (Exception e) {
+					e.printStackTrace(System.err);
+					continue;
 				}
-				
-				/* Perform the analysis (this may take some time) */
-				gitProjectAnalysis.analyze();
-				
 			}
-			
+
+			/* Wait for all threads to finish their work */
+			try {
+				latch.await();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				return;
+			}
+
 		}
 		else {
 			System.out.println("No repository given.");
@@ -111,7 +140,7 @@ public class LearningAnalysisMain {
         System.out.println("");
         return;
 	}
-	
+
 	/**
 	 * Prints the usage of main.
 	 * @param error The error message that triggered the usage message.
