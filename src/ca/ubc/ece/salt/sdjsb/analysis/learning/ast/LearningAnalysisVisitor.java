@@ -149,10 +149,7 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 			changeType = ChangeType.UNCHANGED;
 
 		/* Add a typeof keyword if we're checking if this node is truthy or
-		 * falsey.
-		 *
-		 * TODO: PointsToPrediction throws a runtime exception when we register
-		 * 		 the "~falsey~" keyword. Need to fix. */
+		 * falsey. */
 		if(SpecialTypeAnalysisUtilities.isFalsey(node)) {
 
 			KeywordUse keyword = null;
@@ -172,8 +169,8 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		if(node instanceof Name) {
 			Name name = (Name) node;
 			token = name.getIdentifier();
-			//if(token.matches("e|err")) token = "error"; TODO
-			//else if(token.matches("cb|callb")) token = "callback"; TODO
+			if(token.matches("e|err|error")) token = "exception";
+			else if(token.matches("cb|callb")) token = "callback";
 		}
 		else if(node instanceof KeywordLiteral) {
 			KeywordLiteral kl = (KeywordLiteral) node;
@@ -183,7 +180,7 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 			NumberLiteral nl = (NumberLiteral) node;
 			try {
 				if(Double.parseDouble(nl.getValue()) == 0.0) {
-					//token = "zero"; TODO
+					token = "zero";
 				}
 			}
 			catch (NumberFormatException ignore) { }
@@ -191,7 +188,7 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		else if(node instanceof StringLiteral) {
 			StringLiteral sl = (StringLiteral) node;
 			if(sl.getValue().isEmpty()) {
-				//token = "blank"; TODO
+				token = "blank";
 			}
 			else {
 				token = sl.getValue();

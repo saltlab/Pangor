@@ -139,6 +139,34 @@ public class TestASTLearning {
 		this.runTest(new String[] { src, dst }, Arrays.asList(script));
 	}
 
+	/*
+	 * Tests if predictor recognizes our soft keywords.
+	 */
+	@Test
+	public void testSoftKeywords() throws Exception {
+		String src = "./test/input/learning/soft_old.js";
+		String dst = "./test/input/learning/soft_new.js";
+
+		TopLevelAPI api = APIFactory.buildTopLevelAPI();
+
+		KeywordUse typeof = new KeywordUse(KeywordType.RESERVED, KeywordContext.CONDITION, "typeof", ChangeType.INSERTED, api);
+		KeywordUse blank = new KeywordUse(KeywordType.RESERVED, KeywordContext.CONDITION, "blank", ChangeType.INSERTED, api);
+		KeywordUse zero = new KeywordUse(KeywordType.RESERVED, KeywordContext.CONDITION, "zero", ChangeType.INSERTED, api);
+		KeywordUse undefined = new KeywordUse(KeywordType.RESERVED, KeywordContext.CONDITION, "undefined", ChangeType.INSERTED, api);
+		KeywordUse callback = new KeywordUse(KeywordType.METHOD, KeywordContext.METHOD_CALL, "callback", ChangeType.INSERTED, api);
+		KeywordUse error = new KeywordUse(KeywordType.EXCEPTION, KeywordContext.EXCEPTION_CATCH, "exception", ChangeType.INSERTED, api);
+
+		MockFeatureVector script = new MockFeatureVector("~script~");
+		script.expectedKeywords.add(Pair.of(typeof, 4));
+		script.expectedKeywords.add(Pair.of(blank, 1));
+		script.expectedKeywords.add(Pair.of(zero, 1));
+		script.expectedKeywords.add(Pair.of(undefined, 1));
+		script.expectedKeywords.add(Pair.of(callback, 1));
+		script.expectedKeywords.add(Pair.of(error, 1));
+
+		this.runTest(new String[] { src, dst }, Arrays.asList(script));
+	}
+
 	@Test
 	public void testFileSystem() throws Exception {
 		String src = "./test/input/learning/lrn_fs_old.js";

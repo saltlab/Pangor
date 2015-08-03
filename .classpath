@@ -42,5 +42,6 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="lib/github-api-1.69.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

@@ -27,7 +27,7 @@ public class APIFactory {
 			"char", "class", "debugger", "default", "delete", "double", "enum",
 			"export", "false", "float", "instanceof", "int", "long", "native",
 			"null", "short", "super", "this", "transient", "true", "typeof",
-			"volatile");
+			"volatile", "callback", "error", "zero", "blank", "undefined");
 
 		List<PackageAPI> packages = buildTopLevelPackages();
 
@@ -35,19 +35,21 @@ public class APIFactory {
 		List<String> methods = Arrays.asList("eval", "hasOwnProperty", "isFinite",
 				"isNaN", "isPrototypeOf", "toString", "valueOf", "decodeURI",
 				"decodeURIComponent", "encodeURI", "encodeURIComponent", "Number",
-				"parseFloat", "parseInt", "String", "unescape");
+				"parseFloat", "parseInt", "String", "unescape", "callback");
 
 		/* Fields of the Global class. */
 		List<String> fields = Arrays.asList("length", "name", "prototype",
-				"constructor", "Infinity", "NaN", "undefined");
+				"constructor", "Infinity", "NaN");
 
 		List<String> constants = Arrays.asList();
 
 		List<String> events = Arrays.asList();
 
+		List<String> exceptions = Arrays.asList("exception");
+
 		List<ClassAPI> classes = buildTopLevelClasses();
 
-		return new TopLevelAPI(keywords, packages, methods, fields, constants, events, classes);
+		return new TopLevelAPI(keywords, packages, methods, fields, constants, events, exceptions, classes);
 
 	}
 

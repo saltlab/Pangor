@@ -23,9 +23,13 @@ public class LearningDataSetMain {
 	 */
 	public static void main(String[] args) throws Exception {
 
-		KeywordFilter prototypeFilter = new KeywordFilter(FilterType.INCLUDE,
-				KeywordType.UNKNOWN, KeywordContext.UNKNOWN, ChangeType.INSERTED,
-				"global", "typeof");
+//		KeywordFilter nofilter = new KeywordFilter(FilterType.INCLUDE,
+//				KeywordType.UNKNOWN, KeywordContext.UNKNOWN, ChangeType.UNKNOWN,
+//				"", "");
+
+		KeywordFilter filter = new KeywordFilter(FilterType.INCLUDE,
+				KeywordType.METHOD, KeywordContext.METHOD_CALL, ChangeType.INSERTED,
+				"global", "test");
 
 		LearningDataSetOptions options = new LearningDataSetOptions();
 		CmdLineParser parser = new CmdLineParser(options);
@@ -44,7 +48,7 @@ public class LearningDataSetMain {
 		}
 
 		/* Re-construct the data set. */
-		LearningDataSet dataSet = new LearningDataSet(options.getDataSetPath(), Arrays.asList(prototypeFilter));
+		LearningDataSet dataSet = new LearningDataSet(options.getDataSetPath(), Arrays.asList(filter));
 
 		/* Print the metrics from the data set. */
 		if(options.getPrintMetrics()) {

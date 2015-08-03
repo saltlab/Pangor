@@ -22,8 +22,12 @@ public class TopLevelAPI extends AbstractAPI {
 	public TopLevelAPI(List<String> keywords, List<PackageAPI> packages,
 					   List<String> methodNames, List<String> fieldNames,
 					   List<String> constantNames, List<String> eventNames,
-					   List<ClassAPI> classes) {
+					   List<String> exceptionNames, List<ClassAPI> classes) {
 		super(methodNames, fieldNames, constantNames, eventNames, classes);
+
+		for(String exception : exceptionNames) {
+			this.keywords.add(new KeywordDefinition(KeywordType.EXCEPTION, exception, this));
+		}
 
 		for(String keyword : keywords) {
 			this.keywords.add(new KeywordDefinition(KeywordType.RESERVED, keyword, this));

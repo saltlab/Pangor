@@ -11,6 +11,7 @@ import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.Name;
+import org.mozilla.javascript.ast.NumberLiteral;
 import org.mozilla.javascript.ast.ObjectProperty;
 import org.mozilla.javascript.ast.PropertyGet;
 import org.mozilla.javascript.ast.StringLiteral;
@@ -74,8 +75,9 @@ public class LearningUtilities {
 				"instanceof", "int", "interface", "let", "long", "native",
 				"new", "null", "package", "private", "protected", "public",
 				"return", "short", "static", "super", "switch", "synchronized",
-				"this", "throw", "throws", "transient", "true", "try", "typeof",
-				"var", "void", "volatile", "while", "with", "yield");
+				"this", "undefined", "throw", "throws", "transient", "true",
+				"try", "typeof", "var", "void", "volatile", "while", "with",
+				"yield");
 
 		if(token instanceof Name) {
 			Name name = (Name) token;
@@ -95,6 +97,17 @@ public class LearningUtilities {
 		AstNode parent = token.getParent();
 
 		if(parent == null || token == null) return KeywordType.UNKNOWN;
+
+		/* Check for special types. */
+		if(token instanceof StringLiteral) {
+
+			if(((StringLiteral)token).toSource().equals("\"\"")) {
+				return KeywordType.RESERVED;
+			}
+		}
+		else if((token instanceof NumberLiteral) && ((NumberLiteral)token).getNumber() == 0) {
+			return KeywordType.RESERVED;
+		}
 
 		/* Check for class, method and parameter declarations. */
 		if (parent instanceof FunctionNode) {
@@ -139,7 +152,11 @@ public class LearningUtilities {
 					if(pack instanceof StringLiteral && pack == token) {
 						return KeywordType.PACKAGE;
 					}
-				} else if (target == token) {
+				}
+				else if(target.getIdentifier().equals("~exception")) {
+					return KeywordType.EXCEPTION;
+				}
+				else if (target == token) {
 					/*
 					 * If is not require("package"), but this is exactly the
 					 * target from the function call, it is a method
@@ -206,7 +223,7 @@ public class LearningUtilities {
 		else if(parent instanceof CatchClause) {
 
 			CatchClause catchClause = (CatchClause) parent;
-			if(catchClause.getVarName() == token) {
+			if(catchClause.getVarName().toSource().equals(token.toSource())) {
 				return KeywordType.EXCEPTION;
 			}
 
@@ -342,12 +359,12 @@ public class LearningUtilities {
 
 		/*
 		 * Handles variable.field.field.method()
-		 * 
+		 *
 		 * If we went up the tree, we are a direct child of a property get and
 		 * we found a function in our way up
 		 */
-		if (vf != node 
-				&& node.getParent() instanceof PropertyGet 
+		if (vf != node
+				&& node.getParent() instanceof PropertyGet
 				&& vf.getParent() instanceof FunctionCall) {
 			PropertyGet property = (PropertyGet) node.getParent();
 
@@ -396,10 +413,12 @@ public class LearningUtilities {
 			if(call.getTarget() == vfr) {
 				return KeywordContext.METHOD_CALL;
 			}
+			else if(call.getTarget() instanceof Name && ((Name)call.getTarget()).getIdentifier().equals("~exception")) {
+				return KeywordContext.EXCEPTION_CATCH;
+			}
 			else {
 				return KeywordContext.ARGUMENT;
 			}
-
 		}
 		else if(vfr.getParent() instanceof VariableInitializer) {
 			VariableInitializer initializer = (VariableInitializer) vfr.getParent();
