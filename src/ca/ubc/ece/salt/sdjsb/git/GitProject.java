@@ -248,7 +248,6 @@ public class GitProject {
 	 */
 	protected List<Pair<String, String>> getBugFixingCommitPairs() {
 		List<Pair<String, String>> bugFixingCommits = new LinkedList<Pair<String, String>>();
-		String bugFixingCommit = null;
 		int bugFixingCommitCounter = 0, commitCounter = 0;
 
 		Set<String> authorsEmails = new HashSet<>();
@@ -275,15 +274,6 @@ public class GitProject {
 			PersonIdent authorIdent = commit.getAuthorIdent();
 			authorsEmails.add(authorIdent.getEmailAddress());
 
-			/*
-			 * If last commit was a bug fixing one, add it and current to list
-			 */
-			if (bugFixingCommit != null) {
-				bugFixingCommits.add(Pair.of(commit.name(), bugFixingCommit));
-				bugFixingCommit = null;
-				bugFixingCommitCounter++;
-			}
-
 			String message = commit.getFullMessage();
 			Pattern p = Pattern.compile("fix|repair", Pattern.CASE_INSENSITIVE);
 			Matcher m = p.matcher(message);
@@ -293,7 +283,12 @@ public class GitProject {
 			 * If the commit message contains one of our fix keywords, store it.
 			 */
 			if (m.find()) {
-				bugFixingCommit = commit.name();
+
+				if(commit.getParentCount()  > 0) {
+					bugFixingCommits.add(Pair.of(commit.getParent(0).name(), commit.name()));
+					bugFixingCommitCounter++;
+				}
+
 			}
 
 			/*
