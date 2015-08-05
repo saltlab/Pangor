@@ -43,6 +43,7 @@ public class GitProjectAnalysis extends GitProject {
 	 * @throws IOException
 	 */
 	public void analyze() throws GitAPIException, IOException, Exception {
+		long startTime = System.currentTimeMillis();
 		logger.info("[START ANALYSIS] {}", this.getURI());
 
 		/* Get the list of bug fixing commits from version history. */
@@ -56,7 +57,8 @@ public class GitProjectAnalysis extends GitProject {
 			this.analyzeDiff(bugFixingCommit.getLeft(), bugFixingCommit.getRight());
 		}
 
-		logger.info("[END ANALYSIS] {}", this.getURI());
+		long endTime = System.currentTimeMillis();
+		logger.info("[END ANALYSIS] {}. Time (in seconds): {} ", this.getURI(), (endTime - startTime) / 1000.0);
 	}
 
 	/**
