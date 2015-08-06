@@ -19,7 +19,7 @@ CLIPBOARD_PROGRAM=pbcopy
 attributes=($(cat $ARFF_FILE | grep @attribute | awk -F " " '{print $2}'))
 
 # Get all projects that has instances on this cluster
-projects=($(cat $ARFF_FILE | grep -w "cluster"$1 | grep -v @attribute | awk -F "," '{print $3}' | uniq))
+projects=($(cat $ARFF_FILE | grep -w "cluster"$1 | grep -v @attribute | awk -F "," '{print $3}' | sort | uniq))
 
 echo "------------ Exploring ${#projects[@]} projects ------------"
 
