@@ -15,10 +15,10 @@ ARFF_FILE=../output/output.arff
 SUPPLEMENTARY_FOLDER=../output/supplementary/
 
 # Get all attributes names
-attributes=($(cat $ARFF_FILE | grep attribute | grep -v filters | awk -F " " '{print $2}'))
+attributes=($(cat $ARFF_FILE | grep @attribute | awk -F " " '{print $2}'))
 
 # Get ids of instances
-ids=$(cat $ARFF_FILE | grep -w "cluster"$1 | grep -v attribute | grep $2 | awk -F "," '{print $2}')
+ids=$(cat $ARFF_FILE | grep -w "cluster"$1 | grep -v @attribute | grep $2 | awk -F "," '{print $2}')
 
 # Iterate over instances
 for id in $ids;

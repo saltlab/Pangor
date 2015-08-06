@@ -15,10 +15,10 @@ ARFF_FILE=../output/output.arff
 SUPPLEMENTARY_FOLDER=../output/supplementary/
 
 # Get all attributes names
-attributes=($(cat $ARFF_FILE | grep attribute | grep -v filters | awk -F " " '{print $2}'))
+attributes=($(cat $ARFF_FILE | grep @attribute | awk -F " " '{print $2}'))
 
 # Get feature vector
-vector=$(cat $ARFF_FILE | grep -v attribute | awk -F "," '$2=='$1)
+vector=$(cat $ARFF_FILE | grep -v @attribute | awk -F "," '$2=='$1)
 
 
 # Iterate over features
