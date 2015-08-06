@@ -10,10 +10,10 @@
 #  or 
 #  $ ./cluster_nav_project_diff.sh 84
 
-DIFF_PROGRAM=meld
-ARFF_FILE=../output/output.arff
-SUPPLEMENTARY_FOLDER=../output/supplementary/
-CLIPBOARD_PROGRAM=xclip
+DIFF_PROGRAM=opendiff
+ARFF_FILE=../output/official_js_2015-08-05/RESERVED_CONDITION_INSERTED_global_typeof.arff
+SUPPLEMENTARY_FOLDER=../output/official_js_2015-08-05/supplementary/
+CLIPBOARD_PROGRAM=pbcopy
 
 # Get all attributes names
 attributes=($(cat $ARFF_FILE | grep @attribute | awk -F " " '{print $2}'))
