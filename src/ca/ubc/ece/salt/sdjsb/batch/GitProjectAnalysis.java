@@ -108,6 +108,7 @@ public class GitProjectAnalysis extends GitProject {
                 	AnalysisMetaInformation ami = new AnalysisMetaInformation(
                 			this.totalCommits, this.bugFixingCommits,
                 			this.projectID,
+                			this.projectHomepage,
                 			diff.getOldPath(), diff.getNewPath(),
                 			buggyRevision, bugFixingRevision,
                 			oldFile, newFile);

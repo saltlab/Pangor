@@ -29,6 +29,9 @@ public class FeatureVector {
 	/** The identifier for the project. **/
 	public String projectID;
 
+	/** The homepage for the project. **/
+	public String projectHomepage;
+
 	/** The path to the source file where the bug is present. **/
 	public String buggyFile;
 
@@ -106,7 +109,8 @@ public class FeatureVector {
 	 */
 	public String serialize() {
 
-		String serialized = id + "," + this.projectID + "," + this.buggyFile + "," + this.repairedFile
+		String serialized = id + "," + this.projectID + "," + this.projectHomepage
+				+ "," + this.buggyFile + "," + this.repairedFile
 				+ "," + this.buggyCommitID + "," + this.repairedCommitID + "," + this.functionName;
 
 		for(KeywordUse keyword : this.keywordMap.keySet()) {
@@ -133,13 +137,14 @@ public class FeatureVector {
 		FeatureVector featureVector = new FeatureVector();
 		featureVector.id = Integer.parseInt(features[0]);
 		featureVector.projectID = features[1];
-		featureVector.buggyFile = features[2];
-		featureVector.repairedFile = features[3];
-		featureVector.buggyCommitID = features[4];
-		featureVector.repairedCommitID = features[5];
-		featureVector.functionName = features[6];
+		featureVector.projectHomepage = features[2];
+		featureVector.buggyFile = features[3];
+		featureVector.repairedFile = features[4];
+		featureVector.buggyCommitID = features[5];
+		featureVector.repairedCommitID = features[6];
+		featureVector.functionName = features[7];
 
-		for(int i = 7; i < features.length; i++) {
+		for(int i = 8; i < features.length; i++) {
 			String[] feature = features[i].split(":");
 			if(feature.length < 6) throw new Exception("De-serialization exception. Serial format not recognized.");
 			KeywordUse keyword = new KeywordUse(KeywordType.valueOf(feature[0]),
@@ -160,7 +165,8 @@ public class FeatureVector {
 	 */
 	public String getFeatureVector(Set<KeywordDefinition> keywords) {
 
-		String vector = id + "," + this.projectID + "," + this.buggyFile + "," + this.repairedFile
+		String vector = id + "," + this.projectID + "," + this.projectHomepage + ","
+				+ this.buggyFile + "," + this.repairedFile
 				+ "," + this.buggyCommitID + "," + this.repairedCommitID + "," + this.functionName;
 
 		for(KeywordDefinition keyword : keywords) {

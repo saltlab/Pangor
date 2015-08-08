@@ -11,7 +11,7 @@
 #  $ ./cluster_nav_project_diff.sh 84
 
 DIFF_PROGRAM=opendiff
-ARFF_FILE=../output/official_js_2015-08-05/RESERVED_CONDITION_INSERTED_global_typeof.arff
+ARFF_FILE=../output/official_js_2015-08-05/RESERVED_ASSIGNMENT_LHS_INSERTED_global_this.arff
 SUPPLEMENTARY_FOLDER=../output/official_js_2015-08-05/supplementary/
 CLIPBOARD_PROGRAM=pbcopy
 

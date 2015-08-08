@@ -48,6 +48,9 @@ public class GitProject {
 	/** The repository name. **/
 	protected String projectID;
 
+	/** The repository homepage. **/
+	protected String projectHomepage;
+
 	/** The URI **/
 	protected String URI;
 
@@ -85,6 +88,7 @@ public class GitProject {
 
 		try {
 			this.projectID = getGitProjectName(URI);
+			this.projectHomepage = getGitProjectHomepage(URI);
 		} catch (GitProjectAnalysisException e) {
 			e.printStackTrace();
 		}
@@ -332,6 +336,16 @@ public class GitProject {
 		}
 
 		return matcher.group(1);
+	}
+
+	/**
+	 * Extracts the project home page from the URI.
+	 *
+	 * @param uri The uri (e.g., https://github.com/karma-runner/karma.git)
+	 * @return The project home page.
+	 */
+	protected static String getGitProjectHomepage(String uri) throws GitProjectAnalysisException {
+		return uri.substring(0, uri.lastIndexOf(".git"));
 	}
 
 	/**
