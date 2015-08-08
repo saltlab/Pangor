@@ -11,9 +11,10 @@
 #  $ ./cluster_nav_project_diff.sh 84
 
 DIFF_PROGRAM=opendiff
-ARFF_FILE=../output/official_js_2015-08-05/RESERVED_ASSIGNMENT_LHS_INSERTED_global_this.arff
-SUPPLEMENTARY_FOLDER=../output/official_js_2015-08-05/supplementary/
+ARFF_FILE=../output/official_js_2015-08-08/RESERVED_ASSIGNMENT_LHS_INSERTED_global_this.arff
+SUPPLEMENTARY_FOLDER=../output/official_js_2015-08-08/supplementary/
 CLIPBOARD_PROGRAM=pbcopy
+BROWSER=open
 
 # Get all attributes names
 attributes=($(cat $ARFF_FILE | grep @attribute | awk -F " " '{print $2}'))
@@ -37,6 +38,30 @@ do
 	    # Get feature vector
 	    vector=$(cat $ARFF_FILE | grep -w "cluster"$1 | grep -v attribute | awk -F "," '$2=='$id)
 
+			# Find the ids of the ProjectHomepage and RepairedCommitID
+			projectHomepageIndex=-1
+			repairedCommitIDIndex=-1
+			i=0
+			for attribute in "${attributes[@]}";
+			do
+				if [ $attribute = "ProjectHomepage" ]; then
+					projectHomepageIndex=$i
+				fi
+				if [ $attribute = "RepairedCommitID" ]; then
+					repairedCommitIDIndex=$i
+				fi
+				i=$((i+1))
+			done
+
+			# Build the URL for the diff on GitHub
+			if [ $projectHomepageIndex -ge 0 -a $repairedCommitIDIndex -ge 0 ]; then
+				values=($(echo $vector | tr "," " "))
+				commit_url="${values[$projectHomepageIndex]}/commit/${values[$repairedCommitIDIndex]}"
+				echo "Commit URL - $commit_url"
+			else
+				commit_url=
+			fi
+
 	    # Iterate over features. This is only for printing
 	    # If is not 0, print attribute name and value
 	    i=0
@@ -54,12 +79,17 @@ do
 	    # \t so when we paste on Google Docs it is on 2 different cells
 	    printf "$id \t $project" | $CLIPBOARD_PROGRAM -selection clipboard
 
+			# Open the link to the GitHub diff
+			if [ ! -z "$BROWSER" -a ! -z "$commit_url" ]; then
+				$BROWSER $commit_url 
+			fi
+
 	    # Close *all* running instances of DIFF_PROGRAM
 	    # TODO: Close only the last one
-	    killall $DIFF_PROGRAM > /dev/null 2>&1
+	    #killall $DIFF_PROGRAM > /dev/null 2>&1
 
 	    # Open diff program and redirect possible error outputs to /dev/null
-	    $DIFF_PROGRAM ${SUPPLEMENTARY_FOLDER}${id}_src.js ${SUPPLEMENTARY_FOLDER}${id}_dst.js 2> /dev/null &
+	    #$DIFF_PROGRAM ${SUPPLEMENTARY_FOLDER}${id}_src.js ${SUPPLEMENTARY_FOLDER}${id}_dst.js 2> /dev/null &
 
 	    # Print options
 	    echo ""
