@@ -11,6 +11,7 @@
 #  $ ./cluster_nav_project_diff.sh 84
 
 DIFF_PROGRAM=opendiff
+DIFF_PROCESS=FileMerge
 ARFF_FILE=../output/official_js_2015-08-08/RESERVED_ASSIGNMENT_LHS_INSERTED_global_this.arff
 SUPPLEMENTARY_FOLDER=../output/official_js_2015-08-08/supplementary/
 CLIPBOARD_PROGRAM=pbcopy
@@ -86,10 +87,10 @@ do
 
 	    # Close *all* running instances of DIFF_PROGRAM
 	    # TODO: Close only the last one
-	    #killall $DIFF_PROGRAM > /dev/null 2>&1
+	    killall $DIFF_PROCESS > /dev/null 2>&1
 
 	    # Open diff program and redirect possible error outputs to /dev/null
-	    #$DIFF_PROGRAM ${SUPPLEMENTARY_FOLDER}${id}_src.js ${SUPPLEMENTARY_FOLDER}${id}_dst.js 2> /dev/null &
+	    $DIFF_PROGRAM ${SUPPLEMENTARY_FOLDER}${id}_src.js ${SUPPLEMENTARY_FOLDER}${id}_dst.js 2> /dev/null &
 
 	    # Print options
 	    echo ""
@@ -100,7 +101,8 @@ do
 	    case $input in
 	        [n]* ) echo "" ;;
 			[c]* ) break;;
-	        [q]* ) exit;;
+	        [q]* ) 	killall $DIFF_PROCESS > /dev/null 2>&1
+									exit;;
 	        * ) break;;
 	    esac
 	done
@@ -108,4 +110,4 @@ done
 
 # Close *all* running instances of DIFF_PROGRAM
 # TODO: Close only the last one
-killall $DIFF_PROGRAM > /dev/null 2>&1
+killall $DIFF_PROCESS > /dev/null 2>&1
