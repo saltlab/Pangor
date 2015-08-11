@@ -12,10 +12,16 @@
 
 DIFF_PROGRAM=opendiff
 DIFF_PROCESS=FileMerge
-ARFF_FILE=../output/official_js_2015-08-08/RESERVED_ASSIGNMENT_LHS_INSERTED_global_this.arff
+ARFF_FILE=../output/official_js_2015-08-08/EXCEPTION_EXCEPTION_CATCH_INSERTED_global_exception.arff
 SUPPLEMENTARY_FOLDER=../output/official_js_2015-08-08/supplementary/
 CLIPBOARD_PROGRAM=pbcopy
 BROWSER=open
+
+if [ "$2" = "-s" ]; then
+	skip=true
+else
+	skip=false
+fi
 
 # Get all attributes names
 attributes=($(cat $ARFF_FILE | grep @attribute | awk -F " " '{print $2}'))
@@ -81,7 +87,7 @@ do
 	    printf "$id \t $project" | $CLIPBOARD_PROGRAM -selection clipboard
 
 			# Open the link to the GitHub diff
-			if [ ! -z "$BROWSER" -a ! -z "$commit_url" ]; then
+			if [ ! -z "$BROWSER" -a ! -z "$commit_url"  -a $skip = false ]; then
 				$BROWSER $commit_url 
 			fi
 
@@ -90,20 +96,27 @@ do
 	    killall $DIFF_PROCESS > /dev/null 2>&1
 
 	    # Open diff program and redirect possible error outputs to /dev/null
-	    $DIFF_PROGRAM ${SUPPLEMENTARY_FOLDER}${id}_src.js ${SUPPLEMENTARY_FOLDER}${id}_dst.js 2> /dev/null &
+			if [ $skip = false ]; then
+				$DIFF_PROGRAM ${SUPPLEMENTARY_FOLDER}${id}_src.js ${SUPPLEMENTARY_FOLDER}${id}_dst.js 2> /dev/null &
+			fi
 
 	    # Print options
 	    echo ""
 	    echo "[n] for [n]ext instance in same project."
+	    echo "[s] for continue to next project and [s]kip loading diffs."
 	    echo "[c] or [enter] for [c]ontinue to next project."
 	    echo "[q] for [q]uit"
 	    read -p "" input
 	    case $input in
-	        [n]* ) echo "" ;;
-			[c]* ) break;;
+	        [n]* )	skip=false ;;
+	        [s]* )	skip=true 
+									break;;
+					[c]* ) 	skip=false
+									break;;
 	        [q]* ) 	killall $DIFF_PROCESS > /dev/null 2>&1
-									exit;;
-	        * ) break;;
+					        exit;;
+	        * ) skip=false 
+							break;;
 	    esac
 	done
 done
