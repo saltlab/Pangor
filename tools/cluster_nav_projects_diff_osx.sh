@@ -22,6 +22,7 @@ attributes=($(cat $ARFF_FILE | grep @attribute | awk -F " " '{print $2}'))
 projects=($(cat $ARFF_FILE | grep -w "cluster"$1 | grep -v @attribute | awk -F "," '{print $3}' | sort | uniq))
 
 echo "------------ Exploring ${#projects[@]} projects ------------"
+echo ${projects[@]}
 
 # Iterate over projects
 for project in "${projects[@]}";
