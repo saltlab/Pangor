@@ -38,7 +38,7 @@ public class TestASTLearning {
 	protected void runTest(String[] args, List<MockFeatureVector> expected) throws Exception {
 
 		AnalysisMetaInformation ami = new AnalysisMetaInformation(0, 0, "test",
-				"na", "na", "na", "na", "na", "na");
+				"na", "na", "na", "na", "na", "na", "na");
 
 		KeywordFilter fsFilter = KeywordFilter.buildPackageFilter("fs");
 		KeywordFilter pathFilter = KeywordFilter.buildPackageFilter("path");

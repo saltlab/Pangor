@@ -209,7 +209,7 @@ public class LearningDataSet {
 	 */
 	public String getFeatureVectorHeader() {
 
-		String header = String.join(",", "ID", "ProjectID", "BuggyFile",
+		String header = String.join(",", "ID", "ProjectID", "ProjectHomepage", "BuggyFile",
 				"RepairedFile", "BuggyCommitID", "RepairedCommitID",
 				"FunctionName");
 
