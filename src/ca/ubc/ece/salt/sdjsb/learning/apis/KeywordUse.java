@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.analysis.learning.apis;
+package ca.ubc.ece.salt.sdjsb.learning.apis;
 
 import java.util.Arrays;
 import java.util.HashMap;

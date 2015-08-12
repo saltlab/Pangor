@@ -23,8 +23,8 @@ import org.mozilla.javascript.ast.UnaryExpression;
 import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.VariableInitializer;
 
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningUtilities;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningUtilities;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse.KeywordContext;
 
 public class TestLearningUtilitiesContext {
 

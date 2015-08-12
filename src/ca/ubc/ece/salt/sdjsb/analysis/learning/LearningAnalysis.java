@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.analysis.learning.ast;
+package ca.ubc.ece.salt.sdjsb.analysis.learning;
 
 import java.util.Map;
 

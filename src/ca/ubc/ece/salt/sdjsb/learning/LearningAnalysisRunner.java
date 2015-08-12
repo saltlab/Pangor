@@ -7,9 +7,9 @@ import java.io.IOException;
 import java.io.PrintStream;
 
 import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.FeatureVector;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningDataSet;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.FeatureVector;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningDataSet;
 import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.sdjsb.batch.AnalysisRunner;
 

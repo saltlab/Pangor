@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.analysis.prediction;
+package ca.ubc.ece.salt.sdjsb.learning.pointsto;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -6,10 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.AbstractAPI;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
+import ca.ubc.ece.salt.sdjsb.learning.apis.AbstractAPI;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse;
+import ca.ubc.ece.salt.sdjsb.learning.apis.TopLevelAPI;
 
 /**
  * Predictor implementation using "confidence" and "support" measures.

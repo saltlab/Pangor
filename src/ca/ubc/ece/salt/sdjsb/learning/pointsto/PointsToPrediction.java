@@ -1,14 +1,14 @@
-package ca.ubc.ece.salt.sdjsb.analysis.prediction;
+package ca.ubc.ece.salt.sdjsb.learning.pointsto;
 
 import java.util.Map;
 import java.util.Set;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.AbstractAPI;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
+import ca.ubc.ece.salt.sdjsb.learning.apis.AbstractAPI;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse;
+import ca.ubc.ece.salt.sdjsb.learning.apis.TopLevelAPI;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse.KeywordContext;
 
 /**
  * Predicts the points-to relationships for all keywords (methods, fields,

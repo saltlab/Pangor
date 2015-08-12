@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.analysis.learning.ast;
+package ca.ubc.ece.salt.sdjsb.analysis.learning;
 
 import java.util.Arrays;
 import java.util.List;
@@ -17,9 +17,9 @@ import org.mozilla.javascript.ast.PropertyGet;
 import org.mozilla.javascript.ast.StringLiteral;
 import org.mozilla.javascript.ast.VariableInitializer;
 
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysisUtilities;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse.KeywordContext;
 
 /**
  * Provides AST utilities to help collect feature information (i.e., keyword
@@ -211,10 +211,21 @@ public class LearningUtilities {
 
 			PropertyGet propertyGet = (PropertyGet) token.getParent();
 
-			if (propertyGet.getTarget() == token)
+			if (propertyGet.getTarget() == token) {
+
+				/* If the first character is upper case, consider it a class. */
+				if(Character.isUpperCase(token.toSource().charAt(0))) {
+					return KeywordType.CLASS;
+				}
+
+				/* Otherwise it is a variable. */
 				return KeywordType.VARIABLE;
-			else if (propertyGet.getProperty() == token)
+
+			}
+			else if (propertyGet.getProperty() == token) {
 				return KeywordType.METHOD;
+			}
+
 		}
 
 		/*

@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.analysis.learning.ast;
+package ca.ubc.ece.salt.sdjsb.analysis.learning;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -18,11 +18,11 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.KeywordFilter.FilterType;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.KeywordFilter.FilterType;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse.KeywordContext;
 
 /**
  * The {@code FeatureVectorManager} is a pre-processing step for data mining

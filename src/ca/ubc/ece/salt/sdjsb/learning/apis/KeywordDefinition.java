@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.analysis.learning.apis;
+package ca.ubc.ece.salt.sdjsb.learning.apis;
 
 /**
  * Stores a keyword and the context under which it is used (which we call its type).

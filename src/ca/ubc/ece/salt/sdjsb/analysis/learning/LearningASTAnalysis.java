@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.analysis.learning.ast;
+package ca.ubc.ece.salt.sdjsb.analysis.learning;
 
 import java.util.HashMap;
 import java.util.List;
@@ -7,11 +7,11 @@ import java.util.Map;
 import org.mozilla.javascript.ast.AstRoot;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.APIFactory;
-import ca.ubc.ece.salt.sdjsb.analysis.prediction.PointsToPrediction;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.Scope;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.ScopeAnalysis;
 import ca.ubc.ece.salt.sdjsb.cfg.CFG;
+import ca.ubc.ece.salt.sdjsb.learning.apis.APIFactory;
+import ca.ubc.ece.salt.sdjsb.learning.pointsto.PointsToPrediction;
 
 /**
  * Creates a feature vector for a function by visiting its AST node and 

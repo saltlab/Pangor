@@ -1,8 +1,8 @@
-package ca.ubc.ece.salt.sdjsb.analysis.learning.ast;
+package ca.ubc.ece.salt.sdjsb.analysis.learning;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse.KeywordContext;
 
 public class KeywordFilter {
 

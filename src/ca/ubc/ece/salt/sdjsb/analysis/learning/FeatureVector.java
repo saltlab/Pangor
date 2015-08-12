@@ -1,14 +1,14 @@
-package ca.ubc.ece.salt.sdjsb.analysis.learning.ast;
+package ca.ubc.ece.salt.sdjsb.analysis.learning;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse.KeywordContext;
 
 /**
  * Stores a feature vector (a row) of the repair pattern learning data set.

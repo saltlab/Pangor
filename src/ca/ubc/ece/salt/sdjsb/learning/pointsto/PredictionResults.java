@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.analysis.prediction;
+package ca.ubc.ece.salt.sdjsb.learning.pointsto;
 
 import java.util.Comparator;
 import java.util.PriorityQueue;

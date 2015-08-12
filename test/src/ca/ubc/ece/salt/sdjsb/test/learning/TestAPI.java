@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.test.analysis;
+package ca.ubc.ece.salt.sdjsb.test.learning;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -13,10 +13,10 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.APIFactory;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.AbstractAPI;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.sdjsb.learning.apis.APIFactory;
+import ca.ubc.ece.salt.sdjsb.learning.apis.AbstractAPI;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
 
 public class TestAPI {
 	@Test

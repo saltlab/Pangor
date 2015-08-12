@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.analysis.learning.apis;
+package ca.ubc.ece.salt.sdjsb.learning.apis;
 
 import java.util.Arrays;
 import java.util.List;
@@ -71,8 +71,22 @@ public class APIFactory {
 //				Arrays.asList(), /* Events */
 //				Arrays.asList()); /* Classes */
 
+		ClassAPI json = new ClassAPI("JSON", /* Class Name */
+				Arrays.asList("parse", "stringify"), /* Methods */
+				Arrays.asList(), /* Fields */
+				Arrays.asList(), /* Constants */
+				Arrays.asList(), /* Events */
+				Arrays.asList()); /* Classes */
+
+		ClassAPI function = new ClassAPI("Function", /* Class Name */
+				Arrays.asList("apply", "bind", "call"), /* Methods */
+				Arrays.asList("length"), /* Fields */
+				Arrays.asList(), /* Constants */
+				Arrays.asList(), /* Events */
+				Arrays.asList() /* Classes */);
+
 		ClassAPI array = new ClassAPI("Array", /* Class Name */
-				Arrays.asList("concat", "indexOf", "join", "lastIndexOf",
+				Arrays.asList("concat", "indexOf", "join", "indexOf", "lastIndexOf",
 						"pop", "push", "reverse", "shift", "splice", "sort",
 						"unshift", "forEach", "every", "some", "filter",
 						"map", "reduce", "reduceRight"), /* Methods */
@@ -112,11 +126,11 @@ public class APIFactory {
 		/* Note: for Object, we simplify all Object.prototype.[field|method] to Object.[field|method]. */
 		ClassAPI object = new ClassAPI("Object", /* Class Name */
 				Arrays.asList("create", "defineProperty", "defineProperties", "freeze",
-						"getOwnPropertyDescriptor", "getOwnPropertyNames", "getPrototypeOf",
+						"getOwnPropertyDescriptor", "getOwnPropertyNames", "getPrototypeOf", "is",
 						"isExtensible", "isFrozen", "isSealed", "keys", "preventExtensions",
 						"seal", "hasOwnProperty", "isPrototypeOf", "propertyIsEnumerable",
 						"toLocalString", "toString"), /* Methods */
-				Arrays.asList("length", "prototype", "constructor"), /* Fields */
+				Arrays.asList("length", "prototype", "constructor", "_noSuchMethod_"), /* Fields */
 				Arrays.asList(), /* Constants */
 				Arrays.asList(), /* Events */
 				Arrays.asList()); /* Classes */
@@ -148,7 +162,7 @@ public class APIFactory {
 						"split", "substr", "substring", "toLocaleLowerCase",
 						"toLocaleUpperCase", "toLowerCase", "toUpperCase",
 						"trim"), /* Methods */
-				Arrays.asList(), /* Fields */
+				Arrays.asList("length"), /* Fields */
 				Arrays.asList(), /* Constants */
 				Arrays.asList(), /* Events */
 				Arrays.asList()); /* Classes */
@@ -167,7 +181,7 @@ public class APIFactory {
 		 * 		APIs first.
 		 */
 
-		return Arrays.asList(error, array, date, math, number, string, regexp, object);
+		return Arrays.asList(json, function, error, array, date, math, number, string, regexp, object);
 
 	}
 

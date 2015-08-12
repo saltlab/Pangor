@@ -10,17 +10,17 @@ import org.junit.Test;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.APIFactory;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.AbstractAPI;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.PackageAPI;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.KeywordFilter;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningAnalysis;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningDataSet;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.KeywordFilter;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningDataSet;
 import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
+import ca.ubc.ece.salt.sdjsb.learning.apis.APIFactory;
+import ca.ubc.ece.salt.sdjsb.learning.apis.AbstractAPI;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse;
+import ca.ubc.ece.salt.sdjsb.learning.apis.PackageAPI;
+import ca.ubc.ece.salt.sdjsb.learning.apis.TopLevelAPI;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse.KeywordContext;
 
 public class TestASTLearning {
 

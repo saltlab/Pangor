@@ -1,6 +1,6 @@
 package ca.ubc.ece.salt.sdjsb.alert;
 
-import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.FeatureVector;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.FeatureVector;
 
 public class FeatureVectorAlert extends Alert {
 	

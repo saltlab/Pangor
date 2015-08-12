@@ -1,11 +1,11 @@
-package ca.ubc.ece.salt.sdjsb.analysis.learning.apis;
+package ca.ubc.ece.salt.sdjsb.learning.apis;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
 
 /**
  * Provides functions to extract keywords from APIs and determine which APIs a

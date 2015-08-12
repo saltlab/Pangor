@@ -1,6 +1,6 @@
-package ca.ubc.ece.salt.sdjsb.analysis.prediction;
+package ca.ubc.ece.salt.sdjsb.learning.pointsto;
 
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.AbstractAPI;
+import ca.ubc.ece.salt.sdjsb.learning.apis.AbstractAPI;
 
 /**
  * Data structure to store an API and a likelihood calculated by a prediction

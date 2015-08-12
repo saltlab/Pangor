@@ -1,10 +1,10 @@
-package ca.ubc.ece.salt.sdjsb.analysis.learning.ast;
+package ca.ubc.ece.salt.sdjsb.analysis.learning;
 
 import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse;
 
 /**
  * Stores a set of metrics for a learning data set.

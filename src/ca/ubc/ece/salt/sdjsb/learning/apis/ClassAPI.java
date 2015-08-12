@@ -1,8 +1,8 @@
-package ca.ubc.ece.salt.sdjsb.analysis.learning.apis;
+package ca.ubc.ece.salt.sdjsb.learning.apis;
 
 import java.util.List;
 
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
 
 /**
  * Defines the API of a Node.js class.

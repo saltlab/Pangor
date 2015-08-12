@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.sdjsb.test.analysis;
+package ca.ubc.ece.salt.sdjsb.test.learning;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -11,13 +11,13 @@ import java.util.Set;
 import org.junit.Test;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.APIFactory;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordUse.KeywordContext;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.TopLevelAPI;
-import ca.ubc.ece.salt.sdjsb.analysis.prediction.CSPredictor;
-import ca.ubc.ece.salt.sdjsb.analysis.prediction.Predictor;
+import ca.ubc.ece.salt.sdjsb.learning.apis.APIFactory;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse;
+import ca.ubc.ece.salt.sdjsb.learning.apis.TopLevelAPI;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse.KeywordContext;
+import ca.ubc.ece.salt.sdjsb.learning.pointsto.CSPredictor;
+import ca.ubc.ece.salt.sdjsb.learning.pointsto.Predictor;
 
 public class TestPredictor {
 	@Test

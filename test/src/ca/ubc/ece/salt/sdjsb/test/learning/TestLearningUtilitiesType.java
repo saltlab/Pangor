@@ -23,8 +23,8 @@ import org.mozilla.javascript.ast.UnaryExpression;
 import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.VariableInitializer;
 
-import ca.ubc.ece.salt.sdjsb.analysis.learning.apis.KeywordDefinition.KeywordType;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.ast.LearningUtilities;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningUtilities;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
 
 public class TestLearningUtilitiesType {
 
@@ -170,6 +170,47 @@ public class TestLearningUtilitiesType {
 
 		runTest(target, KeywordType.METHOD);
 
+	}
+
+	/*
+	 * JSON.parse("{ first=John, last=Doe }");
+	 *
+	 * expected: JSON = CLASS
+	 * expected: parse = METHOD
+	 */
+	@Test
+	public void testStaticMethodCall() {
+		StringLiteral argument = new StringLiteral();
+		argument.setQuoteCharacter('"');
+		argument.setValue("{ first='John', last='Doe' }");
+
+		Name object = new Name(0, "JSON");
+		Name method = new Name(0, "parse");
+
+		/*
+		 * JSON.parse
+		 */
+		PropertyGet propertyGet = new PropertyGet();
+		propertyGet.setTarget(object);
+		propertyGet.setProperty(method);
+
+		/*
+		 * JSON.parse("{ first=John, last=Doe }")
+		 */
+		FunctionCall call = new FunctionCall();
+		call.setTarget(propertyGet);
+		call.addArgument(argument);
+
+		/*
+		 * JSON.parse("{ first=John, last=Doe }");
+		 */
+		ExpressionStatement statement = new ExpressionStatement(call);
+
+		AstRoot root = new AstRoot();
+		root.addChild(statement);
+
+		runTest(object, KeywordType.CLASS);
+		runTest(method, KeywordType.METHOD);
 	}
 
 	/*

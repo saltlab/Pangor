@@ -12,8 +12,8 @@
 
 DIFF_PROGRAM=opendiff
 DIFF_PROCESS=FileMerge
-ARFF_FILE=../output/official_js_2015-08-08/EXCEPTION_EXCEPTION_CATCH_INSERTED_global_exception.arff
-SUPPLEMENTARY_FOLDER=../output/official_js_2015-08-08/supplementary/
+ARFF_FILE=../output/official_js_2015-08-11/RESERVED_CONDITION_REMOVED_global_typeof.arff
+SUPPLEMENTARY_FOLDER=../output/official_js_2015-08-11/supplementary/
 CLIPBOARD_PROGRAM=pbcopy
 BROWSER=open
 
