@@ -18,6 +18,7 @@ import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysis;
 import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysisTask;
 
 public class LearningAnalysisMain {
+
 	protected static final Logger logger = LogManager.getLogger(LearningAnalysisMain.class);
 
 	/** The size of the thread pool */
@@ -59,9 +60,10 @@ public class LearningAnalysisMain {
 		if(options.getURI() != null) {
 
 			try {
-                gitProjectAnalysis = GitProjectAnalysis.fromURI(options.getURI(), CHECKOUT_DIR, runner);
 
+                gitProjectAnalysis = GitProjectAnalysis.fromURI(options.getURI(), CHECKOUT_DIR, runner);
 				gitProjectAnalysis.analyze();
+
 			} catch (Exception e) {
 				e.printStackTrace(System.err);
 				return;
@@ -110,7 +112,7 @@ public class LearningAnalysisMain {
 					executor.submit(new GitProjectAnalysisTask(gitProjectAnalysis, latch));
 				} catch (Exception e) {
 					e.printStackTrace(System.err);
-					logger.error("[IMPORTANT] Project {} throwed an exception", uri);
+					logger.error("[IMPORTANT] Project {} threw an exception", uri);
 					logger.error(e);
 					continue;
 				}

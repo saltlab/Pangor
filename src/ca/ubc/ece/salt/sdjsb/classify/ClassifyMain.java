@@ -5,16 +5,29 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
 import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysis;
 import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysisException;
+import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysisTask;
+import ca.ubc.ece.salt.sdjsb.learning.LearningAnalysisMain;
 
 public class ClassifyMain {
 
+	protected static final Logger logger = LogManager.getLogger(LearningAnalysisMain.class);
+
+	/** The size of the thread pool */
+	private static final int THREAD_POOL_SIZE = 7;
+
+	/** The directory where repositories are checked out. **/
 	public static final String CHECKOUT_DIR =  new String("repositories");
 
 	/**
@@ -46,32 +59,17 @@ public class ClassifyMain {
 
         GitProjectAnalysis gitProjectAnalysis;
 
-		/* A project folder was given. */
-		if(options.getGitDirectory() != null) {
-
-			try {
-                gitProjectAnalysis = GitProjectAnalysis.fromDirectory(options.getGitDirectory(), "Unknown", runner);
-			}
-			catch(GitProjectAnalysisException e) {
-                ClassifyMain.printUsage(e.getMessage(), parser);
-                return;
-			}
-
-			ClassifyMain.analyzeAndPrint(gitProjectAnalysis, options);
-
-		}
 		/* A URI was given. */
-		else if(options.getURI() != null) {
+		if(options.getURI() != null) {
 
 			try {
                 gitProjectAnalysis = GitProjectAnalysis.fromURI(options.getURI(), ClassifyMain.CHECKOUT_DIR, runner);
+                gitProjectAnalysis.analyze();
 			}
 			catch(GitProjectAnalysisException e) {
-                ClassifyMain.printUsage(e.getMessage(), parser);
+				e.printStackTrace(System.err);
                 return;
 			}
-
-			ClassifyMain.analyzeAndPrint(gitProjectAnalysis, options);
 
 		}
 		/* A list of URIs was given. */
@@ -89,23 +87,46 @@ public class ClassifyMain {
 				System.err.println("Error while reading URI file: " + e.getMessage());
 			}
 
+			/*
+			 * Create a pool of threads and use a CountDownLatch to check when
+			 * all threads are done.
+			 * http://stackoverflow.com/questions/1250643/how-to-wait-for-all-
+			 * threads-to-finish-using-executorservice
+			 *
+			 * I was going to create a list of Callable objects and use
+			 * executor.invokeAll, but this would remove the start of the
+			 * execution of the tasks from the loop to outside the loop, which
+			 * would mean all git project initializations would have to happen
+			 * before starting the analysis.
+			 */
+			ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+			CountDownLatch latch = new CountDownLatch(uris.size());
+
 			/* Analyze all projects. */
 			for(String uri : uris) {
 
 				try {
+					/* Build git repository object. */
 					gitProjectAnalysis = GitProjectAnalysis.fromURI(uri, ClassifyMain.CHECKOUT_DIR, runner);
+
+					/* Perform the analysis (this may take some time) */
+					executor.submit(new GitProjectAnalysisTask(gitProjectAnalysis, latch));
 				}
-				catch(GitProjectAnalysisException e) {
-					ClassifyMain.printUsage(e.getMessage(), parser);
-					return;
+				catch(Exception e) {
+					e.printStackTrace(System.err);
+					logger.error("[IMPORTANT] Project {} threw an exception", uri);
+					logger.error(e);
+					continue;
 				}
-
-				ClassifyMain.analyzeAndPrint(gitProjectAnalysis, options);
-
-				options.setAppend(true);
-
 			}
 
+			/* Wait for all threads to finish their work */
+			try {
+				latch.await();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				return;
+			}
 
 		}
 		else {
@@ -117,31 +138,11 @@ public class ClassifyMain {
 	}
 
 	/**
-	 * Performs the analysis on the project and prints according to the
-	 * options that are selected.
-	 * @param analysis The analysis to execute.
-	 * @param options The command line options.
-	 * @throws Exception
-	 */
-	private static void analyzeAndPrint(GitProjectAnalysis analysis, ClassifyOptions options) throws Exception {
-
-		/* Perform the analysis (may take some time). */
-		analysis.analyze();
-
-		/* Print what we need. */
-//		AlertPrinter printer = new AlertPrinter(analysis.getAnalysisResult());
-//		if(!options.printCustom()) printer.printSummary(options.printAlerts());
-//		if(options.printLatex()) printer.printLatexTable();
-//		if(options.printCustom()) printer.printFeatureVector(options.getOutfile(), options.getSupplementaryFolder(), options.getAppend());
-
-	}
-
-	/**
 	 * Prints the help file for main.
 	 * @param parser The args4j parser.
 	 */
 	private static void printHelp(CmdLineParser parser) {
-        System.out.print("Usage: ProjectAnalysis ");
+        System.out.print("Usage: ClassifyMain ");
         parser.setUsageWidth(Integer.MAX_VALUE);
         parser.printSingleLineUsage(System.out);
         System.out.println("\n");
