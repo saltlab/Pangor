@@ -20,6 +20,7 @@ https://github.com/npm/newww.git
 
 
 # from https://github.com/nwjs/nw.js/wiki/List-of-apps-and-companies-using-nw.js
+# remove cats, yimello, 
 
 https://github.com/YutaMiyake/Astar.git
 https://github.com/Aluxian/Facebook-Messenger-Desktop.git
@@ -65,12 +66,10 @@ https://github.com/rafaelkyrdan/cypher.git
 https://github.com/fengmk2/fawave_desktop.git
 https://github.com/danielking/docular.git
 https://github.com/Gozala/ambiance.git
-https://github.com/jbaron/cats.git
 https://github.com/bianchimro/markgiu.git
 https://github.com/passcod/twd.git
 https://github.com/zefei/remonit.git
 https://github.com/PCI-TDF/artomico-debian.git
-https://github.com/acadet/yimello.git
 https://github.com/ambrosechua/Youpp.git
 https://github.com/demian85/git-watcher.git
 https://github.com/willerce/spock.git

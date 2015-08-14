@@ -7,7 +7,6 @@ mongoose,https://github.com/Automattic/mongoose.git,5121,1302,241,278,72752,7312
 sails,https://github.com/balderdashy/sails.git,5088,722,214,177,13656,11350,53566,Thu Jul 30 12:09:04 PDT 2015,Mon Jan 16 19:49:11 PST 2012
 react,https://github.com/facebook/react.git,4979,1064,555,328,68749,25658,420013,Thu Jul 30 13:29:50 PDT 2015,Wed May 29 12:46:11 PDT 2013
 hapi,https://github.com/hapijs/hapi.git,4331,570,139,32,16351,4495,88819,Wed Jul 29 12:49:48 PDT 2015,Fri Aug 05 17:36:41 PDT 2011
-coffeescript,https://github.com/jashkenas/coffeescript.git,4007,994,208,113,15682,11638,3072348,Tue Jul 07 21:31:23 PDT 2015,Sun Dec 13 14:07:16 PST 2009
 connect,https://github.com/senchalabs/connect.git,3390,499,149,6,698,5597,3029726,Thu Jun 18 16:42:33 PDT 2015,Wed May 26 12:14:18 PDT 2010
 node-mongodb-native,https://github.com/mongodb/node-mongodb-native.git,3195,940,234,110,38189,3971,886532,Fri Jul 24 04:05:24 PDT 2015,Thu Jan 07 04:53:14 PST 2010
 ejs,https://github.com/mde/ejs.git,2770,383,108,5,1218,221,543169,Sat Jul 11 13:10:32 PDT 2015,Sat Mar 13 23:15:45 PST 2010
@@ -41,7 +40,6 @@ UglifyJS2,https://github.com/mishoo/UglifyJS2.git,695,209,68,44,9677,3614,703312
 underscore.string,https://github.com/epeli/underscore.string.git,636,90,91,159,2928,2738,4615453,Mon Jul 20 21:11:03 PDT 2015,Sat Jun 12 11:26:41 PDT 2010
 forever,https://github.com/foreverjs/forever.git,611,183,76,22,1776,6410,485140,Fri Jul 24 00:58:29 PDT 2015,Mon Sep 27 08:59:36 PDT 2010
 node_redis,https://github.com/mranney/node_redis.git,607,140,98,43,4482,4825,1592244,Sat Jul 25 14:30:10 PDT 2015,Mon Sep 13 19:03:42 PDT 2010
-node-fs-extra,https://github.com/jprichardson/node-fs-extra.git,597,46,21,70,3343,735,2492134,Mon Jul 13 01:27:14 PDT 2015,Wed Nov 16 13:47:40 PST 2011
 marked,https://github.com/chjj/marked.git,596,124,46,7,1415,6789,750560,Wed Jul 29 03:16:23 PDT 2015,Sun Jul 24 06:15:35 PDT 2011
 yargs,https://github.com/bcoe/yargs.git,596,112,52,36,4402,789,3727296,Wed Jul 29 21:53:14 PDT 2015,Thu Sep 09 21:59:20 PDT 2010
 Nodemailer,https://github.com/andris9/Nodemailer.git,584,70,80,11,1223,4433,342943,Tue Jul 28 22:26:46 PDT 2015,Wed Jan 19 13:19:22 PST 2011
@@ -50,7 +48,6 @@ commander.js,https://github.com/tj/commander.js.git,441,95,72,31,1095,3997,11692
 passport,https://github.com/jaredhanson/passport.git,410,5,21,33,6134,5820,425245,Thu May 21 12:35:07 PDT 2015,Sat Oct 08 15:40:46 PDT 2011
 node-glob,https://github.com/isaacs/node-glob.git,372,66,23,36,2203,1261,17564036,Tue Jul 14 18:34:46 PDT 2015,Sun Nov 01 21:03:59 PST 2009
 yo,https://github.com/yeoman/yo.git,361,64,35,21,1271,1062,108659,Mon Jul 27 03:34:50 PDT 2015,Mon Feb 11 05:33:06 PST 2013
-node-xml2js,https://github.com/Leonidas-from-XIV/node-xml2js.git,271,44,41,3,518,1395,1819736,Thu Jun 11 10:27:02 PDT 2015,Sat Jul 17 02:04:32 PDT 2010
 debug,https://github.com/visionmedia/debug.git,259,37,39,8,565,2051,13722101,Sun May 10 00:21:15 PDT 2015,Mon Nov 28 17:08:27 PST 2011
 body-parser,https://github.com/expressjs/body-parser.git,244,18,10,12,2277,575,2322105,Thu Jul 16 20:38:13 PDT 2015,Mon Jan 06 00:24:57 PST 2014
 node-uuid,https://github.com/broofa/node-uuid.git,222,29,26,4,410,2047,5088948,Thu May 28 05:41:32 PDT 2015,Tue Dec 28 11:06:46 PST 2010

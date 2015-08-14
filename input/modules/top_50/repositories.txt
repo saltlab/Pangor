@@ -2,6 +2,7 @@
 # on 2015-07-30
 # cordova-cli.git was not on github. manually replaced to https://github.com/apache/cordova-cli.git mirror
 # https://github.com/nodejitsu/forever.git manually replaced for https://github.com/foreverjs/forever.git
+# remove coffescript files: coffescript, node-xml2js, node-fs-extra
 https://github.com/strongloop/express.git,3088068
 https://github.com/caolan/async.git,16305237
 https://github.com/gulpjs/gulp.git,1302535
@@ -24,7 +25,6 @@ https://github.com/kriskowal/q.git,6387312
 https://github.com/Marak/colors.js.git,5685060
 https://github.com/cheeriojs/cheerio.git,741723
 https://github.com/mranney/node_redis.git,1592244
-https://github.com/jashkenas/coffeescript.git,3072348
 https://github.com/jaredhanson/passport.git,425245
 https://github.com/terinjokes/gulp-uglify.git,493298
 https://github.com/jadejs/jade.git,2318321
@@ -58,7 +58,6 @@ https://github.com/substack/node-optimist.git,6970071
 https://github.com/isaacs/node-glob.git,17564036
 https://github.com/wearefractal/gulp-util.git,2082157
 https://github.com/broofa/node-uuid.git,5088948
-https://github.com/jprichardson/node-fs-extra.git,2492134
 https://github.com/expressjs/body-parser.git,2322105
 https://github.com/jquery/jquery.git,526328
 https://github.com/wycats/handlebars.js.git,2872404
@@ -69,7 +68,6 @@ https://github.com/yeoman/yosay.git,138658
 https://github.com/broofa/node-mime.git,7459379
 https://github.com/mongodb/node-mongodb-native.git,886532
 https://github.com/epeli/underscore.string.git,4615453
-https://github.com/Leonidas-from-XIV/node-xml2js.git,1819736
 https://github.com/mde/ejs.git,543169
 https://github.com/justmoon/node-extend.git,3914054
 https://github.com/bcoe/yargs.git,3727296
