@@ -14,7 +14,7 @@ import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysis;
 import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysisException;
 
 public class ClassifyMain {
-	
+
 	public static final String CHECKOUT_DIR =  new String("repositories");
 
 	/**
@@ -25,7 +25,6 @@ public class ClassifyMain {
 	 */
 	public static void main(String[] args) throws Exception {
 
-		ClassifyAnalysisRunner runner = new ClassifyAnalysisRunner();
 		ClassifyOptions options = new ClassifyOptions();
 		CmdLineParser parser = new CmdLineParser(options);
 
@@ -35,13 +34,16 @@ public class ClassifyMain {
 			ClassifyMain.printUsage(e.getMessage(), parser);
 			return;
 		}
-		
+
 		/* Print the help page. */
 		if(options.getHelp()) {
 			ClassifyMain.printHelp(parser);
 			return;
 		}
-		
+
+		/* Create the runner that will run the analysis. */
+		ClassifyAnalysisRunner runner = new ClassifyAnalysisRunner(options.getDataSetPath(), options.getSupplementaryFolder());
+
         GitProjectAnalysis gitProjectAnalysis;
 
 		/* A project folder was given. */
@@ -49,7 +51,7 @@ public class ClassifyMain {
 
 			try {
                 gitProjectAnalysis = GitProjectAnalysis.fromDirectory(options.getGitDirectory(), "Unknown", runner);
-			} 
+			}
 			catch(GitProjectAnalysisException e) {
                 ClassifyMain.printUsage(e.getMessage(), parser);
                 return;
@@ -63,21 +65,21 @@ public class ClassifyMain {
 
 			try {
                 gitProjectAnalysis = GitProjectAnalysis.fromURI(options.getURI(), ClassifyMain.CHECKOUT_DIR, runner);
-			} 
+			}
 			catch(GitProjectAnalysisException e) {
                 ClassifyMain.printUsage(e.getMessage(), parser);
                 return;
 			}
-			
+
 			ClassifyMain.analyzeAndPrint(gitProjectAnalysis, options);
 
 		}
 		/* A list of URIs was given. */
 		else if(options.getRepoFile() != null) {
-			
+
 			/* Parse the file into a list of URIs. */
 			List<String> uris = new LinkedList<String>();
-			
+
 			try(BufferedReader br = new BufferedReader(new FileReader(options.getRepoFile()))) {
 			    for(String line; (line = br.readLine()) != null; ) {
 			    	uris.add(line);
@@ -86,25 +88,25 @@ public class ClassifyMain {
 			catch(Exception e) {
 				System.err.println("Error while reading URI file: " + e.getMessage());
 			}
-			
+
 			/* Analyze all projects. */
 			for(String uri : uris) {
 
 				try {
 					gitProjectAnalysis = GitProjectAnalysis.fromURI(uri, ClassifyMain.CHECKOUT_DIR, runner);
-				} 
+				}
 				catch(GitProjectAnalysisException e) {
 					ClassifyMain.printUsage(e.getMessage(), parser);
 					return;
 				}
-				
+
 				ClassifyMain.analyzeAndPrint(gitProjectAnalysis, options);
-				
+
 				options.setAppend(true);
-				
+
 			}
-		
-			
+
+
 		}
 		else {
 			System.out.println("No repository given.");
@@ -113,9 +115,9 @@ public class ClassifyMain {
 		}
 
 	}
-	
+
 	/**
-	 * Performs the analysis on the project and prints according to the 
+	 * Performs the analysis on the project and prints according to the
 	 * options that are selected.
 	 * @param analysis The analysis to execute.
 	 * @param options The command line options.
@@ -125,13 +127,13 @@ public class ClassifyMain {
 
 		/* Perform the analysis (may take some time). */
 		analysis.analyze();
-		
+
 		/* Print what we need. */
 //		AlertPrinter printer = new AlertPrinter(analysis.getAnalysisResult());
 //		if(!options.printCustom()) printer.printSummary(options.printAlerts());
 //		if(options.printLatex()) printer.printLatexTable();
 //		if(options.printCustom()) printer.printFeatureVector(options.getOutfile(), options.getSupplementaryFolder(), options.getAppend());
-		
+
 	}
 
 	/**
@@ -147,7 +149,7 @@ public class ClassifyMain {
         System.out.println("");
         return;
 	}
-	
+
 	/**
 	 * Prints the usage of main.
 	 * @param error The error message that triggered the usage message.
@@ -161,5 +163,5 @@ public class ClassifyMain {
         System.out.println("");
         return;
 	}
-	
+
 }

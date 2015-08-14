@@ -8,7 +8,7 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import ca.ubc.ece.salt.sdjsb.alert.Alert;
+import ca.ubc.ece.salt.sdjsb.classify.alert.ClassifierAlert;
 
 public class AlertPrinter {
 	
@@ -45,7 +45,7 @@ public class AlertPrinter {
                 	
                 	if(printAlerts) {
                 		
-                		for(Alert alert : analysisResult.getAlertsOfSubType(subtype)) {
+                		for(ClassifierAlert alert : analysisResult.getAlertsOfSubType(subtype)) {
                 			System.out.println("\t\t\t" + alert.getLongDescription());
                 		}
                 		
@@ -123,9 +123,9 @@ public class AlertPrinter {
 		/* Write each feature vector from the results. */
 		for(ProjectAnalysisResult analysisResult : this.analysisResults) {
 
-			List<Alert> alerts = analysisResult.getAlertsOfSubType("FEATURE_VECTOR_BoW");
+			List<ClassifierAlert> alerts = analysisResult.getAlertsOfSubType("FEATURE_VECTOR_BoW");
 
-			for(Alert alert : alerts) {
+			for(ClassifierAlert alert : alerts) {
 
 				/* The feature vector as a CSV row. */
 				stream.println(alert.getFeatureVector(analysisResult.getProjectName(), null, null, null, null));

@@ -18,8 +18,8 @@ import org.mozilla.javascript.ast.StringLiteral;
 import org.mozilla.javascript.ast.UnaryExpression;
 import org.mozilla.javascript.ast.WhileLoop;
 
-import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert.SpecialType;
 import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;
+import ca.ubc.ece.salt.sdjsb.classify.alert.SpecialTypeAlert.SpecialType;
 
 public class SpecialTypeAnalysisUtilities {
 

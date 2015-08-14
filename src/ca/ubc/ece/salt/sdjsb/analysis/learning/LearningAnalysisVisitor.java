@@ -15,8 +15,9 @@ import org.mozilla.javascript.ast.UnaryExpression;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysisUtilities;
-import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse;
+import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.sdjsb.learning.pointsto.PointsToPrediction;
 
@@ -54,10 +55,11 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 	 * @return A feature vector containing the keywords extracted from the
 	 * 		   script.
 	 */
-	public static FeatureVector getScriptFeatureVector(AstRoot script) {
+	public static FeatureVector getScriptFeatureVector(AnalysisMetaInformation ami, AstRoot script) {
 
 		/* Create the feature vector by visiting the function. */
-		LearningAnalysisVisitor visitor = new LearningAnalysisVisitor(script, null, true);
+		LearningAnalysisVisitor visitor = new LearningAnalysisVisitor(ami,
+				getFunctionName(script), script, null, true);
 		script.visit(visitor);
 
 		return visitor.featureVector;
@@ -69,39 +71,51 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 	 * @param function the script or function to visit.
 	 * @return the feature vector for the function.
 	 */
-	public static FeatureVector getFunctionFeatureVector(ScriptNode function, PointsToPrediction packageModel) {
+	public static FeatureVector getFunctionFeatureVector(AnalysisMetaInformation ami,
+			ScriptNode function, PointsToPrediction packageModel) {
 
 		/* Create the feature vector by visiting the function. */
-		LearningAnalysisVisitor visitor = new LearningAnalysisVisitor(function, packageModel, false);
+		LearningAnalysisVisitor visitor = new LearningAnalysisVisitor(ami,
+				getFunctionName(function), function, packageModel, false);
 		function.visit(visitor);
 
 		/* Store the source code for the function. Since we don't know if we
 		 * are analyzing the source function or destination function, store
 		 * it as both. When the source and destination feature vectors are
 		 * merged. */
-		visitor.featureVector.sourceCode = function.toSource();
-		visitor.featureVector.destinationCode = function.toSource();
-
-		/* Set the function name before we return */
-		if(function instanceof FunctionNode) {
-			String name = ((FunctionNode)function).getName();
-			if(name.isEmpty()) {
-				visitor.featureVector.functionName = "~anonymous~";
-			}
-			else {
-				visitor.featureVector.functionName = name;
-			}
-		}
-		else {
-			visitor.featureVector.functionName = "~script~";
-		}
+		visitor.featureVector.ami.buggyCode = function.toSource();
+		visitor.featureVector.ami.repairedCode = function.toSource();
 
 		return visitor.featureVector;
 	}
 
-	private LearningAnalysisVisitor(ScriptNode root, PointsToPrediction packageModel, boolean visitFunctions) {
+
+	/**
+	 * @param node The script or function.
+	 * @return The name of the function or script.
+	 */
+	private static String getFunctionName(ScriptNode function) {
+
+		if(function instanceof FunctionNode) {
+			String name = ((FunctionNode)function).getName();
+			if(name.isEmpty()) {
+				return "~anonymous~";
+			}
+			else {
+				return name;
+			}
+		}
+		else {
+			return "~script~";
+		}
+
+	}
+
+	private LearningAnalysisVisitor(AnalysisMetaInformation ami,
+			String functionName, ScriptNode root,
+			PointsToPrediction packageModel, boolean visitFunctions) {
 		this.packageModel = packageModel;
-		this.featureVector = new FeatureVector();
+		this.featureVector = new FeatureVector(ami, functionName);
 		this.root = root;
 		this.visitFunctions = visitFunctions;
 	}

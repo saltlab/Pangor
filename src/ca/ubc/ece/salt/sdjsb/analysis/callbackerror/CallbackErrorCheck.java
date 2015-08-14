@@ -1,7 +1,7 @@
 package ca.ubc.ece.salt.sdjsb.analysis.callbackerror;
 
-import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert.SpecialType;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.Scope;
+import ca.ubc.ece.salt.sdjsb.classify.alert.SpecialTypeAlert.SpecialType;
 
 /**
  * Stores a parameter that was unchanged and had a special type check

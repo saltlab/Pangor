@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import ca.ubc.ece.salt.sdjsb.alert.Alert;
+import ca.ubc.ece.salt.sdjsb.classify.alert.ClassifierAlert;
 
 /**
  * Maintains the set of alerts for a project analysis.
@@ -22,7 +22,7 @@ public class ProjectAnalysisResult {
 	private int bugFixingCommits;
 	
 	private TreeMap<String, Set<String>> subtypes; // The map of a type to its subtypes.
-	private TreeMap<String, List<Alert>> alerts; // The map of a subtype to its alerts.
+	private TreeMap<String, List<ClassifierAlert>> alerts; // The map of a subtype to its alerts.
 	
 	/* Keep alerts in alphabetical order according to type then subtype. */
 	private Comparator<String> comparator = new Comparator<String>() {
@@ -37,7 +37,7 @@ public class ProjectAnalysisResult {
 		this.totalCommits = 0;
 		this.bugFixingCommits = 0;
 		this.subtypes = new TreeMap<String, Set<String>>(this.comparator);
-		this.alerts = new TreeMap<String, List<Alert>>(this.comparator);
+		this.alerts = new TreeMap<String, List<ClassifierAlert>>(this.comparator);
 	}
 	
 	
@@ -64,7 +64,7 @@ public class ProjectAnalysisResult {
 	 */
 	public int countAlertsForSubType(String subtype) {
 
-		List<Alert> alerts = this.alerts.get(subtype);
+		List<ClassifierAlert> alerts = this.alerts.get(subtype);
 		if(alerts == null) return 0;
 		return alerts.size();
 	}
@@ -83,7 +83,7 @@ public class ProjectAnalysisResult {
 	/**
 	 * @return The list of alerts for a given subtype.
 	 */
-	public List<Alert> getAlertsOfSubType(String subtype) {
+	public List<ClassifierAlert> getAlertsOfSubType(String subtype) {
 		return this.alerts.get(subtype);
 	}
 	
@@ -91,9 +91,9 @@ public class ProjectAnalysisResult {
 	 * Inserts all alerts into the alert set.
 	 * @param alert
 	 */
-	public void insertAll(List<Alert> alerts) {
+	public void insertAll(List<ClassifierAlert> alerts) {
 		
-		for(Alert alert : alerts) {
+		for(ClassifierAlert alert : alerts) {
 			this.insert(alert);
 		}
 		
@@ -103,7 +103,7 @@ public class ProjectAnalysisResult {
 	 * Insert an alert into the alert set.
 	 * @param alert
 	 */
-	public void insert(Alert alert) {
+	public void insert(ClassifierAlert alert) {
 		String type = alert.getType();
 		String subtype = alert.getType() + "_" + alert.getSubType();
 		
@@ -126,7 +126,7 @@ public class ProjectAnalysisResult {
 			this.alerts.get(subtype).add(alert);
 		}
 		else {
-			List<Alert> subtypes = new LinkedList<Alert>();
+			List<ClassifierAlert> subtypes = new LinkedList<ClassifierAlert>();
 			subtypes.add(alert);
 			this.alerts.put(subtype, subtypes);
 		}

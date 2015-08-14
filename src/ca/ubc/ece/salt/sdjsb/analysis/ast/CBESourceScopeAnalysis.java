@@ -13,25 +13,28 @@ import org.mozilla.javascript.ast.NodeVisitor;
 
 import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;
 import ca.ubc.ece.salt.sdjsb.analysis.callbackerror.CallbackErrorCheck;
+import ca.ubc.ece.salt.sdjsb.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.Scope;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.ScopeAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeCheck;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeVisitor;
+import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.sdjsb.cfg.CFG;
+import ca.ubc.ece.salt.sdjsb.classify.alert.ClassifierAlert;
 
 /**
  * Performs an AST-only callback error handling analysis using AST visitors.
- * 
+ *
  * This classifier is used for evaluation purposes only and should not be used
  * in actual data mining. Instead, use the CallbackErrorAnalysis classifier.
  */
-public class CBESourceScopeAnalysis extends ScopeAnalysis {
+public class CBESourceScopeAnalysis extends ScopeAnalysis<ClassifierAlert, ClassifierDataSet> {
 
 	/** Stores the possible callback error check repairs. */
 	private Set<CallbackErrorCheck> callbackErrorChecks;
-	
-	public CBESourceScopeAnalysis() {
-		super();
+
+	public CBESourceScopeAnalysis(ClassifierDataSet dataSet, AnalysisMetaInformation ami) {
+		super(dataSet, ami);
 		this.callbackErrorChecks = new HashSet<CallbackErrorCheck>();
 	}
 
@@ -45,9 +48,9 @@ public class CBESourceScopeAnalysis extends ScopeAnalysis {
 
 	@Override
 	public void analyze(AstRoot root, List<CFG> cfgs) throws Exception {
-		
+
 		super.analyze(root, cfgs);
-		
+
 		/* Look at each function. */
 		this.inspectFunctions(this.dstScope);
 
@@ -65,24 +68,24 @@ public class CBESourceScopeAnalysis extends ScopeAnalysis {
 	}
 
 	/**
-	 * 
+	 *
 	 * @param scope The function to inspect.
 	 */
 	private void inspectFunctions(Scope scope) {
 
 		/* If this is the script (no parameters) or the function was inserted, there is nothing to do. */
 		if(scope.scope instanceof FunctionNode) {
-		
+
             /* Look through the parameters to see if there is an unchanged error parameter. */
             Set<String> parameters = new HashSet<String>();
             FunctionNode function = (FunctionNode) scope.scope;
             for(AstNode parameter : function.getParams()) {
                 if(parameter instanceof Name) {
-                    
+
                     /* Match only error parameters for now. */
                     Name name = (Name) parameter;
                     if(name.getIdentifier().matches("(?i)e(rr(or)?)?")) {
-                        
+
                         /* Add the parameter to the set of parameters to look for. */
                         parameters.add(name.getIdentifier());
 
@@ -90,30 +93,30 @@ public class CBESourceScopeAnalysis extends ScopeAnalysis {
 
                 }
             }
-            
+
             /* Visit the function and look for CBE patterns. */
             CBEScopeAnalysisVisitor visitor = new CBEScopeAnalysisVisitor(scope, parameters, function.getName(), AnalysisUtilities.getFunctionSignature(function));
             function.getBody().visit(visitor);
 
 		}
-		
+
 		/* Visit the child functions. */
 		for(Scope child : scope.children) {
 			inspectFunctions(child);
 		}
-		
+
 	}
-	
+
 	/**
 	 * Visits if statements and finds new special type checks.
 	 */
 	private class CBEScopeAnalysisVisitor implements NodeVisitor {
-		
+
 		private Scope scope;
 		private Set<String> parameters;
 		private String function;
 		private String signature;
-		
+
 		public CBEScopeAnalysisVisitor(Scope scope, Set<String> parameters, String function, String signature) {
 			this.scope = scope;
 			this.parameters = parameters;
@@ -123,30 +126,30 @@ public class CBESourceScopeAnalysis extends ScopeAnalysis {
 
 		@Override
 		public boolean visit(AstNode node) {
-			
+
 			if(node instanceof IfStatement) {
-				
+
 				IfStatement is = (IfStatement) node;
-				
+
 				/* Get the special type checks in the if statement. */
 				List<SpecialTypeCheck> specialTypeChecks = SpecialTypeVisitor.getSpecialTypeChecks(is.getCondition(), false);
-				
+
 				for(SpecialTypeCheck specialTypeCheck : specialTypeChecks) {
 					if(this.parameters.contains(specialTypeCheck.identifier)) {
 						CBESourceScopeAnalysis.this.callbackErrorChecks.add(new CallbackErrorCheck(this.scope, this.function, this.signature, specialTypeCheck.identifier, specialTypeCheck.specialType));
 					}
 				}
-				
+
 			}
 
 			else if(node instanceof FunctionNode) {
 				return false;
 			}
-			
+
 			return true;
 
 		}
-		
+
 	}
 
 }

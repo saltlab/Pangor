@@ -18,10 +18,11 @@ import java.util.Set;
 import org.apache.commons.lang3.tuple.Pair;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+import ca.ubc.ece.salt.sdjsb.analysis.DataSet;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.KeywordFilter.FilterType;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition;
-import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse.KeywordContext;
 
 /**
@@ -37,7 +38,7 @@ import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse.KeywordContext;
  * aren't wanted (i.e., those that aren't related to a package we are
  * investigating) and features that are not used or hardly used.
  */
-public class LearningDataSet {
+public class LearningDataSet implements DataSet<FeatureVector> {
 
 	/**
 	 * The packages we want to investigate. FeatureVectorManager
@@ -147,7 +148,8 @@ public class LearningDataSet {
 	 * {@code LearningDataSet}.
 	 * @param featureVector The feature vector to be managed by this class.
 	 */
-	public void registerFeatureVector(FeatureVector featureVector) throws Exception {
+	@Override
+	public void registerAlert(FeatureVector featureVector) throws Exception {
 
 		if(this.dataSetPath != null) {
 			this.storeFeatureVector(featureVector);
@@ -442,8 +444,8 @@ public class LearningDataSet {
 		try (PrintStream srcStream = new PrintStream(new FileOutputStream(src));
 			 PrintStream dstStream = new PrintStream(new FileOutputStream(dst));) {
 
-			srcStream.print(featureVector.sourceCode);
-			dstStream.print(featureVector.destinationCode);
+			srcStream.print(featureVector.ami.buggyCode);
+			dstStream.print(featureVector.ami.repairedCode);
 
 			srcStream.close();
 			dstStream.close();

@@ -1,12 +1,14 @@
-package ca.ubc.ece.salt.sdjsb.alert;
+package ca.ubc.ece.salt.sdjsb.classify.alert;
 
-public class SpecialTypeAlert extends Alert {
-	
+import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
+
+public class SpecialTypeAlert extends ClassifierAlert {
+
 	private String variableIdentifier;
 	private SpecialType specialType;
-	
-	public SpecialTypeAlert(String type, String variableIdentifier, SpecialType specialType) {
-		super(type, "TYPE_ERROR_" + specialType.toString());
+
+	public SpecialTypeAlert(AnalysisMetaInformation ami, String functionName, String type, String variableIdentifier, SpecialType specialType) {
+		super(ami, functionName, type, "TYPE_ERROR_" + specialType.toString());
 		this.variableIdentifier = variableIdentifier;
 		this.specialType = specialType;
 	}
@@ -32,10 +34,10 @@ public class SpecialTypeAlert extends Alert {
 
 	/**
 	 * The list of special types that a variable could be assigned to. Note
-	 * that the FALSEY type indicates that a variable could be one of 
+	 * that the FALSEY type indicates that a variable could be one of
 	 * {undefined, NaN, blank, zero} (i.e. the variable evaluates to false in
 	 * a condition expression).
-	 * 
+	 *
 	 * @author qhanam
 	 */
 	public enum SpecialType {

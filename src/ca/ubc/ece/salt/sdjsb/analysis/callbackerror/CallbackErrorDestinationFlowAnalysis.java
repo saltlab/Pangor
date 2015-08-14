@@ -11,22 +11,26 @@ import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;
+import ca.ubc.ece.salt.sdjsb.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.sdjsb.analysis.flow.PathInsensitiveFlowAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.Scope;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeCheck;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeVisitor;
+import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGEdge;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
+import ca.ubc.ece.salt.sdjsb.classify.alert.ClassifierAlert;
 
-public class CallbackErrorDestinationFlowAnalysis extends PathInsensitiveFlowAnalysis<CallbackErrorLatticeElement> {
-	
+public class CallbackErrorDestinationFlowAnalysis extends PathInsensitiveFlowAnalysis<ClassifierAlert, ClassifierDataSet, CallbackErrorLatticeElement> {
+
 	/** Stores the possible callback error check repairs. */
 	private Set<CallbackErrorCheck> callbackErrorChecks;
-	
-	public CallbackErrorDestinationFlowAnalysis() {
+
+	public CallbackErrorDestinationFlowAnalysis(ClassifierDataSet dataSet, AnalysisMetaInformation ami) {
+		super(dataSet, ami);
 		this.callbackErrorChecks = new HashSet<CallbackErrorCheck>();
 	}
-	
+
 	/**
 	 * @return The set of possible callback error check repairs (or
 	 * anti-patterns if this is the source file analysis.
@@ -49,11 +53,11 @@ public class CallbackErrorDestinationFlowAnalysis extends PathInsensitiveFlowAna
 	@Override
 	public CallbackErrorLatticeElement entryValue(ScriptNode node) {
 
-		/* Add any parameters that are not new and htat look like an error 
+		/* Add any parameters that are not new and htat look like an error
 		 * parameter. */
 
 		CallbackErrorLatticeElement cele = new CallbackErrorLatticeElement();
-		
+
 		/* If this is the script (no parameters) or the function was inserted, there is nothing to do. */
 		if(!(node instanceof FunctionNode) || node.getChangeType() == ChangeType.INSERTED) return cele;
 
@@ -61,11 +65,11 @@ public class CallbackErrorDestinationFlowAnalysis extends PathInsensitiveFlowAna
         FunctionNode function = (FunctionNode) node;
         for(AstNode parameter : function.getParams()) {
             if(parameter instanceof Name) {
-                
+
                 /* Match only error parameters for now. */
                 Name name = (Name) parameter;
                 if(name.getIdentifier().matches("(?i)e(rr(or)?)?") && name.getChangeType() != ChangeType.INSERTED && name.getChangeType() != ChangeType.UPDATED) {
-                    
+
                     /* Add the parameter to the lattice element. */
                     cele.parameters.add(name.getIdentifier());
 
@@ -73,7 +77,7 @@ public class CallbackErrorDestinationFlowAnalysis extends PathInsensitiveFlowAna
 
             }
         }
-			
+
 		return cele;
 
 	}
@@ -81,26 +85,26 @@ public class CallbackErrorDestinationFlowAnalysis extends PathInsensitiveFlowAna
 	@Override
 	public void transfer(CFGEdge edge, CallbackErrorLatticeElement sourceLE,
 			Scope scope) {
-		
+
 		AstNode condition = (AstNode) edge.getCondition();
 
 		if(condition == null || !(scope.scope instanceof FunctionNode)) return;
-		
+
 		/* Look for inserted parameter checks. */
         List<SpecialTypeCheck> specialTypeChecks = SpecialTypeVisitor.getSpecialTypeChecks(condition);
-        
+
         for(SpecialTypeCheck specialTypeCheck : specialTypeChecks) {
         	if(sourceLE.parameters.contains(specialTypeCheck.identifier)) {
-        		
+
         		FunctionNode function = (FunctionNode) scope.scope;
-        		
+
                 /* Register an alert. */
                 String signature = AnalysisUtilities.getFunctionSignature(function);
                 this.callbackErrorChecks.add(new CallbackErrorCheck(scope, function.getName(), signature, specialTypeCheck.identifier, specialTypeCheck.specialType));
-        		
+
         	}
         }
-		
+
 	}
 
 	@Override

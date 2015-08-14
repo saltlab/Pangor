@@ -5,9 +5,11 @@ import java.util.Map;
 import java.util.Set;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+import ca.ubc.ece.salt.sdjsb.analysis.Alert;
+import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition;
-import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse.KeywordContext;
 
 /**
@@ -18,49 +20,13 @@ import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse.KeywordContext;
  * the repair patterns once they are discovered through data mining. The
  * keyword counts are used to discover the repair patterns.
  */
-public class FeatureVector {
-
-	/** A counter to produce unique IDs for each feature vector. **/
-	private static int idCounter;
-
-	/** The unique ID for the feature vector. **/
-	public int id;
-
-	/** The identifier for the project. **/
-	public String projectID;
-
-	/** The homepage for the project. **/
-	public String projectHomepage;
-
-	/** The path to the source file where the bug is present. **/
-	public String buggyFile;
-
-	/** The path to the source file where the bug is repaired. **/
-	public String repairedFile;
-
-	/** The ID for the commit where the bug is present. **/
-	public String buggyCommitID;
-
-	/** The ID for the commit where the bug is repaired. **/
-	public String repairedCommitID;
-
-	/** The file path from which this feature vector was constructed. **/
-	public String path;
-
-	/** The function from which this feature vector was constructed. **/
-	public String functionName;
-
-	/** The buggy code **/
-	public String sourceCode;
-
-	/** The repaired code. **/
-	public String destinationCode;
+public class FeatureVector extends Alert {
 
 	/** The keyword counts in each fragment. **/
 	public Map<KeywordUse, Integer> keywordMap;
 
-	public FeatureVector() {
-		this.id = FeatureVector.getNextID();
+	public FeatureVector(AnalysisMetaInformation ami, String functionName) {
+		super(ami, functionName);
 		this.keywordMap = new HashMap<KeywordUse, Integer>();
 	}
 
@@ -69,7 +35,7 @@ public class FeatureVector {
 	 * @param source The source feature vector.
 	 */
 	public void join(FeatureVector source) {
-		this.sourceCode = source.sourceCode;
+		this.ami.buggyCode = source.ami.buggyCode;
 
 		/* Insert the keywords form the source feature vector with change type
 		 * REMOVED into this feature vector. */
@@ -109,9 +75,10 @@ public class FeatureVector {
 	 */
 	public String serialize() {
 
-		String serialized = id + "," + this.projectID + "," + this.projectHomepage
-				+ "," + this.buggyFile + "," + this.repairedFile
-				+ "," + this.buggyCommitID + "," + this.repairedCommitID + "," + this.functionName;
+		String serialized = id + "," + this.ami.projectID + "," + this.ami.projectHomepage
+				+ "," + this.ami.buggyFile + "," + this.ami.repairedFile
+				+ "," + this.ami.buggyCommitID + "," + this.ami.repairedCommitID
+				+ "," + this.functionName;
 
 		for(KeywordUse keyword : this.keywordMap.keySet()) {
 			Integer uses = this.keywordMap.get(keyword);
@@ -134,15 +101,11 @@ public class FeatureVector {
 
 		if(features.length < 7) throw new Exception("De-serialization exception. Serial format not recognized.");
 
-		FeatureVector featureVector = new FeatureVector();
-		featureVector.id = Integer.parseInt(features[0]);
-		featureVector.projectID = features[1];
-		featureVector.projectHomepage = features[2];
-		featureVector.buggyFile = features[3];
-		featureVector.repairedFile = features[4];
-		featureVector.buggyCommitID = features[5];
-		featureVector.repairedCommitID = features[6];
-		featureVector.functionName = features[7];
+		AnalysisMetaInformation ami = new AnalysisMetaInformation(-1, -1,
+				features[1], features[2], features[3], features[4], features[5],
+				features[6], null, null);
+
+		FeatureVector featureVector = new FeatureVector(ami, features[7]);
 
 		for(int i = 8; i < features.length; i++) {
 			String[] feature = features[i].split(":");
@@ -165,9 +128,9 @@ public class FeatureVector {
 	 */
 	public String getFeatureVector(Set<KeywordDefinition> keywords) {
 
-		String vector = id + "," + this.projectID + "," + this.projectHomepage + ","
-				+ this.buggyFile + "," + this.repairedFile
-				+ "," + this.buggyCommitID + "," + this.repairedCommitID + "," + this.functionName;
+		String vector = id + "," + this.ami.projectID + "," + this.ami.projectHomepage + ","
+				+ this.ami.buggyFile + "," + this.ami.repairedFile
+				+ "," + this.ami.buggyCommitID + "," + this.ami.repairedCommitID + "," + this.functionName;
 
 		for(KeywordDefinition keyword : keywords) {
 			if(this.keywordMap.containsKey(keyword)) vector += "," + this.keywordMap.get(keyword).toString();
@@ -182,25 +145,14 @@ public class FeatureVector {
 	 * @return The source code for the alert.
 	 */
 	public String getSource() {
-		return this.sourceCode;
+		return this.ami.buggyCode;
 	}
 
 	/**
 	 * @return The destination code for the alert.
 	 */
 	public String getDestination() {
-		return this.destinationCode;
-	}
-
-	/**
-	 * Generates unique IDs for feature vectors. Synchronized because it may be
-	 * called by several GitProjectAnalysis threads.
-	 *
-	 * @return The next unique ID for a feature vector alert.
-	 */
-	private synchronized static int getNextID() {
-		idCounter++;
-		return idCounter;
+		return this.ami.repairedCode;
 	}
 
 }

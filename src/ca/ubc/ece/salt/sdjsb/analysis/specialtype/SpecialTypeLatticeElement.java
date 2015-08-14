@@ -5,8 +5,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert.SpecialType;
 import ca.ubc.ece.salt.sdjsb.analysis.flow.AbstractLatticeElement;
+import ca.ubc.ece.salt.sdjsb.classify.alert.SpecialTypeAlert.SpecialType;
 
 /**
  * A SpecialTypeLatticeElement

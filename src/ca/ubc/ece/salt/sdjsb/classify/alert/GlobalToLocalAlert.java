@@ -1,12 +1,14 @@
-package ca.ubc.ece.salt.sdjsb.alert;
+package ca.ubc.ece.salt.sdjsb.classify.alert;
+
+import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
 
 
-public class GlobalToLocalAlert extends Alert {
-	
+public class GlobalToLocalAlert extends ClassifierAlert {
+
 	private String identifier;
-	
-	public GlobalToLocalAlert(String type, String identifier) {
-		super(type, "GLOBAL_TO_LOCAL");
+
+	public GlobalToLocalAlert(AnalysisMetaInformation ami, String functionName, String type, String identifier) {
+		super(ami, functionName, type, "GLOBAL_TO_LOCAL");
 		this.identifier = identifier;
 	}
 

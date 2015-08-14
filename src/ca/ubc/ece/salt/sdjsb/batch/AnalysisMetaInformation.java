@@ -36,6 +36,7 @@ public class AnalysisMetaInformation {
 	 * @param totalCommits
 	 * @param bugFixingCommits
 	 * @param projectID
+	 * @param projectHomepage
 	 * @param buggyFile
 	 * @param repairedFile
 	 * @param buggyCommitID

@@ -10,22 +10,26 @@ import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;
+import ca.ubc.ece.salt.sdjsb.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.sdjsb.analysis.flow.PathInsensitiveFlowAnalysis;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.Scope;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeCheck;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeVisitor;
+import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGEdge;
 import ca.ubc.ece.salt.sdjsb.cfg.CFGNode;
+import ca.ubc.ece.salt.sdjsb.classify.alert.ClassifierAlert;
 
-public class CallbackErrorSourceFlowAnalysis extends PathInsensitiveFlowAnalysis<CallbackErrorLatticeElement> {
-	
+public class CallbackErrorSourceFlowAnalysis extends PathInsensitiveFlowAnalysis<ClassifierAlert, ClassifierDataSet, CallbackErrorLatticeElement> {
+
 	/** Stores the possible callback error check repairs. */
 	private Set<CallbackErrorCheck> callbackErrorChecks;
-	
-	public CallbackErrorSourceFlowAnalysis() {
+
+	public CallbackErrorSourceFlowAnalysis(ClassifierDataSet dataSet, AnalysisMetaInformation ami) {
+		super(dataSet, ami);
 		this.callbackErrorChecks = new HashSet<CallbackErrorCheck>();
 	}
-	
+
 	/**
 	 * @return The set of possible callback error check repairs (or
 	 * anti-patterns if this is the source file analysis.
@@ -48,11 +52,11 @@ public class CallbackErrorSourceFlowAnalysis extends PathInsensitiveFlowAnalysis
 	@Override
 	public CallbackErrorLatticeElement entryValue(ScriptNode node) {
 
-		/* Add any parameters that are not new and htat look like an error 
+		/* Add any parameters that are not new and htat look like an error
 		 * parameter. */
 
 		CallbackErrorLatticeElement cele = new CallbackErrorLatticeElement();
-		
+
 		/* If this is the script (no parameters), there is nothing to do. The
 		 * function must also have a mapping to the source file (the function
 		 * should not be inserted) */
@@ -62,11 +66,11 @@ public class CallbackErrorSourceFlowAnalysis extends PathInsensitiveFlowAnalysis
         FunctionNode function = (FunctionNode) node;
         for(AstNode parameter : function.getParams()) {
             if(parameter instanceof Name) {
-                
+
                 /* Match only error parameters for now. */
                 Name name = (Name) parameter;
                 if(name.getIdentifier().matches("(?i)e(rr(or)?)?")) {
-                    
+
                     /* Add the parameter to the lattice element. */
                     cele.parameters.add(name.getIdentifier());
 
@@ -74,7 +78,7 @@ public class CallbackErrorSourceFlowAnalysis extends PathInsensitiveFlowAnalysis
 
             }
         }
-			
+
 		return cele;
 
 	}
@@ -82,26 +86,26 @@ public class CallbackErrorSourceFlowAnalysis extends PathInsensitiveFlowAnalysis
 	@Override
 	public void transfer(CFGEdge edge, CallbackErrorLatticeElement sourceLE,
 			Scope scope) {
-		
+
 		AstNode condition = (AstNode) edge.getCondition();
 
 		if(condition == null || !(scope.scope instanceof FunctionNode)) return;
-		
+
 		/* Look for inserted parameter checks. */
         List<SpecialTypeCheck> specialTypeChecks = SpecialTypeVisitor.getSpecialTypeChecks(condition, false);
-        
+
         for(SpecialTypeCheck specialTypeCheck : specialTypeChecks) {
         	if(sourceLE.parameters.contains(specialTypeCheck.identifier)) {
-        		
+
         		FunctionNode function = (FunctionNode) scope.scope;
-        		
+
                 /* Register an alert. */
                 String signature = AnalysisUtilities.getFunctionSignature(function);
                 this.callbackErrorChecks.add(new CallbackErrorCheck(scope, function.getName(), signature, specialTypeCheck.identifier, specialTypeCheck.specialType));
-        		
+
         	}
         }
-		
+
 	}
 
 	@Override

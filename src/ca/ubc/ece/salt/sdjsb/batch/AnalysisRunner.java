@@ -7,17 +7,17 @@ import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
 /**
  * Runs an analysis on a file within a batch analysis. The batch analysis
  * engine extracts bug fixing commits from multiple projects, multiple versions
- * and multiple files. It then passes the source code contents (from source and 
+ * and multiple files. It then passes the source code contents (from source and
  * destination files) as well as the meta info (project, version and file info)
  * to be differenced and analyzed by this analysis engine.
  */
 public abstract class AnalysisRunner {
-	
+
 	/**
-	 * Performs AST-differencing and launches the analysis of the buggy/repaired 
+	 * Performs AST-differencing and launches the analysis of the buggy/repaired
 	 * source code file pair.
-	 * 
-	 * @param ami The meta info for the analysis (i.e., project id, file paths, 
+	 *
+	 * @param ami The meta info for the analysis (i.e., project id, file paths,
 	 * 			  commit IDs, etc.)
 	 */
 	public void analyzeFile(AnalysisMetaInformation ami) throws Exception {
@@ -38,32 +38,20 @@ public abstract class AnalysisRunner {
         catch(Exception e) {
         	throw e;
         }
-        
-        /* Run the analysis. */ 
+
+        /* Run the analysis. */
         this.analyze(cfd, ami);
-        
+
 	}
-	
-	
-	/**
-	 * Output the results of the analysis. The analysis should be finished when
-	 * this method is called.
-	 * @deprecated To preserve memory, analysis results should be written to
-	 * 			   disk (in the {@code dataSetPath} location) as they are 
-	 * 			   received from the analysis engine. More specifically, the
-	 * 			   {@code registerFeatureVector} method of the {@code DataSet}
-	 * 			   class should write the feature vector to disk.
-	 */
-	public abstract void printResults(String outFile, String supplementaryFolder);
-	
+
 	/**
 	 * Performs the file analysis.
-	 * 
+	 *
 	 * @param cfd The control flow differencing results.
-	 * @param ami The meta info for the analysis (i.e., project id, file paths, 
+	 * @param ami The meta info for the analysis (i.e., project id, file paths,
 	 * 			  commit IDs, etc.)
 	 */
 	protected abstract void analyze(ControlFlowDifferencing cfd, AnalysisMetaInformation ami) throws Exception;
-	
+
 
 }

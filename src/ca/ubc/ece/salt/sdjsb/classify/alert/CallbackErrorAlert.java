@@ -1,14 +1,16 @@
-package ca.ubc.ece.salt.sdjsb.alert;
+package ca.ubc.ece.salt.sdjsb.classify.alert;
+
+import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
 
 
-public class CallbackErrorAlert extends Alert {
-	
+public class CallbackErrorAlert extends ClassifierAlert {
+
 	private String function;
 	private String signature;
 	private String parameter;
-	
-	public CallbackErrorAlert(String type, String function, String signature, String parameter) {
-		super(type, "UNCHECKED_ERROR_PARAMETER");
+
+	public CallbackErrorAlert(AnalysisMetaInformation ami, String functionName, String type, String function, String signature, String parameter) {
+		super(ami, functionName, type, "UNCHECKED_ERROR_PARAMETER");
 		this.function = function.isEmpty() ? "[anonymous]" : function;
 		this.signature = signature;
 		this.parameter = parameter;

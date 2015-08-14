@@ -2,36 +2,39 @@ package ca.ubc.ece.salt.sdjsb.analysis.ast;
 
 import java.util.Set;
 
-import ca.ubc.ece.salt.sdjsb.alert.SpecialTypeAlert;
 import ca.ubc.ece.salt.sdjsb.analysis.ast.STHScopeAnalysis.SpecialTypeCheckResult;
+import ca.ubc.ece.salt.sdjsb.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.sdjsb.analysis.meta.MetaAnalysis;
+import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
+import ca.ubc.ece.salt.sdjsb.classify.alert.ClassifierAlert;
+import ca.ubc.ece.salt.sdjsb.classify.alert.SpecialTypeAlert;
 
-public class STHMetaAnalysis extends MetaAnalysis<STHScopeAnalysis, STHScopeAnalysis> {
+public class STHMetaAnalysis extends MetaAnalysis<ClassifierAlert, ClassifierDataSet, STHScopeAnalysis, STHScopeAnalysis> {
 
-	public STHMetaAnalysis() {
-		super(new STHScopeAnalysis(), new STHScopeAnalysis());
+	public STHMetaAnalysis(ClassifierDataSet dataSet, AnalysisMetaInformation ami) {
+		super(dataSet, ami, new STHScopeAnalysis(dataSet, ami), new STHScopeAnalysis(dataSet, ami));
 	}
 
 	@Override
-	protected void synthesizeAlerts() {
+	protected void synthesizeAlerts() throws Exception {
 
 		/* Anti-patterns. */
 		Set<SpecialTypeCheckResult> antiPatterns = this.srcAnalysis.getSpecialTypeCheckResults();
-		
+
 		/* Possible repair that adds callback error handling. */
 		Set<SpecialTypeCheckResult> repairs = this.dstAnalysis.getSpecialTypeCheckResults();
-		
+
 		for(SpecialTypeCheckResult repair : repairs) {
-			
+
 			if(!antiPatterns.contains(repair)) {
-				
+
 				/* Register an alert. */
-				this.registerAlert(new SpecialTypeAlert("AST_STH", repair.identifier, repair.specialType));
-				
+				this.registerAlert(new SpecialTypeAlert(this.ami, "[TODO: function name]", "AST_STH", repair.identifier, repair.specialType));
+
 			}
-			
+
 		}
-		
+
 	}
 
 }
