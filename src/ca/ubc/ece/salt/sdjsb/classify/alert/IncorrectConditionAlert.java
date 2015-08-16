@@ -1,5 +1,6 @@
 package ca.ubc.ece.salt.sdjsb.classify.alert;
 
+import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysisUtilities;
 import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.sdjsb.classify.alert.SpecialTypeAlert.SpecialType;
 
@@ -18,7 +19,12 @@ public class IncorrectConditionAlert extends ClassifierAlert {
 
 	@Override
 	public String getAlertDescription() {
-		return "An incorrect condition was repaired by changing a " + this.oldSpecialType + " check to a " + this.newSpecialType + " check for '" + this.variableIdentifier + "'.";
+		if(SpecialTypeAnalysisUtilities.isStronger(this.oldSpecialType, this.newSpecialType)) {
+			return "An incorrect condition was repaired by strenthening a " + this.oldSpecialType + " check to a " + this.newSpecialType + " check for '" + this.variableIdentifier + "'.";
+		}
+		else {
+			return "An incorrect condition was repaired by weakening a " + this.oldSpecialType + " check to a " + this.newSpecialType + " check for '" + this.variableIdentifier + "'.";
+		}
 	}
 
 	@Override

@@ -386,5 +386,51 @@ public class SpecialTypeAnalysisUtilities {
 		return false;
 	}
 
+	/**
+	 * @param source The special type checked in the source function.
+	 * @param destination The special type checked in the destination function.
+	 * @return True if the type check has been strengthened (i.e., falsey to value or value to type).
+	 */
+	public static boolean isStronger(SpecialType source, SpecialType destination) {
+
+		switch(source) {
+		case FALSEY:
+			if(destination != SpecialType.FALSEY) return true;
+		case NO_VALUE:
+			if(destination == SpecialType.UNDEFINED
+				|| destination == SpecialType.NULL) return true;
+		case EMPTY:
+			if(destination == SpecialType.BLANK
+				|| destination == SpecialType.ZERO
+				|| destination == SpecialType.EMPTY_ARRAY) return true;
+		default:
+			return false;
+		}
+
+	}
+
+	/**
+	 * @param source The special type checked in the source function.
+	 * @param destination The special type checked in the destination function.
+	 * @return True if the type check has been weakend (i.e., type to value or value to falsey).
+	 */
+	public static boolean isWeaker(SpecialType source, SpecialType destination) {
+
+		switch(destination) {
+		case FALSEY:
+			if(source != SpecialType.FALSEY) return true;
+		case NO_VALUE:
+			if(source == SpecialType.UNDEFINED
+				|| source == SpecialType.NULL) return true;
+		case EMPTY:
+			if(source == SpecialType.BLANK
+				|| source == SpecialType.ZERO
+				|| source == SpecialType.EMPTY_ARRAY) return true;
+		default:
+			return false;
+		}
+
+	}
+
 
 }

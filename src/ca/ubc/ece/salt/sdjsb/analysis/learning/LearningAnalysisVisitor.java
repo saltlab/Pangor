@@ -14,6 +14,7 @@ import org.mozilla.javascript.ast.StringLiteral;
 import org.mozilla.javascript.ast.UnaryExpression;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysisUtilities;
 import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
@@ -59,7 +60,7 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 
 		/* Create the feature vector by visiting the function. */
 		LearningAnalysisVisitor visitor = new LearningAnalysisVisitor(ami,
-				getFunctionName(script), script, null, true);
+				AnalysisUtilities.getFunctionName(script), script, null, true);
 		script.visit(visitor);
 
 		return visitor.featureVector;
@@ -76,7 +77,7 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 
 		/* Create the feature vector by visiting the function. */
 		LearningAnalysisVisitor visitor = new LearningAnalysisVisitor(ami,
-				getFunctionName(function), function, packageModel, false);
+				AnalysisUtilities.getFunctionName(function), function, packageModel, false);
 		function.visit(visitor);
 
 		/* Store the source code for the function. Since we don't know if we
@@ -89,27 +90,6 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		return visitor.featureVector;
 	}
 
-
-	/**
-	 * @param node The script or function.
-	 * @return The name of the function or script.
-	 */
-	private static String getFunctionName(ScriptNode function) {
-
-		if(function instanceof FunctionNode) {
-			String name = ((FunctionNode)function).getName();
-			if(name.isEmpty()) {
-				return "~anonymous~";
-			}
-			else {
-				return name;
-			}
-		}
-		else {
-			return "~script~";
-		}
-
-	}
 
 	private LearningAnalysisVisitor(AnalysisMetaInformation ami,
 			String functionName, ScriptNode root,

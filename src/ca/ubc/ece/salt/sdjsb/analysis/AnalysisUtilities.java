@@ -11,11 +11,12 @@ import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ParenthesizedExpression;
+import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.sdjsb.analysis.flow.IdentifiersTreeVisitor;
 
 public class AnalysisUtilities {
-	
+
 	/**
 	 * Returns the function signature.
 	 * @param function
@@ -37,22 +38,44 @@ public class AnalysisUtilities {
         return signature;
 
 	}
-	
+
+	/**
+	 * @param function The function or script.
+	 * @return The name of the function. "~script~" if it the script node and
+	 * 		   "~anonymous~" if it is an anonymous function.
+	 */
+	public static String getFunctionName(ScriptNode function) {
+
+		if(function instanceof FunctionNode) {
+			String name = ((FunctionNode)function).getName();
+			if(name.isEmpty()) {
+				return "~anonymous~";
+			}
+			else {
+				return name;
+			}
+		}
+		else {
+			return "~script~";
+		}
+
+	}
+
 	/**
 	 * Returns true if the AstNode is part of the parameter list of any of the
 	 * functions in the variables scope.
 	 * @param name The variable to check.
 	 * @return The parameter declaration if a function in the variable's scope
-	 * 		   contains the variable as a parameter (well, a variable with the 
-	 * 		   same name anyways, which won't always be correct but close 
+	 * 		   contains the variable as a parameter (well, a variable with the
+	 * 		   same name anyways, which won't always be correct but close
 	 * 		   enough for us).
 	 */
 	public static AstNode isParameter(Name name) {
-		
+
 		AstNode parent = name.getParent();
-		
+
 		while(!(parent instanceof AstRoot)) {
-			
+
 			if(parent instanceof FunctionNode) {
 				List<AstNode> parameters = ((FunctionNode)parent).getParams();
 				for(AstNode parameter : parameters) {
@@ -61,14 +84,14 @@ public class AnalysisUtilities {
 					}
 				}
 			}
-			
+
 			parent = parent.getParent();
 		}
-		
+
 		return null;
-		
+
 	}
-	
+
 	/**
 	 * Gets the other side of an equivalence binary operator.
 	 * @param node The node that may be part of an equivalence check.
@@ -77,14 +100,14 @@ public class AnalysisUtilities {
 	 */
 	public static AstNode getComparison(AstNode node) {
 		AstNode parent = node.getParent();
-		
+
 		/* Is this part of some binary operation? */
 		if(parent instanceof InfixExpression) {
 			InfixExpression ie = (InfixExpression) parent;
-			
+
 			/* Is the operator an equivalence operator? */
 			if(AnalysisUtilities.isEquivalenceOperator(ie.getOperator())) {
-				
+
 				if(ie.getRight() == node) {
                     return ie.getLeft(); //CheckerUtilities.getIdentifier(ie.getLeft());
 				}
@@ -93,7 +116,7 @@ public class AnalysisUtilities {
 				}
 			}
 		}
-		
+
 		return null;
 	}
 
@@ -105,23 +128,23 @@ public class AnalysisUtilities {
 	 * @throws IllegalArgumentException
 	 */
 	public static AstNode getTopLevelFieldIdentifier(AstNode node) throws IllegalArgumentException {
-		
+
 		/* If this node is a field or method, get the parent. */
 		if(node.getParent() instanceof InfixExpression) {
 
 			InfixExpression ie = (InfixExpression) node.getParent();
 
-			if(AnalysisUtilities.isIdentifierOperator(ie.getOperator()) && 
+			if(AnalysisUtilities.isIdentifierOperator(ie.getOperator()) &&
 			   !(ie.getLeft() instanceof FunctionCall || ie.getRight() instanceof FunctionCall)) {
 				return AnalysisUtilities.getTopLevelIdentifier(ie);
 			}
-			
+
 		}
-		
+
 		return node;
-		
+
 	}
-	
+
 	/**
 	 * Returns the top level identifier for a node. If the node is a name, it will
 	 * check the parent nodes until it gets to the top of the identifier.
@@ -130,7 +153,7 @@ public class AnalysisUtilities {
 	 * @throws IllegalArgumentException
 	 */
 	public static AstNode getTopLevelIdentifier(AstNode node) throws IllegalArgumentException {
-		
+
 		/* If this node is a field or method, get the parent. */
 		if(node.getParent() instanceof InfixExpression) {
 
@@ -139,17 +162,17 @@ public class AnalysisUtilities {
 			if(AnalysisUtilities.isIdentifierOperator(ie.getOperator())) {
 				return AnalysisUtilities.getTopLevelIdentifier(ie);
 			}
-			
+
 		}
-		
+
 		return node;
-		
+
 	}
 
 	/**
 	 * Returns the variable, field or function identifier for the AstNode. If
 	 * the node is not a Name, InfixEpxression or FunctionCall, or if the
-	 * operator of an InfixExpression is not a field access (GETPROP), then it 
+	 * operator of an InfixExpression is not a field access (GETPROP), then it
 	 * can't build an identifier and it returns null.
 	 * @param node The node that represents an identifier.
 	 * @return The variable, field or function identifier or null if an
@@ -181,23 +204,23 @@ public class AnalysisUtilities {
             if(identifier == null) return null;
             return identifier;
         }
-        
+
         return null;
 	}
-	
+
 	/**
 	 * Returns the list of variable, field or function identifiers contained
 	 * in an OR separated list. Use for getting all the identifiers on the
-	 * right hand side of an assignment. 
+	 * right hand side of an assignment.
 	 * @param node The node that represents the right hand side of an assignment.
-	 * @return The list of variable, field or function identifiers.	 
+	 * @return The list of variable, field or function identifiers.
 	 */
 	public static List<String> getRHSIdentifiers(AstNode node) {
 
 		IdentifiersTreeVisitor visitor = new IdentifiersTreeVisitor();
 		node.visit(visitor);
 		return visitor.variableIdentifiers;
-		
+
 	}
 
 	/**
@@ -216,7 +239,7 @@ public class AnalysisUtilities {
 
     /**
      * Returns true if the operatory for the binary expression is an assignment
-     * operator (i.e., an assignment or object 
+     * operator (i.e., an assignment or object
      * @param tokenType
      * @return
      */
@@ -251,7 +274,7 @@ public class AnalysisUtilities {
         UseTreeVisitor useVisitor = new UseTreeVisitor();
         node.visit(useVisitor);
         return useVisitor.getUsedIdentifiers();
-        
+
 	}
 
 }
