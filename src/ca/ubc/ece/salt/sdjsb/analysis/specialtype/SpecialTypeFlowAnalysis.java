@@ -1,8 +1,9 @@
 package ca.ubc.ece.salt.sdjsb.analysis.specialtype;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -38,19 +39,19 @@ import ca.ubc.ece.salt.sdjsb.classify.alert.SpecialTypeAlert.SpecialType;
  */
 public class SpecialTypeFlowAnalysis extends PathSensitiveFlowAnalysis<ClassifierAlert, ClassifierDataSet, SpecialTypeLatticeElement> {
 
-	/** Stores the possible callback error check repairs. */
-	private Set<SpecialTypeCheckResult> specialTypeCheckResults;
+	/** Stores the possible special type check repairs. */
+	private Map<String, List<SpecialTypeCheckResult>> specialTypeCheckResults;
 
 	public SpecialTypeFlowAnalysis(ClassifierDataSet dataSet, AnalysisMetaInformation ami) {
 		super(dataSet, ami);
-		this.specialTypeCheckResults = new HashSet<SpecialTypeCheckResult>();
+		this.specialTypeCheckResults = new HashMap<String, List<SpecialTypeCheckResult>>();
 	}
 
 	/**
 	 * @return The set of possible special type check repairs (or
 	 * anti-patterns if this is the source file analysis.
 	 */
-	public Set<SpecialTypeCheckResult> getSpecialTypeCheckResults() {
+	public Map<String, List<SpecialTypeCheckResult>> getSpecialTypeCheckResults() {
 		return this.specialTypeCheckResults;
 	}
 
@@ -158,7 +159,15 @@ public class SpecialTypeFlowAnalysis extends PathSensitiveFlowAnalysis<Classifie
         				if(assignedTo != specialType) {
 
                             /* Trigger an alert! */
-        					this.specialTypeCheckResults.add(new SpecialTypeCheckResult(identifier, specialType));
+        					List<SpecialTypeCheckResult> identifierResults = null;
+        					if(this.specialTypeCheckResults.containsKey(identifier)) {
+        						identifierResults = this.specialTypeCheckResults.get(identifier);
+        					}
+        					else {
+        						identifierResults = new LinkedList<SpecialTypeCheckResult>();
+								this.specialTypeCheckResults.put(identifier, identifierResults);
+        					}
+							identifierResults.add(new SpecialTypeCheckResult(identifier, specialType));
 
         				}
 
@@ -235,7 +244,7 @@ public class SpecialTypeFlowAnalysis extends PathSensitiveFlowAnalysis<Classifie
 
 		@Override
 		public int hashCode() {
-			return (this.identifier + "-" + this.identifier).hashCode();
+			return (this.identifier + "-" + this.specialType).hashCode();
 		}
 	}
 

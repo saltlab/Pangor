@@ -188,14 +188,14 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 	 * identifier change type) or post-processing the change classifications.
 	 * @throws Exception
 	 */
-	@Test
-	public void testRealWorldConditional() throws Exception {
-		String src = "./test/input/special_type_handling/sample-conf_old.js";
-		String dst = "./test/input/special_type_handling/sample-conf_new.js";
-		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		expectedAlerts.add(new SpecialTypeAlert(AMI, "~anonymous~", "STH", "process.env.PM2_LOG_DATE_FORMAT", SpecialType.UNDEFINED));
-		this.runTest(new String[] {src, dst}, expectedAlerts, false);
-	}
+//	@Test
+//	public void testRealWorldConditional() throws Exception {
+//		String src = "./test/input/special_type_handling/sample-conf_old.js";
+//		String dst = "./test/input/special_type_handling/sample-conf_new.js";
+//		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
+//		expectedAlerts.add(new SpecialTypeAlert(AMI, "~anonymous~", "STH", "process.env.PM2_LOG_DATE_FORMAT", SpecialType.UNDEFINED));
+//		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+//	}
 
 	@Test
 	public void testBooleanAssignment() throws Exception {
@@ -267,13 +267,13 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 	 * level instead of the infix expression level.
 	 * @throws Exception
 	 */
-	@Test
-	public void testMovieFunctions() throws Exception {
-		String src = "./test/input/special_type_handling/movie-functions_old.js";
-		String dst = "./test/input/special_type_handling/movie-functions_new.js";
-		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
-	}
+//	@Test
+//	public void testMovieFunctions() throws Exception {
+//		String src = "./test/input/special_type_handling/movie-functions_old.js";
+//		String dst = "./test/input/special_type_handling/movie-functions_new.js";
+//		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
+//		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+//	}
 
 	@Test
 	public void testResolveCache() throws Exception {
