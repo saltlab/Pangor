@@ -5,7 +5,7 @@
  * 		   STH_TYPE_ERROR_ZERO (c) 
  * 		   STH_TYPE_ERROR_BLANK (e) */
 var a = undefined, b = null, c = NaN, d = 0, e = '';
-if(a !== undefined && b !== null && c !== NaN && d !== 0 && e != '') {
+if(a && a !== undefined && b !== null && c !== NaN && d !== 0 && e !== '' && a != null && d != '') {
     console.log(a);
     console.log(b);
     console.log(c);

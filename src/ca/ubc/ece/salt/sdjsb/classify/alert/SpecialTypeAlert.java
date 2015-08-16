@@ -41,12 +41,15 @@ public class SpecialTypeAlert extends ClassifierAlert {
 	 * @author qhanam
 	 */
 	public enum SpecialType {
-		FALSEY,
+		FALSEY, // undefined, null, NaN, blank or zero
+		NO_VALUE, // undefined or null
+		EMPTY, // blank, zero or empty array
 		UNDEFINED,
 		NULL,
 		NAN,
 		BLANK,
-		ZERO
+		ZERO,
+		EMPTY_ARRAY
 	}
 
 }

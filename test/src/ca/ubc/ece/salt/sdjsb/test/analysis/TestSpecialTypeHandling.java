@@ -65,9 +65,12 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_all_types_old.js";
 		String dst = "./test/input/special_type_handling/sth_all_types_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
+		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "a", SpecialType.FALSEY));
+		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "a", SpecialType.NO_VALUE));
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "a", SpecialType.UNDEFINED));
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "b", SpecialType.NULL));
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "c", SpecialType.NAN));
+		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "d", SpecialType.EMPTY));
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "d", SpecialType.ZERO));
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "e", SpecialType.BLANK));
 		this.runTest(new String[] {src, dst}, expectedAlerts, true);
@@ -87,7 +90,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_undefined_elementget_old.js";
 		String dst = "./test/input/special_type_handling/sth_undefined_elementget_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "a", SpecialType.UNDEFINED));
+		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "a", SpecialType.NO_VALUE));
 		this.runTest(new String[] {src, dst}, expectedAlerts, true);
 	}
 
@@ -164,7 +167,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_undefined_do_old.js";
 		String dst = "./test/input/special_type_handling/sth_undefined_do_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "a", SpecialType.UNDEFINED));
+		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "a", SpecialType.NO_VALUE));
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 

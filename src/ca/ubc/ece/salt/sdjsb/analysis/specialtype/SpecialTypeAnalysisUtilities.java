@@ -30,18 +30,18 @@ public class SpecialTypeAnalysisUtilities {
 	 * 		   a Name node that holds a special type keyword or value.
 	 */
 	public static SpecialType getSpecialType(AstNode node) {
-		
+
         String name = AnalysisUtilities.getIdentifier(node);
-        
+
         if(name != null) {
 
             if(name.equals("undefined")) return SpecialType.UNDEFINED;
             else if(name.equals("NaN")) return SpecialType.NAN;
             else return null;
-            
+
         }
         else if (node instanceof KeywordLiteral) {
-                    
+
             if(node.getType() == Token.NULL) return SpecialType.NULL;
             else return null;
 
@@ -64,17 +64,17 @@ public class SpecialTypeAnalysisUtilities {
             return null;
         }
 	}
-	
+
 	/**
 	 * Returns the special type identified by the string literal.
 	 * @param stringLiteral
 	 * @return
 	 */
 	public static SpecialType getSpecialTypeString(StringLiteral stringLiteral) {
-		
+
 		switch(stringLiteral.getValue()) {
 		case "undefined":
-		
+
 		}
 		return null;
 	}
@@ -86,16 +86,16 @@ public class SpecialTypeAnalysisUtilities {
 	 * 		   node, or null if it is not a special type check.
 	 */
 	public static SpecialTypeCheck getSpecialTypeCheck(AstNode condition, AstNode node) {
-		
+
 		/* Is this part of some binary operation? */
 		if(node instanceof InfixExpression) {
 			InfixExpression ie = (InfixExpression) node;
-			
+
 			/* Is the operator an equivalence operator? */
 			if(AnalysisUtilities.isEquivalenceOperator(ie.getOperator())) {
 				String identifier = null;
 				SpecialType specialType = null;
-				
+
 				/* Get the identifier and the special type. */
 				System.out.println(ie.toSource());
 				if(getSpecialType(ie.getLeft()) != null) {
@@ -129,41 +129,56 @@ public class SpecialTypeAnalysisUtilities {
 				}
 
                 if(identifier != null && specialType != null) {
-                	
+
                     /* Check if this branches on true or false. */
                     BranchesOn branchesOn;
-                    
+
                     /* Get the value that this node evaluates to on the branch. */
                     if(ie == condition) branchesOn = BranchesOn.TRUE;
                     else branchesOn = SpecialTypeAnalysisUtilities.evaluatesTo(condition, ie.getParent(), BranchesOn.TRUE);
-                    
+
+                    /* Determine whether this is a special type (if it is in a comparison). */
+					boolean isSpecialType = true;
+					if(branchesOn == BranchesOn.TRUE || branchesOn == BranchesOn.TRUE_AND) {
+						isSpecialType = true;
+					}
+					else if(branchesOn == BranchesOn.FALSE || branchesOn == BranchesOn.FALSE_AND){
+						isSpecialType = false;
+					}
+
                     /* If the condition needs to definitely be true or false to branch, return the special type. */
-                    if(ie.getOperator() == Token.EQ || ie.getOperator() == Token.SHEQ) {
-                    	if(branchesOn == BranchesOn.TRUE || branchesOn == BranchesOn.TRUE_AND){
-                            return new SpecialTypeCheck(identifier, specialType, true);
-                    	}
-                    	else if(branchesOn == BranchesOn.FALSE || branchesOn == BranchesOn.FALSE_AND){
-                            return new SpecialTypeCheck(identifier, specialType, false);
-                    	}
+                    if(ie.getOperator() == Token.NE || ie.getOperator() == Token.SHNE) {
+                    	isSpecialType = !isSpecialType;
                     }
-                    else {
-                    	if(branchesOn == BranchesOn.TRUE || branchesOn == BranchesOn.TRUE_AND){
-                            return new SpecialTypeCheck(identifier, specialType, false);
-                    	}
-                    	else if(branchesOn == BranchesOn.FALSE || branchesOn == BranchesOn.FALSE_AND){
-                            return new SpecialTypeCheck(identifier, specialType, true);
-                    	}
+
+                    if(ie.getOperator() == Token.NE || ie.getOperator() == Token.EQ) {
+						/* This is a value check, so it could return true for multiple values. */
+						switch(specialType) {
+						case UNDEFINED:
+						case NULL:
+							return new SpecialTypeCheck(identifier, SpecialType.NO_VALUE, isSpecialType);
+						case BLANK:
+						case ZERO:
+						case EMPTY_ARRAY:
+							return new SpecialTypeCheck(identifier, SpecialType.EMPTY, isSpecialType);
+						default:
+							return new SpecialTypeCheck(identifier, specialType, isSpecialType);
+						}
+                    }
+                    else if(ie.getOperator() == Token.SHNE || ie.getOperator() == Token.SHEQ) {
+                    	/* This is a value and type check. */
+                    	return new SpecialTypeCheck(identifier, specialType, isSpecialType);
                     }
 
                 }
-				
+
 			}
-				
+
 		}
-		
+
 		/* Is this a 'falsey' identifier? */
 		else {
-			
+
 			String identifier = AnalysisUtilities.getIdentifier(node);
 
 			if(identifier != null) {
@@ -181,30 +196,30 @@ public class SpecialTypeAnalysisUtilities {
                 }
 
 			}
-			
+
 		}
-		
+
 		return null;
 	}
-	
+
 	/**
 	 * Determine what the value of the child node needs to be for this node to
-	 * evaluate to true (i.e., to execute this branch). 
+	 * evaluate to true (i.e., to execute this branch).
 	 * @param node the parent of the condition we are evaluating.
-	 * @return the value that the condition must evaluate to in order for the 
+	 * @return the value that the condition must evaluate to in order for the
 	 * 		   branch to be taken.
 	 */
 	public static BranchesOn evaluatesTo(AstNode condition, AstNode node, BranchesOn current) {
-		
+
 		if(node == condition.getParent()) return current;
-		
+
 		if(node instanceof UnaryExpression) {
 
 			UnaryExpression ue = (UnaryExpression)node;
 			if(ue.getOperator() == Token.NOT) {
-				
+
 				switch(current) {
-				case TRUE: 
+				case TRUE:
 					return evaluatesTo(condition, node.getParent(), BranchesOn.FALSE);
 				case FALSE:
 					return evaluatesTo(condition, node.getParent(), BranchesOn.TRUE);
@@ -220,20 +235,20 @@ public class SpecialTypeAnalysisUtilities {
 					return BranchesOn.UNKNOWN;
 				}
 			}
-			
+
 		}
 		else if(node instanceof ParenthesizedExpression) {
-			
+
 			return evaluatesTo(condition, node.getParent(), current);
-			
+
 		}
 		else if(node instanceof InfixExpression) {
 			InfixExpression ie = (InfixExpression)node;
 
 			if(ie.getType() == Token.AND) {
-				
+
 				switch(current) {
-				case TRUE: 
+				case TRUE:
 				case TRUE_AND:
 					return evaluatesTo(condition, node.getParent(), BranchesOn.TRUE_AND);
 				case FALSE:
@@ -245,12 +260,12 @@ public class SpecialTypeAnalysisUtilities {
 				case UNKNOWN:
 					return BranchesOn.UNKNOWN;
 				}
-				
+
 			}
 			else if(ie.getType() == Token.OR) {
-				
+
 				switch(current) {
-				case TRUE: 
+				case TRUE:
 				case TRUE_OR:
 					return evaluatesTo(condition, node.getParent(), BranchesOn.TRUE_OR);
 				case FALSE:
@@ -262,14 +277,14 @@ public class SpecialTypeAnalysisUtilities {
 				case UNKNOWN:
 					return BranchesOn.UNKNOWN;
 				}
-				
+
 			}
 		}
-		
+
 		return BranchesOn.UNKNOWN;
-		
+
 	}
-	
+
 	/**
 	 * @param val the value to negate.
 	 * @return the negation of the BranchesOn value.
@@ -279,9 +294,9 @@ public class SpecialTypeAnalysisUtilities {
 		if(val == BranchesOn.UNKNOWN) return val;
 		if(val == BranchesOn.TRUE) return BranchesOn.FALSE;
 		return BranchesOn.TRUE;
-		
+
 	}
-	
+
 	/**
 	 * The value that a condition must evaluate to in order for the branch to
 	 * be taken.
@@ -295,7 +310,7 @@ public class SpecialTypeAnalysisUtilities {
 		FALSE_OR,
 		UNKNOWN
 	}
-	
+
 	/**
 	 * Generates a list of identifers that are assigned to in the tree.
 	 * @param node the tree to look for assignments in.
@@ -306,26 +321,26 @@ public class SpecialTypeAnalysisUtilities {
         AssignmentTreeVisitor assignmentVisitor = new AssignmentTreeVisitor();
         node.visit(assignmentVisitor);
         return assignmentVisitor.getAssignedIdentifiers();
-		
+
 	}
-    
+
     /**
-     * Returns true if the operator represents an operation where the 
+     * Returns true if the operator represents an operation where the
      * identifiers are dereferenced.
      * @param tokenType
      * @return
      */
     public static boolean isUseOperator(int tokenType) {
-        int[] useOperators = new int[] { Token.GETPROP, Token.GETPROPNOWARN, 
-        								 Token.BITOR, Token.BITXOR, Token.BITAND, 
-        								 Token.ADD, Token.SUB , Token.MUL, 
-        								 Token.DIV , Token.MOD, Token.GETELEM, 
-        								 Token.SETELEM, Token.ASSIGN_BITOR, 
-        								 Token.ASSIGN_BITXOR, 
+        int[] useOperators = new int[] { Token.GETPROP, Token.GETPROPNOWARN,
+        								 Token.BITOR, Token.BITXOR, Token.BITAND,
+        								 Token.ADD, Token.SUB , Token.MUL,
+        								 Token.DIV , Token.MOD, Token.GETELEM,
+        								 Token.SETELEM, Token.ASSIGN_BITOR,
+        								 Token.ASSIGN_BITXOR,
         								 Token.ASSIGN_BITAND , Token.ASSIGN_LSH,
-                                         Token.ASSIGN_RSH , Token.ASSIGN_ADD, 
+                                         Token.ASSIGN_RSH , Token.ASSIGN_ADD,
                                          Token.ASSIGN_SUB , Token.ASSIGN_MUL,
-                                         Token.ASSIGN_DIV, Token.ASSIGN_MOD, 
+                                         Token.ASSIGN_DIV, Token.ASSIGN_MOD,
                                          Token.DOT, Token.INC, Token.DEC };
         return ArrayUtils.contains(useOperators, tokenType);
     }
@@ -339,9 +354,9 @@ public class SpecialTypeAnalysisUtilities {
 
 		AstNode parent = node.getParent();
 		String identifier = AnalysisUtilities.getIdentifier(node);
-		
+
 		if(identifier == null) return false;
-		
+
 		/* If this is a direct child of a branch statement's condition, it is a
 		 * truthy/falsey identifier. */
 		if(parent instanceof IfStatement
@@ -349,10 +364,10 @@ public class SpecialTypeAnalysisUtilities {
 		   || parent instanceof ForLoop
 		   || parent instanceof WhileLoop
 		   || parent instanceof ConditionalExpression) {
-			
+
 			return true;
 		}
-		
+
 		/* If this is a direct child of an AND or OR operator, it is a
 		 * truthy/falsey identifier. */
 		if(parent instanceof InfixExpression) {
@@ -367,9 +382,9 @@ public class SpecialTypeAnalysisUtilities {
             SpecialType specialType = SpecialTypeAnalysisUtilities.getSpecialType(node);
             if(specialType == null) return false;
 		}
-		
+
 		return false;
 	}
 
-    
+
 }
