@@ -107,7 +107,7 @@ public class ErrorHandlingDestinationScopeAnalysis extends ScopeAnalysis<Classif
 				tryStatement.visit(visitor);
 
 				List<String> insertedMethodCalls = visitor.getInsertedMethodCalls();
-				List<String> unchangedMethodCalls = visitor.getRemovedMethodCalls();
+				List<String> unchangedMethodCalls = visitor.getUnchangedMethodCalls();
 
 				/* If there are inserted calls, they may be the reason why the
 				 * try/catch block was inserted, so do not register a repair. */
