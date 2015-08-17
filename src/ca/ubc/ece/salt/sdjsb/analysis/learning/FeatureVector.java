@@ -30,6 +30,11 @@ public class FeatureVector extends Alert {
 		this.keywordMap = new HashMap<KeywordUse, Integer>();
 	}
 
+	public FeatureVector(AnalysisMetaInformation ami, String functionName, int id) {
+		super(ami, functionName, id);
+		this.keywordMap = new HashMap<KeywordUse, Integer>();
+	}
+
 	/**
 	 * Joins a source feature vector with this (the destination) feature vector.
 	 * @param source The source feature vector.
@@ -105,7 +110,7 @@ public class FeatureVector extends Alert {
 				features[1], features[2], features[3], features[4], features[5],
 				features[6], null, null);
 
-		FeatureVector featureVector = new FeatureVector(ami, features[7]);
+		FeatureVector featureVector = new FeatureVector(ami, features[7], Integer.parseInt(features[0]));
 
 		for(int i = 8; i < features.length; i++) {
 			String[] feature = features[i].split(":");

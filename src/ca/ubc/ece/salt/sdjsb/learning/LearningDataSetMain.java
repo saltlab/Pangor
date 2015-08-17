@@ -7,9 +7,9 @@ import org.kohsuke.args4j.CmdLineParser;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.KeywordFilter;
+import ca.ubc.ece.salt.sdjsb.analysis.learning.KeywordFilter.FilterType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningDataSet;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningMetrics;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.KeywordFilter.FilterType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningMetrics.KeywordFrequency;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse.KeywordContext;
@@ -28,8 +28,8 @@ public class LearningDataSetMain {
 //				"", "");
 
 		KeywordFilter filter = new KeywordFilter(FilterType.INCLUDE,
-				KeywordType.RESERVED, KeywordContext.CONDITION, ChangeType.REMOVED,
-				"global", "typeof");
+				KeywordType.METHOD, KeywordContext.METHOD_CALL, ChangeType.INSERTED,
+				"global", "join");
 
 		LearningDataSetOptions options = new LearningDataSetOptions();
 		CmdLineParser parser = new CmdLineParser(options);

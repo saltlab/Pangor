@@ -5,19 +5,19 @@
 #  supplementary folder should be output/supplementary
 #
 # USAGE: 
-#  $ bash cluster_nav_projects_diff.sh <cluster number>
-#  $ bash cluster_nav_project_diff.sh 84
+#  $ bash cluster_nav_projects_diff.sh <cluster number> <arff file> <supplementary folder> <-s>?
+#  $ bash cluster_nav_project_diff.sh 84 ../output/official_js_2015-08-11/METHOD_METHOD_CALL_INSERTED_global_join.arff ../output/official_js_2015-08-11/supplementary/ -s
 #  or 
 #  $ ./cluster_nav_project_diff.sh 84
 
 DIFF_PROGRAM=opendiff
 DIFF_PROCESS=FileMerge
-ARFF_FILE=../output/official_js_2015-08-11/RESERVED_CONDITION_REMOVED_global_typeof.arff
-SUPPLEMENTARY_FOLDER=../output/official_js_2015-08-11/supplementary/
+ARFF_FILE=$2
+SUPPLEMENTARY_FOLDER=$3
 CLIPBOARD_PROGRAM=pbcopy
 BROWSER=open
 
-if [ "$2" = "-s" ]; then
+if [ "$4" = "-s" ]; then
 	skip=true
 else
 	skip=false
