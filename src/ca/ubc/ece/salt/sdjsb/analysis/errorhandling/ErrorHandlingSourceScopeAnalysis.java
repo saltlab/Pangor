@@ -1,15 +1,18 @@
 package ca.ubc.ece.salt.sdjsb.analysis.errorhandling;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
+import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.NodeVisitor;
 import org.mozilla.javascript.ast.TryStatement;
 
-import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;
 import ca.ubc.ece.salt.sdjsb.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.Scope;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.ScopeAnalysis;
@@ -23,21 +26,23 @@ import ca.ubc.ece.salt.sdjsb.classify.alert.ClassifierAlert;
  */
 public class ErrorHandlingSourceScopeAnalysis extends ScopeAnalysis<ClassifierAlert, ClassifierDataSet> {
 
-	/** Stores the possible error handling repairs. **/
-	private List<ErrorHandlingCheck> errorHandlingChecks;
+	/**
+	 * Stores the unchanged calls which have been protected by an inserted
+	 * try statement.
+	 */
+	private Map<AstNode, List<String>> unprotectedCalls;
 
 	public ErrorHandlingSourceScopeAnalysis(ClassifierDataSet dataSet,
 			AnalysisMetaInformation ami) {
 		super(dataSet, ami);
-		this.errorHandlingChecks = new LinkedList<ErrorHandlingCheck>();
+		this.unprotectedCalls = new HashMap<AstNode, List<String>>();
 	}
 
 	/**
-	 * @return The set of possible error handling repairs (or
-	 * anti-patterns if this is the source file analysis.
+	 * @return The set of possible calls that are protected by a try statement.
 	 */
-	public List<ErrorHandlingCheck> getCallbackErrorChecks() {
-		return this.errorHandlingChecks;
+	public Map<AstNode, List<String>> getUnprotectedCalls() {
+		return this.unprotectedCalls;
 	}
 
 	@Override
@@ -71,6 +76,9 @@ public class ErrorHandlingSourceScopeAnalysis extends ScopeAnalysis<ClassifierAl
 		ErrorHandlingDestinationAnalysisVisitor visitor = new ErrorHandlingDestinationAnalysisVisitor(scope);
 		scope.scope.visit(visitor);
 
+		/* Store the unprotected methods for the meta analysis. */
+		this.unprotectedCalls.put(scope.scope, visitor.getUnprotectedMethodCalls());
+
 		/* We still need to inspect the functions declared in this scope. */
 		for(Scope child : scope.children) {
 			inspectFunctions(child);
@@ -79,28 +87,36 @@ public class ErrorHandlingSourceScopeAnalysis extends ScopeAnalysis<ClassifierAl
 	}
 
 	/**
-	 * Visits inserted try blocks and checks that none of the internal
-	 * statements have been inserted or updated (all unchanged/moved).
+	 * Visits a function and finds all method calls which are not protected by
+	 * try blocks.
 	 */
 	private class ErrorHandlingDestinationAnalysisVisitor implements NodeVisitor {
 
 		private Scope scope;
 
+		/** Stores the identifiers for the unprotected method calls. **/
+		private List<String> unprotectedMethodCalls;
+
 		public ErrorHandlingDestinationAnalysisVisitor(Scope scope) {
 			this.scope = scope;
+			this.unprotectedMethodCalls = new LinkedList<String>();
+		}
+
+		public List<String> getUnprotectedMethodCalls() {
+			return this.unprotectedMethodCalls;
 		}
 
 		@Override
 		public boolean visit(AstNode node) {
 
-			if(node instanceof TryStatement && node.getChangeType() == ChangeType.REMOVED) {
+			if(node instanceof FunctionCall) {
+				FunctionCall call = (FunctionCall)node;
+				String identifier = AnalysisUtilities.getIdentifier(call.getTarget());
 
-				/* Register the repair. */
-				ErrorHandlingSourceScopeAnalysis.this.errorHandlingChecks.add(new ErrorHandlingCheck(this.scope, "function name"));
-
+				this.unprotectedMethodCalls.add(identifier);
 			}
-
-			else if(node instanceof FunctionNode) {
+			else if(node instanceof TryStatement ||
+					(node != scope.scope && node instanceof FunctionNode)) {
 				return false;
 			}
 

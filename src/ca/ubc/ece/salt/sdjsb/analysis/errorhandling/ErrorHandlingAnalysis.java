@@ -1,7 +1,11 @@
 package ca.ubc.ece.salt.sdjsb.analysis.errorhandling;
 
 import java.util.List;
+import java.util.Map;
 
+import org.mozilla.javascript.ast.AstNode;
+
+import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;
 import ca.ubc.ece.salt.sdjsb.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.sdjsb.analysis.meta.MetaAnalysis;
 import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
@@ -10,7 +14,7 @@ import ca.ubc.ece.salt.sdjsb.classify.alert.ErrorHandlingAlert;
 
 /**
  * Classifies repairs that fix an uncaught error by surrounding the
- * statement which throws the error with a try statement.
+ * call which throws the error with a try statement.
  */
 public class ErrorHandlingAnalysis extends MetaAnalysis<ClassifierAlert, ClassifierDataSet,
 														ErrorHandlingSourceScopeAnalysis,
@@ -26,14 +30,29 @@ public class ErrorHandlingAnalysis extends MetaAnalysis<ClassifierAlert, Classif
 	protected void synthesizeAlerts() throws Exception {
 
 		/* Anti-patterns. */
-		List<ErrorHandlingCheck> antiPatterns = this.srcAnalysis.getCallbackErrorChecks();
+		Map<AstNode, List<String>> antiPatterns = this.srcAnalysis.getUnprotectedCalls();
 
 		/* Possible repair patterns. */
-		List<ErrorHandlingCheck> repairPatterns = this.dstAnalysis.getCallbackErrorChecks();
+		List<ErrorHandlingCheck> repairPatterns = this.dstAnalysis.getProtectedCalls();
 
-		/* Register the alert. */
-		for(ErrorHandlingCheck repairPattern : repairPatterns) {
-			if(!antiPatterns.contains(repairPattern)) this.registerAlert(new ErrorHandlingAlert(this.ami, repairPattern.functionName, "EH"));
+		repairs: for(ErrorHandlingCheck repairPattern : repairPatterns) {
+
+			if(antiPatterns.containsKey(repairPattern.scope.scope.getMapping())) {
+
+				List<String> unprotectedMethodCalls = antiPatterns.get(repairPattern.scope.scope.getMapping());
+
+				/* To be a repair, all the function calls need to be unprotected
+				 * in the source file. */
+				for(String protectedMethodCall : repairPattern.callTargetIdentifiers) {
+					if(!unprotectedMethodCalls.contains(protectedMethodCall)) continue repairs;
+				}
+
+				/* Register an alert. */
+				this.registerAlert(new ErrorHandlingAlert(this.ami,
+						AnalysisUtilities.getFunctionName(repairPattern.scope.scope), "EH"));
+
+			}
+
 		}
 
 	}

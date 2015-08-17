@@ -30,7 +30,39 @@ public class TestErrorHandling extends TestAnalysis {
 		this.runTest(new String[] {src, dst}, expectedAlerts, true);
 	}
 
-	/* TODO: Should we make the analysis more advanced by getting a list of
-	 * function identifiers which are protected by try blocks? */
+	@Test
+	public void testKiwiIRC() throws Exception{
+		String src = "./test/input/error_handling/kiwiirc_old.js";
+		String dst = "./test/input/error_handling/kiwiirc_new.js";
+		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
+		expectedAlerts.add(new ErrorHandlingAlert(AMI, "~anonymous~", "EH"));
+		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+	}
+
+	@Test
+	public void testExpress() throws Exception{
+		String src = "./test/input/error_handling/express_old.js";
+		String dst = "./test/input/error_handling/express_new.js";
+		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
+		expectedAlerts.add(new ErrorHandlingAlert(AMI, "trim_prefix", "EH"));
+		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+	}
+
+	@Test
+	public void testFalsePositive() throws Exception{
+		String src = "./test/input/error_handling/eh_fp_old.js";
+		String dst = "./test/input/error_handling/eh_fp_new.js";
+		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+	}
+
+	@Test
+	public void testMultiMethods() throws Exception{
+		String src = "./test/input/error_handling/eh_methods_old.js";
+		String dst = "./test/input/error_handling/eh_methods_new.js";
+		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
+		expectedAlerts.add(new ErrorHandlingAlert(AMI, "trim_prefix", "EH"));
+		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+	}
 
 }

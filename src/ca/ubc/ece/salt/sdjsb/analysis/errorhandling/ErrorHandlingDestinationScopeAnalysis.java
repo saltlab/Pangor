@@ -3,7 +3,6 @@ package ca.ubc.ece.salt.sdjsb.analysis.errorhandling;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.mozilla.javascript.Node;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.FunctionNode;
@@ -11,7 +10,6 @@ import org.mozilla.javascript.ast.NodeVisitor;
 import org.mozilla.javascript.ast.TryStatement;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;
 import ca.ubc.ece.salt.sdjsb.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.Scope;
 import ca.ubc.ece.salt.sdjsb.analysis.scope.ScopeAnalysis;
@@ -25,21 +23,24 @@ import ca.ubc.ece.salt.sdjsb.classify.alert.ClassifierAlert;
  */
 public class ErrorHandlingDestinationScopeAnalysis extends ScopeAnalysis<ClassifierAlert, ClassifierDataSet> {
 
-	/** Stores the possible error handling repairs. **/
-	private List<ErrorHandlingCheck> errorHandlingChecks;
+	/**
+	 * Stores the unchanged calls which have been protected by an inserted
+	 * try statement.
+	 */
+	private List<ErrorHandlingCheck> protectedCalls;
 
 	public ErrorHandlingDestinationScopeAnalysis(ClassifierDataSet dataSet,
 			AnalysisMetaInformation ami) {
 		super(dataSet, ami);
-		this.errorHandlingChecks = new LinkedList<ErrorHandlingCheck>();
+		this.protectedCalls = new LinkedList<ErrorHandlingCheck>();
 	}
 
 	/**
-	 * @return The set of possible error handling repairs (or
-	 * anti-patterns if this is the source file analysis.
+	 * @return The set of possible calls that are protected by an inserted
+	 * try statement.
 	 */
-	public List<ErrorHandlingCheck> getCallbackErrorChecks() {
-		return this.errorHandlingChecks;
+	public List<ErrorHandlingCheck> getProtectedCalls() {
+		return this.protectedCalls;
 	}
 
 	@Override
@@ -99,37 +100,28 @@ public class ErrorHandlingDestinationScopeAnalysis extends ScopeAnalysis<Classif
 
 				TryStatement tryStatement = (TryStatement) node;
 
-				/* Check that all inner nodes are unchanged. */
-				AstNode tryBlock = tryStatement.getTryBlock();
+				/* Check that there are no inserted function calls and get a
+				 * list of the unchanged function calls. */
 
-				boolean changes = false;
-				if(tryBlock instanceof org.mozilla.javascript.ast.Scope) {
-					/* We need to check every statement in the block. */
-					org.mozilla.javascript.ast.Scope block = (org.mozilla.javascript.ast.Scope) tryBlock;
-					for(Node n : block) {
-						if(n instanceof AstNode) {
-							AstNode statement = (AstNode) n;
-							changes = ChangedSubtreeVisitor.hasChanges(statement);
-						}
-						if(changes) break;
-					}
-				}
-				else {
-					/* We only need to check one statement. */
-					changes = ChangedSubtreeVisitor.hasChanges(tryStatement.getTryBlock());
-				}
+				ProtectedMethodCallVisitor visitor = new ProtectedMethodCallVisitor();
+				tryStatement.visit(visitor);
 
+				List<String> insertedMethodCalls = visitor.getInsertedMethodCalls();
+				List<String> unchangedMethodCalls = visitor.getRemovedMethodCalls();
 
-				/* Register the repair. */
-				if(!changes) {
-					ErrorHandlingDestinationScopeAnalysis.this.errorHandlingChecks.add(
-							new ErrorHandlingCheck(this.scope,
-									AnalysisUtilities.getFunctionName(this.scope.scope)));
+				/* If there are inserted calls, they may be the reason why the
+				 * try/catch block was inserted, so do not register a repair. */
+				if(insertedMethodCalls.size() == 0) {
+
+					/* Register the potential repair. */
+					ErrorHandlingDestinationScopeAnalysis.this.protectedCalls.add(
+							new ErrorHandlingCheck(this.scope,unchangedMethodCalls));
+
 				}
 
 			}
 
-			else if(node instanceof FunctionNode) {
+			else if(node != this.scope.scope && node instanceof FunctionNode) {
 				return false;
 			}
 

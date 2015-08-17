@@ -2,7 +2,7 @@ package ca.ubc.ece.salt.sdjsb.classify;
 
 import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
 import ca.ubc.ece.salt.sdjsb.analysis.classify.ClassifierDataSet;
-import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysis;
+import ca.ubc.ece.salt.sdjsb.analysis.errorhandling.ErrorHandlingAnalysis;
 import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.sdjsb.batch.AnalysisRunner;
 
@@ -24,8 +24,11 @@ public class ClassifyAnalysisRunner extends AnalysisRunner {
 	protected void analyze(ControlFlowDifferencing cfd,
 			AnalysisMetaInformation ami) throws Exception {
 
-		SpecialTypeAnalysis analysis = new SpecialTypeAnalysis(this.dataset, ami);
-		cfd.analyze(analysis);
+//		SpecialTypeAnalysis sth_analysis = new SpecialTypeAnalysis(this.dataset, ami);
+//		cfd.analyze(sth_analysis);
+
+		ErrorHandlingAnalysis eh_analysis = new ErrorHandlingAnalysis(this.dataset, ami);
+		cfd.analyze(eh_analysis);
 
         	/* These analyses are full analyses. */
 //        	tasks.add(new CFDTask(cfd, new SpecialTypeAnalysis()));
