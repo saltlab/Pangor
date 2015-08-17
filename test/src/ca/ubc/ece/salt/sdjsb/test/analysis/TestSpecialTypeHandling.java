@@ -23,6 +23,16 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 	}
 
 	@Test
+	public void testFunction() throws Exception{
+		String src = "./test/input/special_type_handling/sth_function_old.js";
+		String dst = "./test/input/special_type_handling/sth_function_new.js";
+		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
+		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "a", SpecialType.FUNCTION));
+		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "b", SpecialType.FUNCTION));
+		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+	}
+
+	@Test
 	public void testUndefined() throws Exception{
 		String src = "./test/input/special_type_handling/sth_undefined_old.js";
 		String dst = "./test/input/special_type_handling/sth_undefined_new.js";

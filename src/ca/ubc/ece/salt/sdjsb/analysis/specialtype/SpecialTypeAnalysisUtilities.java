@@ -125,6 +125,10 @@ public class SpecialTypeAnalysisUtilities {
                         	 specialType = SpecialType.UNDEFINED;
                         	 identifier = AnalysisUtilities.getIdentifier(ue.getOperand());
                          }
+                         else if(ue.getOperator() == Token.TYPEOF && sl.getValue().equals("function")) {
+                        	 specialType = SpecialType.FUNCTION;
+                        	 identifier = AnalysisUtilities.getIdentifier(ue.getOperand());
+                         }
 					}
 				}
 
@@ -136,6 +140,32 @@ public class SpecialTypeAnalysisUtilities {
                     /* Get the value that this node evaluates to on the branch. */
                     if(ie == condition) branchesOn = BranchesOn.TRUE;
                     else branchesOn = SpecialTypeAnalysisUtilities.evaluatesTo(condition, ie.getParent(), BranchesOn.TRUE);
+
+                    /* Handle the function case, where we want to dereference if the value IS a function. */
+                    if(specialType == SpecialType.FUNCTION) {
+                    	switch(branchesOn) {
+                    	case TRUE:
+                    		branchesOn = BranchesOn.FALSE;
+							break;
+                    	case FALSE:
+                    		branchesOn = BranchesOn.TRUE;
+							break;
+                    	case TRUE_AND:
+                    		branchesOn = BranchesOn.FALSE_OR;
+							break;
+                    	case FALSE_AND:
+                    		branchesOn = BranchesOn.TRUE_OR;
+							break;
+                    	case TRUE_OR:
+                    		branchesOn = BranchesOn.FALSE_AND;
+							break;
+                    	case FALSE_OR:
+                    		branchesOn = BranchesOn.TRUE_AND;
+							break;
+						default:
+							break;
+                    	}
+                    }
 
                     /* Determine whether this is a special type (if it is in a comparison). */
 					boolean isSpecialType = true;

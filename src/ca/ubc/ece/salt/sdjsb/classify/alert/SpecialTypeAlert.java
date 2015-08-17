@@ -49,7 +49,8 @@ public class SpecialTypeAlert extends ClassifierAlert {
 		NAN,
 		BLANK,
 		ZERO,
-		EMPTY_ARRAY
+		EMPTY_ARRAY,
+		FUNCTION
 	}
 
 }
