@@ -65,4 +65,12 @@ public class TestErrorHandling extends TestAnalysis {
 		this.runTest(new String[] {src, dst}, expectedAlerts, true);
 	}
 
+	@Test
+	public void testAddedCall() throws Exception{
+		String src = "./test/input/error_handling/eh_added_call_old.js";
+		String dst = "./test/input/error_handling/eh_added_call_new.js";
+		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
+		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+	}
+
 }
