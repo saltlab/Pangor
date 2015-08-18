@@ -100,14 +100,19 @@ public class BoundedContextAnalysis extends
 		 * mapped (source version) and look for unbounded version of call there
 		 */
 		if (call.getChangeType() == ChangeType.INSERTED) {
-			FunctionNode function = (FunctionNode) call.getEnclosingFunction().getMapping();
+			if (call.getEnclosingFunction() != null) {
+				FunctionNode function = (FunctionNode) call.getEnclosingFunction().getMapping();
 
-			if (function != null) {
-				FunctionCallVisitor visitor = new FunctionCallVisitor();
-				function.visit(visitor);
+				if (function != null) {
+					FunctionCallVisitor visitor = new FunctionCallVisitor();
+					function.visit(visitor);
 
-				if (isUnboundedVersionOfCallOnList(call, visitor.normalCalls))
-					return true;
+					List<FunctionCall> changedCalls = visitor.normalCalls.stream()
+							.filter(c -> c.getChangeType() != ChangeType.UNCHANGED).collect(Collectors.toList());
+
+					if (isUnboundedVersionOfCallOnList(call, changedCalls))
+						return true;
+				}
 			} else {
 				if (isUnboundedVersionOfCallOnList(call, this.srcAnalysis.visitor.normalCalls))
 					return true;
