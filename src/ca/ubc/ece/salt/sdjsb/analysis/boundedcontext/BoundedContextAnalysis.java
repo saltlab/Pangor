@@ -94,24 +94,30 @@ public class BoundedContextAnalysis extends
 		 * Case 2: GumTree detects function as INSERTED. But sometimes its a
 		 * false positive, so we check if the function call without the bounded
 		 * call was on the old version
+		 *
+		 * First we used to check in the entire srcScope, but this was giving a
+		 * lot of false positives, so now we get the enclosing function, its
+		 * mapped (source version) and look for unbounded version of call there
 		 */
 		if (call.getChangeType() == ChangeType.INSERTED) {
-			if (isUnboundedVersionOfCallOnList(call, this.srcAnalysis.visitor.normalCalls))
-				return true;
+			FunctionNode function = (FunctionNode) call.getEnclosingFunction().getMapping();
+
+			if (function != null) {
+				FunctionCallVisitor visitor = new FunctionCallVisitor();
+				function.visit(visitor);
+
+				if (isUnboundedVersionOfCallOnList(call, visitor.normalCalls))
+					return true;
+			} else {
+				if (isUnboundedVersionOfCallOnList(call, this.srcAnalysis.visitor.normalCalls))
+					return true;
+			}
+
+
 		}
 
 		/*
-		 * Case 3: object.method("foo", function1) to object.method("foo",
-		 * function1.bind(this)). Tricky because function1 is not a function
-		 * call.
-		 */
-		if (((PropertyGet) call.getTarget()).getLeft().getChangeType() == ChangeType.MOVED) {
-			if (isUnboundedVersionOfCallOnList(call, this.srcAnalysis.visitor.normalCalls))
-				return true;
-		}
-
-		/*
-		 * Case 4: app.get('/debug', redirectToRoot) to app.get('/debug',
+		 * Case 3: app.get('/debug', redirectToRoot) to app.get('/debug',
 		 * redirectToRoot.bind(this)); And GumTree says redirectToRoot was
 		 * removed from source and inserted in destination
 		 *
