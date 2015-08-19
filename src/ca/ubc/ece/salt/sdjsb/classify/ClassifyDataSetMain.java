@@ -4,6 +4,7 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
 import ca.ubc.ece.salt.sdjsb.analysis.classify.ClassifierDataSet;
+import ca.ubc.ece.salt.sdjsb.analysis.classify.ClassifierMetrics;
 
 public class ClassifyDataSetMain {
 
@@ -34,12 +35,10 @@ public class ClassifyDataSetMain {
 		ClassifierDataSet dataSet = new ClassifierDataSet(options.getDataSetPath());
 
 		/* Print the metrics from the data set. */
-//		if(options.getPrintMetrics()) {
-//			LearningMetrics metrics = dataSet.getMetrics();
-//			for(KeywordFrequency frequency : metrics.changedKeywordFrequency) {
-//				System.out.println(frequency.keyword + " : " + frequency.frequency);
-//			}
-//		}
+		if(options.getPrintMetrics()) {
+			ClassifierMetrics metrics = dataSet.getMetrics();
+			System.out.println(metrics.printMetricsAsLatexTable());
+		}
 
 		/* Pre-process the file. */
 		dataSet.preProcess();

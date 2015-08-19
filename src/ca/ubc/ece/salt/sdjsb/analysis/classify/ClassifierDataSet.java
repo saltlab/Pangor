@@ -7,9 +7,11 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import ca.ubc.ece.salt.sdjsb.analysis.DataSet;
@@ -197,6 +199,51 @@ public class ClassifierDataSet implements DataSet<ClassifierAlert> {
 
 		/* Write the data set. */
 		stream.println(this.getAlertVector());
+
+	}
+
+	/**
+	 * Computes metrics about the data set:
+	 *
+	 *	Type Count: A ranked list of the classifer alert types.
+	 *
+	 *	Subtype Count: A ranked list of the classifer alert subtypes.
+	 *
+	 * @return The metrics for the data set (in the {@code ClassifierMetrics}
+	 * 		   object).
+	 */
+	public ClassifierMetrics getMetrics() {
+
+		/* The metrics object. */
+		ClassifierMetrics metrics = new ClassifierMetrics();
+
+		/* Compute the frequency of keywords. */
+		Map<String, Integer> typeCount = new HashMap<String, Integer>();
+		Map<String, Integer> subtypeCount = new HashMap<String, Integer>();
+		for(ClassifierAlert alert : this.alerts) {
+
+			/* Increment the type/subtype that appears in this alert. */
+			Integer tc = typeCount.get(alert.getType());
+			tc = tc == null ? 1 : tc + 1;
+			typeCount.put(alert.getType(), tc);
+
+			Integer sc = subtypeCount.get(alert.getType() + "_" + alert.getSubType());
+			sc = sc == null ? 1 : sc + 1;
+			subtypeCount.put(alert.getType() + "_" + alert.getSubType(), sc);
+
+		}
+
+		/* Create the ordered set of alert types. */
+		for(String typeName : typeCount.keySet()) {
+			metrics.addTypeCount(typeName, typeCount.get(typeName));
+		}
+
+		for(String subtypeName : subtypeCount.keySet()) {
+			metrics.addSubTypeCount(subtypeName, subtypeCount.get(subtypeName));
+		}
+
+
+		return metrics;
 
 	}
 
