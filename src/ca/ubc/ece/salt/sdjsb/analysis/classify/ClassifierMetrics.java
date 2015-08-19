@@ -27,7 +27,8 @@ public class ClassifierMetrics {
 
 			@Override
 			public int compare(TypeCount o1, TypeCount o2) {
-				if(o1.count == o2.count) return 0;
+				if (o1.typeName.equals(o2.typeName) && o1.count == o2.count) return 0;
+				else if (o1.count == o2.count) return 1;
 				else if(o1.count > o2.count) return -1;
 				else return 1;
 			}
@@ -124,8 +125,9 @@ public class ClassifierMetrics {
 
 				@Override
 				public int compare(SubTypeCount o1, SubTypeCount o2) {
-					if(o1.count == o2.count) return 0;
-					else if(o1.count > o2.count) return -1;
+					if (o1.subTypeName.equals(o2.subTypeName) && o1.count == o2.count) return 0;
+					else if (o1.count == o2.count) return 1;
+					else if (o1.count > o2.count) return -1;
 					else return 1;
 				}
 
