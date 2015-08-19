@@ -14,10 +14,10 @@ import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
 public abstract class ClassifierAlert extends Alert {
 
 	/** The alert type. **/
-	private String type;
+	protected String type;
 
 	/** The alert subtype. **/
-	private String subtype;
+	protected String subtype;
 
 	/**
 	 * An alert is always associated a concrete Checker.
@@ -26,6 +26,21 @@ public abstract class ClassifierAlert extends Alert {
 	 */
 	public ClassifierAlert(AnalysisMetaInformation ami, String functionName, String type, String subtype) {
 		super(ami, functionName);
+		this.type = type;
+		this.subtype = subtype;
+	}
+
+	/**
+	 * An alert is always associated a concrete Checker. This constructor
+	 * should only be used if making a ClassifierAlert from serial. Otherwise
+	 * the other constructor should be used so the ID is automatically
+	 * generated.
+	 * @param checker The checker which generated the alert.
+	 * @param subtype A checker may detect more than one repair subtype.
+	 * @param id The unique id for the alert.
+	 */
+	public ClassifierAlert(AnalysisMetaInformation ami, String functionName, String type, String subtype, int id) {
+		super(ami, functionName, id);
 		this.type = type;
 		this.subtype = subtype;
 	}
@@ -45,13 +60,6 @@ public abstract class ClassifierAlert extends Alert {
 
 		return serialized;
 
-	}
-
-	/**
-	 * @return A unique identifier for the alert.
-	 */
-	public String getID() {
-		throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -93,28 +101,7 @@ public abstract class ClassifierAlert extends Alert {
 	 * @return The repair type, subtype and description.
 	 */
 	public String getLongDescription() {
-		return this.type + "_" + this.subtype + ": " + this.getAlertDescription();
-	}
-
-	/**
-	 * A custom description specified by the concrete alert.
-	 */
-	public String getFeatureVector(String uri, String sourceFile, String destinationFile, String buggyCommit, String repairedCommit) {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @return The source code for the alert.
-	 */
-	public String getSourceCode() {
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * @return The destination code for the alert.
-	 */
-	public String getDestinationCode() {
-		throw new UnsupportedOperationException();
+		return this.getAlertDescription();
 	}
 
 	/**

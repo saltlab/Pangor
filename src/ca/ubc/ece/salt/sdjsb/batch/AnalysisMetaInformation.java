@@ -64,4 +64,30 @@ public class AnalysisMetaInformation {
 
 	}
 
+	@Override
+	public boolean equals(Object o) {
+
+		if(o instanceof AnalysisMetaInformation) {
+
+			AnalysisMetaInformation a = (AnalysisMetaInformation) o;
+
+			if(this.projectID.equals(a.projectID)
+				&& this.buggyFile.equals(a.buggyFile)
+				&& this.repairedFile.equals(a.repairedFile)
+				&& this.buggyCommitID.equals(a.buggyCommitID)
+				&& this.repairedCommitID.equals(a.repairedCommitID)) {
+
+				return true;
+
+			}
+
+		}
+		return false;
+	}
+
+	@Override
+	public int hashCode() {
+		return (projectID + repairedCommitID).hashCode();
+	}
+
 }

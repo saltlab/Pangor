@@ -1,20 +1,11 @@
-package ca.ubc.ece.salt.sdjsb.learning;
-
-import java.util.Arrays;
+package ca.ubc.ece.salt.sdjsb.classify;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
-import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.KeywordFilter;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.KeywordFilter.FilterType;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningDataSet;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningMetrics;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningMetrics.KeywordFrequency;
-import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
-import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse.KeywordContext;
+import ca.ubc.ece.salt.sdjsb.analysis.classify.ClassifierDataSet;
 
-public class LearningDataSetMain {
+public class ClassifyDataSetMain {
 
 	/**
 	 * Creates the learning data set for extracting repair patterns.
@@ -23,40 +14,32 @@ public class LearningDataSetMain {
 	 */
 	public static void main(String[] args) throws Exception {
 
-//		KeywordFilter nofilter = new KeywordFilter(FilterType.INCLUDE,
-//				KeywordType.UNKNOWN, KeywordContext.UNKNOWN, ChangeType.UNKNOWN,
-//				"", "");
-
-		KeywordFilter filter = new KeywordFilter(FilterType.INCLUDE,
-				KeywordType.METHOD, KeywordContext.METHOD_CALL, ChangeType.INSERTED,
-				"global", "replace");
-
-		LearningDataSetOptions options = new LearningDataSetOptions();
+		ClassifyDataSetOptions options = new ClassifyDataSetOptions();
 		CmdLineParser parser = new CmdLineParser(options);
 
 		try {
 			parser.parseArgument(args);
 		} catch (CmdLineException e) {
-			LearningDataSetMain.printUsage(e.getMessage(), parser);
+			ClassifyDataSetMain.printUsage(e.getMessage(), parser);
 			return;
 		}
 
 		/* Print the help page. */
 		if(options.getHelp()) {
-			LearningDataSetMain.printHelp(parser);
+			ClassifyDataSetMain.printHelp(parser);
 			return;
 		}
 
-		/* Re-construct the data set. */
-		LearningDataSet dataSet = new LearningDataSet(options.getDataSetPath(), Arrays.asList(filter));
+		/* Re-construct and filter the data set. */
+		ClassifierDataSet dataSet = new ClassifierDataSet(options.getDataSetPath());
 
 		/* Print the metrics from the data set. */
-		if(options.getPrintMetrics()) {
-			LearningMetrics metrics = dataSet.getMetrics();
-			for(KeywordFrequency frequency : metrics.changedKeywordFrequency) {
-				System.out.println(frequency.keyword + " : " + frequency.frequency);
-			}
-		}
+//		if(options.getPrintMetrics()) {
+//			LearningMetrics metrics = dataSet.getMetrics();
+//			for(KeywordFrequency frequency : metrics.changedKeywordFrequency) {
+//				System.out.println(frequency.keyword + " : " + frequency.frequency);
+//			}
+//		}
 
 		/* Pre-process the file. */
 		dataSet.preProcess();

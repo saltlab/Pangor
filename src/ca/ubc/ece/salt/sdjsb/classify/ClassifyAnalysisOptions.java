@@ -2,7 +2,7 @@ package ca.ubc.ece.salt.sdjsb.classify;
 
 import org.kohsuke.args4j.Option;
 
-public class ClassifyOptions {
+public class ClassifyAnalysisOptions {
 
 	@Option(name="-u", aliases={"--uri"}, usage="The uri of the public repository (e.g., https://github.com/qhanam/JSRepairClass.git).")
 	private String host = null;

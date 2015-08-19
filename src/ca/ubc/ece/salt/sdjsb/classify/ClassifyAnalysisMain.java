@@ -20,7 +20,7 @@ import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysisException;
 import ca.ubc.ece.salt.sdjsb.batch.GitProjectAnalysisTask;
 import ca.ubc.ece.salt.sdjsb.learning.LearningAnalysisMain;
 
-public class ClassifyMain {
+public class ClassifyAnalysisMain {
 
 	protected static final Logger logger = LogManager.getLogger(LearningAnalysisMain.class);
 
@@ -38,19 +38,19 @@ public class ClassifyMain {
 	 */
 	public static void main(String[] args) throws Exception {
 
-		ClassifyOptions options = new ClassifyOptions();
+		ClassifyAnalysisOptions options = new ClassifyAnalysisOptions();
 		CmdLineParser parser = new CmdLineParser(options);
 
 		try {
 			parser.parseArgument(args);
 		} catch (CmdLineException e) {
-			ClassifyMain.printUsage(e.getMessage(), parser);
+			ClassifyAnalysisMain.printUsage(e.getMessage(), parser);
 			return;
 		}
 
 		/* Print the help page. */
 		if(options.getHelp()) {
-			ClassifyMain.printHelp(parser);
+			ClassifyAnalysisMain.printHelp(parser);
 			return;
 		}
 
@@ -63,7 +63,7 @@ public class ClassifyMain {
 		if(options.getURI() != null) {
 
 			try {
-                gitProjectAnalysis = GitProjectAnalysis.fromURI(options.getURI(), ClassifyMain.CHECKOUT_DIR, runner);
+                gitProjectAnalysis = GitProjectAnalysis.fromURI(options.getURI(), ClassifyAnalysisMain.CHECKOUT_DIR, runner);
                 gitProjectAnalysis.analyze();
 			}
 			catch(GitProjectAnalysisException e) {
@@ -107,7 +107,7 @@ public class ClassifyMain {
 
 				try {
 					/* Build git repository object. */
-					gitProjectAnalysis = GitProjectAnalysis.fromURI(uri, ClassifyMain.CHECKOUT_DIR, runner);
+					gitProjectAnalysis = GitProjectAnalysis.fromURI(uri, ClassifyAnalysisMain.CHECKOUT_DIR, runner);
 
 					/* Perform the analysis (this may take some time) */
 					executor.submit(new GitProjectAnalysisTask(gitProjectAnalysis, latch));
@@ -131,7 +131,7 @@ public class ClassifyMain {
 		}
 		else {
 			System.out.println("No repository given.");
-			ClassifyMain.printUsage("No repository given.", parser);
+			ClassifyAnalysisMain.printUsage("No repository given.", parser);
 			return;
 		}
 
