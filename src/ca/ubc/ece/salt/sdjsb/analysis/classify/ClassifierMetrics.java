@@ -57,8 +57,9 @@ public class ClassifierMetrics {
 	 * @param count The number of rows the classifier alert appeared in the data set.
 	 */
 	public void addSubTypeCount(String subTypeName, int count) {
-		TypeCount typeCount = this.typeMap.get(subTypeName.split("_")[0]);
-		typeCount.addSubTypeCount(subTypeName, count);
+		String typeName = subTypeName.split("_")[0];
+		TypeCount typeCount = this.typeMap.get(typeName);
+		typeCount.addSubTypeCount(subTypeName.substring(typeName.length() + 1, subTypeName.length()), count);
 	}
 
 	/**
@@ -66,13 +67,46 @@ public class ClassifierMetrics {
 	 */
 	public String printMetricsAsLatexTable() {
 		String output = "";
+
+        output += "\\begin{table*}\n";
+        output += "\t\\centering\n";
+        output += "\t\\caption{Classifier Evaluation and Results}\n";
+        output += "\t\\begin{tabular}{ | c | l | r | r | r | r | r | }\n";
+        output += "\t\t\\hline\n";
+        output += "\t\t\\textbf{Type} & \\textbf{SubType} & \\textbf{Count} & \\textbf{Sample Size} & \\textbf{TP} & \\textbf{FP} & \\textbf{Precision} \\\\ \\hline\n";
+
 		for(TypeCount typeCount : this.typeCount) {
-			output += typeCount.typeName + " - " + typeCount.count + "\n";
+
+			output += "\t\t\\multirow{" + (typeCount.subTypes.size() + 1) + "}{*}{" + typeCount.typeName + "}\n";
+
 			for(SubTypeCount subTypeCount : typeCount.subTypes) {
-				output += "\t" + subTypeCount.subTypeName + " - " + subTypeCount.count + "\n";
+
+				output += "\t\t& " + subTypeCount.subTypeName
+						+ " & " + subTypeCount.count
+						+ " & "
+						+ " & "
+						+ " & "
+						+ " & "
+						+ " \\\\ \n";
+
 			}
+
+			output += "\t\t& \\textbf{Total}"
+					+ " & \\textbf{" + typeCount.count + "}"
+					+ " & "
+					+ " & "
+					+ " & "
+					+ " & "
+					+ " \\\\ \n";
+
+			output += "\t\t\\hline\n";
 		}
-		return output;
+
+        output += "\t\\end{tabular}\n";
+        output += "\t\\label{tbl:classifierEvaluation}\n";
+        output += "\\end{table*}\n";
+
+		return output.replaceAll("_", "\\\\_");
 	}
 
 	/**
