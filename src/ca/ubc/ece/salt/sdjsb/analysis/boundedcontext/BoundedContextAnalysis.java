@@ -6,10 +6,10 @@ import java.util.stream.Collectors;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.FunctionNode;
-import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.PropertyGet;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;
 import ca.ubc.ece.salt.sdjsb.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.sdjsb.analysis.meta.MetaAnalysis;
 import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
@@ -39,34 +39,11 @@ public class BoundedContextAnalysis extends
 		List<FunctionCall> insrtBoundedCalls = filterInsertedBoundedCalls(this.dstAnalysis.visitor.boundedContextCalls);
 
 		for (FunctionCall call : insrtBoundedCalls) {
-			this.registerAlert(new BoundedContextAlert(ami, getFunctionName(call),
+			this.registerAlert(new BoundedContextAlert(ami, AnalysisUtilities.getBoundedContextFunctionName(call),
 							((PropertyGet) call.getTarget()).getRight().toSource()));
 		}
 
 		return;
-	}
-
-	/**
-	 * @param node The script or function.
-	 * @return The name of the function or script.
-	 */
-	private String getFunctionName(FunctionCall call) {
-		PropertyGet target = (PropertyGet) call.getTarget();
-
-		if (target.getLeft() instanceof Name || target.getLeft() instanceof PropertyGet) {
-			return target.getLeft().toSource();
-		}
-
-		if (target.getLeft() instanceof FunctionNode) {
-			Name targetFunctionName = ((FunctionNode) target.getLeft()).getFunctionName();
-
-			if (targetFunctionName == null)
-				return "~anonymous~";
-			else
-				return targetFunctionName.toString();
-		}
-
-		return "?";
 	}
 
 	/*
@@ -138,14 +115,14 @@ public class BoundedContextAnalysis extends
 			if (parent.getChangeType() == ChangeType.UNCHANGED && parent.getMapping() != null) {
 				AstNode mapped = (AstNode) parent.getMapping();
 
-				RemovedAndMovedNodeVisitor visitor = new RemovedAndMovedNodeVisitor();
+				ChangeTypeFilterVisitor visitor = new ChangeTypeFilterVisitor(ChangeType.MOVED, ChangeType.REMOVED);
 				mapped.visit(visitor);
 
 				/*
 				 * To remove false positives, we check if node is not part of a
 				 * function that already has bounded context
 				 */
-				List<AstNode> filtered = visitor.removedAndMovedNodes.stream()
+				List<AstNode> filtered = visitor.storedNodes.stream()
 						.filter(c -> (c.toSource().equals(((PropertyGet) call.getTarget()).getLeft().toSource())))
 						.filter(c -> (!FunctionCallVisitor.isBoundedContextCall(c.getParent())))
 						.filter(c -> (!FunctionCallVisitor.isBoundedContextCall(c.getParent().getParent())))

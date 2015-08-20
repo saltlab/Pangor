@@ -9,8 +9,8 @@ import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
  */
 public class BoundedContextAlert extends ClassifierAlert {
 
-	public BoundedContextAlert(AnalysisMetaInformation ami, String functionName, String type) {
-		super(ami, functionName, type, "BOUNDED_CONTEXT");
+	public BoundedContextAlert(AnalysisMetaInformation ami, String functionName, String subtype) {
+		super(ami, functionName, "BOUNDEDCONTEXT", subtype);
 	}
 
 	@Override
@@ -20,14 +20,14 @@ public class BoundedContextAlert extends ClassifierAlert {
 
 	@Override
 	public String getAlertExplanation() {
-		return "The function was being called with a undesired bounded context. The repair is using call(), apply() or bind() to pass the desired context.";
+		return "The function was being called with a undesired bounded context. The repair is using call() apply() or bind() to pass the desired context.";
 	}
 
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof BoundedContextAlert && super.equals(o)) {
 			BoundedContextAlert wbca = (BoundedContextAlert) o;
-			return this.functionName.equals(wbca.functionName);
+			return (this.functionName.equals(wbca.functionName) && this.subtype.equals(wbca.subtype));
 		}
 		return false;
 	}

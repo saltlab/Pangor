@@ -1,5 +1,6 @@
 package ca.ubc.ece.salt.sdjsb.analysis;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -10,9 +11,13 @@ import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.Name;
+import org.mozilla.javascript.ast.ObjectLiteral;
 import org.mozilla.javascript.ast.ParenthesizedExpression;
+import org.mozilla.javascript.ast.PropertyGet;
 import org.mozilla.javascript.ast.ScriptNode;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+import ca.ubc.ece.salt.sdjsb.analysis.boundedcontext.ChangeTypeFilterVisitor;
 import ca.ubc.ece.salt.sdjsb.analysis.flow.IdentifiersTreeVisitor;
 
 public class AnalysisUtilities {
@@ -275,6 +280,194 @@ public class AnalysisUtilities {
         node.visit(useVisitor);
         return useVisitor.getUsedIdentifiers();
 
+	}
+
+	/**
+	 * Returns the last name of a function call. Ex: for function call
+	 * object.method.call(...), it returns call. It handles anonymous functions
+	 * calls. There is also a full name version of this function.
+	 *
+	 * @param node The script or function.
+	 * @return The name of the function or script.
+	 */
+	public static String getFunctionCallName(FunctionCall call) {
+		AstNode target = call.getTarget();
+
+		if (target instanceof Name)
+			return ((Name) target).getIdentifier();
+
+		if (target instanceof PropertyGet)
+			return ((PropertyGet) target).getRight().toSource();
+
+		if (target instanceof FunctionNode) {
+			Name targetFunctionName = ((FunctionNode) target).getFunctionName();
+
+			if (targetFunctionName == null)
+				return "~anonymous~";
+			else
+				return targetFunctionName.toString();
+		}
+
+		return "?";
+	}
+
+	/**
+	 * Returns the full name of a function call. Ex: for function call
+	 * object.method.call(...), it returns object.method.call. It handles
+	 * anonymous functions calls. CAREFUL: if you have a chain call, it will
+	 * return everything!
+	 *
+	 * @param node The script or function.
+	 * @return The name of the function or script.
+	 */
+	public static String getFunctionFullCallName(FunctionCall call) {
+		AstNode target = call.getTarget();
+
+		if (target instanceof Name || target instanceof PropertyGet)
+			return target.toSource();
+
+		if (target instanceof FunctionNode) {
+			Name targetFunctionName = ((FunctionNode) target).getFunctionName();
+
+			if (targetFunctionName == null)
+				return "~anonymous~";
+			else
+				return targetFunctionName.toString();
+		}
+
+		return "?";
+	}
+
+
+	/**
+	 * Returns the name of a bounded context function call, without the bounded
+	 * context method. Ex: for function call object.method.call(...), it returns
+	 * object.method
+	 *
+	 * @param node The script or function.
+	 * @return The name of the function or script.
+	 */
+	public static String getBoundedContextFunctionName(FunctionCall call) {
+		PropertyGet target = (PropertyGet) call.getTarget();
+
+		if (target.getLeft() instanceof Name || target.getLeft() instanceof PropertyGet) {
+			return target.getLeft().toSource();
+		}
+
+		if (target.getLeft() instanceof FunctionNode) {
+			Name targetFunctionName = ((FunctionNode) target.getLeft()).getFunctionName();
+
+			if (targetFunctionName == null)
+				return "~anonymous~";
+			else
+				return targetFunctionName.toString();
+		}
+
+		return "?";
+	}
+
+	/**
+	 * Returns the changed arguments for a given function call We care for
+	 * INSERTED or REMOVED parameters, not UPDATED. We use the mapped function
+	 * to see if number of parameters on call has changed.
+	 *
+	 * @param call The function call
+	 * @return The arguments that has been changed
+	 */
+	public static List<AstNode> getChangedArguments(FunctionCall call) {
+		List<AstNode> arguments = new ArrayList<>();
+
+		/*
+		 * We only care for 2 cases: 1 - number of arguments has changed; 2 -
+		 * number of arguments is the same, but type of any of them has changed.
+		 */
+
+		AstNode mappedNode = (AstNode) call.getMapping();
+
+		if (mappedNode == null || !(mappedNode instanceof FunctionCall))
+			return arguments;
+
+		FunctionCall mappedCall = (FunctionCall) mappedNode;
+
+		if (call.getArguments().size() == mappedCall.getArguments().size()) {
+			/*
+			 * Case 2: Look for type changes on arguments
+			 */
+
+			for (int argumentIndex = 0; argumentIndex < call.getArguments().size(); argumentIndex++) {
+				AstNode argument = call.getArguments().get(argumentIndex);
+
+				/*
+				 * False positives
+				 */
+				if (argument instanceof FunctionCall || argument instanceof FunctionNode)
+					continue;
+
+				if (!argument.getTypeName()
+						.equals(mappedCall.getArguments().get(argumentIndex).getTypeName())) {
+					arguments.add(argument);
+				}
+			}
+		} else {
+			/*
+			 * Case 1: Arguments count is not the same. Look for which arguments
+			 * were inserted/deleted
+			 */
+
+			/*
+			 * Inserted
+			 */
+			for (AstNode argument : call.getArguments()) {
+				if (argument instanceof FunctionCall || argument instanceof FunctionNode)
+					continue;
+
+				if (argument.getChangeType() == ChangeType.INSERTED) {
+					arguments.add(argument);
+				}
+			}
+
+			/*
+			 * Removed
+			 */
+			for (AstNode argument : mappedCall.getArguments()) {
+				if (argument instanceof FunctionCall || argument instanceof FunctionNode)
+					continue;
+
+				if (argument.getChangeType() == ChangeType.REMOVED) {
+					arguments.add(argument);
+				}
+			}
+		}
+
+		/*
+		 * Anyway, we have to use a Visitor to look recursively for changes on
+		 * ObjectLiterals
+		 */
+		for (AstNode argument : call.getArguments()) {
+
+			/*
+			 * If it is a ObjectLiteral, we should visit nodes to see if anything has changed
+			 */
+			if (argument instanceof ObjectLiteral) {
+				ChangeTypeFilterVisitor visitor = new ChangeTypeFilterVisitor(ChangeType.REMOVED, ChangeType.UPDATED,
+						ChangeType.INSERTED);
+				argument.visit(visitor);
+
+				/*
+				 * If something has changed, store it, and change ChangeType of
+				 * ObjectLiteral so alert is printed correctly
+				 */
+				if (visitor.storedNodes.size() > 0) {
+					argument.setChangeType(ChangeType.UPDATED);
+					arguments.add(argument);
+
+					continue;
+				}
+			}
+
+		}
+
+		return arguments;
 	}
 
 }
