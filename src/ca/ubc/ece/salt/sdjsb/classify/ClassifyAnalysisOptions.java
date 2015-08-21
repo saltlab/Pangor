@@ -28,6 +28,13 @@ public class ClassifyAnalysisOptions {
 	@Option(name="-s", aliases={"--supplement"}, usage="The folder path to place any supplementary files.")
 	private String supplement = null;
 
+	@Option(name = "-tr", aliases = { "--threads" }, usage = "The number of threads to be used.")
+	private Integer nThreads = 6;
+
+	public Integer getNThreads() {
+		return this.nThreads;
+	}
+
 	public String getURI() {
 		return this.host;
 	}

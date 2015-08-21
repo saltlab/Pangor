@@ -13,7 +13,8 @@ import ca.ubc.ece.salt.sdjsb.classify.alert.ClassifierAlert;
 
 public class TestCallbackError extends TestAnalysis {
 
-	private final AnalysisMetaInformation AMI = new AnalysisMetaInformation(0, 0, "test", "homepage", "src file", "dst file", "src commit", "dst commit", "src code", "dst code");
+	private final AnalysisMetaInformation AMI = new AnalysisMetaInformation(0, 0, "test", "homepage", "src file",
+			"dst file", "src commit", "dst commit", "src code", "dst code");
 
 	private void runTest(String[] args, List<ClassifierAlert> expectedAlerts, boolean printAlerts) throws Exception {
 		ClassifierDataSet dataSet = new ClassifierDataSet(null, null);
@@ -21,51 +22,74 @@ public class TestCallbackError extends TestAnalysis {
 		super.runTest(args, expectedAlerts, printAlerts, analysis, dataSet);
 	}
 
-	@Test
-	public void testCallbackErrorHandling() throws Exception {
-		String src = "./test/input/callback_error/cbe_old.js";
-		String dst = "./test/input/callback_error/cbe_new.js";
-		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		expectedAlerts.add(new CallbackErrorAlert(AMI, "printMessage", "CB", "donePrinting", "(err)", "err"));
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
-	}
-
-	@Test
-	public void testRealWorld() throws Exception {
-		String src = "./test/input/callback_error/CLI_old.js";
-		String dst = "./test/input/callback_error/CLI_new.js";
-		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		expectedAlerts.add(new CallbackErrorAlert(AMI, "~anonymous~", "CB", "[anonymous]", "(err,processes)", "err"));
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
-	}
-
-	/**
-	 * This test fails right now because it's a bit limited by AST
-	 * differencing. When we implement CFG analysis we should be able to
-	 * make this test pass.
+	/*
+	 * Initial simple scenario
 	 */
 	@Test
-	public void testMultiCheck() throws Exception {
-		String src = "./test/input/callback_error/cbe_multi_check_old.js";
-		String dst = "./test/input/callback_error/cbe_multi_check_new.js";
+	public void testSimplestScenario() throws Exception {
+		String src = "./test/input/callback_error/simplest_old.js";
+		String dst = "./test/input/callback_error/simplest_new.js";
+
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		expectedAlerts.add(new CallbackErrorAlert(AMI, "doSomething", "cb"));
+
+		this.runTest(new String[] { src, dst }, expectedAlerts, true);
 	}
 
+	/*
+	 * WikiIRC: 296924
+	 */
 	@Test
-	public void testInteractorDaemonizer() throws Exception {
-		String src = "./test/input/callback_error/InteractorDaemonizer_old.js";
-		String dst = "./test/input/callback_error/InteractorDaemonizer_new.js";
+	public void testReal() throws Exception {
+		String src = "./test/input/callback_error/real_old.js";
+		String dst = "./test/input/callback_error/real_new.js";
+
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		expectedAlerts.add(new CallbackErrorAlert(AMI, "~anonymous~", "callback"));
+
+		this.runTest(new String[] { src, dst }, expectedAlerts, true);
 	}
 
+	/*
+	 * marked: 558769
+	 *
+	 * No alerts because we already had another callback call passing error
+	 */
 	@Test
-	public void testCLI2() throws Exception {
-		String src = "./test/input/callback_error/CLI2_old.js";
-		String dst = "./test/input/callback_error/CLI2_new.js";
+	public void testReal2() throws Exception {
+		String src = "./test/input/callback_error/real2_old.js";
+		String dst = "./test/input/callback_error/real2_new.js";
+
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+
+		this.runTest(new String[] { src, dst }, expectedAlerts, true);
 	}
 
+	/*
+	 * mediacenterjs: 108767
+	 */
+	@Test
+	public void testReal3() throws Exception {
+		String src = "./test/input/callback_error/real3_old.js";
+		String dst = "./test/input/callback_error/real3_new.js";
+
+		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
+		expectedAlerts.add(new CallbackErrorAlert(AMI, "~anonymous~", "callback"));
+
+		this.runTest(new String[] { src, dst }, expectedAlerts, true);
+	}
+
+	/*
+	 * node-browserify: 2156173
+	 */
+	@Test
+	public void testReal4() throws Exception {
+		String src = "./test/input/callback_error/real4_old.js";
+		String dst = "./test/input/callback_error/real4_new.js";
+
+		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
+		expectedAlerts.add(new CallbackErrorAlert(AMI, "~anonymous~", "cb"));
+
+		this.runTest(new String[] { src, dst }, expectedAlerts, true);
+	}
 }
