@@ -19,7 +19,6 @@ import ca.ubc.ece.salt.sdjsb.learning.apis.AbstractAPI;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse.KeywordContext;
-import ca.ubc.ece.salt.sdjsb.learning.apis.PackageAPI;
 import ca.ubc.ece.salt.sdjsb.learning.apis.TopLevelAPI;
 
 public class TestASTLearning {
@@ -101,25 +100,25 @@ public class TestASTLearning {
 	 * Tests if predictor actually realize that parse() belongs to "path" (which
 	 * was imported), and not to "Date", which is globally available
 	 */
-	@Test
-	public void testPath() throws Exception {
-		String src = "./test/input/learning/path_old.js";
-		String dst = "./test/input/learning/path_new.js";
-
-		PackageAPI path = APIFactory.buildPathPackage();
-
-		KeywordUse parse = new KeywordUse(KeywordType.METHOD, KeywordContext.METHOD_CALL, "parse", ChangeType.INSERTED,
-				path);
-		KeywordUse pkg = new KeywordUse(KeywordType.PACKAGE, KeywordContext.REQUIRE, "path", ChangeType.INSERTED, path);
-
-		MockFeatureVector function = new MockFeatureVector("testFunction");
-		function.expectedKeywords.add(Pair.of(parse, 1));
-
-		MockFeatureVector script = new MockFeatureVector("~script~");
-		script.expectedKeywords.add(Pair.of(pkg, 1));
-
-		this.runTest(new String[] { src, dst }, Arrays.asList(function, script));
-	}
+//	@Test
+//	public void testPath() throws Exception {
+//		String src = "./test/input/learning/path_old.js";
+//		String dst = "./test/input/learning/path_new.js";
+//
+//		PackageAPI path = APIFactory.buildPathPackage();
+//
+//		KeywordUse parse = new KeywordUse(KeywordType.METHOD, KeywordContext.METHOD_CALL, "parse", ChangeType.INSERTED,
+//				path);
+//		KeywordUse pkg = new KeywordUse(KeywordType.PACKAGE, KeywordContext.REQUIRE, "path", ChangeType.INSERTED, path);
+//
+//		MockFeatureVector function = new MockFeatureVector("testFunction");
+//		function.expectedKeywords.add(Pair.of(parse, 1));
+//
+//		MockFeatureVector script = new MockFeatureVector("~script~");
+//		script.expectedKeywords.add(Pair.of(pkg, 1));
+//
+//		this.runTest(new String[] { src, dst }, Arrays.asList(function, script));
+//	}
 
 	/*
 	 * Tests if predictor recognizes JS reserved words.
@@ -150,6 +149,100 @@ public class TestASTLearning {
 
 		MockFeatureVector script = new MockFeatureVector("~script~");
 		script.expectedKeywords.add(Pair.of(falsey, 1));
+
+		this.runTest(new String[] { src, dst }, Arrays.asList(script));
+	}
+
+	@Test
+	public void testFalseyNot() throws Exception {
+		String src = "./test/input/learning/falsey2_old.js";
+		String dst = "./test/input/learning/falsey2_new.js";
+
+		TopLevelAPI api = APIFactory.buildTopLevelAPI();
+
+		KeywordUse falsey = new KeywordUse(KeywordType.RESERVED, KeywordContext.CONDITION, "falsey", ChangeType.INSERTED, api);
+
+		MockFeatureVector script = new MockFeatureVector("~script~");
+		script.expectedKeywords.add(Pair.of(falsey, 1));
+
+		this.runTest(new String[] { src, dst }, Arrays.asList(script));
+	}
+
+	@Test
+	public void testFalseyWhile() throws Exception {
+		String src = "./test/input/learning/falsey3_old.js";
+		String dst = "./test/input/learning/falsey3_new.js";
+
+		TopLevelAPI api = APIFactory.buildTopLevelAPI();
+
+		KeywordUse falsey = new KeywordUse(KeywordType.RESERVED, KeywordContext.CONDITION, "falsey", ChangeType.INSERTED, api);
+
+		MockFeatureVector script = new MockFeatureVector("~script~");
+		script.expectedKeywords.add(Pair.of(falsey, 1));
+
+		this.runTest(new String[] { src, dst }, Arrays.asList(script));
+	}
+
+	@Test
+	public void testFalseyConditional() throws Exception {
+		String src = "./test/input/learning/falsey4_old.js";
+		String dst = "./test/input/learning/falsey4_new.js";
+
+		TopLevelAPI api = APIFactory.buildTopLevelAPI();
+
+		KeywordUse falsey = new KeywordUse(KeywordType.RESERVED, KeywordContext.CONDITION, "falsey", ChangeType.INSERTED, api);
+
+		MockFeatureVector script = new MockFeatureVector("~script~");
+		script.expectedKeywords.add(Pair.of(falsey, 1));
+
+		this.runTest(new String[] { src, dst }, Arrays.asList(script));
+	}
+
+	@Test
+	public void testFalseyAnd() throws Exception {
+		String src = "./test/input/learning/falsey5_old.js";
+		String dst = "./test/input/learning/falsey5_new.js";
+
+		TopLevelAPI api = APIFactory.buildTopLevelAPI();
+
+		KeywordUse falsey = new KeywordUse(KeywordType.RESERVED, KeywordContext.CONDITION, "falsey", ChangeType.INSERTED, api);
+
+		MockFeatureVector script = new MockFeatureVector("~script~");
+		script.expectedKeywords.add(Pair.of(falsey, 1));
+
+		this.runTest(new String[] { src, dst }, Arrays.asList(script));
+	}
+
+	@Test
+	public void testVar() throws Exception {
+		String src = "./test/input/learning/var_old.js";
+		String dst = "./test/input/learning/var_new.js";
+
+		TopLevelAPI api = APIFactory.buildTopLevelAPI();
+
+		KeywordUse falsey = new KeywordUse(KeywordType.RESERVED, KeywordContext.STATEMENT, "var", ChangeType.INSERTED, api);
+
+		MockFeatureVector script = new MockFeatureVector("~script~");
+		script.expectedKeywords.add(Pair.of(falsey, 1));
+
+		this.runTest(new String[] { src, dst }, Arrays.asList(script));
+	}
+
+	@Test
+	public void testCallbackError() throws Exception {
+		String src = "./test/input/learning/cbe_old.js";
+		String dst = "./test/input/learning/cbe_new.js";
+
+		TopLevelAPI api = APIFactory.buildTopLevelAPI();
+
+		KeywordUse errorParam = new KeywordUse(KeywordType.RESERVED, KeywordContext.PARAMETER_DECLARATION, "error", ChangeType.INSERTED, api);
+		KeywordUse falsey = new KeywordUse(KeywordType.RESERVED, KeywordContext.CONDITION, "falsey", ChangeType.INSERTED, api);
+		KeywordUse errorArg = new KeywordUse(KeywordType.RESERVED, KeywordContext.ARGUMENT, "error", ChangeType.INSERTED, api);
+
+		MockFeatureVector script = new MockFeatureVector("print");
+		script.expectedKeywords.add(Pair.of(errorParam, 1));
+		script.expectedKeywords.add(Pair.of(falsey, 1));
+		script.expectedKeywords.add(Pair.of(errorArg, 1));
 
 		this.runTest(new String[] { src, dst }, Arrays.asList(script));
 	}
@@ -191,8 +284,8 @@ public class TestASTLearning {
 		KeywordUse blank = new KeywordUse(KeywordType.RESERVED, KeywordContext.CONDITION, "blank", ChangeType.INSERTED, api);
 		KeywordUse zero = new KeywordUse(KeywordType.RESERVED, KeywordContext.CONDITION, "zero", ChangeType.INSERTED, api);
 		KeywordUse undefined = new KeywordUse(KeywordType.RESERVED, KeywordContext.CONDITION, "undefined", ChangeType.INSERTED, api);
-		KeywordUse callback = new KeywordUse(KeywordType.METHOD, KeywordContext.METHOD_CALL, "callback", ChangeType.INSERTED, api);
-		KeywordUse error = new KeywordUse(KeywordType.EXCEPTION, KeywordContext.EXCEPTION_CATCH, "exception", ChangeType.INSERTED, api);
+		KeywordUse callback = new KeywordUse(KeywordType.RESERVED, KeywordContext.METHOD_CALL, "callback", ChangeType.INSERTED, api);
+		KeywordUse error = new KeywordUse(KeywordType.RESERVED, KeywordContext.EXCEPTION_CATCH, "error", ChangeType.INSERTED, api);
 
 		MockFeatureVector script = new MockFeatureVector("~script~");
 		script.expectedKeywords.add(Pair.of(typeof, 4));
@@ -205,46 +298,46 @@ public class TestASTLearning {
 		this.runTest(new String[] { src, dst }, Arrays.asList(script));
 	}
 
-	@Test
-	public void testFileSystem() throws Exception {
-		String src = "./test/input/learning/lrn_fs_old.js";
-		String dst = "./test/input/learning/lrn_fs_new.js";
-
-		PackageAPI fs = APIFactory.buildFileSystemPackage();
-
-		/* Create the expected keywords. */
-		KeywordUse openSync = new KeywordUse(KeywordType.METHOD, KeywordContext.METHOD_CALL, "openSync",
-				ChangeType.UNCHANGED, fs);
-		KeywordUse closeSync = new KeywordUse(KeywordType.METHOD, KeywordContext.METHOD_CALL, "closeSync",
-				ChangeType.INSERTED, fs);
-		KeywordUse existsSync = new KeywordUse(KeywordType.METHOD, KeywordContext.METHOD_CALL, "existsSync",
-				ChangeType.UNCHANGED, fs);
-		KeywordUse writeSync = new KeywordUse(KeywordType.METHOD, KeywordContext.METHOD_CALL, "writeSync",
-				ChangeType.UNCHANGED, fs);
-		KeywordUse fsU = new KeywordUse(KeywordType.PACKAGE, KeywordContext.REQUIRE, "fs", ChangeType.UNCHANGED, fs);
-		KeywordUse fsI = new KeywordUse(KeywordType.PACKAGE, KeywordContext.REQUIRE, "fs", ChangeType.INSERTED, fs);
-
-		/* Create the expected feature vectors. */
-		MockFeatureVector fv1 = new MockFeatureVector("writeHello");
-		fv1.expectedKeywords.add(Pair.of(openSync, 1));
-		fv1.expectedKeywords.add(Pair.of(closeSync, 1));
-		fv1.expectedKeywords.add(Pair.of(existsSync, 0));
-		fv1.expectedKeywords.add(Pair.of(writeSync, 1));
-		fv1.expectedKeywords.add(Pair.of(fsU, 0));
-		fv1.expectedKeywords.add(Pair.of(fsI, 0));
-
-		MockFeatureVector fv2 = new MockFeatureVector("writeHello");
-		fv2.expectedKeywords.add(Pair.of(openSync, 0));
-		fv2.expectedKeywords.add(Pair.of(closeSync, 0));
-		fv2.expectedKeywords.add(Pair.of(existsSync, 1));
-		fv2.expectedKeywords.add(Pair.of(writeSync, 0));
-		fv2.expectedKeywords.add(Pair.of(fsU, 2));
-		fv2.expectedKeywords.add(Pair.of(fsI, 1));
-
-		List<MockFeatureVector> expected = Arrays.asList(fv1, fv2);
-
-		this.runTest(new String[] {src, dst}, expected);
-	}
+//	@Test
+//	public void testFileSystem() throws Exception {
+//		String src = "./test/input/learning/lrn_fs_old.js";
+//		String dst = "./test/input/learning/lrn_fs_new.js";
+//
+//		PackageAPI fs = APIFactory.buildFileSystemPackage();
+//
+//		/* Create the expected keywords. */
+//		KeywordUse openSync = new KeywordUse(KeywordType.METHOD, KeywordContext.METHOD_CALL, "openSync",
+//				ChangeType.UNCHANGED, fs);
+//		KeywordUse closeSync = new KeywordUse(KeywordType.METHOD, KeywordContext.METHOD_CALL, "closeSync",
+//				ChangeType.INSERTED, fs);
+//		KeywordUse existsSync = new KeywordUse(KeywordType.METHOD, KeywordContext.METHOD_CALL, "existsSync",
+//				ChangeType.UNCHANGED, fs);
+//		KeywordUse writeSync = new KeywordUse(KeywordType.METHOD, KeywordContext.METHOD_CALL, "writeSync",
+//				ChangeType.UNCHANGED, fs);
+//		KeywordUse fsU = new KeywordUse(KeywordType.PACKAGE, KeywordContext.REQUIRE, "fs", ChangeType.UNCHANGED, fs);
+//		KeywordUse fsI = new KeywordUse(KeywordType.PACKAGE, KeywordContext.REQUIRE, "fs", ChangeType.INSERTED, fs);
+//
+//		/* Create the expected feature vectors. */
+//		MockFeatureVector fv1 = new MockFeatureVector("writeHello");
+//		fv1.expectedKeywords.add(Pair.of(openSync, 1));
+//		fv1.expectedKeywords.add(Pair.of(closeSync, 1));
+//		fv1.expectedKeywords.add(Pair.of(existsSync, 0));
+//		fv1.expectedKeywords.add(Pair.of(writeSync, 1));
+//		fv1.expectedKeywords.add(Pair.of(fsU, 0));
+//		fv1.expectedKeywords.add(Pair.of(fsI, 0));
+//
+//		MockFeatureVector fv2 = new MockFeatureVector("writeHello");
+//		fv2.expectedKeywords.add(Pair.of(openSync, 0));
+//		fv2.expectedKeywords.add(Pair.of(closeSync, 0));
+//		fv2.expectedKeywords.add(Pair.of(existsSync, 1));
+//		fv2.expectedKeywords.add(Pair.of(writeSync, 0));
+//		fv2.expectedKeywords.add(Pair.of(fsU, 2));
+//		fv2.expectedKeywords.add(Pair.of(fsI, 1));
+//
+//		List<MockFeatureVector> expected = Arrays.asList(fv1, fv2);
+//
+//		this.runTest(new String[] {src, dst}, expected);
+//	}
 
 	/**
 	 * A mock FeatureVector for verifying test cases.

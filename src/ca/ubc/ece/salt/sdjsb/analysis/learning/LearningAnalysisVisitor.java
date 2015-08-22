@@ -187,8 +187,14 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		else if(node instanceof Name) {
 			Name name = (Name) node;
 			token = name.getIdentifier();
-			if(token.matches("e|err|error")) token = "exception";
-			else if(token.matches("cb|callb")) token = "callback";
+			if(token.matches("e|err|error|exception")) {
+				type = KeywordType.RESERVED;
+				token = "error";
+			}
+			else if(token.matches("cb|callb|callback")) {
+				type = KeywordType.RESERVED;
+				token = "callback";
+			}
 		}
 		else if(node instanceof KeywordLiteral) {
 			KeywordLiteral kl = (KeywordLiteral) node;

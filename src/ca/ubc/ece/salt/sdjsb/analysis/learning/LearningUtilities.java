@@ -105,7 +105,6 @@ public class LearningUtilities {
 		AstNode parent = token.getParent();
 
 		/* Special case: falsey */
-		System.out.println(token.toSource());
 		if(SpecialTypeAnalysisUtilities.isFalsey(token)) {
 			return KeywordType.RESERVED;
 		}
@@ -262,7 +261,7 @@ public class LearningUtilities {
 		/*
 		 * Check for variable or field
 		 */
-		else if(token instanceof Name) {
+		if(token instanceof Name) {
 			return getVariableOrFieldType(token, (Name)token);
 		}
 

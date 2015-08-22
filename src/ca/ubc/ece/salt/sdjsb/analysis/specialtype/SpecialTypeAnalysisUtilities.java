@@ -393,7 +393,10 @@ public class SpecialTypeAnalysisUtilities {
 		   || parent instanceof DoLoop
 		   || parent instanceof ForLoop
 		   || parent instanceof WhileLoop
-		   || parent instanceof ConditionalExpression) {
+		   || parent instanceof ConditionalExpression
+		   || (parent instanceof InfixExpression && ((InfixExpression)parent).getOperator() == Token.AND)
+		   || (parent instanceof InfixExpression && ((InfixExpression)parent).getOperator() == Token.OR)
+		   || (parent instanceof UnaryExpression && ((UnaryExpression)parent).getOperator() == Token.NOT)) {
 
 			return true;
 		}
