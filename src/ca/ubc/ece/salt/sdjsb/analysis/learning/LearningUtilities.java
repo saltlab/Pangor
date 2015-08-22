@@ -6,15 +6,21 @@ import java.util.List;
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.Assignment;
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.BreakStatement;
 import org.mozilla.javascript.ast.CatchClause;
+import org.mozilla.javascript.ast.ContinueStatement;
 import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.Name;
+import org.mozilla.javascript.ast.NewExpression;
 import org.mozilla.javascript.ast.NumberLiteral;
 import org.mozilla.javascript.ast.ObjectProperty;
 import org.mozilla.javascript.ast.PropertyGet;
+import org.mozilla.javascript.ast.ReturnStatement;
 import org.mozilla.javascript.ast.StringLiteral;
+import org.mozilla.javascript.ast.TryStatement;
+import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.VariableInitializer;
 
 import ca.ubc.ece.salt.sdjsb.analysis.specialtype.SpecialTypeAnalysisUtilities;
@@ -94,12 +100,25 @@ public class LearningUtilities {
 	 */
 	private static KeywordType typeSwitch(AstNode token) {
 
+		if(token == null || token.getParent() == null) return KeywordType.UNKNOWN;
+
 		AstNode parent = token.getParent();
 
-		if(parent == null || token == null) return KeywordType.UNKNOWN;
-
+		/* Special case: falsey */
+		System.out.println(token.toSource());
+		if(SpecialTypeAnalysisUtilities.isFalsey(token)) {
+			return KeywordType.RESERVED;
+		}
 		/* Check for special types. */
-		if(token instanceof StringLiteral) {
+		if(token instanceof ReturnStatement ||
+				token instanceof BreakStatement ||
+				token instanceof ContinueStatement ||
+				token instanceof VariableDeclaration ||
+				token instanceof NewExpression ||
+				token instanceof TryStatement) {
+			return KeywordType.RESERVED;
+		}
+		else if(token instanceof StringLiteral) {
 
 			if(((StringLiteral)token).toSource().equals("\"\"")) {
 				return KeywordType.RESERVED;
@@ -256,12 +275,25 @@ public class LearningUtilities {
 	 */
 	private static KeywordContext contextSwitch(AstNode token) {
 
+		if(token == null || token.getParent() == null) return KeywordContext.UNKNOWN;
+
 		AstNode parent = token.getParent();
 
-		if(parent == null || token == null) return KeywordContext.UNKNOWN;
-
+		/* Special case: falsey */
+		if(SpecialTypeAnalysisUtilities.isFalsey(token)) {
+			return KeywordContext.CONDITION;
+		}
+		/* Special case: statements */
+		else if(token instanceof ReturnStatement ||
+				token instanceof BreakStatement ||
+				token instanceof ContinueStatement ||
+				token instanceof VariableDeclaration ||
+				token instanceof NewExpression ||
+				token instanceof TryStatement) {
+			return KeywordContext.STATEMENT;
+		}
 		/* Special case: infix expression that compares a falsey keyword? */
-		if(token instanceof InfixExpression) {
+		else if(token instanceof InfixExpression) {
 			InfixExpression ie = (InfixExpression) token;
 			if(ie.getType() == Token.SHEQ || ie.getType() == Token.SHNE) {
 				if(SpecialTypeAnalysisUtilities.getSpecialType(ie.getLeft()) != null ||

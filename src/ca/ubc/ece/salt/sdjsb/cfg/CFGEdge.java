@@ -9,29 +9,29 @@ import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
  * A labeled, directed edge to another node.
  */
 public class CFGEdge {
-	
+
 	/** Unique IDs for nodes. **/
 	private static long idGen = 0;
-	
+
 	/** The unique id for this node. **/
 	private long id;
-	
+
 	/** The condition in which this edge is traversed. If null then the edge
 	 * is always traversed. **/
 	private ClassifiedASTNode condition;
-	
+
 	/** The node that this edge exits. */
 	private CFGNode from;
-	
+
 	/** The node that this edge points to. */
 	private CFGNode to;
-	
+
 	/** The change operation applied to the edge from source to destination. **/
 	public ChangeType changeType;
-	
+
 	/** Does this edge traverse a path that loops? */
 	public boolean loopEdge;
-	
+
 	public CFGEdge(ClassifiedASTNode condition, CFGNode from, CFGNode to) {
 		this.condition = condition;
 		this.to = to;
@@ -40,7 +40,7 @@ public class CFGEdge {
 		this.id = CFGEdge.getUniqueId();
 		this.loopEdge = false;
 
-		if(condition != null && ((AstNode)condition).toSource().equals("i < 5")) 
+		if(condition != null && ((AstNode)condition).toSource().equals("i < 5"))
 			System.out.println(((AstNode)condition).toSource() + ":" + loopEdge);
 	}
 
@@ -52,7 +52,7 @@ public class CFGEdge {
 		this.id = CFGEdge.getUniqueId();
 		this.loopEdge = loopEdge;
 	}
-	
+
 	/**
 	 * @return a shallow copy of the edge.
 	 */
@@ -73,7 +73,7 @@ public class CFGEdge {
 	public CFGNode getTo() {
 		return to;
 	}
-	
+
 	/**
 	 * @param from the node this edge exits.
 	 */
@@ -117,20 +117,26 @@ public class CFGEdge {
 		CFGEdge.idGen++;
 		return id;
 	}
-	
+
 	/**
 	 * Reset the ID generator value. Needed in between test cases.
 	 */
 	public static synchronized void resetIdGen() {
 		CFGEdge.idGen = 0;
 	}
-	
-	@Override 
+
+	@Override
 	public boolean equals(Object o) {
 		if(o instanceof CFGEdge) {
 			return ((CFGEdge)o).condition == this.condition;
 		}
 		return false;
 	}
-	
+
+	@Override
+	public int hashCode() {
+		assert false : "hashCode not designed";
+		return 42; // any arbitrary constant will do
+	}
+
 }

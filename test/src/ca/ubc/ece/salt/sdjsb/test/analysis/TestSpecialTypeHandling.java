@@ -29,7 +29,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "a", SpecialType.FUNCTION));
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "b", SpecialType.FUNCTION));
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, true);
 	}
 
 	@Test
@@ -38,7 +38,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String dst = "./test/input/special_type_handling/sth_undefined_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "a", SpecialType.UNDEFINED));
-		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, false);
 	}
 
 	@Test
@@ -47,7 +47,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String dst = "./test/input/special_type_handling/sth_undefined_typeof_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "a", SpecialType.UNDEFINED));
-		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, false);
 	}
 
 	@Test
@@ -56,7 +56,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String dst = "./test/input/special_type_handling/sth_undefined_return_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "log", "STH", "a", SpecialType.UNDEFINED));
-		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, false);
 	}
 
 	@Test
@@ -67,7 +67,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "a", SpecialType.FALSEY));
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "b", SpecialType.FALSEY));
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "c", SpecialType.FALSEY));
-		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, false);
 	}
 
 	@Test
@@ -83,7 +83,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "d", SpecialType.EMPTY));
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "d", SpecialType.ZERO));
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "e", SpecialType.BLANK));
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, true);
 	}
 
 	@Test
@@ -92,7 +92,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String dst = "./test/input/special_type_handling/sth_undefined_field_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "a.field.value", SpecialType.UNDEFINED));
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, true);
 	}
 
 	@Test
@@ -101,7 +101,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String dst = "./test/input/special_type_handling/sth_undefined_elementget_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "a", SpecialType.NO_VALUE));
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, true);
 	}
 
 	@Test
@@ -111,7 +111,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~anonymous~", "STH", "tvShowTitle", SpecialType.UNDEFINED));
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~anonymous~", "STH", "progression", SpecialType.UNDEFINED));
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, true);
 	}
 
 	@Test
@@ -119,7 +119,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_used_dereferenced_old.js";
 		String dst = "./test/input/special_type_handling/sth_used_dereferenced_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, true);
 	}
 
 	@Test
@@ -127,7 +127,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_used_argument_old.js";
 		String dst = "./test/input/special_type_handling/sth_used_argument_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, false);
 	}
 
 	@Test
@@ -135,7 +135,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_used_field_argument_old.js";
 		String dst = "./test/input/special_type_handling/sth_used_field_argument_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, false);
 	}
 
 	@Test
@@ -143,7 +143,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_used_field_dereferenced_old.js";
 		String dst = "./test/input/special_type_handling/sth_used_field_dereferenced_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, false);
 	}
 
 	@Test
@@ -151,7 +151,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_assigned_field_old.js";
 		String dst = "./test/input/special_type_handling/sth_assigned_field_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, true);
 	}
 
 	@Test
@@ -160,7 +160,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String dst = "./test/input/special_type_handling/sth_undefined_while_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "a", SpecialType.UNDEFINED));
-		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, false);
 	}
 
 	@Test
@@ -169,7 +169,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String dst = "./test/input/special_type_handling/sth_undefined_for_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "a", SpecialType.UNDEFINED));
-		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, false);
 	}
 
 	@Test
@@ -178,7 +178,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String dst = "./test/input/special_type_handling/sth_undefined_do_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "a", SpecialType.NO_VALUE));
-		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, false);
 	}
 
 	@Test
@@ -187,7 +187,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String dst = "./test/input/special_type_handling/sth_undefined_conditional_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		expectedAlerts.add(new SpecialTypeAlert(AMI, "~script~", "STH", "a", SpecialType.UNDEFINED));
-		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, false);
 	}
 
 	/**
@@ -204,7 +204,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 //		String dst = "./test/input/special_type_handling/sample-conf_new.js";
 //		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 //		expectedAlerts.add(new SpecialTypeAlert(AMI, "~anonymous~", "STH", "process.env.PM2_LOG_DATE_FORMAT", SpecialType.UNDEFINED));
-//		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+//		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, false);
 //	}
 
 	@Test
@@ -212,7 +212,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_boolean_assignment_old.js";
 		String dst = "./test/input/special_type_handling/sth_boolean_assignment_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, false);
 	}
 
 	@Test
@@ -220,7 +220,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_deleted_old.js";
 		String dst = "./test/input/special_type_handling/sth_deleted_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, true);
 	}
 
 	@Test
@@ -228,7 +228,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_not_used_old.js";
 		String dst = "./test/input/special_type_handling/sth_not_used_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, false);
 	}
 
 	@Test
@@ -236,7 +236,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/cfg_diff/CLI_1_old.js";
 		String dst = "./test/input/cfg_diff/CLI_1_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, false);
 	}
 
 	@Test
@@ -244,7 +244,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/Common_old.js";
 		String dst = "./test/input/special_type_handling/Common_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, false);
 	}
 
 	@Test
@@ -252,7 +252,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/ForkMode_old.js";
 		String dst = "./test/input/special_type_handling/ForkMode_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, true);
 	}
 
 	@Test
@@ -260,7 +260,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/ForkMode_e_old.js";
 		String dst = "./test/input/special_type_handling/ForkMode_e_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, true);
 	}
 
 	@Test
@@ -268,7 +268,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/ForkMode_e2_old.js";
 		String dst = "./test/input/special_type_handling/ForkMode_e2_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, true);
 	}
 
 	/**
@@ -282,7 +282,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 //		String src = "./test/input/special_type_handling/movie-functions_old.js";
 //		String dst = "./test/input/special_type_handling/movie-functions_new.js";
 //		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-//		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+//		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, true);
 //	}
 
 	@Test
@@ -290,7 +290,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/ResolveCache_old.js";
 		String dst = "./test/input/special_type_handling/ResolveCache_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, true);
 	}
 
 	@Test
@@ -298,7 +298,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/sth_undefined_protect_other_old.js";
 		String dst = "./test/input/special_type_handling/sth_undefined_protect_other_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, true);
 	}
 
 	@Test
@@ -306,7 +306,7 @@ public class TestSpecialTypeHandling extends TestAnalysis {
 		String src = "./test/input/special_type_handling/music-metadata_old.js";
 		String dst = "./test/input/special_type_handling/music-metadata_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, true);
 	}
 
 }

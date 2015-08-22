@@ -117,10 +117,10 @@ public class ControlFlowDifferencing {
         /* Create the abstract GumTree representations of the ASTs. */
         Tree src = null;
         Tree dst = null;
-        if(srcSourceCode == null) src = ControlFlowDifferencing.createGumTree(options.getSrc());
-        else src = ControlFlowDifferencing.createGumTree(srcSourceCode, options.getSrc());
-        if(dstSourceCode == null) dst = ControlFlowDifferencing.createGumTree(options.getDst());
-        else dst = ControlFlowDifferencing.createGumTree(dstSourceCode, options.getDst());
+        if(srcSourceCode == null) src = ControlFlowDifferencing.createGumTree(options.getSrc(), options.getPreProcess());
+        else src = ControlFlowDifferencing.createGumTree(srcSourceCode, options.getSrc(), options.getPreProcess());
+        if(dstSourceCode == null) dst = ControlFlowDifferencing.createGumTree(options.getDst(), options.getPreProcess());
+        else dst = ControlFlowDifferencing.createGumTree(dstSourceCode, options.getDst(), options.getPreProcess());
 
 		/* Match the source tree nodes to the destination tree nodes. */
         Matcher matcher = ControlFlowDifferencing.matchTreeNodes(src, dst);
@@ -174,13 +174,14 @@ public class ControlFlowDifferencing {
      * RhinoTreeGenerator.
 	 *
 	 * @param file The file containing the source code.
+	 * @param preProcess Set to true to perform pre-processing on the AST.
 	 * @return The GumTree (AST) representation of the source file.
 	 * @throws IOException When something goes wrong reading the source file.
 	 */
-	public static Tree createGumTree(String path) throws IOException {
+	public static Tree createGumTree(String path, boolean preProcess) throws IOException {
 
         RhinoTreeGenerator rhinoTreeGenerator = new RhinoTreeGenerator();
-        Tree tree = rhinoTreeGenerator.fromFile(new File(path).getAbsolutePath());
+        Tree tree = rhinoTreeGenerator.fromFile(new File(path).getAbsolutePath(), preProcess);
         return tree;
 
 	}
@@ -194,13 +195,14 @@ public class ControlFlowDifferencing {
      * RhinoTreeGenerator.
 	 *
 	 * @param file The file containing the source code.
+	 * @param preProcess Set to true to perform pre-processing on the AST.
 	 * @return The GumTree (AST) representation of the source file.
 	 * @throws IOException When something goes wrong reading the source file.
 	 */
-	public static Tree createGumTree(String source, String path) throws IOException {
+	public static Tree createGumTree(String source, String path, boolean preProcess) throws IOException {
 
         RhinoTreeGenerator rhinoTreeGenerator = new RhinoTreeGenerator();
-        Tree tree = rhinoTreeGenerator.fromSource(source, path);
+        Tree tree = rhinoTreeGenerator.fromSource(source, path, preProcess);
         return tree;
 
 	}

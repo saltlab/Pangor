@@ -149,7 +149,8 @@ public class KeywordUse extends KeywordDefinition {
 		ARGUMENT,
 		EXCEPTION_CATCH,
 		EVENT_REGISTER,
-		EVENT_REMOVE
+		EVENT_REMOVE,
+		STATEMENT
 	}
 
 	/**

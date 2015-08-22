@@ -41,38 +41,38 @@ import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
  * Builds a control flow graph.
  */
 public class CFGFactory {
-	
+
 	/**
 	 * Builds intra-procedural control flow graphs for the given artifact.
 	 * @param root
 	 * @return
 	 */
 	public static List<CFG> createCFGs(AstRoot root) {
-		
+
 		/* Store the CFGs from all the functions. */
 		List<CFG> cfgs = new LinkedList<CFG>();
-		
+
 		/* Start by getting the CFG for the script. */
         cfgs.add(CFGFactory.buildScriptCFG(root));
-		
+
 		/* Get the list of functions in the script. */
 		List<FunctionNode> functions = FunctionNodeVisitor.getFunctions(root);
-		
+
 		/* For each function, generate its CFG. */
 		for (FunctionNode function : functions) {
 			cfgs.add(CFGFactory.buildScriptCFG(function));
 		}
-		
+
 		return cfgs;
 	}
-	
+
 	/**
 	 * Builds a CFG for a function or script.
 	 * @param scriptNode An ASTRoot node or FunctionNode.
 	 * @return The complete CFG.
 	 */
 	private static CFG buildScriptCFG(ScriptNode scriptNode) {
-		
+
 		String name = "FUNCTION";
 		if(scriptNode instanceof AstRoot) name = "SCRIPT";
 
@@ -81,14 +81,14 @@ public class CFGFactory {
 
 		CFGNode scriptEntry = new CFGNode(scriptNode, name + "_ENTRY");
 		CFGNode scriptExit = new CFGNode(new EmptyStatement(), name + "_EXIT");
-		
+
         /* Build the CFG for the script. */
         CFG cfg = new CFG(scriptEntry);
         cfg.addExitNode(scriptExit);
-        
+
         /* Build the CFG subgraph for the script body. */
         CFG subGraph = CFGFactory.build(scriptNode);
-        
+
         if(subGraph == null) {
         	CFGNode empty = new CFGNode(new EmptyStatement());
         	subGraph = new CFG(empty);
@@ -97,21 +97,21 @@ public class CFGFactory {
 
         /* The next node in the graph is first node of the subgraph. */
         scriptEntry.addEdge(null, subGraph.getEntryNode());
-        
+
         /* Merge the subgraph's exit nodes into the script exit node. */
         for(CFGNode exitNode : subGraph.getExitNodes()) {
         	exitNode.addEdge(null, scriptExit);
         }
-        
+
         /* The return nodes should point to the function exit. */
         for(CFGNode returnNode : subGraph.getReturnNodes()) {
         	returnNode.addEdge(null, scriptExit);
         }
-        
+
         return cfg;
-		
+
 	}
-	
+
 	/**
 	 * Builds a CFG for a block.
 	 * @param block The block statement.
@@ -127,7 +127,7 @@ public class CFGFactory {
 	private static CFG build(Scope scope) {
 		return CFGFactory.buildBlock(scope);
 	}
-	
+
 	/**
 	 * Builds a CFG for a script or function.
 	 * @param script The block statement ({@code AstRoot} or {@code FunctionNode}).
@@ -149,16 +149,16 @@ public class CFGFactory {
 		 * 	- First statement in block (set entry point for the CFG and won't need to merge previous into it).
 		 * 	- Last statement: The exit nodes for the block will be the same as the exit nodes for this statement.
 		 */
-		
+
 		CFG cfg = null;
 		CFG previous = null;
-		
+
 		for(Node statement : block) {
-			
+
 			assert(statement instanceof AstNode);
 
 			CFG subGraph = CFGFactory.buildSwitch((AstNode)statement);
-			
+
 			if(subGraph != null) {
 
 				if(previous == null) {
@@ -170,7 +170,7 @@ public class CFGFactory {
 					assert(previous.getExitNodes().size() == 1);
 					for(CFGNode exitNode : previous.getExitNodes()) {
 						exitNode.addEdge(null, subGraph.getEntryNode());
-						
+
 					}
 				}
 
@@ -182,9 +182,9 @@ public class CFGFactory {
 
                 previous = subGraph;
 			}
-			
+
 		}
-		
+
 		if(previous != null) {
 
             /* Propagate exit nodes from the last node in the block. */
@@ -193,30 +193,30 @@ public class CFGFactory {
 		else {
 			assert(cfg == null);
 		}
-		
+
 		return cfg;
 	}
-	
+
 	/**
 	 * Builds a control flow subgraph for an if statement.
 	 * @param ifStatement
 	 * @return
 	 */
 	private static CFG build(IfStatement ifStatement) {
-		
+
 		CFGNode ifNode = new CFGNode(new EmptyStatement(), "IF");
 		CFG cfg = new CFG(ifNode);
-		
+
 		/* Build the true branch. */
-		
+
 		CFG trueBranch = CFGFactory.buildSwitch(ifStatement.getThenPart());
-		
+
 		if(trueBranch == null) {
 			CFGNode empty = new CFGNode(new EmptyStatement());
 			trueBranch = new CFG(empty);
 			trueBranch.addExitNode(empty);
 		}
-		
+
 		ifNode.addEdge(new CFGEdge(ifStatement.getCondition(), ifNode, trueBranch.getEntryNode()));
 
         /* Propagate exit, return, continue, break and throw nodes. */
@@ -225,7 +225,7 @@ public class CFGFactory {
         cfg.addAllBreakNodes(trueBranch.getBreakNodes());
         cfg.addAllContinueNodes(trueBranch.getContinueNodes());
         cfg.addAllThrowNodes(trueBranch.getThrowNodes());
-        
+
         /* Build the false branch. */
 
 		CFG falseBranch = CFGFactory.buildSwitch(ifStatement.getElsePart());
@@ -236,10 +236,13 @@ public class CFGFactory {
 			falseBranch.addExitNode(empty);
 		}
 
-		/* The false branch condition is the negation of the true branch 
+		/* The false branch condition is the negation of the true branch
 		 * condition. We give it the same change type label as the true
 		 * branch condition. */
-		AstNode falseBranchCondition = new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(ifStatement.getCondition()));
+		ParenthesizedExpression pe = new ParenthesizedExpression();
+		pe.setExpression(ifStatement.getCondition().clone(pe));
+		AstNode falseBranchCondition = new UnaryExpression(Token.NOT, 0, pe);
+		falseBranchCondition.setParent(ifStatement);
 		falseBranchCondition.setChangeType(ifStatement.getCondition().getChangeType());
 
 		ifNode.addEdge(new CFGEdge(falseBranchCondition, ifNode, falseBranch.getEntryNode()));
@@ -250,9 +253,9 @@ public class CFGFactory {
         cfg.addAllBreakNodes(falseBranch.getBreakNodes());
         cfg.addAllContinueNodes(falseBranch.getContinueNodes());
         cfg.addAllThrowNodes(falseBranch.getThrowNodes());
-		
+
 		return cfg;
-		
+
 	}
 
 	/**
@@ -261,12 +264,12 @@ public class CFGFactory {
 	 * @return The CFG for the while loop.
 	 */
 	private static CFG build(WhileLoop whileLoop) {
-		
+
 		CFGNode whileNode = new CFGNode(new EmptyStatement(), "WHILE");
 		CFG cfg = new CFG(whileNode);
 
 		/* Build the true branch. */
-		
+
 		CFG trueBranch = CFGFactory.buildSwitch(whileLoop.getBody());
 
 		if(trueBranch == null) {
@@ -274,40 +277,43 @@ public class CFGFactory {
 			trueBranch = new CFG(empty);
 			trueBranch.addExitNode(empty);
 		}
-		
+
 		whileNode.addEdge(new CFGEdge(whileLoop.getCondition(), whileNode, trueBranch.getEntryNode(), true));
 
         /* Propagate return and throw nodes. */
         cfg.addAllReturnNodes(trueBranch.getReturnNodes());
         cfg.addAllThrowNodes(trueBranch.getThrowNodes());
-        
+
         /* The break nodes are exit nodes for this loop. */
         cfg.addAllExitNodes(trueBranch.getBreakNodes());
-        
+
         /* Exit nodes point back to the start of the loop. */
         for(CFGNode exitNode : trueBranch.getExitNodes()) {
         	exitNode.addEdge(null, whileNode);
         }
-        
+
         /* Continue nodes point back to the start of the loop. */
         for(CFGNode continueNode : trueBranch.getContinueNodes()) {
         	continueNode.addEdge(null, whileNode);
         }
-        
+
         /* Build the false branch. */
 
-		/* The false branch condition is the negation of the true branch 
+		/* The false branch condition is the negation of the true branch
 		 * condition. We give it the same change type label as the true
 		 * branch condition. */
-		AstNode falseBranchCondition = new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(whileLoop.getCondition()));
+		ParenthesizedExpression pe = new ParenthesizedExpression();
+		pe.setExpression(whileLoop.getCondition().clone(pe));
+		AstNode falseBranchCondition = new UnaryExpression(Token.NOT, 0, pe);
 		falseBranchCondition.setChangeType(whileLoop.getCondition().getChangeType());
-        
+		falseBranchCondition.setParent(whileLoop);
+
         CFGNode empty = new CFGNode(new EmptyStatement());
 		whileNode.addEdge(new CFGEdge(falseBranchCondition, whileNode, empty));
 		cfg.addExitNode(empty);
-		
+
 		return cfg;
-		
+
 	}
 
 	/**
@@ -316,21 +322,21 @@ public class CFGFactory {
 	 * @return The CFG for the do loop.
 	 */
 	private static CFG build(DoLoop doLoop) {
-		
+
 		CFGNode doNode = new CFGNode(new EmptyStatement(), "DO");
 		CFGNode whileNode = new CFGNode(new EmptyStatement(), "WHILE");
 		CFG cfg = new CFG(doNode);
-		
+
 		/* Build the loop branch. */
-		
+
 		CFG loopBranch = CFGFactory.buildSwitch(doLoop.getBody());
-		
+
 		if(loopBranch == null) {
 			CFGNode empty = new CFGNode(new EmptyStatement());
 			loopBranch = new CFG(empty);
 			loopBranch.addExitNode(empty);
 		}
-		
+
 		/* We always execute the do block at least once. */
 		doNode.addEdge(null, loopBranch.getEntryNode());
 
@@ -350,17 +356,20 @@ public class CFGFactory {
         for(CFGNode continueNode : loopBranch.getContinueNodes()) {
         	continueNode.addEdge(null, whileNode);
         }
-		
+
 		/* Add edge for true condition back to the start of the loop. */
 		whileNode.addEdge(doLoop.getCondition(), doNode, true);
-		
+
 		/* Add edge for false condition. */
 
-		/* The false branch condition is the negation of the true branch 
+		/* The false branch condition is the negation of the true branch
 		 * condition. We give it the same change type label as the true
 		 * branch condition. */
-		AstNode falseBranchCondition = new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(doLoop.getCondition()));
+		ParenthesizedExpression pe = new ParenthesizedExpression();
+		pe.setExpression(doLoop.getCondition().clone(pe));
+		AstNode falseBranchCondition = new UnaryExpression(Token.NOT, 0, pe);
 		falseBranchCondition.setChangeType(doLoop.getCondition().getChangeType());
+		falseBranchCondition.setParent(doLoop);
 
         CFGNode empty = new CFGNode(new EmptyStatement());
 		whileNode.addEdge(falseBranchCondition, empty);
@@ -378,7 +387,7 @@ public class CFGFactory {
 	 * @return The CFG for the for loop.
 	 */
 	private static CFG build(ForLoop forLoop) {
-		
+
 		CFGNode forNode = new CFGNode(forLoop.getInitializer());
 		CFG cfg = new CFG(forNode);
 
@@ -389,9 +398,9 @@ public class CFGFactory {
 		/* After the body of the loop executes, add the node to perform the increment. */
 		CFGNode increment = new CFGNode(forLoop.getIncrement());
 		increment.addEdge(null, condition);
-		
+
 		/* Build the true branch. */
-		
+
 		CFG trueBranch = CFGFactory.buildSwitch(forLoop.getBody());
 
 		if(trueBranch == null) {
@@ -399,45 +408,48 @@ public class CFGFactory {
 			trueBranch = new CFG(empty);
 			trueBranch.addExitNode(empty);
 		}
-		
+
 		condition.addEdge(forLoop.getCondition(), trueBranch.getEntryNode(), true);
 
         /* Propagate return and throw nodes. */
         cfg.addAllReturnNodes(trueBranch.getReturnNodes());
         cfg.addAllThrowNodes(trueBranch.getThrowNodes());
-        
+
         /* The break nodes are exit nodes for this loop. */
         cfg.addAllExitNodes(trueBranch.getBreakNodes());
-        
+
         /* Exit nodes point to the increment node. */
         for(CFGNode exitNode : trueBranch.getExitNodes()) {
         	exitNode.addEdge(null, increment);
         }
-        
+
         /* Continue nodes point to the increment. */
         for(CFGNode continueNode : trueBranch.getContinueNodes()) {
         	continueNode.addEdge(null, increment);
         }
-        
+
         /* Build the false branch. */
 
-		/* The false branch condition is the negation of the true branch 
+		/* The false branch condition is the negation of the true branch
 		 * condition. We give it the same change type label as the true
 		 * branch condition. */
-		AstNode falseBranchCondition = new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(forLoop.getCondition()));
+		ParenthesizedExpression pe = new ParenthesizedExpression();
+		pe.setExpression(forLoop.getCondition().clone(pe));
+		AstNode falseBranchCondition = new UnaryExpression(Token.NOT, 0, pe);
 		falseBranchCondition.setChangeType(forLoop.getCondition().getChangeType());
-        
+		falseBranchCondition.setParent(forLoop);
+
         CFGNode empty = new CFGNode(new EmptyStatement());
 		condition.addEdge(falseBranchCondition, empty);
 		cfg.addExitNode(empty);
-		
+
 		return cfg;
-		
+
 	}
 
 	/**
 	 * Builds a control flow subgraph for a for in statement. A for in statement
-	 * is a loop that iterates over the keys of an object. The Rhino IR 
+	 * is a loop that iterates over the keys of an object. The Rhino IR
 	 * represents this using the Node labeled "ENUM_INIT_KEYS". Here, we make
 	 * a fake function that returns an object's keys.
 	 * @param forInLoop
@@ -446,19 +458,19 @@ public class CFGFactory {
 	private static CFG build(ForInLoop forInLoop) {
 
 		/* To represent key iteration, we make up two functions:
-		 *  
-		 * 	~getNextKey() - iterates through each key in an object. 
-		 *	~hasNextKey() - true if there is another key to iterate. 
+		 *
+		 * 	~getNextKey() - iterates through each key in an object.
+		 *	~hasNextKey() - true if there is another key to iterate.
 		 *
          * These names are invalid in JavaScript to ensure that there isn't
          * another function with the same name. Since we're not producing code,
          * this is ok. */
-		
+
 		/* Start with the variable declaration. */
 		AstNode iterator = forInLoop.getIterator();
 		CFGNode forInNode = new CFGNode(iterator);
 		CFG cfg = new CFG(forInNode);
-		
+
 		/* Get the variable being assigned. */
 		AstNode target;
 		if(iterator instanceof VariableDeclaration) {
@@ -484,7 +496,7 @@ public class CFGFactory {
         Assignment targetAssignment = new Assignment(target, keyIteratorFunction);
         targetAssignment.setType(Token.ASSIGN);
         targetAssignment.setChangeType(target.getChangeType());
-		
+
         CFGNode assignment = new CFGNode(targetAssignment);
 
         /* Create the the condition that checks if an object still has keys.
@@ -497,14 +509,14 @@ public class CFGFactory {
         keyConditionFunction.setChangeType(iterator.getChangeType());
 
 		CFGNode condition = new CFGNode(new EmptyStatement(), "FORIN");
-		
+
 		/* Add the edges connecting the entry point to the assignment and
 		 * assignment to condition. */
         forInNode.addEdge(null, condition);
         condition.addEdge(new CFGEdge(keyConditionFunction, condition, assignment, true));
-		
+
         /* Create the CFG for the loop body. */
-		
+
 		CFG trueBranch = CFGFactory.buildSwitch(forInLoop.getBody());
 
 		if(trueBranch == null) {
@@ -512,7 +524,7 @@ public class CFGFactory {
 			trueBranch = new CFG(empty);
 			trueBranch.addExitNode(empty);
 		}
-		
+
         /* Propagate return and throw nodes. */
         cfg.addAllReturnNodes(trueBranch.getReturnNodes());
         cfg.addAllThrowNodes(trueBranch.getThrowNodes());
@@ -524,28 +536,31 @@ public class CFGFactory {
         for(CFGNode exitNode : trueBranch.getExitNodes()) {
             exitNode.addEdge(null, condition);
         }
-        
+
         /* The continue nodes point back to the assignment node. */
         for(CFGNode continueNode : trueBranch.getContinueNodes()) {
         	continueNode.addEdge(null, condition);
         }
-        
+
         /* Create a node for the false branch to exit the loop. */
         CFGNode falseBranch = new CFGNode(new EmptyStatement());
         cfg.addExitNode(falseBranch);
 
-		/* The false branch condition is the negation of the true branch 
+		/* The false branch condition is the negation of the true branch
 		 * condition. We give it the same change type label as the true
 		 * branch condition. */
-		AstNode falseBranchCondition = new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(keyConditionFunction));
+		ParenthesizedExpression pe = new ParenthesizedExpression();
+		pe.setExpression(keyConditionFunction.clone(pe));
+		AstNode falseBranchCondition = new UnaryExpression(Token.NOT, 0, pe);
 		falseBranchCondition.setChangeType(keyConditionFunction.getChangeType());
+		falseBranchCondition.setParent(keyConditionFunction.getParent());
 
         /* Add the edges from the assignment node to the start of the loop. */
         assignment.addEdge(null, trueBranch.getEntryNode());
 		condition.addEdge(new CFGEdge(new UnaryExpression(Token.NOT, 0, new ParenthesizedExpression(keyConditionFunction)), condition, falseBranch));
-		
+
 		return cfg;
-		
+
 	}
 
 	/**
@@ -556,19 +571,19 @@ public class CFGFactory {
 	 * @return The CFG for the for loop.
 	 */
 	private static CFG build(SwitchStatement switchStatement) {
-		
+
 		CFGNode switchNode = new CFGNode(new EmptyStatement(), "SWITCH");
 		CFG cfg = new CFG(switchNode);
-		
+
 		/* Keep track of the default edge so we can update the condition later. */
 		CFGEdge defaultEdge = null;
 		AstNode defaultCondition = null;
-		
+
 		/* Add edges for each case. */
 		List<SwitchCase> switchCases = switchStatement.getCases();
 		CFG previousSubGraph = null;
 		for(SwitchCase switchCase : switchCases) {
-			
+
 			/* Build the subgraph for the case. */
             CFG subGraph = null;
 			if(switchCase.getStatements() != null) {
@@ -591,7 +606,7 @@ public class CFGFactory {
                 InfixExpression compare = new InfixExpression(switchStatement.getExpression(), switchCase.getExpression());
                 compare.setType(Token.SHEQ);
                 switchNode.addEdge(new CFGEdge(compare, switchNode, subGraph.getEntryNode()));
-                
+
                 if(defaultCondition == null) {
                 	defaultCondition = compare;
                 	defaultCondition.setChangeType(compare.getChangeType());
@@ -603,13 +618,13 @@ public class CFGFactory {
                     else infix.setChangeType(ChangeType.UPDATED);
                     defaultCondition = infix;
                 }
-                
+
             }
             else {
             	defaultEdge = new CFGEdge(null, switchNode, subGraph.getEntryNode());
             	switchNode.addEdge(defaultEdge);
             }
-			
+
 			/* Propagate return and throw nodes. */
 			cfg.addAllReturnNodes(subGraph.getReturnNodes());
 			cfg.addAllThrowNodes(subGraph.getThrowNodes());
@@ -629,11 +644,11 @@ public class CFGFactory {
                 }
 
 			}
-			
+
 			previousSubGraph = subGraph;
-            
+
 		}
-		
+
 		/* Setup the default path if wasn't explicitly given in the switch statement. */
 		if(defaultEdge == null) {
 			CFGNode defaultPath = new CFGNode(new EmptyStatement());
@@ -641,7 +656,7 @@ public class CFGFactory {
             cfg.addExitNode(defaultPath);
 		}
 
-		/* The false branch condition is the negation of the true branch 
+		/* The false branch condition is the negation of the true branch
 		 * condition. We give it the same change type label as the true
 		 * branch condition. */
 		if(defaultCondition != null)  {
@@ -651,15 +666,15 @@ public class CFGFactory {
             defaultCondition = falseBranchCondition;
 
 		}
-		
+
 		/* Add the final default condition. */
 		defaultEdge.setCondition(defaultCondition);
 
         /* The rest of the exit nodes are exit nodes for the statement. */
         cfg.addAllExitNodes(previousSubGraph.getExitNodes());
-		
+
 		return cfg;
-		
+
 	}
 
 	/**
@@ -677,17 +692,17 @@ public class CFGFactory {
         FunctionCall createScopeFunction = new FunctionCall();
         createScopeFunction.setTarget(new Name(0, "~createScope"));
         createScopeFunction.addArgument(withStatement.getExpression());
-        
+
         FunctionCall destroyScopeFunction = new FunctionCall();
         destroyScopeFunction.setTarget(new Name(0, "~destroySceop"));
         destroyScopeFunction.addArgument(withStatement.getExpression());
-		
+
 		CFGNode withNode = new CFGNode(createScopeFunction, "BEGIN_SCOPE");
 		CFGNode endWithNode = new CFGNode(destroyScopeFunction, "END_SCOPE");
 
 		CFG cfg = new CFG(withNode);
 		cfg.addExitNode(endWithNode);
-		
+
 		CFG scopeBlock = CFGFactory.buildSwitch(withStatement.getStatement());
 
         if(scopeBlock == null) {
@@ -695,48 +710,48 @@ public class CFGFactory {
             scopeBlock = new CFG(empty);
             scopeBlock.addExitNode(empty);
         }
-		
+
         withNode.addEdge(null, scopeBlock.getEntryNode());
 
         /* Exit nodes point to the scope destroy method. */
         for(CFGNode exitNode : scopeBlock.getExitNodes()) {
         	exitNode.addEdge(null, endWithNode);
         }
-        
+
         /* Propagate return and throw nodes. */
         cfg.addAllReturnNodes(scopeBlock.getReturnNodes());
         cfg.addAllThrowNodes(scopeBlock.getThrowNodes());
 
         /* Propagate break nodes. */
         cfg.addAllBreakNodes(scopeBlock.getBreakNodes());
-        
+
         /* Propagate continue nodes. */
         cfg.addAllContinueNodes(scopeBlock.getContinueNodes());
-		
+
 		return cfg;
-		
+
 	}
 
 	/**
 	 * Builds a control flow subgraph for a try/catch statement.
-	 * 
+	 *
 	 * @param tryStatement
 	 * @return The CFG for the while loop.
 	 */
 	private static CFG build(TryStatement tryStatement) {
-		
+
 		CFGNode tryNode = new CFGNode(new EmptyStatement(), "TRY");
 		CFG cfg = new CFG(tryNode);
-		
+
 		/* To make life easier, add a node that represents the exit of the try. */
 		CFGNode exit = new CFGNode(new EmptyStatement());
 		cfg.addExitNode(exit);
-		
+
 		/* Set up the finally block. */
 
 		CFG finallyBlock = CFGFactory.buildSwitch(tryStatement.getFinallyBlock());
 
-		if(finallyBlock == null) { 
+		if(finallyBlock == null) {
 			CFGNode empty = new CFGNode(new EmptyStatement());
 			finallyBlock = new CFG(empty);
 			finallyBlock.addExitNode(empty);
@@ -763,7 +778,7 @@ public class CFGFactory {
             /* Create the clause for branching to the catch. */
             AstNode catchCondition = catchClause.getCatchCondition();
             if(catchCondition == null) {
-            	
+
             	/* Create a special method that contains the exception. */
             	FunctionCall exception = new FunctionCall();
             	List<AstNode> args = new LinkedList<AstNode>();
@@ -773,23 +788,23 @@ public class CFGFactory {
                 catchCondition = exception;
 
             }
-			
+
 			if(catchBlock == null) {
 				CFGNode empty = new CFGNode(new EmptyStatement());
 				catchBlock = new CFG(empty);
 				catchBlock.addExitNode(empty);
 			}
 			else {
-				
+
 				/* Create empty exit nodes so there is an edge from each exit
 				 * node in the finally block for each clause. */
 				CFGNode empty = new CFGNode(new EmptyStatement());
 				cfg.addExitNode(empty);
-				
+
 				for(CFGNode exitNode : finallyBlock.getExitNodes()) {
 					exitNode.addEdge(catchCondition, empty);
 				}
-				
+
                 /* Move the jump nodes after the finally block and propagate them
                  * through the CFG. */
                 cfg.addAllBreakNodes(moveJumpAfterFinally(finallyBlock.copy(), catchBlock.getBreakNodes(), catchCondition));
@@ -801,17 +816,17 @@ public class CFGFactory {
                 for(CFGNode exitNode : catchBlock.getExitNodes()) {
                     exitNode.addEdge(null, finallyBlock.getEntryNode());
                 }
-				
+
 			}
-			
+
 			tryNode.addEdge(catchCondition, catchBlock.getEntryNode());
-			
+
 		}
-		
+
 		/* Set up the try block. */
-		
+
 		CFG tryBlock = CFGFactory.buildSwitch(tryStatement.getTryBlock());
-		
+
 		if(tryBlock == null) {
 			CFGNode empty = new CFGNode(new EmptyStatement());
 			tryBlock = new CFG(empty);
@@ -822,11 +837,11 @@ public class CFGFactory {
              * node in the finally block for the catch block. */
             CFGNode empty = new CFGNode(new EmptyStatement());
             cfg.addExitNode(empty);
-            
+
             for(CFGNode exitNode : finallyBlock.getExitNodes()) {
                 exitNode.addEdge(null, empty);
             }
-            
+
             /* Move the jump nodes after the finally block and propagate them
              * through the CFG. */
             cfg.addAllBreakNodes(moveJumpAfterFinally(finallyBlock.copy(), tryBlock.getBreakNodes(), null));
@@ -844,12 +859,12 @@ public class CFGFactory {
             	exitNode.addEdge(null, finallyBlock.getEntryNode());
             }
 		}
-		
+
 		tryNode.addEdge(null, tryBlock.getEntryNode());
-		
+
 
 		return cfg;
-		
+
 	}
 
 	/**
@@ -859,33 +874,33 @@ public class CFGFactory {
 	 * @return The set of newly created jump nodes (to be propagated to the CFG).
 	 */
 	private static List<CFGNode> moveJumpAfterFinally(CFG finallyBlock, List<CFGNode> jumpNodes, AstNode condition) {
-		
+
 		/* The list of newly created jump nodes to propagate to the cfg. */
 		List<CFGNode> newJumpNodes = new LinkedList<CFGNode>();
 
 		for(CFGNode jumpNode : jumpNodes) {
-			
+
 			/* Make a shallow copy of the node. */
 			CFGNode newJumpNode = CFGNode.copy(jumpNode);
 			newJumpNodes.add(newJumpNode);
-			
+
 			/* Add an edge from the finally block to the return node. */
 			for(CFGNode exitNode : finallyBlock.getExitNodes()) {
 				exitNode.addEdge(condition, newJumpNode);
 			}
-			
+
 			/* Change the original jump node to do nothing. */
 			jumpNode.setStatement(new EmptyStatement());
-			
+
 			/* Remove any previous edges from the jump node. */
 			jumpNode.getEdges().clear();
-			
+
 			/* Add an edge from the original jump node to the start of the
 			 * finally block. */
 			jumpNode.addEdge(null, finallyBlock.getEntryNode());
-			
+
 		}
-		
+
 		return newJumpNodes;
 	}
 
@@ -896,7 +911,7 @@ public class CFGFactory {
 	 * @return A list of exit nodes for the subgraph.
 	 */
 	private static CFG build(BreakStatement breakStatement) {
-		
+
 		CFGNode breakNode = new CFGNode(breakStatement);
 		CFG cfg = new CFG(breakNode);
 		cfg.addBreakNode(breakNode);
@@ -911,7 +926,7 @@ public class CFGFactory {
 	 * @return A list of exit nodes for the subgraph.
 	 */
 	private static CFG build(ContinueStatement continueStatement) {
-		
+
 		CFGNode continueNode = new CFGNode(continueStatement);
 		CFG cfg = new CFG(continueNode);
 		cfg.addContinueNode(continueNode);
@@ -926,7 +941,7 @@ public class CFGFactory {
 	 * @return A list of exit nodes for the subgraph.
 	 */
 	private static CFG build(ReturnStatement returnStatement) {
-		
+
 		CFGNode returnNode = new CFGNode(returnStatement);
 		CFG cfg = new CFG(returnNode);
 		cfg.addReturnNode(returnNode);
@@ -941,7 +956,7 @@ public class CFGFactory {
 	 * @return A list of exit nodes for the subgraph.
 	 */
 	private static CFG build(ThrowStatement throwStatement) {
-		
+
 		CFGNode throwNode = new CFGNode(throwStatement);
 		CFG cfg = new CFG(throwNode);
 		cfg.addThrowNode(throwNode);
@@ -957,21 +972,21 @@ public class CFGFactory {
 	 * @return A list of exit nodes for the subgraph.
 	 */
 	private static CFG build(AstNode statement) {
-		
+
 		CFGNode expressionNode = new CFGNode(statement);
 		CFG cfg = new CFG(expressionNode);
 		cfg.addExitNode(expressionNode);
 		return cfg;
 
 	}
-	
+
 	/**
 	 * Calls the appropriate build method for the node type.
 	 */
 	private static CFG buildSwitch(AstNode node) {
-		
+
 		if(node == null) return null;
-		
+
 		if (node instanceof Block) {
 			return CFGFactory.build((Block) node);
 		} else if (node instanceof IfStatement) {
@@ -1007,5 +1022,5 @@ public class CFGFactory {
 		}
 
 	}
-	
+
 }

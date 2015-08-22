@@ -23,11 +23,19 @@ public class APIFactory {
 	 */
 	public static TopLevelAPI buildTopLevelAPI() {
 
-		List<String> keywords = Arrays.asList("arguments", "boolean", "byte",
-			"char", "class", "debugger", "default", "delete", "double", "enum",
-			"export", "false", "float", "instanceof", "int", "long", "native",
-			"null", "short", "super", "this", "transient", "true", "typeof",
-			"volatile", "callback", "error", "zero", "blank", "undefined");
+		List<String> keywords = Arrays.asList( "abstract",
+				"arguments", "boolean", "break", "byte", "case", "catch",
+				"char", "class", "const", "continue", "debugger", "default",
+				"delete", "do", "double", "else", "enum", "eval", "export",
+				"extends", "false", "final", "finally", "float", "for",
+				"function", "goto", "if", "implements", "import", "in",
+				"instanceof", "int", "interface", "let", "long", "native",
+				"new", "null", "package", "private", "protected", "public",
+				"return", "short", "static", "super", "switch", "synchronized",
+				"this", "undefined", "throw", "throws", "transient", "true",
+				"try", "typeof", "var", "void", "volatile", "while", "with",
+				"yield", "callback", "error", "zero", "blank", "undefined",
+				"falsey");
 
 		List<PackageAPI> packages = buildTopLevelPackages();
 

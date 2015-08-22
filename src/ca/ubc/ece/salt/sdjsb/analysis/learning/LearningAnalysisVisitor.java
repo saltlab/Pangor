@@ -3,15 +3,21 @@ package ca.ubc.ece.salt.sdjsb.analysis.learning;
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
+import org.mozilla.javascript.ast.BreakStatement;
+import org.mozilla.javascript.ast.ContinueStatement;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.KeywordLiteral;
 import org.mozilla.javascript.ast.Name;
+import org.mozilla.javascript.ast.NewExpression;
 import org.mozilla.javascript.ast.NodeVisitor;
 import org.mozilla.javascript.ast.NumberLiteral;
+import org.mozilla.javascript.ast.ReturnStatement;
 import org.mozilla.javascript.ast.ScriptNode;
 import org.mozilla.javascript.ast.StringLiteral;
+import org.mozilla.javascript.ast.TryStatement;
 import org.mozilla.javascript.ast.UnaryExpression;
+import org.mozilla.javascript.ast.VariableDeclaration;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.analysis.AnalysisUtilities;
@@ -148,10 +154,10 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 
 			KeywordUse keyword = null;
 			if(this.packageModel != null) {
-				keyword = this.packageModel.getKeyword(type, context, "typeof", changeType);
+				keyword = this.packageModel.getKeyword(type, context, "falsey", changeType);
 			}
 			else {
-				keyword = new KeywordUse(type, context, "typeof", changeType);
+				keyword = new KeywordUse(type, context, "falsey", changeType);
 				keyword.apiString = "global";
 			}
 
@@ -160,7 +166,25 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 		}
 
 		/* Get the relevant keyword from the node. */
-		if(node instanceof Name) {
+		if(node instanceof ReturnStatement) {
+			token = "return";
+		}
+		else if(node instanceof BreakStatement) {
+			token = "break";
+		}
+		else if(node instanceof ContinueStatement) {
+			token = "continue";
+		}
+		else if (node instanceof VariableDeclaration) {
+			token = "var";
+		}
+		else if (node instanceof NewExpression) {
+			token = "new";
+		}
+		else if (node instanceof TryStatement) {
+			token = "try";
+		}
+		else if(node instanceof Name) {
 			Name name = (Name) node;
 			token = name.getIdentifier();
 			if(token.matches("e|err|error")) token = "exception";

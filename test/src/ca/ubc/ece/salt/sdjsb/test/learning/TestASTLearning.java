@@ -16,11 +16,11 @@ import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningDataSet;
 import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.sdjsb.learning.apis.APIFactory;
 import ca.ubc.ece.salt.sdjsb.learning.apis.AbstractAPI;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse;
+import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse.KeywordContext;
 import ca.ubc.ece.salt.sdjsb.learning.apis.PackageAPI;
 import ca.ubc.ece.salt.sdjsb.learning.apis.TopLevelAPI;
-import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
-import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse.KeywordContext;
 
 public class TestASTLearning {
 
@@ -137,6 +137,44 @@ public class TestASTLearning {
 		script.expectedKeywords.add(Pair.of(typeof, 1));
 
 		this.runTest(new String[] { src, dst }, Arrays.asList(script));
+	}
+
+	@Test
+	public void testFalsey() throws Exception {
+		String src = "./test/input/learning/falsey_old.js";
+		String dst = "./test/input/learning/falsey_new.js";
+
+		TopLevelAPI api = APIFactory.buildTopLevelAPI();
+
+		KeywordUse falsey = new KeywordUse(KeywordType.RESERVED, KeywordContext.CONDITION, "falsey", ChangeType.INSERTED, api);
+
+		MockFeatureVector script = new MockFeatureVector("~script~");
+		script.expectedKeywords.add(Pair.of(falsey, 1));
+
+		this.runTest(new String[] { src, dst }, Arrays.asList(script));
+	}
+
+	@Test
+	public void testStatements() throws Exception {
+		String src = "./test/input/learning/statement_old.js";
+		String dst = "./test/input/learning/statement_new.js";
+
+		TopLevelAPI api = APIFactory.buildTopLevelAPI();
+
+		KeywordUse returnStatement = new KeywordUse(KeywordType.RESERVED, KeywordContext.STATEMENT, "return", ChangeType.INSERTED, api);
+		KeywordUse varStatement = new KeywordUse(KeywordType.RESERVED, KeywordContext.STATEMENT, "var", ChangeType.INSERTED, api);
+		KeywordUse breakStatement = new KeywordUse(KeywordType.RESERVED, KeywordContext.STATEMENT, "break", ChangeType.INSERTED, api);
+		KeywordUse continueStatement = new KeywordUse(KeywordType.RESERVED, KeywordContext.STATEMENT, "continue", ChangeType.INSERTED, api);
+
+		MockFeatureVector testFunction = new MockFeatureVector("~testFunction~");
+		testFunction.expectedKeywords.add(Pair.of(returnStatement, 1));
+
+		MockFeatureVector script = new MockFeatureVector("~script~");
+		script.expectedKeywords.add(Pair.of(varStatement, 1));
+		script.expectedKeywords.add(Pair.of(breakStatement, 1));
+		script.expectedKeywords.add(Pair.of(continueStatement, 1));
+
+		this.runTest(new String[] { src, dst }, Arrays.asList(script, testFunction));
 	}
 
 	/*

@@ -28,7 +28,7 @@ public class TestIncorrectComparison extends TestAnalysis {
 		String dst = "./test/input/incorrect_comparison/ic_falsey_to_value_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		expectedAlerts.add(new IncorrectConditionAlert(AMI, "~script~", "IC", "a", SpecialType.FALSEY, SpecialType.NO_VALUE));
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, true);
 	}
 
 	@Test
@@ -37,7 +37,7 @@ public class TestIncorrectComparison extends TestAnalysis {
 		String dst = "./test/input/incorrect_comparison/ic_value_to_falsey_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		expectedAlerts.add(new IncorrectConditionAlert(AMI, "~script~", "IC", "a", SpecialType.NO_VALUE, SpecialType.FALSEY));
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, true);
 	}
 
 	@Test
@@ -46,7 +46,7 @@ public class TestIncorrectComparison extends TestAnalysis {
 		String dst = "./test/input/incorrect_comparison/ic_falsey_to_type_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		expectedAlerts.add(new IncorrectConditionAlert(AMI, "~script~", "IC", "a", SpecialType.FALSEY, SpecialType.UNDEFINED));
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, true);
 	}
 
 	@Test
@@ -55,7 +55,7 @@ public class TestIncorrectComparison extends TestAnalysis {
 		String dst = "./test/input/incorrect_comparison/ic_type_to_falsey_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		expectedAlerts.add(new IncorrectConditionAlert(AMI, "~script~", "IC", "a", SpecialType.UNDEFINED, SpecialType.FALSEY));
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, true);
 	}
 
 	@Test
@@ -64,7 +64,7 @@ public class TestIncorrectComparison extends TestAnalysis {
 		String dst = "./test/input/incorrect_comparison/ic_value_to_type_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		expectedAlerts.add(new IncorrectConditionAlert(AMI, "~script~", "IC", "a", SpecialType.NO_VALUE, SpecialType.UNDEFINED));
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, true);
 	}
 
 	@Test
@@ -73,7 +73,7 @@ public class TestIncorrectComparison extends TestAnalysis {
 		String dst = "./test/input/incorrect_comparison/ic_type_to_value_new.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		expectedAlerts.add(new IncorrectConditionAlert(AMI, "~script~", "IC", "a", SpecialType.UNDEFINED, SpecialType.NO_VALUE));
-		this.runTest(new String[] {src, dst}, expectedAlerts, true);
+		this.runTest(new String[] {src, dst, "-pp"}, expectedAlerts, true);
 	}
 
 }
