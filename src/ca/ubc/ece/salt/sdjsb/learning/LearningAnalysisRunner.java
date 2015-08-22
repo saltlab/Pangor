@@ -25,6 +25,7 @@ public class LearningAnalysisRunner extends AnalysisRunner {
 	 */
 	public LearningAnalysisRunner(String dataSetPath, String supplementaryPath, int maxChangeComplexity) {
 		this.dataset = new LearningDataSet(dataSetPath, supplementaryPath);
+		this.maxChangeComplexity = maxChangeComplexity;
 	}
 
 	@Override

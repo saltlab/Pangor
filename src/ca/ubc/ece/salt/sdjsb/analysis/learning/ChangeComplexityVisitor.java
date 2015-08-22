@@ -38,7 +38,9 @@ public class ChangeComplexityVisitor implements NodeVisitor {
 
 	}
 
-	public ChangeComplexityVisitor() { }
+	public ChangeComplexityVisitor() {
+		this.score = 0;
+	}
 
 	@Override
 	public boolean visit(AstNode node) {
