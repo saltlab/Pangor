@@ -21,9 +21,6 @@ public class LearningAnalysisMain {
 
 	protected static final Logger logger = LogManager.getLogger(LearningAnalysisMain.class);
 
-	/** The size of the thread pool */
-	private static final int THREAD_POOL_SIZE = 7;
-
 	/** The directory where repositories are checked out. **/
 	public static final String CHECKOUT_DIR =  new String("repositories");
 
@@ -98,7 +95,7 @@ public class LearningAnalysisMain {
 			 * would mean all git project initializations would have to happen
 			 * before starting the analysis.
 			 */
-			ExecutorService executor = Executors.newFixedThreadPool(THREAD_POOL_SIZE);
+			ExecutorService executor = Executors.newFixedThreadPool(options.getNThreads());
 			CountDownLatch latch = new CountDownLatch(uris.size());
 
 			/* Analyze all projects. */
