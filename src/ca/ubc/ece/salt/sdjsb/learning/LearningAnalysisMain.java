@@ -49,7 +49,8 @@ public class LearningAnalysisMain {
 		}
 
 		/* Create the runner that will run the analysis. */
-		LearningAnalysisRunner runner = new LearningAnalysisRunner(options.getDataSetPath(), options.getSupplementaryFolder());
+		LearningAnalysisRunner runner = new LearningAnalysisRunner(options.getDataSetPath(),
+				options.getSupplementaryFolder(), options.getMaxChangeComplexity());
 
         GitProjectAnalysis gitProjectAnalysis;
 

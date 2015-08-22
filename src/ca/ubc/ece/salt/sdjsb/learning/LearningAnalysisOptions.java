@@ -25,6 +25,9 @@ public class LearningAnalysisOptions {
 	@Option(name = "-tr", aliases = { "--threads" }, usage = "The number of threads to be used.")
 	private Integer nThreads = 6;
 
+	@Option(name = "-cc", aliases = { "--complexity" }, usage = "The maximum change complexity of a file to analyze.")
+	private Integer maxChangeComplexity = 10;
+
 	public Integer getNThreads() {
 		return this.nThreads;
 	}
@@ -51,6 +54,10 @@ public class LearningAnalysisOptions {
 
 	public String getSupplementaryFolder() {
 		return this.supplement;
+	}
+
+	public Integer getMaxChangeComplexity() {
+		return this.maxChangeComplexity;
 	}
 
 }

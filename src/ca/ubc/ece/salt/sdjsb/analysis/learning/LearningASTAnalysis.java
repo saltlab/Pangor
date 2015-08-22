@@ -23,9 +23,29 @@ public class LearningASTAnalysis extends ScopeAnalysis<FeatureVector, LearningDa
 	/** Stores the results for each function. **/
 	private Map<Scope, FeatureVector> featureVectors;
 
-	public LearningASTAnalysis(LearningDataSet dataSet, AnalysisMetaInformation ami){
+	/** Stores the change complexity. **/
+	private int changeComplexity;
+
+
+	/**
+	 * The maximum change complexity for the file. If the change cmplexity for
+	 * a file is greater than the maximum change complexity, the file is not
+	 * analyzed and no feature vectors are generated.
+	 */
+	private int maxChangeComplexity;
+
+	/**
+	 * @param dataSet The data set to register alerts with.
+	 * @param ami	The meta information.
+	 * @param maxChangeComplexity The maximum change complexity for the file.
+	 *   						  Files that have many changes are not likely
+	 *   						  to contain repetitive fault patterns.
+	 */
+	public LearningASTAnalysis(LearningDataSet dataSet, AnalysisMetaInformation ami, int maxChangeComplexity){
 		super(dataSet, ami);
 		this.featureVectors = new HashMap<Scope, FeatureVector>();
+		this.maxChangeComplexity = maxChangeComplexity;
+		this.changeComplexity = -1;
 	}
 
 	/**
@@ -35,16 +55,27 @@ public class LearningASTAnalysis extends ScopeAnalysis<FeatureVector, LearningDa
 		return featureVectors;
 	}
 
+	/**
+	 * @return The change complexity score for the file.
+	 */
+	public int getChangeComplexity() {
+		return this.changeComplexity;
+	}
+
 	@Override
 	public void analyze(AstRoot root, List<CFG> cfgs) throws Exception {
 
 		super.analyze(root, cfgs);
 
 		/* Check the change complexity. */
-		// TODO
+		this.changeComplexity = ChangeComplexityVisitor.getChangeComplexity(root);
 
-		/* Look at each function. */
-		this.inspectFunctions(this.dstScope);
+		if(this.changeComplexity <= this.maxChangeComplexity) {
+
+			/* Look at each function. */
+			this.inspectFunctions(this.dstScope);
+
+		}
 
 	}
 
@@ -55,10 +86,22 @@ public class LearningASTAnalysis extends ScopeAnalysis<FeatureVector, LearningDa
 		super.analyze(srcRoot, srcCFGs, dstRoot, dstCFGs);
 
 		/* Check the change complexity. */
-		// TODO
+		int sourceChangeComplexityScore = ChangeComplexityVisitor.getChangeComplexity(srcRoot);
+		int destinationChangeComplexityScore = ChangeComplexityVisitor.getChangeComplexity(dstRoot);
 
-		/* Look at each function. */
-		this.inspectFunctions(this.dstScope);
+		if(sourceChangeComplexityScore > destinationChangeComplexityScore) {
+			this.changeComplexity = sourceChangeComplexityScore;
+		}
+		else {
+			this.changeComplexity = destinationChangeComplexityScore;
+		}
+
+		if( this.changeComplexity <= this.maxChangeComplexity) {
+
+			/* Look at each function. */
+			this.inspectFunctions(this.dstScope);
+
+		}
 
 	}
 

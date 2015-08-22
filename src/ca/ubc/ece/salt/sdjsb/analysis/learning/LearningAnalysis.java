@@ -23,14 +23,22 @@ public class LearningAnalysis extends MetaAnalysis<FeatureVector, LearningDataSe
 	private LearningDataSet featureVectorManager;
 
 	/**
+	 * The maximum change complexity for the file. If the change complexity for
+	 * a file is greater than the maximum change complexity, the file is not
+	 * analyzed and no feature vectors are generated.
+	 */
+	private int maxChangeComplexity;
+
+	/**
 	 * @param featureVectorManager the manager that stores the feature vectors produced by this analysis.
 	 * @param ami The meta info for the analysis (i.e., project id, file paths, commit IDs, etc.).
 	 */
-	public LearningAnalysis(LearningDataSet featureVectorManager, AnalysisMetaInformation ami) {
+	public LearningAnalysis(LearningDataSet featureVectorManager, AnalysisMetaInformation ami, int maxChangeComplexity) {
 		super(featureVectorManager, ami,
-				new LearningASTAnalysis(featureVectorManager, ami),
-				new LearningASTAnalysis(featureVectorManager, ami));
+				new LearningASTAnalysis(featureVectorManager, ami, maxChangeComplexity),
+				new LearningASTAnalysis(featureVectorManager, ami, maxChangeComplexity));
 		this.featureVectorManager = featureVectorManager;
+		this.maxChangeComplexity = maxChangeComplexity;
 	}
 
 	@Override
@@ -42,28 +50,32 @@ public class LearningAnalysis extends MetaAnalysis<FeatureVector, LearningDataSe
 		/* Destination analysis. */
 		Map<Scope, FeatureVector> dstFeatureVectors = this.dstAnalysis.getFeatureVectors();
 
-		/* Combine the source and destination analyses. */
+		/* Check that the change complexity falls within the max. */
+		if(this.srcAnalysis.getChangeComplexity() <= this.maxChangeComplexity
+				&& this.dstAnalysis.getChangeComplexity() <= this.maxChangeComplexity) {
 
-		/* Synthesize the alerts. */
-		for(Scope dstScope : dstFeatureVectors.keySet()) {
+			/* Synthesize the alerts. */
+			for(Scope dstScope : dstFeatureVectors.keySet()) {
 
-			/* Get the source scope that maps to the destination scope. */
-			Scope srcScope;
-			if(dstScope.scope.getMapping() != null) {
-				srcScope = this.srcAnalysis.getDstScope((ScriptNode)dstScope.scope.getMapping());
+				/* Get the source scope that maps to the destination scope. */
+				Scope srcScope;
+				if(dstScope.scope.getMapping() != null) {
+					srcScope = this.srcAnalysis.getDstScope((ScriptNode)dstScope.scope.getMapping());
+				}
+				else {
+					srcScope = this.srcAnalysis.getDstScope();
+				}
+
+				FeatureVector srcFeatureVector = srcFeatureVectors.get(srcScope);
+				FeatureVector dstFeatureVector = dstFeatureVectors.get(dstScope);
+
+				/* Get the 'removed' statements and keywords from the source feature vector. */
+				dstFeatureVector.join(srcFeatureVector);
+
+				/* Add the feature vector to the FeatureVectorManager. */
+				this.featureVectorManager.registerAlert(dstFeatureVector);
+
 			}
-			else {
-				srcScope = this.srcAnalysis.getDstScope();
-			}
-
-			FeatureVector srcFeatureVector = srcFeatureVectors.get(srcScope);
-			FeatureVector dstFeatureVector = dstFeatureVectors.get(dstScope);
-
-			/* Get the 'removed' statements and keywords from the source feature vector. */
-			dstFeatureVector.join(srcFeatureVector);
-
-			/* Add the feature vector to the FeatureVectorManager. */
-			this.featureVectorManager.registerAlert(dstFeatureVector);
 
 		}
 

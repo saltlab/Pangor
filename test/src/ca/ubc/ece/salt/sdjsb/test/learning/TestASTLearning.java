@@ -44,7 +44,7 @@ public class TestASTLearning {
 		LearningDataSet featureVectorManager = new LearningDataSet(filters);
 
 		/* Set up the analysis. */
-		LearningAnalysis analysis = new LearningAnalysis(featureVectorManager, ami);
+		LearningAnalysis analysis = new LearningAnalysis(featureVectorManager, ami, 10);
 
 		/* Control flow difference the files. */
 		ControlFlowDifferencing cfd = new ControlFlowDifferencing(args);
