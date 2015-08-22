@@ -40,6 +40,9 @@ public class LearningASTAnalysis extends ScopeAnalysis<FeatureVector, LearningDa
 
 		super.analyze(root, cfgs);
 
+		/* Check the change complexity. */
+		// TODO
+
 		/* Look at each function. */
 		this.inspectFunctions(this.dstScope);
 
@@ -50,6 +53,9 @@ public class LearningASTAnalysis extends ScopeAnalysis<FeatureVector, LearningDa
 			List<CFG> dstCFGs) throws Exception {
 
 		super.analyze(srcRoot, srcCFGs, dstRoot, dstCFGs);
+
+		/* Check the change complexity. */
+		// TODO
 
 		/* Look at each function. */
 		this.inspectFunctions(this.dstScope);

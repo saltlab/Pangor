@@ -23,12 +23,6 @@ import ca.ubc.ece.salt.sdjsb.learning.apis.TopLevelAPI;
 
 public class TestASTLearning {
 
-	/** The file where we will save the data set from our analysis. **/
-	public static final String DATA_SET_PATH = new String("./output/dataset.csv");
-
-	/** The folder where we will store the supplementary files from our analysis. **/
-	public static final String SUPPLEMENTARY_PATH = new String("./output/supplementary/");
-
 	/**
 	 * Tests data mining data set construction.
 	 * @param args The command line arguments (i.e., old and new file names).

@@ -43,6 +43,8 @@ public class AnalysisMetaInformation {
 	 * @param repairedCommitID
 	 * @param buggyCode
 	 * @param repairedCode
+	 * @param buggyChangeComplexity
+	 * @param repairedChangeComplexity
 	 */
 	public AnalysisMetaInformation(int totalCommits, int bugFixingCommits,
 			String projectID,
