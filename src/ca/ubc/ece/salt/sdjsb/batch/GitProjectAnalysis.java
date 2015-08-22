@@ -92,11 +92,17 @@ public class GitProjectAnalysis extends GitProject {
 
 			if(diff.getOldPath().matches("^.*\\.js$") && diff.getNewPath().matches("^.*\\.js$")){
 
-                /* Skip jquery files. */
-                if(diff.getOldPath().matches("^.*jquery.*$") || diff.getNewPath().matches("^.*jquery.*$")) {
-                	System.err.println("Skipping jquery file: " + diff.getOldPath());
-                	continue;
-                }
+				/* Skip jquery files. */
+				if (diff.getOldPath().matches("^.*jquery.*$") || diff.getNewPath().matches("^.*jquery.*$")) {
+					logger.info("[SKIP_FILE] jquery file: " + diff.getOldPath());
+					continue;
+				}
+
+				/* Skip minified files. */
+				if (diff.getOldPath().endsWith(".min.js") || diff.getNewPath().endsWith(".min.js")) {
+					logger.info("[SKIP_FILE] Skipping minifed file: " + diff.getOldPath());
+					return;
+				}
 
 				logger.debug("Exploring diff \n {} \n {} - {} \n {} - {}", getURI(), buggyRevision, diff.getOldPath(),
 						bugFixingRevision, diff.getNewPath());

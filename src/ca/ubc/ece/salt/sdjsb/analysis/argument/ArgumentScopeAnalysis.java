@@ -37,14 +37,6 @@ public class ArgumentScopeAnalysis extends ScopeAnalysis<ClassifierAlert, Classi
 			return;
 		}
 
-		/*
-		 * Minified files gave a lot of false positives! Skipping them
-		 */
-		if (ami.repairedFile.endsWith(".min.js")) {
-			logger.info("Skipping minimifed file file: " + ami.repairedFile);
-			return;
-		}
-
 		/* Look at each function. */
 		this.inspectFunctions(this.dstScope);
 	}
