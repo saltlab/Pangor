@@ -444,8 +444,8 @@ public class LearningDataSet implements DataSet<FeatureVector> {
 		try (PrintStream srcStream = new PrintStream(new FileOutputStream(src));
 			 PrintStream dstStream = new PrintStream(new FileOutputStream(dst));) {
 
-			srcStream.print(featureVector.ami.buggyCode);
-			dstStream.print(featureVector.ami.repairedCode);
+			srcStream.print(featureVector.buggyFunctionCode);
+			dstStream.print(featureVector.repairedFunctionCode);
 
 			srcStream.close();
 			dstStream.close();

@@ -86,13 +86,6 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 				AnalysisUtilities.getFunctionName(function), function, packageModel, false);
 		function.visit(visitor);
 
-		/* Store the source code for the function. Since we don't know if we
-		 * are analyzing the source function or destination function, store
-		 * it as both. When the source and destination feature vectors are
-		 * merged. */
-		visitor.featureVector.ami.buggyCode = function.toSource();
-		visitor.featureVector.ami.repairedCode = function.toSource();
-
 		return visitor.featureVector;
 	}
 
@@ -101,7 +94,7 @@ public class LearningAnalysisVisitor implements NodeVisitor {
 			String functionName, ScriptNode root,
 			PointsToPrediction packageModel, boolean visitFunctions) {
 		this.packageModel = packageModel;
-		this.featureVector = new FeatureVector(ami, functionName);
+		this.featureVector = new FeatureVector(ami, functionName, root.toSource(), root.toSource());
 		this.root = root;
 		this.visitFunctions = visitFunctions;
 	}

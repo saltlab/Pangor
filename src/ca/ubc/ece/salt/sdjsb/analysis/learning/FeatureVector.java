@@ -25,14 +25,25 @@ public class FeatureVector extends Alert {
 	/** The keyword counts in each fragment. **/
 	public Map<KeywordUse, Integer> keywordMap;
 
-	public FeatureVector(AnalysisMetaInformation ami, String functionName) {
+	/** The source code for the buggy function. **/
+	public String buggyFunctionCode;
+
+	/** The source code for the repaired function. **/
+	public String repairedFunctionCode;
+
+	public FeatureVector(AnalysisMetaInformation ami, String functionName,
+			String buggyFunctionCode, String repairedFunctionCode) {
 		super(ami, functionName);
 		this.keywordMap = new HashMap<KeywordUse, Integer>();
+		this.buggyFunctionCode = buggyFunctionCode;
+		this.repairedFunctionCode = repairedFunctionCode;
 	}
 
 	public FeatureVector(AnalysisMetaInformation ami, String functionName, int id) {
 		super(ami, functionName, id);
 		this.keywordMap = new HashMap<KeywordUse, Integer>();
+		this.buggyFunctionCode = "";
+		this.repairedFunctionCode = "";
 	}
 
 	/**
@@ -40,7 +51,7 @@ public class FeatureVector extends Alert {
 	 * @param source The source feature vector.
 	 */
 	public void join(FeatureVector source) {
-		this.ami.buggyCode = source.ami.buggyCode;
+		this.buggyFunctionCode = source.buggyFunctionCode;
 
 		/* Insert the keywords form the source feature vector with change type
 		 * REMOVED into this feature vector. */
