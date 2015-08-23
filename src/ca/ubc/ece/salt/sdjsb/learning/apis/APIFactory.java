@@ -93,7 +93,7 @@ public class APIFactory {
 				Arrays.asList() /* Classes */);
 
 		ClassAPI array = new ClassAPI("Array", /* Class Name */
-				Arrays.asList("concat", "indexOf", "join", "indexOf", "lastIndexOf",
+				Arrays.asList("concat", "indexOf", /*"join",path.join*/ "indexOf", "lastIndexOf",
 						"pop", "push", "reverse", "shift", "splice", "sort",
 						"unshift", "forEach", "every", "some", "filter",
 						"map", "reduce", "reduceRight"), /* Methods */
@@ -122,7 +122,7 @@ public class APIFactory {
 
 		ClassAPI math = new ClassAPI("Math", /* Class Name */
 				Arrays.asList("abs", "acos", "asin", "atan", "atan2", "ceil",
-						"cos", "exp", "floor", "log", "max", "min", "pow",
+						"cos", "exp", "floor", /*"log",console.log*/ "max", "min", "pow",
 						"random", "round", "sin", "sqrt", "tan"), /* Methods */
 				Arrays.asList(), /* Fields */
 				Arrays.asList("E", "LN2", "LN10", "LOG2E", "LOG10E", "PI",
