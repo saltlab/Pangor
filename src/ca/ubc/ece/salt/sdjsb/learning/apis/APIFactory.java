@@ -34,8 +34,7 @@ public class APIFactory {
 				"return", "short", "static", "super", "switch", "synchronized",
 				"this", "undefined", "throw", "throws", "transient", "true",
 				"try", "typeof", "var", "void", "volatile", "while", "with",
-				"yield", "callback", "error", "zero", "blank", "undefined",
-				"falsey");
+				"yield", "callback", "error", "undefined", "falsey");
 
 		List<PackageAPI> packages = buildTopLevelPackages();
 

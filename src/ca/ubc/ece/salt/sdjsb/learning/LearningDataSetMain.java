@@ -28,8 +28,8 @@ public class LearningDataSetMain {
 //				"", "");
 
 		KeywordFilter filter = new KeywordFilter(FilterType.INCLUDE,
-				KeywordType.RESERVED, KeywordContext.CONDITION, ChangeType.INSERTED,
-				"global", "falsey");
+				KeywordType.RESERVED, KeywordContext.STATEMENT, ChangeType.INSERTED,
+				"global", "var");
 
 		LearningDataSetOptions options = new LearningDataSetOptions();
 		CmdLineParser parser = new CmdLineParser(options);
