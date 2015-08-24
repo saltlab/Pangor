@@ -395,9 +395,11 @@ public class LearningDataSet implements DataSet<FeatureVector> {
 	 * Generates the clusters for this data set using DBScan, epsilon = 0.01
 	 * and min = 30.
 	 * TODO: Write the clusters to an arrf file.
+	 * @return The number of instances in each cluster. The array index is the
+	 * 		   cluster number.
 	 * @throws Exception
 	 */
-	public void getWekaClusters() throws Exception {
+	public int[] getWekaClusters() throws Exception {
 
 		/* Convert the data set to a Weka-usable format. */
 		Instances data = this.getWekaDataSet();
@@ -454,6 +456,9 @@ public class LearningDataSet implements DataSet<FeatureVector> {
 		for(int i = 0; i < clusters.length; i++) {
 			System.out.println("Cluster " + i + " has " + clusters[i] + " instances.");
 		}
+
+		return clusters;
+
 	}
 
 	/**

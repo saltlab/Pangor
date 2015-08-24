@@ -16,6 +16,9 @@ public class LearningDataSetOptions {
 	@Option(name="-m", aliases={"--metrics"}, usage="Print the metrics from the data set.")
 	private boolean printMetrics = false;
 
+	@Option(name="-c", aliases={"--clusters"}, usage="Print the clusters from the data set.")
+	private boolean printClusters = false;
+
 	public boolean getHelp() {
 		return this.help;
 	}
@@ -30,6 +33,10 @@ public class LearningDataSetOptions {
 
 	public boolean getPrintMetrics() {
 		return this.printMetrics;
+	}
+
+	public boolean getPrintClusters() {
+		return this.printClusters;
 	}
 
 }
