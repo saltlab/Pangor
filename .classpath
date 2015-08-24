@@ -43,5 +43,6 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/github-api-1.69.jar"/>
+	<classpathentry kind="lib" path="lib/optics_dbScan.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

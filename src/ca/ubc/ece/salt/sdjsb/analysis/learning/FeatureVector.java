@@ -1,9 +1,14 @@
 package ca.ubc.ece.salt.sdjsb.analysis.learning;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import weka.core.Attribute;
+import weka.core.Instance;
+import weka.core.Instances;
+import weka.core.SparseInstance;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.analysis.Alert;
 import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
@@ -134,6 +139,41 @@ public class FeatureVector extends Alert {
 		}
 
 		return featureVector;
+
+	}
+
+	/**
+	 * Converts this feature vector into a Weka Instance.
+	 * @return This feature vector as a Weka Instance
+	 */
+	public Instance getWekaInstance(Instances dataSet, ArrayList<Attribute> attributes, Set<KeywordDefinition> keywords) {
+
+		Instance instance = new SparseInstance(attributes.size());
+		instance.setDataset(dataSet);
+
+		/* Set the meta info for the instance. */
+		instance.setValue(0, this.id);
+		instance.setValue(1, this.ami.projectID);
+		instance.setValue(2, this.ami.projectHomepage);
+		instance.setValue(3, this.ami.buggyFile);
+		instance.setValue(4, this.ami.repairedFile);
+		instance.setValue(5, this.ami.buggyCommitID);
+		instance.setValue(6, this.ami.repairedCommitID);
+		instance.setValue(7, this.functionName);
+
+		/* Set the keyword values. */
+		int i = 8;
+		for(KeywordDefinition keyword : keywords) {
+			if(this.keywordMap.containsKey(keyword)) {
+				instance.setValue(i, this.keywordMap.get(keyword));
+			}
+			else {
+				instance.setValue(i, 0);
+			}
+			i++;
+		}
+
+		return instance;
 
 	}
 

@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -17,6 +18,14 @@ import java.util.Set;
 
 import org.apache.commons.lang3.tuple.Pair;
 
+import weka.clusterers.DBSCAN;
+import weka.core.Attribute;
+import weka.core.Instance;
+import weka.core.Instances;
+import weka.core.ManhattanDistance;
+import weka.filters.Filter;
+import weka.filters.unsupervised.attribute.Remove;
+import weka.filters.unsupervised.attribute.RemoveByName;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.analysis.DataSet;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.KeywordFilter.FilterType;
@@ -205,6 +214,33 @@ public class LearningDataSet implements DataSet<FeatureVector> {
 	}
 
 	/**
+	 * Converts the feature vector header into a list of Weka attributes.
+	 * @return The feature vector header as a list of Weka attributes.
+	 */
+	public ArrayList<Attribute> getWekaAttributes() {
+
+		ArrayList<Attribute> attributes = new ArrayList<Attribute>();
+
+		attributes.add(new Attribute("ID", 0));
+		attributes.add(new Attribute("ProjectID", (ArrayList<String>)null, 1));
+		attributes.add(new Attribute("ProjectHomepage", (ArrayList<String>)null, 2));
+		attributes.add(new Attribute("BuggyFile", (ArrayList<String>)null, 3));
+		attributes.add(new Attribute("RepairedFile", (ArrayList<String>)null, 4));
+		attributes.add(new Attribute("BuggyCommitID", (ArrayList<String>)null, 5));
+		attributes.add(new Attribute("RepairedCommitID", (ArrayList<String>)null, 6));
+		attributes.add(new Attribute("FunctionName", (ArrayList<String>)null, 7));
+
+		int i = 8;
+		for(KeywordDefinition keyword : this.keywords) {
+			attributes.add(new Attribute(keyword.toString(), i));
+			i++;
+		}
+
+		return attributes;
+
+	}
+
+	/**
 	 * Builds the feature vector header by filtering out features (columns)
 	 * that are not used or hardly used.
 	 * @return The feature vector header as a CSV list.
@@ -335,6 +371,89 @@ public class LearningDataSet implements DataSet<FeatureVector> {
 			for(KeywordDefinition keyword : featureVector.keywordMap.keySet()) keywords.add(keyword);
 		}
 
+	}
+
+	/**
+	 * Converts this data set to a set of Weka Instances.
+	 * @return The Weka data set.
+	 */
+	public Instances getWekaDataSet() {
+
+		ArrayList<Attribute> attributes = this.getWekaAttributes();
+
+		Instances dataSet = new Instances("DataSet", attributes, 0);
+		dataSet.setClassIndex(-1);
+
+		for(FeatureVector featureVector : this.featureVectors) {
+			dataSet.add(featureVector.getWekaInstance(dataSet, attributes, this.keywords));
+		}
+
+		return dataSet;
+	}
+
+	/**
+	 * Generates the clusters for this data set using DBScan, epsilon = 0.01
+	 * and min = 30.
+	 * TODO: Write the clusters to an arrf file.
+	 * @throws Exception
+	 */
+	public void getWekaClusters() throws Exception {
+
+		/* Convert the data set to a Weka-usable format. */
+		Instances data = this.getWekaDataSet();
+
+		/* Filter out the columns we don't want. */
+		String[] removeOptions = new String[2];
+		removeOptions[0] = "-R";
+		removeOptions[1] = "1-8";
+		Remove remove = new Remove();
+		remove.setOptions(removeOptions);
+		remove.setInputFormat(data);
+		Instances filteredData = Filter.useFilter(data, remove);
+
+		/* Filter out the UNCHANGED columns. */
+		String[] removeByNameOptions = new String[2];
+		removeByNameOptions[0] = "-E";
+		removeByNameOptions[1] = ".*UNCHANGED.*";
+		RemoveByName removeByName = new RemoveByName();
+		removeByName.setOptions(removeByNameOptions);
+		removeByName.setInputFormat(filteredData);
+		filteredData = Filter.useFilter(filteredData, removeByName);
+
+		/* Set up the distance function. We want Manhattan Distance. */
+		ManhattanDistance distanceFunction = new ManhattanDistance();
+		String[] distanceFunctionOptions = "-R first-last".split("\\s");
+		distanceFunction.setOptions(distanceFunctionOptions);
+
+		/* DBScan Clusterer. */
+		DBSCAN dbScan = new DBSCAN();
+		String[] dbScanClustererOptions = "-E 0.001 -M 30".split("\\s");
+		dbScan.setOptions(dbScanClustererOptions);
+		dbScan.setDistanceFunction(distanceFunction);
+		dbScan.buildClusterer(filteredData);
+
+		if(dbScan.numberOfClusters() == 1) {
+			System.out.println("There is 1 cluster.");
+		}
+		else {
+			System.out.println("There are " + dbScan.numberOfClusters() + " clusters.");
+		}
+
+		/* Initialize the array for storing cluster metrics. */
+		int[] clusters = new int[dbScan.numberOfClusters()];
+		for(int i = 0; i < clusters.length; i++) clusters[i] = 0;
+
+		/* Compute the metrics for the clustering. */
+		for(Instance instance : data) {
+			try {
+				int cluster = dbScan.clusterInstance(instance);
+				clusters[cluster]++;
+			} catch (Exception ignore) { }
+		}
+
+		for(int i = 0; i < clusters.length; i++) {
+			System.out.println("Cluster " + i + " has " + clusters[i] + " instances.");
+		}
 	}
 
 	/**

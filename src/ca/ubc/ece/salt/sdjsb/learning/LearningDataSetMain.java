@@ -9,8 +9,6 @@ import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.KeywordFilter;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.KeywordFilter.FilterType;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningDataSet;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningMetrics;
-import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningMetrics.KeywordFrequency;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse.KeywordContext;
 
@@ -28,8 +26,8 @@ public class LearningDataSetMain {
 //				"", "");
 
 		KeywordFilter filter = new KeywordFilter(FilterType.INCLUDE,
-				KeywordType.RESERVED, KeywordContext.STATEMENT, ChangeType.INSERTED,
-				"global", "var");
+				KeywordType.RESERVED, KeywordContext.CONDITION, ChangeType.INSERTED,
+				"global", "falsey");
 
 		LearningDataSetOptions options = new LearningDataSetOptions();
 		CmdLineParser parser = new CmdLineParser(options);
@@ -51,18 +49,21 @@ public class LearningDataSetMain {
 		LearningDataSet dataSet = new LearningDataSet(options.getDataSetPath(), Arrays.asList(filter));
 
 		/* Print the metrics from the data set. */
-		if(options.getPrintMetrics()) {
-			LearningMetrics metrics = dataSet.getMetrics();
-			for(KeywordFrequency frequency : metrics.changedKeywordFrequency) {
-				System.out.println(frequency.keyword + " : " + frequency.frequency);
-			}
-		}
+//		if(options.getPrintMetrics()) {
+//			LearningMetrics metrics = dataSet.getMetrics();
+//			for(KeywordFrequency frequency : metrics.changedKeywordFrequency) {
+//				System.out.println(frequency.keyword + " : " + frequency.frequency);
+//			}
+//		}
 
 		/* Pre-process the file. */
 		dataSet.preProcess();
 
+		/* Get the clusters. */
+		dataSet.getWekaClusters();
+
 		/* Print the data set. */
-		dataSet.writeFilteredDataSet(options.getFilteredPath());
+//		dataSet.writeFilteredDataSet(options.getFilteredPath());
 
 	}
 
