@@ -422,6 +422,15 @@ public class LearningDataSet implements DataSet<FeatureVector> {
 		removeByName.setInputFormat(filteredData);
 		filteredData = Filter.useFilter(filteredData, removeByName);
 
+		/* Filter out the var column. */
+		String[] removeKeywordOptions = new String[2];
+		removeKeywordOptions[0] = "-E";
+		removeKeywordOptions[1] = ".*_global_test";
+		RemoveByName removeKeyword = new RemoveByName();
+		removeKeyword.setOptions(removeKeywordOptions);
+		removeKeyword.setInputFormat(filteredData);
+		filteredData = Filter.useFilter(filteredData, removeKeyword);
+
 		/* Set up the distance function. We want Manhattan Distance. */
 		ManhattanDistance distanceFunction = new ManhattanDistance();
 		String[] distanceFunctionOptions = "-R first-last".split("\\s");
@@ -429,7 +438,7 @@ public class LearningDataSet implements DataSet<FeatureVector> {
 
 		/* DBScan Clusterer. */
 		DBSCAN dbScan = new DBSCAN();
-		String[] dbScanClustererOptions = "-E 0.001 -M 30".split("\\s");
+		String[] dbScanClustererOptions = "-E 0.01 -M 25".split("\\s");
 		dbScan.setOptions(dbScanClustererOptions);
 		dbScan.setDistanceFunction(distanceFunction);
 		dbScan.buildClusterer(filteredData);

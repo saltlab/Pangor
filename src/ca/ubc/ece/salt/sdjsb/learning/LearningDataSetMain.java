@@ -63,7 +63,7 @@ public class LearningDataSetMain {
 			Set<Cluster> clusters = new TreeSet<Cluster>(new Comparator<Cluster>() {
 				@Override
 				public int compare(Cluster c1, Cluster c2) {
-					if(c1.instances == c2.instances) return 0;
+					if(c1.instances == c2.instances) return c1.toString().compareTo(c2.toString());
 					else if(c1.instances < c2.instances) return 1;
 					else return -1;
 				}
@@ -93,8 +93,21 @@ public class LearningDataSetMain {
 
 			}
 
+			int i = 0;
 			for(Cluster cluster : clusters) {
-				System.out.println(cluster);
+				if(cluster.keyword.context == KeywordContext.STATEMENT
+						&& !cluster.keyword.keyword.equals("this")
+						&& !cluster.keyword.keyword.equals("typeof")
+						&& !cluster.keyword.keyword.equals("falsey")
+						&& !cluster.keyword.keyword.equals("undefined")
+						&& !cluster.keyword.keyword.equals("null")
+						&& !cluster.keyword.keyword.equals("true")
+						&& !cluster.keyword.keyword.equals("false")
+						&& !cluster.keyword.keyword.equals("test")
+						) {
+					System.out.println(i + "\t" + cluster);
+					i++;
+				}
 			}
 		}
 
