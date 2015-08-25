@@ -19,6 +19,13 @@ public class LearningDataSetOptions {
 	@Option(name="-c", aliases={"--clusters"}, usage="Print the clusters from the data set.")
 	private boolean printClusters = false;
 
+	@Option(name = "-a", aliases = { "--arff-path" }, usage = "Folder to write the ARFF files.")
+	private String arffFolder = null;
+
+	public String getArffFolder() {
+		return this.arffFolder;
+	}
+
 	public boolean getHelp() {
 		return this.help;
 	}

@@ -14,13 +14,13 @@ DIFF_PROGRAM=meld
 ARFF_FILE=../output/output.arff
 SUPPLEMENTARY_FOLDER=../output/supplementary/
 CLIPBOARD_PROGRAM=xclip
-BROWSER=
+BROWSER=firefox
 
 # Get all attributes names
 attributes=($(cat $ARFF_FILE | grep @attribute | awk -F " " '{print $2}'))
 
 # Get all projects that has instances on this cluster
-projects=($(cat $ARFF_FILE | grep -w "cluster"$1 | grep -v @attribute | awk -F "," '{print $3}' | sort | uniq))
+projects=($(cat $ARFF_FILE | grep -w "cluster"$1 | grep -v @attribute | awk -F "," '{print $2}' | sort | uniq))
 
 echo "------------ Exploring ${#projects[@]} projects ------------"
 echo ${projects[@]}
@@ -29,7 +29,7 @@ echo ${projects[@]}
 for project in "${projects[@]}";
 do
 	# Get the ids of all instances of this project on this cluster
-    ids_from_this_project=($(cat $ARFF_FILE | grep -w "cluster"$1 | grep -v @attribute | grep ,$project, | awk -F "," '{print $2}'))
+    ids_from_this_project=($(cat $ARFF_FILE | grep -w "cluster"$1 | grep -v @attribute | grep ,$project, | awk -F "," '{print $1}'))
 
     echo "--------- Project: ${project} (${#ids_from_this_project[@]} commits) ---------"
 
@@ -37,7 +37,7 @@ do
     for id in "${ids_from_this_project[@]}";
     do
 	    # Get feature vector
-	    vector=$(cat $ARFF_FILE | grep -w "cluster"$1 | grep -v attribute | awk -F "," '$2=='$id)
+	    vector=$(cat $ARFF_FILE | grep -w "cluster"$1 | grep -v attribute | awk -F "," '$1=='$id)
 
 			# Find the ids of the ProjectHomepage and RepairedCommitID
 			projectHomepageIndex=-1
@@ -82,7 +82,7 @@ do
 
 			# Open the link to the GitHub diff
 			if [ ! -z "$BROWSER" -a ! -z "$commit_url" ]; then
-				$BROWSER $commit_url 
+				$BROWSER $commit_url > /dev/null 2>&1 &
 			fi
 
 	    # Close *all* running instances of DIFF_PROGRAM
