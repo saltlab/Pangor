@@ -422,10 +422,10 @@ public class LearningDataSet implements DataSet<FeatureVector> {
 		removeByName.setInputFormat(filteredData);
 		filteredData = Filter.useFilter(filteredData, removeByName);
 
-		/* Filter out the var column. */
+		/* Filter out the statement columns. */
 		String[] removeKeywordOptions = new String[2];
 		removeKeywordOptions[0] = "-E";
-		removeKeywordOptions[1] = ".*_global_test";
+		removeKeywordOptions[1] = ".*typeof.*|.*null.*|.*undefined.*|.*falsey.*|.*this.*|.*true.*|.*false.*|.*_STATEMENT.*|.*_global_test";
 		RemoveByName removeKeyword = new RemoveByName();
 		removeKeyword.setOptions(removeKeywordOptions);
 		removeKeyword.setInputFormat(filteredData);
@@ -443,13 +443,6 @@ public class LearningDataSet implements DataSet<FeatureVector> {
 		dbScan.setDistanceFunction(distanceFunction);
 		dbScan.buildClusterer(filteredData);
 
-		if(dbScan.numberOfClusters() == 1) {
-			System.out.println("There is 1 cluster.");
-		}
-		else {
-			System.out.println("There are " + dbScan.numberOfClusters() + " clusters.");
-		}
-
 		/* Initialize the array for storing cluster metrics. */
 		int[] clusters = new int[dbScan.numberOfClusters()];
 		for(int i = 0; i < clusters.length; i++) clusters[i] = 0;
@@ -460,10 +453,6 @@ public class LearningDataSet implements DataSet<FeatureVector> {
 				int cluster = dbScan.clusterInstance(instance);
 				clusters[cluster]++;
 			} catch (Exception ignore) { }
-		}
-
-		for(int i = 0; i < clusters.length; i++) {
-			System.out.println("Cluster " + i + " has " + clusters[i] + " instances.");
 		}
 
 		return clusters;

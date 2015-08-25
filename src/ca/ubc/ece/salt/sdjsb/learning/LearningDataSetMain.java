@@ -60,7 +60,18 @@ public class LearningDataSetMain {
 		/* Get the clusters for the data set. */
 		if(options.getPrintClusters()) {
 
-			Set<Cluster> clusters = new TreeSet<Cluster>(new Comparator<Cluster>() {
+			/* The clusters stored according to their keyword. */
+			Set<ClusterMetrics> keywordClusters = new TreeSet<ClusterMetrics>(new Comparator<ClusterMetrics>() {
+				@Override
+				public int compare(ClusterMetrics c1, ClusterMetrics c2) {
+					if(c1.totalInstances == c2.totalInstances) return c1.toString().compareTo(c2.toString());
+					else if(c1.totalInstances < c2.totalInstances) return 1;
+					else return -1;
+				}
+			});
+
+			/* The clusters ranked by their size. */
+			Set<Cluster> rankedClusters = new TreeSet<Cluster>(new Comparator<Cluster>() {
 				@Override
 				public int compare(Cluster c1, Cluster c2) {
 					if(c1.instances == c2.instances) return c1.toString().compareTo(c2.toString());
@@ -85,17 +96,31 @@ public class LearningDataSetMain {
 				clusteringDataSet.preProcess();
 
 				/* Get the clusters. */
-				int[] keywordClusters = clusteringDataSet.getWekaClusters();
-				for(int i = 0; i < keywordClusters.length; i++) {
-					Cluster cluster = new Cluster(frequency.keyword, i, keywordClusters[i]);
-					clusters.add(cluster);
+				ClusterMetrics clusterMetrics = new ClusterMetrics(frequency.keyword);
+				int[] c = clusteringDataSet.getWekaClusters();
+				for(int i = 0; i < c.length; i++) {
+					Cluster cluster = new Cluster(frequency.keyword, i, c[i]);
+					clusterMetrics.addCluster(cluster);
+
+					/* Sorted by instances. */
+					rankedClusters.add(cluster);
 				}
+				if(c.length > 0 && frequency.keyword.context != KeywordContext.STATEMENT
+						&& !frequency.keyword.keyword.equals("this")
+						&& !frequency.keyword.keyword.equals("typeof")
+						&& !frequency.keyword.keyword.equals("falsey")
+						&& !frequency.keyword.keyword.equals("undefined")
+						&& !frequency.keyword.keyword.equals("null")
+						&& !frequency.keyword.keyword.equals("true")
+						&& !frequency.keyword.keyword.equals("false")
+						&& !frequency.keyword.keyword.equals("test"))
+					keywordClusters.add(clusterMetrics);
 
 			}
 
 			int i = 0;
-			for(Cluster cluster : clusters) {
-				if(cluster.keyword.context == KeywordContext.STATEMENT
+			for(Cluster cluster : rankedClusters) {
+				if(cluster.keyword.context != KeywordContext.STATEMENT
 						&& !cluster.keyword.keyword.equals("this")
 						&& !cluster.keyword.keyword.equals("typeof")
 						&& !cluster.keyword.keyword.equals("falsey")
@@ -109,6 +134,9 @@ public class LearningDataSetMain {
 					i++;
 				}
 			}
+
+			System.out.println(ClusterMetrics.getLatexTable(keywordClusters));
+
 		}
 
 		/* Pre-process the file. */
