@@ -5,6 +5,8 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
@@ -16,8 +18,10 @@ import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningMetrics;
 import ca.ubc.ece.salt.sdjsb.analysis.learning.LearningMetrics.KeywordFrequency;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse.KeywordContext;
+import weka.core.WekaException;
 
 public class LearningDataSetMain {
+	protected static final Logger logger = LogManager.getLogger(LearningAnalysisMain.class);
 
 	/**
 	 * Creates the learning data sets for extracting repair patterns.
@@ -85,15 +89,21 @@ public class LearningDataSetMain {
 				clusteringDataSet.preProcess();
 
 				/* Get the clusters. */
-				int[] keywordClusters = clusteringDataSet.getWekaClusters();
-				for(int i = 0; i < keywordClusters.length; i++) {
-					Cluster cluster = new Cluster(frequency.keyword, i, keywordClusters[i]);
-					clusters.add(cluster);
-				}
+				try {
+					int[] keywordClusters = clusteringDataSet.getWekaClusters();
 
-				/* Save arff file */
-				if (options.getArffFolder() != null)
-					clusteringDataSet.writeArffFile(options.getArffFolder(), frequency.keyword.toString() + ".arff");
+					for (int i = 0; i < keywordClusters.length; i++) {
+						Cluster cluster = new Cluster(frequency.keyword, i, keywordClusters[i]);
+						clusters.add(cluster);
+					}
+
+					/* Save arff file */
+					if (options.getArffFolder() != null)
+						clusteringDataSet.writeArffFile(options.getArffFolder(),
+								frequency.keyword.toString() + ".arff");
+				} catch (WekaException ex) {
+					logger.error("Weka error on building clusters.", ex);
+				}
 			}
 
 			int i = 0;
