@@ -5,10 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import weka.core.Attribute;
-import weka.core.Instance;
-import weka.core.Instances;
-import weka.core.SparseInstance;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.sdjsb.analysis.Alert;
 import ca.ubc.ece.salt.sdjsb.batch.AnalysisMetaInformation;
@@ -16,6 +12,10 @@ import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.sdjsb.learning.apis.KeywordUse.KeywordContext;
+import weka.core.Attribute;
+import weka.core.DenseInstance;
+import weka.core.Instance;
+import weka.core.Instances;
 
 /**
  * Stores a feature vector (a row) of the repair pattern learning data set.
@@ -148,7 +148,7 @@ public class FeatureVector extends Alert {
 	 */
 	public Instance getWekaInstance(Instances dataSet, ArrayList<Attribute> attributes, Set<KeywordDefinition> keywords) {
 
-		Instance instance = new SparseInstance(attributes.size());
+		Instance instance = new DenseInstance(attributes.size());
 		instance.setDataset(dataSet);
 
 		/* Set the meta info for the instance. */
@@ -160,9 +160,10 @@ public class FeatureVector extends Alert {
 		instance.setValue(5, this.ami.buggyCommitID);
 		instance.setValue(6, this.ami.repairedCommitID);
 		instance.setValue(7, this.functionName);
+		instance.setValue(8, "?"); // assigned cluster
 
 		/* Set the keyword values. */
-		int i = 8;
+		int i = 9;
 		for(KeywordDefinition keyword : keywords) {
 			if(this.keywordMap.containsKey(keyword)) {
 				instance.setValue(i, this.keywordMap.get(keyword));

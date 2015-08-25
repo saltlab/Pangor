@@ -91,11 +91,14 @@ public class LearningDataSetMain {
 					clusters.add(cluster);
 				}
 
+				/* Save arff file */
+				if (options.getArffFolder() != null)
+					clusteringDataSet.writeArffFile(options.getArffFolder(), frequency.keyword.toString() + ".arff");
 			}
 
 			int i = 0;
 			for(Cluster cluster : clusters) {
-				if(cluster.keyword.context == KeywordContext.STATEMENT
+				if (cluster.keyword.context != KeywordContext.STATEMENT
 						&& !cluster.keyword.keyword.equals("this")
 						&& !cluster.keyword.keyword.equals("typeof")
 						&& !cluster.keyword.keyword.equals("falsey")
