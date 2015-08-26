@@ -8,6 +8,8 @@ class Alert
     :short_description, :long_description, :inspection_result,
     :original_row
 
+  attr_accessor :github_url, :fix_commit
+
   def initialize(row)
     @original_row = row
 
@@ -18,6 +20,9 @@ class Alert
     @subtype = row[9]
     @short_description = row[10]
     @long_description = row[11]
+
+    @github_url = row[2]
+    @fix_commit = row[6]
 
     # Check if the file we are reading has already inspection results
     if (%w{y n ?}.include?(row[12]))
@@ -49,18 +54,32 @@ class Alert
   end
 end
 
-class DiffViewer
+class GuiDiffViewer
   TOOL = 'meld'
 
   def self.open(alert)
     src = File.join(SUPPLEMENTARY_FOLDER, "#{alert.id}_src.js")
     dst = File.join(SUPPLEMENTARY_FOLDER, "#{alert.id}_dst.js")
 
-    Process.spawn("#{TOOL} #{src} #{dst}")
+    return Process.spawn("#{TOOL} #{src} #{dst}")
   end
 
   def self.kill(pid)
     Process.kill('TERM', pid)
+  end
+end
+
+class BrowserDiffViewer
+  TOOL = 'firefox'
+
+  def self.open(alert)
+    url = "#{alert.github_url}/commit/#{alert.fix_commit}"
+
+    return Process.spawn("#{TOOL} #{url} 2>&1 > /dev/null")
+  end
+
+  def self.kill(pid)
+    # Process.kill('TERM', pid)
   end
 end
 
@@ -99,7 +118,7 @@ for alert in alerts
   end
 
   # Open diff
-  pid = DiffViewer.open(alert)
+  pid = BrowserDiffViewer.open(alert)
 
   # Read input
   puts "\n=== Alert inspection (#{current_row} / #{total_rows}) ==="
@@ -111,7 +130,7 @@ for alert in alerts
   input = gets.chomp
 
   # Close diff
-  DiffViewer.kill(pid)
+  BrowserDiffViewer.kill(pid)
 
   # Parse input
   case input
