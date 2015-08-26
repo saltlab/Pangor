@@ -123,7 +123,7 @@ for alert in alerts
   # Read input
   puts "\n=== Alert inspection (#{current_row} / #{total_rows}) ==="
   puts alert
-  puts "\n(y) for YES, (n) for NO,"
+  puts "\n(y) for YES, (n) for NO, (?) to MARK"
   puts "(s) or (anything) to SKIP to next alert"
   puts "(ss) to SKIP-SKIP to next inespected alert"
   puts "(q) for QUIT"
@@ -134,7 +134,7 @@ for alert in alerts
 
   # Parse input
   case input
-  when 'y', 'n'
+  when 'y', 'n', '?'
     alert.inspection_result = input
   when 'q'
     break
@@ -151,6 +151,8 @@ puts "==> Saving file"
 
 # Save alerts to file
 CSV.open(INPUT_FILE, "w") do |csv|
+  alerts = alerts.sort_by{|a| a.inspection_result}.reverse
+
   for alert in alerts
     csv << alert.to_array
   end
