@@ -52,7 +52,7 @@ public class ClassifyAnalysisMain {
 		}
 
 		/* Create the runner that will run the analysis. */
-		ClassifyAnalysisRunner runner = new ClassifyAnalysisRunner(options.getDataSetPath(), options.getSupplementaryFolder());
+		ClassifyAnalysisRunner runner = new ClassifyAnalysisRunner(options.getDataSetPath(), options.getSupplementaryFolder(), options.getPreProcess());
 
         GitProjectAnalysis gitProjectAnalysis;
 

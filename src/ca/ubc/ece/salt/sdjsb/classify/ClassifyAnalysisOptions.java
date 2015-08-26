@@ -31,6 +31,9 @@ public class ClassifyAnalysisOptions {
 	@Option(name = "-tr", aliases = { "--threads" }, usage = "The number of threads to be used.")
 	private Integer nThreads = 6;
 
+	@Option(name="-pp", aliases={"--preprocess"}, usage="Pre-process the AST before running GumTree.")
+	private boolean preProcess = false;
+
 	public Integer getNThreads() {
 		return this.nThreads;
 	}
@@ -65,6 +68,10 @@ public class ClassifyAnalysisOptions {
 
 	public String getSupplementaryFolder() {
 		return this.supplement;
+	}
+
+	public boolean getPreProcess() {
+		return preProcess;
 	}
 
 }

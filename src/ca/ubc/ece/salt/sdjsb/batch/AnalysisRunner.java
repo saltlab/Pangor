@@ -13,6 +13,20 @@ import ca.ubc.ece.salt.sdjsb.ControlFlowDifferencing;
  */
 public abstract class AnalysisRunner {
 
+	/** Set to true to enable AST pre-processing. **/
+	private boolean preProcess;
+
+	public AnalysisRunner() {
+		this.preProcess = false;
+	}
+
+	/**
+	 * @param preProcess Set to true to enable AST pre-processing.
+	 */
+	public AnalysisRunner(boolean preProcess) {
+		this.preProcess = preProcess;
+	}
+
 	/**
 	 * Performs AST-differencing and launches the analysis of the buggy/repaired
 	 * source code file pair.
@@ -21,11 +35,24 @@ public abstract class AnalysisRunner {
 	 * 			  commit IDs, etc.)
 	 */
 	public void analyzeFile(AnalysisMetaInformation ami) throws Exception {
+		this.analyzeFile(ami, false);
+	}
+
+	/**
+	 * Performs AST-differencing and launches the analysis of the buggy/repaired
+	 * source code file pair.
+	 *
+	 * @param ami The meta info for the analysis (i.e., project id, file paths,
+	 * 			  commit IDs, etc.)
+	 * @param preProcess Set to true to enable AST pre-processing.
+	 */
+	public void analyzeFile(AnalysisMetaInformation ami, boolean preProcess) throws Exception {
 
         /* Control flow difference the files. */
         ControlFlowDifferencing cfd = null;
         try {
-            cfd = new ControlFlowDifferencing(new String[] {"", ""}, ami.buggyCode, ami.repairedCode);
+			String[] args = this.preProcess ? new String[] {"", "", "-pp"} : new String[] {"", ""};
+            cfd = new ControlFlowDifferencing(args, ami.buggyCode, ami.repairedCode);
         }
         catch(ArrayIndexOutOfBoundsException e) {
         	System.err.println("ArrayIndexOutOfBoundsException: possibly caused by empty file.");

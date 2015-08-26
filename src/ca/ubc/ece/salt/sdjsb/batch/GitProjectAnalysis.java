@@ -25,6 +25,7 @@ import ca.ubc.ece.salt.sdjsb.git.GitProject;
  * Performs analysis on a Git project using an AnalysisRunner
  */
 public class GitProjectAnalysis extends GitProject {
+
 	/** Runs an analysis on a source file. **/
 	private AnalysisRunner runner;
 
