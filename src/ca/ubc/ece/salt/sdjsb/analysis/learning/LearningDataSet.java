@@ -430,11 +430,13 @@ public class LearningDataSet implements DataSet<FeatureVector> {
 		/* Filter out the statement columns. */
 		String[] removeKeywordOptions = new String[2];
 		removeKeywordOptions[0] = "-E";
-		/* Attribute filter for Statements */
-//		removeKeywordOptions[1] = "(.*_global_test)";
-		/* Attribute filter for Reserved Words and Operators */
-		removeKeywordOptions[1] = "(.*_STATEMENT.*)|(.*_global_test)";
-		/* Attribute filter for API Methods and Properties. */
+		/* Attribute filter for Context Group 0 (Statements) */
+		removeKeywordOptions[1] = "(.*_falsey.*)|(.*_this.*)|(.*_STATEMENT_.*)|(.*_global_test)";
+		/* Attribute filter for Context Group 1 (Common Reserved Words and Operators) */
+		removeKeywordOptions[1] = "(.*_global_test)";
+		/* Attribute filter for Context Group 2 (Reserved Words and Operators) */
+//		removeKeywordOptions[1] = "(.*_falsey.*)|(.*_this.*)|(.*_STATEMENT_.*)|(.*_global_test)";
+		/* Attribute filter for Context Group 3 (API Methods and Properties). */
 //		removeKeywordOptions[1] = "(.*typeof.*)|(.*null.*)|(.*undefined.*)|(.*falsey.*)|(.*this.*)|(.*true.*)|(.*false.*)|(.*_STATEMENT.*)|(.*_global_test)";
 		RemoveByName removeKeyword = new RemoveByName();
 		removeKeyword.setOptions(removeKeywordOptions);
