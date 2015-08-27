@@ -37,7 +37,8 @@ public class TestArgumentOrder extends TestAnalysis {
 	}
 
 	/*
-	 * Also a simple scenario
+	 * No alerts expected because opt is not an argument, so the pattern
+	 * criteria is not match
 	 */
 	@Test
 	public void testNewwww() throws Exception {
@@ -45,14 +46,14 @@ public class TestArgumentOrder extends TestAnalysis {
 		String dst = "./test/input/argument_order/newww_new.js";
 
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		expectedAlerts.add(new ArgumentOrderAlert(AMI, "~anonymous~", "TODO"));
+		// expectedAlerts.add(new ArgumentOrderAlert(AMI, "~anonymous~", "TODO"));
 
 		this.runTest(new String[] { src, dst }, expectedAlerts, true);
 	}
 
 	/*
-	 * TODO: Should this pass? To remove false positives, we could check if
-	 * there are at least two parameters on the function
+	 * No alerts expected because there is only one argument. Which order are we
+	 * changing?
 	 */
 	@Test
 	public void testNodeMysql() throws Exception {
@@ -60,7 +61,7 @@ public class TestArgumentOrder extends TestAnalysis {
 		String dst = "./test/input/argument_order/node-mysql_new.js";
 
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		expectedAlerts.add(new ArgumentOrderAlert(AMI, "PoolConfig", "TODO"));
+		// expectedAlerts.add(new ArgumentOrderAlert(AMI, "PoolConfig", "TODO"));
 
 		this.runTest(new String[] { src, dst }, expectedAlerts, true);
 	}

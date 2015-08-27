@@ -76,7 +76,7 @@ public class BoundedContextAnalysis extends
 		 * lot of false positives, so now we get the enclosing function, its
 		 * mapped (source version) and look for unbounded version of call there
 		 */
-		if (call.getChangeType() == ChangeType.INSERTED) {
+		if (call.getChangeType() == ChangeType.INSERTED || call.getChangeType() == ChangeType.UPDATED) {
 			if (call.getEnclosingFunction() != null) {
 				FunctionNode function = (FunctionNode) call.getEnclosingFunction().getMapping();
 
@@ -112,7 +112,8 @@ public class BoundedContextAnalysis extends
 		if (call.getChangeType() == ChangeType.INSERTED) {
 			AstNode parent = call.getParent();
 
-			if (parent.getChangeType() == ChangeType.UNCHANGED && parent.getMapping() != null) {
+			if ((parent.getChangeType() == ChangeType.UNCHANGED || parent.getChangeType() == ChangeType.UPDATED)
+					&& parent.getMapping() != null) {
 				AstNode mapped = (AstNode) parent.getMapping();
 
 				ChangeTypeFilterVisitor visitor = new ChangeTypeFilterVisitor(ChangeType.MOVED, ChangeType.REMOVED);
