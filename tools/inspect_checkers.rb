@@ -1,7 +1,7 @@
 require "csv"
 
-INPUT_FILE = "../output/remote/dataset.csv"
-SUPPLEMENTARY_FOLDER = '../output/remote/supplementary/'
+INPUT_FILE = "../output/remote_all_checkers/output7_ttt/dataset.csv"
+SUPPLEMENTARY_FOLDER = '../output/remote_all_checkers/output7_ttt/supplementary/'
 
 class Alert
   attr_accessor :id, :project, :function_name, :type, :subtype, 
@@ -83,6 +83,20 @@ class BrowserDiffViewer
   end
 end
 
+class ResultsPrinter
+  def self.print(alerts)
+    inspected = alerts.select{|a| ! a.inspection_result.empty? }.size
+    tp = alerts.select{|a| a.inspection_result == "y"}.size
+    fp = alerts.select{|a| a.inspection_result == "n"}.size
+
+    puts "=== RESULTS ==="
+    puts "== INSPECTED: #{inspected}"
+    puts "=== TRUE: #{tp}"
+    puts "=== FALSE: #{fp}"
+    puts "== PRECISION: #{tp.to_f/inspected}"
+  end
+end
+
 
 # Parse csv file
 alerts = []
@@ -104,7 +118,6 @@ alerts = alerts.shuffle.sort_by{|a| a.inspection_result}.reverse
 
 # Then we start the inspection
 for alert in alerts 
-
   # If we are looking for next empty
   if skip_to_next_empty
 
@@ -117,8 +130,15 @@ for alert in alerts
     end
   end
 
+  puts "=" * 50
+
+  # Print results
+  ResultsPrinter.print(alerts)
+
   # Open diff
-  pid = BrowserDiffViewer.open(alert)
+  #pid = BrowserDiffViewer.open(alert)
+  pid1 = GuiDiffViewer.open(alert)
+  pid2 = BrowserDiffViewer.open(alert)
 
   # Read input
   puts "\n=== Alert inspection (#{current_row} / #{total_rows}) ==="
@@ -130,7 +150,9 @@ for alert in alerts
   input = gets.chomp
 
   # Close diff
-  BrowserDiffViewer.kill(pid)
+  # BrowserDiffViewer.kill(pid)
+  GuiDiffViewer.kill(pid1)
+  BrowserDiffViewer.kill(pid2)
 
   # Parse input
   case input

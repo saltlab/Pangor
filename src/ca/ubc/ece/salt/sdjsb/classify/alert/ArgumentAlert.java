@@ -18,6 +18,13 @@ public class ArgumentAlert extends ClassifierAlert {
 
 		if (argumentChanged.equals("~objectLiteral~"))
 			this.subtype = "~objectLiteral~";
+
+		/*
+		 * If we try to generate an alert for an UNCHANGED argument, it means it
+		 * has been moved
+		 */
+		if (argumentChanged.equals("UNCHANGED"))
+			this.subtype = "MOVED";
 	}
 
 	@Override

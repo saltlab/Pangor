@@ -397,17 +397,16 @@ public class AnalysisUtilities {
 			for (int argumentIndex = 0; argumentIndex < call.getArguments().size(); argumentIndex++) {
 				AstNode argument = call.getArguments().get(argumentIndex);
 
-				/*
-				 * False positives
-				 */
+				// False positives
+
 				if (argument instanceof FunctionCall || argument instanceof FunctionNode)
 					continue;
 
-				if (!argument.getTypeName()
-						.equals(mappedCall.getArguments().get(argumentIndex).getTypeName())) {
+				if (!argument.getTypeName().equals(mappedCall.getArguments().get(argumentIndex).getTypeName())) {
 					arguments.add(argument);
 				}
 			}
+
 		} else {
 			/*
 			 * Case 1: Arguments count is not the same. Look for which arguments
@@ -449,7 +448,7 @@ public class AnalysisUtilities {
 			 * If it is a ObjectLiteral, we should visit nodes to see if anything has changed
 			 */
 			if (argument instanceof ObjectLiteral) {
-				ChangeTypeFilterVisitor visitor = new ChangeTypeFilterVisitor(ChangeType.REMOVED, ChangeType.UPDATED,
+				ChangeTypeFilterVisitor visitor = new ChangeTypeFilterVisitor(ChangeType.REMOVED,
 						ChangeType.INSERTED);
 				argument.visit(visitor);
 
