@@ -52,10 +52,18 @@ public class ThisToThatAnalysis extends
 				RemovedThisInsertedThatVisitor visitor = new RemovedThisInsertedThatVisitor();
 				mappedPropertyGet.visit(visitor);
 
-				if (visitor.insertedThat.size() == 1)
-					this.registerAlert(new ThisToThatAlert(ami,
-							AnalysisUtilities.getFunctionName(removedThis.getEnclosingFunction()),
-							visitor.insertedThat.get(0).getLeft().toSource()));
+				if (visitor.insertedThat.size() == 1) {
+					/*
+					 * Even if we have UPDATED, it may be MOVED, so we check
+					 */
+					if (visitor.insertedThat.get(0).getEnclosingFunction().getMapping() == removedThis
+							.getEnclosingFunction()) {
+
+						this.registerAlert(new ThisToThatAlert(ami,
+								AnalysisUtilities.getFunctionName(removedThis.getEnclosingFunction()),
+								visitor.insertedThat.get(0).getLeft().toSource()));
+					}
+				}
 			}
 
 			if (removedThis.getChangeType() == ChangeType.REMOVED) {

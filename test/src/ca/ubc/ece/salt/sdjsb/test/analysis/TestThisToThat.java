@@ -36,7 +36,7 @@ public class TestThisToThat extends TestAnalysis {
 
 		this.runTest(new String[] { src, dst }, expectedAlerts, true);
 	}
-	
+
 	/*
 	 * popcorn: used to be a false positive. moving calls from outside to inside
 	 * anonymous function, and changing from this to self accordingly
@@ -59,6 +59,20 @@ public class TestThisToThat extends TestAnalysis {
 	public void testHapi() throws Exception {
 		String src = "./test/input/this_to_that/hapi_self_old.js";
 		String dst = "./test/input/this_to_that/hapi_self_new.js";
+
+		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
+
+		this.runTest(new String[] { src, dst }, expectedAlerts, true);
+	}
+
+	/*
+	 * hapi: same case as popcorn. Changes from this to self are expected
+	 * because they are moving scope
+	 */
+	@Test
+	public void testBower() throws Exception {
+		String src = "./test/input/this_to_that/bower_fp_old.js";
+		String dst = "./test/input/this_to_that/bower_fp_new.js";
 
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 
