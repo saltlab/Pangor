@@ -48,6 +48,7 @@ public class TestArgument extends TestAnalysis {
 		this.runTest(new String[] { src, dst }, expectedAlerts, true);
 	}
 
+
 	/*
 	 * pm2 false positive 2: function call substituted by another function call
 	 */
@@ -68,6 +69,20 @@ public class TestArgument extends TestAnalysis {
 	public void testObjectLiteral() throws Exception {
 		String src = "./test/input/argument/object_literal_change_old.js";
 		String dst = "./test/input/argument/object_literal_change_new.js";
+
+		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
+		expectedAlerts.add(new ArgumentAlert(AMI, "watch", "~objectLiteral~", ChangeType.UPDATED));
+
+		this.runTest(new String[] { src, dst }, expectedAlerts, true);
+	}
+
+	/*
+	 * Changing order of arguments
+	 */
+	@Test
+	public void testChangingOrder() throws Exception {
+		String src = "./test/input/argument/change_order_old.js";
+		String dst = "./test/input/argument/change_order_new.js";
 
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		expectedAlerts.add(new ArgumentAlert(AMI, "watch", "~objectLiteral~", ChangeType.UPDATED));
