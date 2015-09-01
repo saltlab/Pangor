@@ -127,7 +127,7 @@ public class LearningDataSetMain {
 							|| frequency.keyword.keyword.equals("null")
 							|| frequency.keyword.keyword.equals("true")
 							|| frequency.keyword.keyword.equals("false"))
-							&& (frequency.keyword.keyword.equals("falsey") // Context Group 1
+							&& !(frequency.keyword.keyword.equals("falsey") // Context Group 1
 							|| frequency.keyword.keyword.equals("this"))
 							&& !frequency.keyword.keyword.equals("test")) {
 						keywordClusters.add(clusterMetrics);
@@ -147,7 +147,7 @@ public class LearningDataSetMain {
 						|| cluster.keyword.keyword.equals("null")
 						|| cluster.keyword.keyword.equals("true")
 						|| cluster.keyword.keyword.equals("false"))
-						&& (cluster.keyword.keyword.equals("falsey") // Context Group 1
+						&& !(cluster.keyword.keyword.equals("falsey") // Context Group 1
 						|| cluster.keyword.keyword.equals("this"))
 						&& !cluster.keyword.keyword.equals("test")) {
 					System.out.println(i + "\t" + cluster);
