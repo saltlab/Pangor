@@ -11,11 +11,37 @@ The keyword change analysis component has two parts. The first builds a data set
 
 ### Data Set Construction ###
 
-* Analysis Main: ca.ubc.ece.salt.pangor.learning.LearningAnalysisMain
+To run Pangor's keyword change analysis from the command line:
+```bash
+java ca.ubc.ece.salt.pangor.learning.LearningAnalysisMain -h
+
+Usage: DataSetMain  [-cc (--complexity) N] [-d (--directory) VAL] [-ds (--dataset) VAL] [-h (--help)] [-r (--repositories) VAL] [-s (--supplement) VAL] [-tr (--threads) N] [-u (--uri) VAL]
+
+ -cc (--complexity) N    : The maximum change complexity of a file to analyze.
+ -d (--directory) VAL    : The git directory (e.g., /path/to/project/.git/).
+ -ds (--dataset) VAL     : The data set file to read.
+ -h (--help)             : Display the help file.
+ -r (--repositories) VAL : The path to the file specifying the repositories to analyze.
+ -s (--supplement) VAL   : The folder path to place any supplementary files.
+ -tr (--threads) N       : The number of threads to be used.
+ -u (--uri) VAL          : The uri of the public repository (e.g., https://github.com/qhanam/JSRepairClass.git).
+```
 
 ### Cluster Construction ###
 
-* Cluster Creation & Metrics: ca.ubc.ece.salt.pangor.learning.LearningDataSetMain
+To run Pangor's clustering and keyword metrics program:
+```bash
+java ca.ubc.ece.salt.pangor.learning.LearningDataSetMain -h
+
+Usage: DataSetMain  [-a (--arff-path) VAL] [-c (--clusters)] [-ds (--dataset) VAL] [-f (--filtered) VAL] [-h (--help)] [-m (--metrics)]
+
+ -a (--arff-path) VAL : Folder to write the ARFF files.
+ -c (--clusters)      : Print the clusters from the data set.
+ -ds (--dataset) VAL  : The data set file to read.
+ -f (--filtered) VAL  : The file to write the filtered data set to.
+ -h (--help)          : Display the help file.
+ -m (--metrics)       : Print the metrics from the data set.
+```
 
 ## Static Analysis ##
 
@@ -23,7 +49,7 @@ The static analysis component detects instances of bug patterns in source code b
 
 ### Analysis ###
 
-To run Pangor's Checker from the command line:
+To run Pangor's checker from the command line:
 ```bash
 java ca.ubc.ece.salt.pangor.classify.ClassifyAnalysisMain -h
 
@@ -50,9 +76,21 @@ ClassifyAnalysisMain creates the following artifacts:
 
 ### Duplicate Filtering and Metrics ###
 
+To run Pangor's checker duplicate filtering and metrics program from the command line:
 ```bash
-java ca.ubc.ece.salt.pangor.ClassifyDataSetMain -h
+java ca.ubc.ece.salt.pangor.classify.ClassifyDataSetMain -h
+
+Usage: DataSetMain  [-ds (--dataset) VAL] [-f (--filtered) VAL] [-h (--help)] [-m (--metrics)]
+
+ -ds (--dataset) VAL : The data set file to read.
+ -f (--filtered) VAL : The file to write the filtered data set to.
+ -h (--help)         : Display the help file.
+ -m (--metrics)      : Print the metrics from the data set.
 ```
+
+ClassifyDataSetMain creates the following artifacts:
+
+* `filtered.csv`: The data set with duplicate alerts removed.
 
 ### Installation ###
 
