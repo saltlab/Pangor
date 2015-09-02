@@ -1,7 +1,7 @@
 =======
 ## README ##
 
-Pangor is a static analyis framework for discovering and analyzing the pervasive bug patterns of JavaScript. For details on Pangor, see our method description and empirical study [Mining the Pervasive and Detectable Bug Patterns of JavaScript](htttp://salt.ece.ubc.ca/software/pangor/).
+Pangor is a static analyis framework for discovering and analyzing the pervasive bug patterns of JavaScript. For details on Pangor, see our method description and empirical study [Mining the Pervasive and Detectable Bug Patterns of JavaScript](http://salt.ece.ubc.ca/software/pangor/).
 
 Pangor contains two analysis types: keyword change analysis and instance checker analysis.
 
