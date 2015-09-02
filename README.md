@@ -5,11 +5,16 @@ Pangor is a static analyis framework for discovering and analyzing the pervasive
 
 Pangor contains two analysis types: keyword change analysis and flow analysis.
 
-### Keyword Change Analysis ##
+## Keyword Change Analysis ##
 
-### Configuring and Running ###
+The keyword change analysis component has two parts. The first builds a data set of keyword changes in bug fixing commits. The second creates a set of clusters from the data set. Clusters contain similar bug patterns.
+
+### Data Set Construction ###
 
 * Analysis Main: ca.ubc.ece.salt.pangor.learning.LearningAnalysisMain
+
+### Cluster Construction ###
+
 * Cluster Creation & Metrics: ca.ubc.ece.salt.pangor.learning.LearningDataSetMain
 
 ## Static Analysis ##
@@ -45,7 +50,9 @@ ClassifyAnalysisMain creates the following artifacts:
 
 ### Duplicate Filtering and Metrics ###
 
-* Duplicate Filtering & Metrics: ca.ubc.ece.salt.pangor.ClassifyDataSetMain
+```bash
+java ca.ubc.ece.salt.pangor.ClassifyDataSetMain -h
+```
 
 ### Installation ###
 
@@ -63,3 +70,4 @@ Optional: Create the Eclipse project files (`mvn eclipse:eclipse`).
     * `src\`: The source code for the Pangor framwork tests.
     * `input\`: JavaScript files used in the Pangor framework tests.
 * `tools\`: Scripts for inspecting bug pattern clusters.
+* `input\`: Contains a repository list for input to LearningAnalysisMain and ClassifyAnalysisMain.
