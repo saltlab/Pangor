@@ -1,9 +1,9 @@
 =======
 ## README ##
 
-Pangor is a static analyis framework for discovering and analyzing the pervasive bug patterns of JavaScript. It is used as part of our study [Mining the Pervasive and Detectable Bug Patterns of JavaScript](htttp://salt.ece.ubc.ca/software/pangor/).
+Pangor is a static analyis framework for discovering and analyzing the pervasive bug patterns of JavaScript. For details on Pangor, see our method description and empirical study [Mining the Pervasive and Detectable Bug Patterns of JavaScript](htttp://salt.ece.ubc.ca/software/pangor/).
 
-Pangor contains two analysis types: keyword change analysis and flow analysis.
+Pangor contains two analysis types: keyword change analysis and instance checker analysis.
 
 ## Keyword Change Analysis ##
 
@@ -27,6 +27,11 @@ Usage: DataSetMain  [-cc (--complexity) N] [-d (--directory) VAL] [-ds (--datase
  -u (--uri) VAL          : The uri of the public repository (e.g., https://github.com/qhanam/JSRepairClass.git).
 ```
 
+Through Maven:
+```bash
+mvn exec:java -Dexec.mainClass="ca.ubc.ece.salt.pangor.ClassifyAnalysisMain" -Dexec.args="-h"
+```
+
 ### Cluster Construction ###
 
 To run Pangor's clustering and keyword metrics program:
@@ -43,9 +48,9 @@ Usage: DataSetMain  [-a (--arff-path) VAL] [-c (--clusters)] [-ds (--dataset) VA
  -m (--metrics)       : Print the metrics from the data set.
 ```
 
-## Static Analysis ##
+## Instance Checker Analysis ##
 
-The static analysis component detects instances of bug patterns in source code by using AST or flow analysis to inspect the repaired file.
+The instance checker analysis component also has two parts. The first builds a data set of bug pattern instance alerts. The second filters out duplicates from the data set and computes metrics (i.e., counts each type of alert).
 
 ### Analysis ###
 
@@ -62,11 +67,6 @@ Usage: ClassifyMain  [-ds (--dataset) VAL] [-h (--help)] [-pp (--preprocess)] [-
  -s (--supplement) VAL   : The folder path to place the supplementary files.
  -tr (--threads) N       : The number of threads to be used.
  -u (--uri) VAL          : The uri of the public repository (e.g., https://github.com/qhanam/JSRepairClass.git).
-```
-
-Through Maven:
-```bash
-mvn exec:java -Dexec.mainClass="ca.ubc.ece.salt.pangor.ClassifyAnalysisMain" -Dexec.args="-h"
 ```
 
 ClassifyAnalysisMain creates the following artifacts:
