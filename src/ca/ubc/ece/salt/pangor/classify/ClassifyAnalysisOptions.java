@@ -10,28 +10,19 @@ public class ClassifyAnalysisOptions {
 	@Option(name="-h", aliases={"--help"}, usage="Display the help file.")
 	private boolean help = false;
 
-	@Option(name="-t", aliases={"--latex"}, usage="Output summary to latex table.")
-	private boolean latex = false;
-
-	@Option(name="-a", aliases={"--alerts"}, usage="Print individual alert descriptions.")
-	private boolean alerts = false;
-
-	@Option(name="-c", aliases={"--custom"}, usage="Prints custom alerts.")
-	private boolean custom = false;
-
-	@Option(name="-r", aliases={"--repositories"}, usage="The path to the file specifying the repositories to analyze.")
+	@Option(name="-r", aliases={"--repositories"}, usage="The path to the file specifying the list of repositories to analyze.")
 	private String repoFile = null;
 
-	@Option(name="-ds", aliases={"--dataset"}, usage="The data set file to read.")
+	@Option(name="-ds", aliases={"--dataset"}, usage="The data set file to write to.")
 	private String dataSetPath = null;
 
-	@Option(name="-s", aliases={"--supplement"}, usage="The folder path to place any supplementary files.")
+	@Option(name="-s", aliases={"--supplement"}, usage="The folder path to place the supplementary files.")
 	private String supplement = null;
 
 	@Option(name = "-tr", aliases = { "--threads" }, usage = "The number of threads to be used.")
 	private Integer nThreads = 6;
 
-	@Option(name="-pp", aliases={"--preprocess"}, usage="Pre-process the AST before running GumTree.")
+	@Option(name="-pp", aliases={"--preprocess"}, usage="Pre-process the AST before running GumTree. Expands ternary operators and short circuits.")
 	private boolean preProcess = false;
 
 	public Integer getNThreads() {
@@ -44,18 +35,6 @@ public class ClassifyAnalysisOptions {
 
 	public boolean getHelp() {
 		return this.help;
-	}
-
-	public boolean printLatex() {
-		return this.latex;
-	}
-
-	public boolean printAlerts() {
-		return this.alerts;
-	}
-
-	public boolean printCustom() {
-		return this.custom;
 	}
 
 	public String getRepoFile() {
