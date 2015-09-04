@@ -11,7 +11,8 @@
 #  $ ./cluster_nav_project_diff.sh 84
 
 DIFF_PROGRAM=meld
-ARFF_FILE=../output/output.arff
+ARFF_FILE=../output/arff/METHOD_METHOD_CALL_INSERTED_global_push.arff
+# ARFF_FILE=../output/arff/FIELD_ASSIGNMENT_LHS_INSERTED_global_prototype.arff
 SUPPLEMENTARY_FOLDER=../output/supplementary/
 CLIPBOARD_PROGRAM=xclip
 BROWSER=firefox
@@ -19,10 +20,12 @@ BROWSER=firefox
 # Get all attributes names
 attributes=($(cat $ARFF_FILE | grep @attribute | awk -F " " '{print $2}'))
 
+instances=($(cat $ARFF_FILE | grep -w "cluster"$1 | wc -l))
+
 # Get all projects that has instances on this cluster
 projects=($(cat $ARFF_FILE | grep -w "cluster"$1 | grep -v @attribute | awk -F "," '{print $2}' | sort | uniq))
 
-echo "------------ Exploring ${#projects[@]} projects ------------"
+echo "------------ Exploring ${#projects[@]} projects from ${instances} ------------"
 echo ${projects[@]}
 
 # Iterate over projects
