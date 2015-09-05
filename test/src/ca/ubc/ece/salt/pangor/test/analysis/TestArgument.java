@@ -25,7 +25,7 @@ public class TestArgument extends TestAnalysis {
 		super.runTest(args, expectedAlerts, printAlerts, analysis, dataSet);
 	}
 
-	@Test
+	@Ignore @Test
 	public void testSimplestScenario() throws Exception {
 		String src = "./test/input/argument/simplest_old.js";
 		String dst = "./test/input/argument/simplest_new.js";
@@ -40,7 +40,7 @@ public class TestArgument extends TestAnalysis {
 	/*
 	 * pm2 false positive 1: function removed
 	 */
-	@Test
+	@Ignore @Test
 	public void testPM2FP1() throws Exception {
 		String src = "./test/input/argument/pm2_fp1_old.js";
 		String dst = "./test/input/argument/pm2_fp1_new.js";
@@ -54,7 +54,7 @@ public class TestArgument extends TestAnalysis {
 	/*
 	 * pm2 false positive 2: function call substituted by another function call
 	 */
-	@Test
+	@Ignore @Test
 	public void testPM2FP2() throws Exception {
 		String src = "./test/input/argument/pm2_fp2_old.js";
 		String dst = "./test/input/argument/pm2_fp2_new.js";
@@ -67,7 +67,7 @@ public class TestArgument extends TestAnalysis {
 	/*
 	 * Changing a field of an object literal that is used as parameter
 	 */
-	@Test
+	@Ignore @Test
 	public void testObjectLiteral() throws Exception {
 		String src = "./test/input/argument/object_literal_change_old.js";
 		String dst = "./test/input/argument/object_literal_change_new.js";
@@ -81,7 +81,7 @@ public class TestArgument extends TestAnalysis {
 	/*
 	 * Changing order of arguments
 	 */
-	@Test
+	@Ignore @Test
 	public void testChangingOrder() throws Exception {
 		String src = "./test/input/argument/change_order_old.js";
 		String dst = "./test/input/argument/change_order_new.js";
@@ -95,7 +95,7 @@ public class TestArgument extends TestAnalysis {
 	/*
 	 * False positive: function refactoring
 	 */
-	@Test
+	@Ignore @Test
 	public void testFunctionRefactoring() throws Exception {
 		String src = "./test/input/argument/function_refactor_old.js";
 		String dst = "./test/input/argument/function_refactor_new.js";
@@ -108,7 +108,7 @@ public class TestArgument extends TestAnalysis {
 	/*
 	 * False positive: event
 	 */
-	@Test
+	@Ignore @Test
 	public void testEvent() throws Exception {
 		String src = "./test/input/argument/event_old.js";
 		String dst = "./test/input/argument/event_new.js";
@@ -122,7 +122,7 @@ public class TestArgument extends TestAnalysis {
 	 * Test how we print the function name. On chain function calls, we were
 	 * printing everything, which breaks the .csv file
 	 */
-	@Test
+	@Ignore @Test
 	public void testChain() throws Exception {
 		String src = "./test/input/argument/chain_old.js";
 		String dst = "./test/input/argument/chain_new.js";
@@ -136,7 +136,7 @@ public class TestArgument extends TestAnalysis {
 	/*
 	 * Test how we print the function name. On functions assingments as a param
 	 */
-	@Test
+	@Ignore @Test
 	public void testFunctionAssignment() throws Exception {
 		String src = "./test/input/argument/function_assign_old.js";
 		String dst = "./test/input/argument/function_assign_new.js";
@@ -150,7 +150,7 @@ public class TestArgument extends TestAnalysis {
 	/*
 	 * Test how we print the function name. On functions expressions as a param
 	 */
-	@Test
+	@Ignore @Test
 	public void testExpression() throws Exception {
 		String src = "./test/input/argument/expression_old.js";
 		String dst = "./test/input/argument/expression_new.js";

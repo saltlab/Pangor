@@ -167,10 +167,8 @@ public class CFGFactory {
 				}
 				else {
 					/* Merge the previous subgraph into the entry point of this subgraph. */
-					assert(previous.getExitNodes().size() == 1);
 					for(CFGNode exitNode : previous.getExitNodes()) {
 						exitNode.addEdge(null, subGraph.getEntryNode());
-
 					}
 				}
 

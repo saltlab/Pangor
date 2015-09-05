@@ -33,7 +33,7 @@ public class TestArgumentOrder extends TestAnalysis {
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		expectedAlerts.add(new ArgumentOrderAlert(AMI, "~anonymous~", "TODO"));
 
-		this.runTest(new String[] { src, dst }, expectedAlerts, true);
+		this.runTest(new String[] { src, dst }, expectedAlerts, false);
 	}
 
 	/*
@@ -48,7 +48,7 @@ public class TestArgumentOrder extends TestAnalysis {
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		// expectedAlerts.add(new ArgumentOrderAlert(AMI, "~anonymous~", "TODO"));
 
-		this.runTest(new String[] { src, dst }, expectedAlerts, true);
+		this.runTest(new String[] { src, dst }, expectedAlerts, false);
 	}
 
 	/*
@@ -63,6 +63,6 @@ public class TestArgumentOrder extends TestAnalysis {
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		// expectedAlerts.add(new ArgumentOrderAlert(AMI, "PoolConfig", "TODO"));
 
-		this.runTest(new String[] { src, dst }, expectedAlerts, true);
+		this.runTest(new String[] { src, dst }, expectedAlerts, false);
 	}
 }

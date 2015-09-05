@@ -37,7 +37,7 @@ public class TestASTPreProcessing extends TestCase {
         shortCircuitPreProcessor.process(original);
 
 		/* Print the new AST. */
-		System.out.println(original.toSource());
+//		System.out.println(original.toSource());
         
 	}
 	

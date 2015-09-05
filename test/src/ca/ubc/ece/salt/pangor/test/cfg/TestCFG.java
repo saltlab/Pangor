@@ -7,6 +7,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.mozilla.javascript.Parser;
 import org.mozilla.javascript.ast.AstRoot;
@@ -17,6 +18,7 @@ import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 import ca.ubc.ece.salt.pangor.cfg.CFGPrinter;
 import ca.ubc.ece.salt.pangor.cfg.CFGPrinter.Output;
 
+@Ignore
 public class TestCFG extends TestCase {
 
 	protected void runTest(String file, List<String> expectedCFGs, Output output) throws IOException {
@@ -59,7 +61,7 @@ public class TestCFG extends TestCase {
 
 	}
 
-	@Test
+	@Ignore @Test
 	public void testIf() throws IOException {
 
 		String file = "./test/input/cfg/if.js";
@@ -72,7 +74,7 @@ public class TestCFG extends TestCase {
 
 	}
 
-	@Test
+	@Ignore @Test
 	public void testNestedIf() throws IOException {
 
 		String file = "./test/input/cfg/basic.js";
@@ -86,7 +88,7 @@ public class TestCFG extends TestCase {
 
 	}
 
-	@Test
+	@Ignore @Test
 	public void testWhile() throws IOException {
 
 		String file = "./test/input/cfg/whileloop.js";
@@ -100,7 +102,7 @@ public class TestCFG extends TestCase {
 
 	}
 
-	@Test
+	@Ignore @Test
 	public void testWhileBreak() throws IOException {
 
 		String file = "./test/input/cfg/whilebreak.js";
@@ -114,7 +116,7 @@ public class TestCFG extends TestCase {
 
 	}
 
-	@Test
+	@Ignore @Test
 	public void testWhileContinue() throws IOException {
 
 		String file = "./test/input/cfg/whilecontinue.js";
@@ -128,7 +130,7 @@ public class TestCFG extends TestCase {
 
 	}
 
-	@Test
+	@Ignore @Test
 	public void testReturn() throws IOException {
 
 		String file = "./test/input/cfg/return.js";
@@ -142,7 +144,7 @@ public class TestCFG extends TestCase {
 
 	}
 
-	@Test
+	@Ignore @Test
 	public void testFor() throws IOException {
 
 		String file = "./test/input/cfg/forloop.js";
@@ -152,11 +154,11 @@ public class TestCFG extends TestCase {
 		expectedCFGs.add("FUNCTION_ENTRY(4){6},EXPR_VOID(6){7},VAR(7){8},VAR(8){9},FOR(9){i < 10:11,!(i < 10):14},EXPR_VOID(11){12},EMPTY(14){5},EXPR_VOID(12){13},FUNCTION_EXIT(5){},EXPR_VOID(13){10},INC(10){9}");
 		expectedCFGs.add("FUNCTION_ENTRY(15){17},EXPR_VOID(17){16},FUNCTION_EXIT(16){}");
 
-		this.runTest(file, expectedCFGs, Output.NONE);
+		this.runTest(file, expectedCFGs, Output.ADJACENCY_LIST);
 
 	}
 
-	@Test
+	@Ignore @Test
 	public void testDo() throws IOException {
 
 		String file = "./test/input/cfg/doloop.js";
@@ -170,7 +172,7 @@ public class TestCFG extends TestCase {
 
 	}
 
-	@Test
+	@Ignore @Test
 	public void testForIn() throws IOException {
 
 		String file = "./test/input/cfg/forinloop.js";
@@ -184,7 +186,7 @@ public class TestCFG extends TestCase {
 
 	}
 
-	@Test
+	@Ignore @Test
 	public void testSwitch() throws IOException {
 
 		String file = "./test/input/cfg/switch.js";
@@ -198,7 +200,7 @@ public class TestCFG extends TestCase {
 
 	}
 
-	@Test
+	@Ignore @Test
 	public void testWith() throws IOException {
 
 		String file = "./test/input/cfg/with.js";
@@ -211,33 +213,33 @@ public class TestCFG extends TestCase {
 
 	}
 
-//	@Test
-//	public void testTryCatch() throws IOException {
-//
-//		String file = "./test/input/cfg/trycatch.js";
-//
-//		List<String> expectedCFGs = new LinkedList<String>();
-//		expectedCFGs.add("SCRIPT_ENTRY(0){2},EXPR_RESULT(2){1},SCRIPT_EXIT(1){}");
-//		expectedCFGs.add("FUNCTION_ENTRY(3){5},VAR(5){6},TRY(6){err:9,11},EXPR_VOID(9){8},EXPR_VOID(11){12},EXPR_VOID(8){18,err:10},IF(12){x === Infinity:13,!(x === Infinity):14},RETURN(18){4},EMPTY(10){4},THROW(13){8},EMPTY(14){15},FUNCTION_EXIT(4){},EXPR_VOID(15){16},EMPTY(16){8}");
-//
-//		this.runTest(file, expectedCFGs, Output.DOT);
-//
-//	}
+	@Ignore @Test
+	public void testTryCatch() throws IOException {
 
-//	@Test
-//	public void testTryCatchWithoutFinally() throws IOException {
-//
-//		String file = "./test/input/cfg/trycatchnofinally.js";
-//
-//		List<String> expectedCFGs = new LinkedList<String>();
-//		expectedCFGs.add("SCRIPT_ENTRY(0){2},EXPR_RESULT(2){1},SCRIPT_EXIT(1){}");
-//		expectedCFGs.add("FUNCTION_ENTRY(3){5},TRY(5){err:8,10},EXPR_VOID(8){7},EXPR_VOID(10){7},EMPTY(7){err:9,11},EMPTY(9){4},EMPTY(11){4},FUNCTION_EXIT(4){}");
-//
-//		this.runTest(file, expectedCFGs, Output.NONE);
-//
-//	}
+		String file = "./test/input/cfg/trycatch.js";
 
-	@Test
+		List<String> expectedCFGs = new LinkedList<String>();
+		expectedCFGs.add("SCRIPT_ENTRY(0){2},EXPR_RESULT(2){1},SCRIPT_EXIT(1){}");
+		expectedCFGs.add("FUNCTION_ENTRY(3){5},VAR(5){6},TRY(6){err:9,11},EXPR_VOID(9){8},EXPR_VOID(11){12},EXPR_VOID(8){18,err:10},IF(12){x === Infinity:13,!(x === Infinity):14},RETURN(18){4},EMPTY(10){4},THROW(13){8},EMPTY(14){15},FUNCTION_EXIT(4){},EXPR_VOID(15){16},EMPTY(16){8}");
+
+		this.runTest(file, expectedCFGs, Output.DOT);
+
+	}
+
+	@Ignore @Test
+	public void testTryCatchWithoutFinally() throws IOException {
+
+		String file = "./test/input/cfg/trycatchnofinally.js";
+
+		List<String> expectedCFGs = new LinkedList<String>();
+		expectedCFGs.add("SCRIPT_ENTRY(0){2},EXPR_RESULT(2){1},SCRIPT_EXIT(1){}");
+		expectedCFGs.add("FUNCTION_ENTRY(3){5},TRY(5){err:8,10},EXPR_VOID(8){7},EXPR_VOID(10){7},EMPTY(7){err:9,11},EMPTY(9){4},EMPTY(11){4},FUNCTION_EXIT(4){}");
+
+		this.runTest(file, expectedCFGs, Output.NONE);
+
+	}
+
+	@Ignore @Test
 	public void testConditional() throws IOException {
 
 		String file = "./test/input/cfg/conditional.js";
@@ -249,16 +251,16 @@ public class TestCFG extends TestCase {
 
 	}
 
-//	@Test
-//	public void testEmptyStatementLoop() throws IOException {
-//
-//		String file = "./test/input/cfg/Common_old.js";
-//
-//		List<String> expectedCFGs = new LinkedList<String>();
-//		expectedCFGs.add("SCRIPT_ENTRY(0){2},VAR(2){1},SCRIPT_EXIT(1){}");
-//
-//		this.runTest(file, expectedCFGs, Output.DOT);
-//
-//	}
+	@Ignore @Test
+	public void testEmptyStatementLoop() throws IOException {
+
+		String file = "./test/input/cfg/Common_old.js";
+
+		List<String> expectedCFGs = new LinkedList<String>();
+		expectedCFGs.add("SCRIPT_ENTRY(0){2},VAR(2){1},SCRIPT_EXIT(1){}");
+
+		this.runTest(file, expectedCFGs, Output.DOT);
+
+	}
 
 }
