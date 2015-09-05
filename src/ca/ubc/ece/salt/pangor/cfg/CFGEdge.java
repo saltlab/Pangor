@@ -39,9 +39,6 @@ public class CFGEdge {
 		this.changeType = ChangeType.UNKNOWN;
 		this.id = CFGEdge.getUniqueId();
 		this.loopEdge = false;
-
-		if(condition != null && ((AstNode)condition).toSource().equals("i < 5"))
-			System.out.println(((AstNode)condition).toSource() + ":" + loopEdge);
 	}
 
 	public CFGEdge(ClassifiedASTNode condition, CFGNode from, CFGNode to, boolean loopEdge) {

@@ -126,7 +126,6 @@ public class SpecialTypeFlowAnalysis extends PathSensitiveFlowAnalysis<Classifie
 					couldNotBe.add(specialTypeCheck.specialType);
                     sourceLE.nonSpecialTypes.put(specialTypeCheck.identifier, couldNotBe);
 				}
-				System.out.println(specialTypeCheck.identifier + " is not " + specialTypeCheck.specialType);
 			}
 		}
 

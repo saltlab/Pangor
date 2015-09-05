@@ -82,8 +82,6 @@ public abstract class PathInsensitiveFlowAnalysis<U extends Alert, T extends Dat
                     /* Increment the # of paths visited by one if we're at an exit node. */
                     if(edge.getTo().getEdges().size() == 0) {
                         pathsComplete++;
-                        System.out.println("Paths Complete: " + pathsComplete);
-                        System.out.println("Edges Visited: " + edgesVisited);
                     }
 
                     /* If an edge has been visited on this path, don't visit it
