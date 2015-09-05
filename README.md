@@ -3,7 +3,7 @@
 
 Pangor is a static analyis framework for discovering and analyzing the pervasive bug patterns of JavaScript. For details on Pangor, see our method description and empirical study [Mining the Pervasive and Detectable Bug Patterns of JavaScript](http://salt.ece.ubc.ca/software/pangor/).
 
-Pangor contains two analysis types: keyword change analysis and instance checker analysis.
+Pangor contains two analysis types: keyword change analysis (a data mining framework) and static change analysis (a flow analysis framework).
 
 ## Keyword Change Analysis ##
 
@@ -48,9 +48,9 @@ Usage: DataSetMain  [-a (--arff-path) VAL] [-c (--clusters)] [-ds (--dataset) VA
  -m (--metrics)       : Print the metrics from the data set.
 ```
 
-## Instance Checker Analysis ##
+## Static Change Analysis ##
 
-The instance checker analysis component also has two parts. The first builds a data set of bug pattern instance alerts. The second filters out duplicates from the data set and computes metrics (i.e., counts each type of alert).
+The static change analysis component also has two parts. The first builds a data set of bug pattern instance alerts. The second filters out duplicates from the data set and computes metrics (i.e., counts each type of alert).
 
 ### Analysis ###
 
