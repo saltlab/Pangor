@@ -2,12 +2,15 @@ package ca.ubc.ece.salt.pangor.test.analysis;
 
 import java.util.List;
 
+import org.junit.Ignore;
+
 import junit.framework.TestCase;
 import ca.ubc.ece.salt.pangor.analysis.Analysis;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.cfd.ControlFlowDifferencing;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
 
+@Ignore
 public class TestAnalysis extends TestCase {
 
 	/**
