@@ -25,11 +25,11 @@ public class TestASTClone extends TestCase {
 		AstRoot clone = (AstRoot)original.clone(original.getParent());
 
 		/* Get the serialized ASTs. */
-		String expected = TestASTClone.serialize(original);
-		String actual = TestASTClone.serialize(clone);
+//		String expected = TestASTClone.serialize(original);
+//		String actual = TestASTClone.serialize(clone);
 		
-		System.out.println(expected);
-		System.out.println(actual);
+//		System.out.println(expected);
+//		System.out.println(actual);
         
         /* Check the AST. */
         check(clone, original);
@@ -61,7 +61,7 @@ public class TestASTClone extends TestCase {
 		String expected = original.toSource();
 		String actual = clone.toSource();
 		
-		System.out.println("Original: " + original.toSource());
+//		System.out.println("Original: " + original.toSource());
 		
 		TestCase.assertEquals("the source code does not match", expected.replace("\n", ""), actual.replace("\n", ""));
 

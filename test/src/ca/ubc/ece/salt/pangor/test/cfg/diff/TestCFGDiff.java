@@ -28,10 +28,10 @@ public class TestCFGDiff extends TestCase {
 		CFDContext context = ControlFlowDifferencing.setup(args);
 
 		/* Print the CFGs. */
-		System.out.println("Source CFGs: *************");
-		this.getCFGs(context.srcCFGs, output);
-		System.out.println("Destination CFGs: *************");
-		this.getCFGs(context.dstCFGs, output);
+//		System.out.println("Source CFGs: *************");
+//		this.getCFGs(context.srcCFGs, output);
+//		System.out.println("Destination CFGs: *************");
+//		this.getCFGs(context.dstCFGs, output);
 
         /* Check the CFGs. */
 		List<String> actualSrcCFGs = new LinkedList<String>();

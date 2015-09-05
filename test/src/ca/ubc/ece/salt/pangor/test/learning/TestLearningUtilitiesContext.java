@@ -117,7 +117,7 @@ public class TestLearningUtilitiesContext {
 		AstRoot root = new AstRoot();
 		root.addChild(ifs);
 
-		System.out.println(root.toSource());
+//		System.out.println(root.toSource());
 
 		runTest(lhs, KeywordContext.CONDITION);
 
@@ -139,7 +139,7 @@ public class TestLearningUtilitiesContext {
 		AstRoot root = new AstRoot();
 		root.addChild(ifs);
 
-		System.out.println(root.toSource());
+//		System.out.println(root.toSource());
 
 		runTest(condition, KeywordContext.CONDITION);
 
@@ -360,7 +360,7 @@ public class TestLearningUtilitiesContext {
 		root.addChild(removeStatement);
 		root.addChild(removeAllStatement);
 
-		System.out.println(root.toSource());
+//		System.out.println(root.toSource());
 		runTest(registerEvent, KeywordContext.EVENT_REGISTER);
 		runTest(removeListenerEvent, KeywordContext.EVENT_REMOVE);
 		runTest(removeAllListenerEvent, KeywordContext.EVENT_REMOVE);

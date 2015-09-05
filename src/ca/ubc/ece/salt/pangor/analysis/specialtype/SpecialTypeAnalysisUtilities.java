@@ -97,7 +97,6 @@ public class SpecialTypeAnalysisUtilities {
 				SpecialType specialType = null;
 
 				/* Get the identifier and the special type. */
-				System.out.println(ie.toSource());
 				if(getSpecialType(ie.getLeft()) != null) {
 					specialType = getSpecialType(ie.getLeft());
 					identifier = AnalysisUtilities.getIdentifier(ie.getRight());

@@ -117,7 +117,7 @@ public class TestLearningUtilitiesType {
 		AstRoot root = new AstRoot();
 		root.addChild(ifs);
 
-		System.out.println(root.toSource());
+//		System.out.println(root.toSource());
 
 		runTest(lhs, KeywordType.RESERVED);
 
@@ -139,7 +139,7 @@ public class TestLearningUtilitiesType {
 		AstRoot root = new AstRoot();
 		root.addChild(ifs);
 
-		System.out.println(root.toSource());
+//		System.out.println(root.toSource());
 
 		runTest(condition, KeywordType.RESERVED);
 
@@ -492,7 +492,7 @@ public class TestLearningUtilitiesType {
 		root.addChild(removeStatement);
 		root.addChild(removeAllStatement);
 
-		System.out.println(root.toSource());
+//		System.out.println(root.toSource());
 		runTest(registerEvent, KeywordType.EVENT);
 		runTest(removeListenerEvent, KeywordType.EVENT);
 		runTest(removeAllListenerEvent, KeywordType.EVENT);

@@ -58,8 +58,8 @@ public class TestASTLearning {
         featureVectorManager.preProcess();
 
         /* Print the data set. */
-        System.out.println(featureVectorManager.getFeatureVectorHeader());
-        System.out.println(featureVectorManager.getFeatureVector());
+//        System.out.println(featureVectorManager.getFeatureVectorHeader());
+//        System.out.println(featureVectorManager.getFeatureVector());
 
         /* Verify the expected feature vectors match the actual feature vectors. */
         for(MockFeatureVector fv : expected) {
