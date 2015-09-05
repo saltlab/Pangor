@@ -4,6 +4,7 @@
 	<groupId>ca.ubc.ece.salt</groupId>
 	<artifactId>sdjsb</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
+
 	<build>
 		<sourceDirectory>src</sourceDirectory>
 		<testSourceDirectory>test/src</testSourceDirectory>
@@ -19,6 +20,11 @@
 		</plugins>
 	</build>
 	<repositories>
+		<repository>
+			<id>pangor</id>
+			<name>Pangor dependency repository</name>
+			<url>http://ece.ubc.ca/~qhanam/maven/</url>
+		</repository>
 		<repository>
 			<id>labri</id>
 			<name>LaBRI repository</name>
@@ -95,6 +101,21 @@
 			<groupId>fr.labri.utils</groupId>
 			<artifactId>utils</artifactId>
 			<version>1.0-20130410.213900-5</version>
+		</dependency>
+		<dependency>
+			<groupId>ca.ubc.ece.salt.pangor</groupId>
+			<artifactId>optics_dbscan</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>ca.ubc.ece.salt.pangor</groupId>
+			<artifactId>rhino</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+		<dependency>
+			<groupId>ca.ubc.ece.salt.pangor</groupId>
+			<artifactId>gumtree</artifactId>
+			<version>1.0.0</version>
 		</dependency>
 	</dependencies>
 </project>
