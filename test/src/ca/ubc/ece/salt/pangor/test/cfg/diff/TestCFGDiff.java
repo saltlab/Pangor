@@ -85,59 +85,59 @@ public class TestCFGDiff extends TestCase {
 		
 	}
 
-	@Test
-	public void testIf() throws Exception {
-		
-		String src = "./test/input/special_type_handling/sth_undefined_old.js";
-		String dst = "./test/input/special_type_handling/sth_undefined_new.js";
-		
-		List<String> expectedSrcCFGs = new LinkedList<String>();
-		expectedSrcCFGs.add("digraph control_flow_graph { node [ style = filled fillcolor = \"white\" ]; 0 [ fillcolor = \"grey\" label = \"script entry\" ]; 0 -> 2 [ color = \"grey\" ]; 2 [ fillcolor = \"grey\" label = \"var a;\" ]; 2 -> 3 [ color = \"grey\" ]; 3 [ fillcolor = \"yellow\" label = \"console.log(a);\" ]; 3 -> 1 [ color = \"grey\" ]; 1 [ fillcolor = \"grey\" label = \"\" ]; }");
-		
-		List<String> expectedDstCFGs = new LinkedList<String>();
-		expectedDstCFGs.add("digraph control_flow_graph { node [ style = filled fillcolor = \"white\" ]; 4 [ fillcolor = \"grey\" label = \"script entry\" ]; 4 -> 6 [ color = \"grey\" ]; 6 [ fillcolor = \"grey\" label = \"var a;\" ]; 6 -> 7 [ color = \"grey\" ]; 7 [ fillcolor = \"grey\" label = \"\" ]; 7 -> 8 [ color = \"grey\" fontcolor = \"green\" label = \"a !== undefined\" ]; 7 -> 9 [ color = \"green\" fontcolor = \"green\" label = \"!(a !== undefined)\" ]; 8 [ fillcolor = \"yellow\" label = \"console.log(a);\" ]; 8 -> 5 [ color = \"grey\" ]; 9 [ fillcolor = \"grey\" label = \"\" ]; 9 -> 5 [ color = \"green\" ]; 5 [ fillcolor = \"grey\" label = \"\" ]; }");
-		
-		this.runTest(new String[] {src, dst}, expectedSrcCFGs, expectedDstCFGs, Output.DOT);
+//	@Test
+//	public void testIf() throws Exception {
+//		
+//		String src = "./test/input/special_type_handling/sth_undefined_old.js";
+//		String dst = "./test/input/special_type_handling/sth_undefined_new.js";
+//		
+//		List<String> expectedSrcCFGs = new LinkedList<String>();
+//		expectedSrcCFGs.add("digraph control_flow_graph { node [ style = filled fillcolor = \"white\" ]; 0 [ fillcolor = \"grey\" label = \"script entry\" ]; 0 -> 2 [ color = \"grey\" ]; 2 [ fillcolor = \"grey\" label = \"var a;\" ]; 2 -> 3 [ color = \"grey\" ]; 3 [ fillcolor = \"yellow\" label = \"console.log(a);\" ]; 3 -> 1 [ color = \"grey\" ]; 1 [ fillcolor = \"grey\" label = \"\" ]; }");
+//		
+//		List<String> expectedDstCFGs = new LinkedList<String>();
+//		expectedDstCFGs.add("digraph control_flow_graph { node [ style = filled fillcolor = \"white\" ]; 4 [ fillcolor = \"grey\" label = \"script entry\" ]; 4 -> 6 [ color = \"grey\" ]; 6 [ fillcolor = \"grey\" label = \"var a;\" ]; 6 -> 7 [ color = \"grey\" ]; 7 [ fillcolor = \"grey\" label = \"\" ]; 7 -> 8 [ color = \"grey\" fontcolor = \"green\" label = \"a !== undefined\" ]; 7 -> 9 [ color = \"green\" fontcolor = \"green\" label = \"!(a !== undefined)\" ]; 8 [ fillcolor = \"yellow\" label = \"console.log(a);\" ]; 8 -> 5 [ color = \"grey\" ]; 9 [ fillcolor = \"grey\" label = \"\" ]; 9 -> 5 [ color = \"green\" ]; 5 [ fillcolor = \"grey\" label = \"\" ]; }");
+//		
+//		this.runTest(new String[] {src, dst}, expectedSrcCFGs, expectedDstCFGs, Output.DOT);
+//
+//	}
 
-	}
+//	@Test
+//	public void testReverseIf() throws Exception {
+//		
+//		String src = "./test/input/special_type_handling/sth_undefined_new.js";
+//		String dst = "./test/input/special_type_handling/sth_undefined_old.js";
+//
+//		List<String> expectedSrcCFGs = new LinkedList<String>();
+//		expectedSrcCFGs.add("digraph control_flow_graph { node [ style = filled fillcolor = \"white\" ]; 0 [ fillcolor = \"grey\" label = \"script entry\" ]; 0 -> 2 [ color = \"grey\" ]; 2 [ fillcolor = \"grey\" label = \"var a;\" ]; 2 -> 3 [ color = \"grey\" ]; 3 [ fillcolor = \"grey\" label = \"\" ]; 3 -> 4 [ color = \"grey\" fontcolor = \"red\" label = \"a !== undefined\" ]; 3 -> 5 [ color = \"red\" fontcolor = \"red\" label = \"!(a !== undefined)\" ]; 4 [ fillcolor = \"yellow\" label = \"console.log(a);\" ]; 4 -> 1 [ color = \"grey\" ]; 5 [ fillcolor = \"grey\" label = \"\" ]; 5 -> 1 [ color = \"red\" ]; 1 [ fillcolor = \"grey\" label = \"\" ]; }");
+//		
+//		List<String> expectedDstCFGs = new LinkedList<String>();
+//		expectedDstCFGs.add("digraph control_flow_graph { node [ style = filled fillcolor = \"white\" ]; 6 [ fillcolor = \"grey\" label = \"script entry\" ]; 6 -> 8 [ color = \"grey\" ]; 8 [ fillcolor = \"grey\" label = \"var a;\" ]; 8 -> 9 [ color = \"grey\" ]; 9 [ fillcolor = \"yellow\" label = \"console.log(a);\" ]; 9 -> 7 [ color = \"grey\" ]; 7 [ fillcolor = \"grey\" label = \"\" ]; }");
+//		
+//		this.runTest(new String[] {src, dst}, expectedSrcCFGs, expectedDstCFGs, Output.DOT);
+//
+//	}
 
-	@Test
-	public void testReverseIf() throws Exception {
-		
-		String src = "./test/input/special_type_handling/sth_undefined_new.js";
-		String dst = "./test/input/special_type_handling/sth_undefined_old.js";
-
-		List<String> expectedSrcCFGs = new LinkedList<String>();
-		expectedSrcCFGs.add("digraph control_flow_graph { node [ style = filled fillcolor = \"white\" ]; 0 [ fillcolor = \"grey\" label = \"script entry\" ]; 0 -> 2 [ color = \"grey\" ]; 2 [ fillcolor = \"grey\" label = \"var a;\" ]; 2 -> 3 [ color = \"grey\" ]; 3 [ fillcolor = \"grey\" label = \"\" ]; 3 -> 4 [ color = \"grey\" fontcolor = \"red\" label = \"a !== undefined\" ]; 3 -> 5 [ color = \"red\" fontcolor = \"red\" label = \"!(a !== undefined)\" ]; 4 [ fillcolor = \"yellow\" label = \"console.log(a);\" ]; 4 -> 1 [ color = \"grey\" ]; 5 [ fillcolor = \"grey\" label = \"\" ]; 5 -> 1 [ color = \"red\" ]; 1 [ fillcolor = \"grey\" label = \"\" ]; }");
-		
-		List<String> expectedDstCFGs = new LinkedList<String>();
-		expectedDstCFGs.add("digraph control_flow_graph { node [ style = filled fillcolor = \"white\" ]; 6 [ fillcolor = \"grey\" label = \"script entry\" ]; 6 -> 8 [ color = \"grey\" ]; 8 [ fillcolor = \"grey\" label = \"var a;\" ]; 8 -> 9 [ color = \"grey\" ]; 9 [ fillcolor = \"yellow\" label = \"console.log(a);\" ]; 9 -> 7 [ color = \"grey\" ]; 7 [ fillcolor = \"grey\" label = \"\" ]; }");
-		
-		this.runTest(new String[] {src, dst}, expectedSrcCFGs, expectedDstCFGs, Output.DOT);
-
-	}
-
-	@Test
-	public void testMultipleCFGs() throws Exception {
-		
-		String src = "./test/input/callback_parameter/cbp_old.js";
-		String dst = "./test/input/callback_parameter/cbp_new.js";
-
-		List<String> expectedSrcCFGs = new LinkedList<String>();
-		
-		expectedSrcCFGs.add("digraph control_flow_graph { node [ style = filled fillcolor = \"white\" ]; 0 [ fillcolor = \"grey\" label = \"script entry\" ]; 0 -> 2 [ color = \"grey\" ]; 2 [ fillcolor = \"grey\" label = \"printMessage(\\\"Hello World!\\\", donePrinting);\" ]; 2 -> 1 [ color = \"grey\" ]; 1 [ fillcolor = \"grey\" label = \"\" ]; }");
-		expectedSrcCFGs.add("digraph control_flow_graph { node [ style = filled fillcolor = \"white\" ]; 3 [ fillcolor = \"grey\" label = \"printMessage(message,callback)\" ]; 3 -> 5 [ color = \"grey\" ]; 5 [ fillcolor = \"grey\" label = \"console.log(message);\" ]; 5 -> 4 [ color = \"grey\" ]; 4 [ fillcolor = \"grey\" label = \"\" ]; }");
-		expectedSrcCFGs.add("digraph control_flow_graph { node [ style = filled fillcolor = \"white\" ]; 6 [ fillcolor = \"grey\" label = \"donePrinting()\" ]; 6 -> 8 [ color = \"grey\" ]; 8 [ fillcolor = \"yellow\" label = \"console.log(\\\"Finished!\\\");\" ]; 8 -> 7 [ color = \"grey\" ]; 7 [ fillcolor = \"grey\" label = \"\" ]; }");
-		
-		List<String> expectedDstCFGs = new LinkedList<String>();
-		
-		expectedDstCFGs.add("digraph control_flow_graph { node [ style = filled fillcolor = \"white\" ]; 9 [ fillcolor = \"grey\" label = \"script entry\" ]; 9 -> 11 [ color = \"grey\" ]; 11 [ fillcolor = \"grey\" label = \"printMessage(\\\"Hello World!\\\", donePrinting);\" ]; 11 -> 10 [ color = \"grey\" ]; 10 [ fillcolor = \"grey\" label = \"\" ]; }");
-		expectedDstCFGs.add("digraph control_flow_graph { node [ style = filled fillcolor = \"white\" ]; 12 [ fillcolor = \"grey\" label = \"printMessage(message,callback)\" ]; 12 -> 14 [ color = \"grey\" ]; 14 [ fillcolor = \"grey\" label = \"console.log(null, message);\" ]; 14 -> 13 [ color = \"grey\" ]; 13 [ fillcolor = \"grey\" label = \"\" ]; }");
-		expectedDstCFGs.add("digraph control_flow_graph { node [ style = filled fillcolor = \"white\" ]; 15 [ fillcolor = \"grey\" label = \"donePrinting(err)\" ]; 15 -> 17 [ color = \"grey\" ]; 17 [ fillcolor = \"grey\" label = \"\" ]; 17 -> 18 [ color = \"green\" fontcolor = \"green\" label = \"err\" ]; 17 -> 19 [ color = \"grey\" fontcolor = \"green\" label = \"!(err)\" ]; 18 [ fillcolor = \"green\" label = \"console.log(\\\"Error!\\\");\" ]; 18 -> 20 [ color = \"green\" ]; 19 [ fillcolor = \"grey\" label = \"\" ]; 19 -> 20 [ color = \"grey\" ]; 20 [ fillcolor = \"yellow\" label = \"console.log(\\\"Finished!\\\");\" ]; 20 -> 16 [ color = \"grey\" ]; 16 [ fillcolor = \"grey\" label = \"\" ]; }");
-		
-		this.runTest(new String[] {src, dst}, expectedSrcCFGs, expectedDstCFGs, Output.DOT);
-
-	}
+//	@Test
+//	public void testMultipleCFGs() throws Exception {
+//		
+//		String src = "./test/input/callback_parameter/cbp_old.js";
+//		String dst = "./test/input/callback_parameter/cbp_new.js";
+//
+//		List<String> expectedSrcCFGs = new LinkedList<String>();
+//		
+//		expectedSrcCFGs.add("digraph control_flow_graph { node [ style = filled fillcolor = \"white\" ]; 0 [ fillcolor = \"grey\" label = \"script entry\" ]; 0 -> 2 [ color = \"grey\" ]; 2 [ fillcolor = \"grey\" label = \"printMessage(\\\"Hello World!\\\", donePrinting);\" ]; 2 -> 1 [ color = \"grey\" ]; 1 [ fillcolor = \"grey\" label = \"\" ]; }");
+//		expectedSrcCFGs.add("digraph control_flow_graph { node [ style = filled fillcolor = \"white\" ]; 3 [ fillcolor = \"grey\" label = \"printMessage(message,callback)\" ]; 3 -> 5 [ color = \"grey\" ]; 5 [ fillcolor = \"grey\" label = \"console.log(message);\" ]; 5 -> 4 [ color = \"grey\" ]; 4 [ fillcolor = \"grey\" label = \"\" ]; }");
+//		expectedSrcCFGs.add("digraph control_flow_graph { node [ style = filled fillcolor = \"white\" ]; 6 [ fillcolor = \"grey\" label = \"donePrinting()\" ]; 6 -> 8 [ color = \"grey\" ]; 8 [ fillcolor = \"yellow\" label = \"console.log(\\\"Finished!\\\");\" ]; 8 -> 7 [ color = \"grey\" ]; 7 [ fillcolor = \"grey\" label = \"\" ]; }");
+//		
+//		List<String> expectedDstCFGs = new LinkedList<String>();
+//		
+//		expectedDstCFGs.add("digraph control_flow_graph { node [ style = filled fillcolor = \"white\" ]; 9 [ fillcolor = \"grey\" label = \"script entry\" ]; 9 -> 11 [ color = \"grey\" ]; 11 [ fillcolor = \"grey\" label = \"printMessage(\\\"Hello World!\\\", donePrinting);\" ]; 11 -> 10 [ color = \"grey\" ]; 10 [ fillcolor = \"grey\" label = \"\" ]; }");
+//		expectedDstCFGs.add("digraph control_flow_graph { node [ style = filled fillcolor = \"white\" ]; 12 [ fillcolor = \"grey\" label = \"printMessage(message,callback)\" ]; 12 -> 14 [ color = \"grey\" ]; 14 [ fillcolor = \"grey\" label = \"console.log(null, message);\" ]; 14 -> 13 [ color = \"grey\" ]; 13 [ fillcolor = \"grey\" label = \"\" ]; }");
+//		expectedDstCFGs.add("digraph control_flow_graph { node [ style = filled fillcolor = \"white\" ]; 15 [ fillcolor = \"grey\" label = \"donePrinting(err)\" ]; 15 -> 17 [ color = \"grey\" ]; 17 [ fillcolor = \"grey\" label = \"\" ]; 17 -> 18 [ color = \"green\" fontcolor = \"green\" label = \"err\" ]; 17 -> 19 [ color = \"grey\" fontcolor = \"green\" label = \"!(err)\" ]; 18 [ fillcolor = \"green\" label = \"console.log(\\\"Error!\\\");\" ]; 18 -> 20 [ color = \"green\" ]; 19 [ fillcolor = \"grey\" label = \"\" ]; 19 -> 20 [ color = \"grey\" ]; 20 [ fillcolor = \"yellow\" label = \"console.log(\\\"Finished!\\\");\" ]; 20 -> 16 [ color = \"grey\" ]; 16 [ fillcolor = \"grey\" label = \"\" ]; }");
+//		
+//		this.runTest(new String[] {src, dst}, expectedSrcCFGs, expectedDstCFGs, Output.DOT);
+//
+//	}
 
 	/**
 	 * Too complex to add expected CFGs. We are using it to debug exceptions.

@@ -19,23 +19,24 @@ import ca.ubc.ece.salt.pangor.learning.apis.KeywordDefinition;
 import ca.ubc.ece.salt.pangor.learning.apis.KeywordDefinition.KeywordType;
 
 public class TestAPI {
-	@Test
-	public void testGetPackageNameWhenHasAPackage() {
-		AbstractAPI api = APIFactory.buildTopLevelAPI();
 
-		KeywordDefinition keyword = api.getFirstKeyword(KeywordType.FIELD, "bytesWritten");
-		assertEquals("WriteStream", keyword.api.getName());
-		assertEquals("fs", keyword.getPackageName());
-	}
+//	@Test
+//	public void testGetPackageNameWhenHasAPackage() {
+//		AbstractAPI api = APIFactory.buildTopLevelAPI();
+//
+//		KeywordDefinition keyword = api.getFirstKeyword(KeywordType.FIELD, "bytesWritten");
+//		assertEquals("WriteStream", keyword.api.getName());
+//		assertEquals("fs", keyword.getPackageName());
+//	}
 
-	@Test
-	public void testGetPackageNameWhenIsAPackage() {
-		AbstractAPI api = APIFactory.buildTopLevelAPI();
-
-		KeywordDefinition keyword = api.getFirstKeyword(KeywordType.PACKAGE, "fs");
-		assertEquals("fs", keyword.api.getName());
-		assertEquals("fs", keyword.getPackageName());
-	}
+//	@Test
+//	public void testGetPackageNameWhenIsAPackage() {
+//		AbstractAPI api = APIFactory.buildTopLevelAPI();
+//
+//		KeywordDefinition keyword = api.getFirstKeyword(KeywordType.PACKAGE, "fs");
+//		assertEquals("fs", keyword.api.getName());
+//		assertEquals("fs", keyword.getPackageName());
+//	}
 
 	@Test
 	public void testGetPackageNameWhenIsReservedKeyword() {
@@ -46,20 +47,20 @@ public class TestAPI {
 		assertEquals("global", keyword.getPackageName());
 	}
 
-	@Test
-	public void testGetPackageNameWhenIsAClassOfAPackage() {
-		AbstractAPI api = APIFactory.buildTopLevelAPI();
-
-		KeywordDefinition keyword = api.getFirstKeyword(KeywordType.CLASS, "WriteStream");
-
-		/*
-		 * It seems strange that WriteStream api's is WriteStream. However, the
-		 * logic is: the WriteStream keyword points to the WriteStream ClassAPI,
-		 * which makes sense, as the keyword is stored within the ClassAPI class
-		 */
-		assertEquals("WriteStream", keyword.api.getName());
-		assertEquals("fs", keyword.getPackageName());
-	}
+//	@Test
+//	public void testGetPackageNameWhenIsAClassOfAPackage() {
+//		AbstractAPI api = APIFactory.buildTopLevelAPI();
+//
+//		KeywordDefinition keyword = api.getFirstKeyword(KeywordType.CLASS, "WriteStream");
+//
+//		/*
+//		 * It seems strange that WriteStream api's is WriteStream. However, the
+//		 * logic is: the WriteStream keyword points to the WriteStream ClassAPI,
+//		 * which makes sense, as the keyword is stored within the ClassAPI class
+//		 */
+//		assertEquals("WriteStream", keyword.api.getName());
+//		assertEquals("fs", keyword.getPackageName());
+//	}
 
 	@Test
 	public void testGetPackageNameWhenIsGlobal() {
@@ -91,22 +92,22 @@ public class TestAPI {
 		assertNull(api.getFirstKeyword(KeywordType.CLASS, "Bar"));
 	}
 
-	@Test
-	public void testGetAllKeywordsWhenIsMemberOnDifferentAPIs() {
-		AbstractAPI api = APIFactory.buildTopLevelAPI();
-
-		List<KeywordDefinition> keywordsList = api.getAllKeywords(new KeywordDefinition(KeywordType.EVENT, "open"));
-		List<String> APIsNames = extractAPIsFromKeywordList(keywordsList);
-
-		/*
-		 * 'open' event is member of ReadStream and WriteStream class, but not
-		 * of Math
-		 */
-		assertEquals(2, keywordsList.size());
-		assertTrue(APIsNames.contains("WriteStream"));
-		assertTrue(APIsNames.contains("ReadStream"));
-		assertFalse(APIsNames.contains("Math"));
-	}
+//	@Test
+//	public void testGetAllKeywordsWhenIsMemberOnDifferentAPIs() {
+//		AbstractAPI api = APIFactory.buildTopLevelAPI();
+//
+//		List<KeywordDefinition> keywordsList = api.getAllKeywords(new KeywordDefinition(KeywordType.EVENT, "open"));
+//		List<String> APIsNames = extractAPIsFromKeywordList(keywordsList);
+//
+//		/*
+//		 * 'open' event is member of ReadStream and WriteStream class, but not
+//		 * of Math
+//		 */
+//		assertEquals(2, keywordsList.size());
+//		assertTrue(APIsNames.contains("WriteStream"));
+//		assertTrue(APIsNames.contains("ReadStream"));
+//		assertFalse(APIsNames.contains("Math"));
+//	}
 
 	@Test
 	public void testGetAllKeywordsWhenIsNotMember() {

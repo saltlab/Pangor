@@ -24,22 +24,22 @@ public class TestPointsToPrediction {
 	 *
 	 * Expected result: 'Date' (because path was not imported)
 	 */
-	@Test
-	public void testGetKeywordWhenAmbiguousOnPathButPathIsNotImported() {
-		Map<KeywordUse, Integer> keywords = new HashMap<>();
-		keywords.put(new KeywordUse(KeywordType.METHOD, KeywordContext.UNKNOWN, "parse", ChangeType.INSERTED), 1);
-		keywords.put(new KeywordUse(KeywordType.METHOD, KeywordContext.UNKNOWN, "normalize", ChangeType.REMOVED), 1);
-		keywords.put(new KeywordUse(KeywordType.METHOD, KeywordContext.UNKNOWN, "posix", ChangeType.UPDATED), 1);
-
-		TopLevelAPI api = APIFactory.buildTopLevelAPI();
-		PointsToPrediction predictor = new PointsToPrediction(api, keywords);
-
-		KeywordUse keyword = predictor.getKeyword(KeywordType.METHOD, "parse");
-
-		assertNotNull(keyword);
-		assertEquals("Date", keyword.api.getName());
-		assertEquals("global", keyword.getPackageName());
-	}
+//	@Test
+//	public void testGetKeywordWhenAmbiguousOnPathButPathIsNotImported() {
+//		Map<KeywordUse, Integer> keywords = new HashMap<>();
+//		keywords.put(new KeywordUse(KeywordType.METHOD, KeywordContext.UNKNOWN, "parse", ChangeType.INSERTED), 1);
+//		keywords.put(new KeywordUse(KeywordType.METHOD, KeywordContext.UNKNOWN, "normalize", ChangeType.REMOVED), 1);
+//		keywords.put(new KeywordUse(KeywordType.METHOD, KeywordContext.UNKNOWN, "posix", ChangeType.UPDATED), 1);
+//
+//		TopLevelAPI api = APIFactory.buildTopLevelAPI();
+//		PointsToPrediction predictor = new PointsToPrediction(api, keywords);
+//
+//		KeywordUse keyword = predictor.getKeyword(KeywordType.METHOD, "parse");
+//
+//		assertNotNull(keyword);
+//		assertEquals("Date", keyword.api.getName());
+//		assertEquals("global", keyword.getPackageName());
+//	}
 
 	/*
 	 * 'parse' is present on both 'path' and 'Date' APIs 'normalize' and 'posix'
@@ -47,23 +47,23 @@ public class TestPointsToPrediction {
 	 *
 	 * Expected result: 'path'
 	 */
-	@Test
-	public void testGetKeywordWhenAmbiguousOnPath() {
-		Map<KeywordUse, Integer> keywords = new HashMap<>();
-		keywords.put(new KeywordUse(KeywordType.METHOD, KeywordContext.UNKNOWN, "parse", ChangeType.INSERTED), 1);
-		keywords.put(new KeywordUse(KeywordType.PACKAGE, KeywordContext.UNKNOWN, "path", ChangeType.INSERTED), 1);
-		keywords.put(new KeywordUse(KeywordType.METHOD, KeywordContext.UNKNOWN, "normalize", ChangeType.REMOVED), 1);
-		keywords.put(new KeywordUse(KeywordType.METHOD, KeywordContext.UNKNOWN, "posix", ChangeType.UPDATED), 1);
-
-		TopLevelAPI api = APIFactory.buildTopLevelAPI();
-		PointsToPrediction predictor = new PointsToPrediction(api, keywords);
-
-		KeywordUse keyword = predictor.getKeyword(KeywordType.METHOD, "parse");
-
-		assertNotNull(keyword);
-		assertEquals("path", keyword.api.getName());
-		assertEquals("path", keyword.getPackageName());
-	}
+//	@Test
+//	public void testGetKeywordWhenAmbiguousOnPath() {
+//		Map<KeywordUse, Integer> keywords = new HashMap<>();
+//		keywords.put(new KeywordUse(KeywordType.METHOD, KeywordContext.UNKNOWN, "parse", ChangeType.INSERTED), 1);
+//		keywords.put(new KeywordUse(KeywordType.PACKAGE, KeywordContext.UNKNOWN, "path", ChangeType.INSERTED), 1);
+//		keywords.put(new KeywordUse(KeywordType.METHOD, KeywordContext.UNKNOWN, "normalize", ChangeType.REMOVED), 1);
+//		keywords.put(new KeywordUse(KeywordType.METHOD, KeywordContext.UNKNOWN, "posix", ChangeType.UPDATED), 1);
+//
+//		TopLevelAPI api = APIFactory.buildTopLevelAPI();
+//		PointsToPrediction predictor = new PointsToPrediction(api, keywords);
+//
+//		KeywordUse keyword = predictor.getKeyword(KeywordType.METHOD, "parse");
+//
+//		assertNotNull(keyword);
+//		assertEquals("path", keyword.api.getName());
+//		assertEquals("path", keyword.getPackageName());
+//	}
 
 	/*
 	 * 'parse' is present on both 'path' and 'Date' APIs 'getMinutes' and
@@ -93,20 +93,20 @@ public class TestPointsToPrediction {
 	/*
 	 * 'win32' is present only on 'path' API AND relevant packages are imported
 	 */
-	@Test
-	public void testGetKeywordWhenNotAmbiguous() {
-		Map<KeywordUse, Integer> keywords = new HashMap<>();
-		keywords.put(new KeywordUse(KeywordType.FIELD, KeywordContext.UNKNOWN, "win32", ChangeType.INSERTED), 1);
-		keywords.put(new KeywordUse(KeywordType.PACKAGE, KeywordContext.UNKNOWN, "path", ChangeType.INSERTED), 1);
-
-		TopLevelAPI api = APIFactory.buildTopLevelAPI();
-		PointsToPrediction predictor = new PointsToPrediction(api, keywords);
-
-		KeywordUse keyword = predictor.getKeyword(KeywordType.FIELD, "win32");
-
-		assertNotNull(keyword);
-		assertEquals("path", keyword.api.getName());
-	}
+//	@Test
+//	public void testGetKeywordWhenNotAmbiguous() {
+//		Map<KeywordUse, Integer> keywords = new HashMap<>();
+//		keywords.put(new KeywordUse(KeywordType.FIELD, KeywordContext.UNKNOWN, "win32", ChangeType.INSERTED), 1);
+//		keywords.put(new KeywordUse(KeywordType.PACKAGE, KeywordContext.UNKNOWN, "path", ChangeType.INSERTED), 1);
+//
+//		TopLevelAPI api = APIFactory.buildTopLevelAPI();
+//		PointsToPrediction predictor = new PointsToPrediction(api, keywords);
+//
+//		KeywordUse keyword = predictor.getKeyword(KeywordType.FIELD, "win32");
+//
+//		assertNotNull(keyword);
+//		assertEquals("path", keyword.api.getName());
+//	}
 
 	/*
 	 * 'win32' is present only on 'path' API BUT package is not imported
