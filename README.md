@@ -50,7 +50,7 @@ Usage: DataSetMain  [-a (--arff-path) VAL] [-c (--clusters)] [-ds (--dataset) VA
 
 ## Static Change Analysis ##
 
-The static change analysis component also has two parts. The first builds a data set of bug pattern instance alerts. The second filters out duplicates from the data set and computes metrics (i.e., counts each type of alert).
+The static change analysis component provides a framework for building static analysis 'checkers' that investigate changes between two versions of source code. For our study we look for instances of bug repairs, but there are many other uses for the framework. The static change analysis component has two main programs. The first builds a data set of bug pattern instance alerts. The second filters out duplicates from the data set and computes metrics (i.e., counts each type of alert).
 
 ### Analysis ###
 
