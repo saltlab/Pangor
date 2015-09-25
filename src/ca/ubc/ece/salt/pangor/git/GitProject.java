@@ -237,12 +237,6 @@ public class GitProject {
 	 * Extracts revision identifier pairs from bug fixing commits. The pair
 	 * includes the bug fixing commit and the previous (buggy) commit.
 	 *
-	 * TODO:
-	 * This method is also the main method for calculating metrics. Ideally we
-	 * would have different methods for metrics and for returning the bug fixing
-	 * commit pairs, but we would have to iterate over all commits twice, so for
-	 * now, everything is done on this method.
-	 *
 	 * @param git The project git instance.
 	 * @param repository The project git repository.
 	 * @param buggyRevision The hash that identifies the buggy revision.
