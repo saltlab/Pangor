@@ -13,9 +13,8 @@ import ca.ubc.ece.salt.pangor.classify.alert.PromisesAlert;
 public class PromisesAnalysis extends MetaAnalysis<ClassifierAlert, ClassifierDataSet, PromisesSourceAnalysis, PromisesDestinationAnalysis> {
 
 	public PromisesAnalysis(ClassifierDataSet dataSet,
-			AnalysisMetaInformation ami, PromisesSourceAnalysis srcAnalysis,
-			PromisesDestinationAnalysis dstAnalysis) {
-		super(dataSet, ami, srcAnalysis, dstAnalysis);
+			AnalysisMetaInformation ami) {
+		super(dataSet, ami, new PromisesSourceAnalysis(dataSet, ami), new PromisesDestinationAnalysis(dataSet, ami));
 	}
 
 	@Override
