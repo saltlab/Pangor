@@ -6,6 +6,8 @@ test/output/
 .DS_Store
 *.swp
 *.log
+.classpath
+.project
 output/
 /target/
 dependencies/

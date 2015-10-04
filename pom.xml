@@ -1,11 +1,62 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>ca.ubc.ece.salt</groupId>
-	<artifactId>sdjsb</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
 
-	<build>
+	<groupId>ca.ubc.ece.salt</groupId>
+	<artifactId>pangor</artifactId>
+	<version>0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>Pangor parent POM</name>
+	<description>
+		Pangor is a software repository mining framework that provides tools for
+		deep static analysis of source code and source code changes. More 
+		specifically, Pangor (1) automates the collection of source code artifacts
+		from Git repositories, (2) provides a framework for building custom static 
+		analyses (including AST, flow and differential) and (3) provides a framework
+		for building and analysing datasets of static analysis results.
+	</description>
+	<url>https://github.com/saltlab/Pangor</url>
+	<inceptionYear>2015</inceptionYear>
+
+	<prerequisites>
+		<maven>3.1.0</maven>
+	</prerequisites>
+
+	<properties>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+	</properties>
+
+	<scm>
+		<connection>scm:git:git@github.com:saltlab/pangor.git</connection>
+		<developerConnection>scm:git:git@github.com:saltlab/pangor.git</developerConnection>
+		<url>https://github.com/saltlab/Pangor</url>
+		<tag>HEAD</tag>
+	</scm>
+
+	<issueManagement>
+		<system>GitHub</system>
+		<url>https://github.com/saltlab/Panor/issues</url>
+	</issueManagement>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<modules>
+		<module>core</module>
+		<!--<module>js</module>-->
+	</modules>
+			
+
+	<!--<build>
 		<sourceDirectory>src</sourceDirectory>
 		<testSourceDirectory>test/src</testSourceDirectory>
 		<plugins>
@@ -18,7 +69,8 @@
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>
+	</build>-->
+
 	<repositories>
 		<repository>
 			<id>pangor</id>
@@ -31,17 +83,10 @@
 			<url>http://se.labri.fr/maven/</url>
 		</repository>
 	</repositories>
+
 	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.11</version>
-		</dependency>
-		<dependency>
-			<groupId>org.kohsuke</groupId>
-			<artifactId>github-api</artifactId>
-			<version>1.69</version>
-		</dependency>
+
+		<!-- Logging -->
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-api</artifactId>
@@ -53,6 +98,31 @@
 			<version>2.3</version>
 		</dependency>
 		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.7.10</version>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>log4j-over-slf4j</artifactId>
+			<version>1.7.10</version>
+		</dependency>
+
+		<!-- Test dependencies -->
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+		</dependency>
+
+		<!-- Argument parsing -->
+
+		<dependency>
+			<groupId>org.kohsuke</groupId>
+			<artifactId>github-api</artifactId>
+			<version>1.69</version>
+		</dependency>
+		<dependency>
 			<groupId>args4j</groupId>
 			<artifactId>args4j</artifactId>
 			<version>2.0.23</version>
@@ -62,25 +132,13 @@
 			<artifactId>args4j-tools</artifactId>
 			<version>2.0.23</version>
 		</dependency>
+
+		<!-- Libraries -->
+
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.3.2</version>
-		</dependency>
-		<dependency>
-			<groupId>com.jcraft</groupId>
-			<artifactId>jsch</artifactId>
-			<version>0.1.51</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>slf4j-api</artifactId>
-			<version>1.7.10</version>
-		</dependency>
-		<dependency>
-			<groupId>org.slf4j</groupId>
-			<artifactId>log4j-over-slf4j</artifactId>
-			<version>1.7.10</version>
 		</dependency>
 		<dependency>
 			<groupId>trove</groupId>
@@ -92,11 +150,23 @@
 			<artifactId>trove4j</artifactId>
 			<version>3.0.3</version>
 		</dependency>
+
+		<!-- JGit -->
+
 		<dependency>
 			<groupId>org.eclipse.jgit</groupId>
 			<artifactId>org.eclipse.jgit</artifactId>
 			<version>3.7.0.201502260915-r</version>
 		</dependency>
+		<dependency>
+			<groupId>com.jcraft</groupId>
+			<artifactId>jsch</artifactId>
+			<version>0.1.51</version>
+		</dependency>
+
+
+		<!-- Machine learning -->
+
 		<dependency>
 			<groupId>nz.ac.waikato.cms.weka</groupId>
 			<artifactId>weka-dev</artifactId>
@@ -107,6 +177,9 @@
 			<artifactId>utils</artifactId>
 			<version>1.0-20130410.213900-5</version>
 		</dependency>
+
+		<!-- Pangor specific forks -->
+
 		<dependency>
 			<groupId>ca.ubc.ece.salt.pangor</groupId>
 			<artifactId>optics_dbscan</artifactId>
@@ -122,5 +195,28 @@
 			<artifactId>gumtree</artifactId>
 			<version>1.0.0</version>
 		</dependency>
+
 	</dependencies>
+
+	<developers>
+		<developer>
+			<id>qhanam</id>
+			<name>Quinn Hanam</name>
+			<email>qhanam@ece.ubc.ca</email>
+			<url>http://ece.ubc.ca/~qhanam/</url>	
+			<organization>SALTLab, UBC</organization>
+			<organizationUrl>http://salt.ece.ubc.ca</organizationUrl>
+			<timezone>-8</timezone>
+		</developer>
+		<developer>
+			<id>fbrito</id>
+			<name>Fernando Brito</name>
+			<email>email@fernandobrito.com</email>
+			<url>http://fernandobrito.com</url>	
+			<organization>UFPB</organization>
+			<organizationUrl>http://www.ufpb.br/</organizationUrl>
+			<timezone>-3</timezone>
+		</developer>
+	</developers>
+
 </project>
