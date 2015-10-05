@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+	<Properties>
+		<Property name="LOG_PATH">output/logs/${date:yyyy-MM-dd-HH:mm}</Property>
+		<Property name="PATTERN">%d %-5level [%t] %C{2}:%M(%L) - %m%n</Property>
+		
+		<!-- %d{yyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n -->
+		<!-- %d %-5level [%t] %C{2}:%M(%L) (%F:%L) - %m%n -->
+       	<!-- %d %-5p [%t] %C{2} (%F:%L) - %m%n -->
+	</Properties>
+
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${PATTERN}"/>
+        </Console>
+        
+        <File name="infoFile" fileName="${LOG_PATH}/info.log" append="false">
+            <PatternLayout pattern="${PATTERN}"/>
+        </File>
+        
+        <File name="errorFile" fileName="${LOG_PATH}/error.log" append="false">
+        	<PatternLayout pattern="${PATTERN}"/>
+        </File>
+        
+        <File name="debugFile" fileName="${LOG_PATH}/debug.log" append="false">
+        	<PatternLayout pattern="${PATTERN}"/>
+        </File>
+        
+        <File name="allFile" fileName="${LOG_PATH}/all.log" append="false">
+        	<PatternLayout pattern="${PATTERN}"/>
+        </File>
+        
+    </Appenders>
+    
+    <Loggers>    
+        <Logger name="ca.ubc.ece.salt.sdjsb" level="ALL" additivity="true">
+        	<AppenderRef ref="console" level="INFO" />
+       		<AppenderRef ref="infoFile" level="INFO" />
+            
+        	<AppenderRef ref="errorFile" level="ERROR" />
+       		<AppenderRef ref="debugFile" level="DEBUG" />
+		</Logger>      
+		
+		<!--  Log everything to file -->
+        <Root level="ALL">
+        	<AppenderRef ref="allFile"/>
+        </Root>
+    </Loggers>
+</Configuration>
