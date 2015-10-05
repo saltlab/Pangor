@@ -9,5 +9,5 @@ test/output/
 .classpath
 .project
 output/
-/target/
+target/
 dependencies/

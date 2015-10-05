@@ -30,4 +30,12 @@
 		</plugins>
 	</build>
 
+	<dependencies>
+		<dependency>
+			<groupId>ca.ubc.ece.salt</groupId>
+			<artifactId>pangor-core</artifactId>
+			<version>0.1-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+
 </project>
