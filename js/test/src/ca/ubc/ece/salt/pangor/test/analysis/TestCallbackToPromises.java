@@ -3,7 +3,6 @@ package ca.ubc.ece.salt.pangor.test.analysis;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
@@ -12,7 +11,6 @@ import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
 import ca.ubc.ece.salt.pangor.classify.alert.PromisesAlert;
 
-@Ignore("Not ready yet.")
 public class TestCallbackToPromises extends TestAnalysis {
 
 	private final AnalysisMetaInformation AMI = new AnalysisMetaInformation(0, 0, "test", "homepage", "src file", "dst file", "src commit", "dst commit", "src code", "dst code");

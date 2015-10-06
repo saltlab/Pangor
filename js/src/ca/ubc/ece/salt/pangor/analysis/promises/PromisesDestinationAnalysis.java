@@ -2,11 +2,14 @@ package ca.ubc.ece.salt.pangor.analysis.promises;
 
 import java.util.List;
 
+import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.FunctionNode;
+import org.mozilla.javascript.ast.NewExpression;
 import org.mozilla.javascript.ast.NodeVisitor;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.analysis.scope.ScopeAnalysis;
@@ -22,6 +25,7 @@ public class PromisesDestinationAnalysis extends ScopeAnalysis<ClassifierAlert, 
 	public PromisesDestinationAnalysis(ClassifierDataSet dataSet,
 			AnalysisMetaInformation ami) {
 		super(dataSet, ami);
+		this.meetsPostConditions = false;
 	}
 
 	/**
@@ -36,6 +40,7 @@ public class PromisesDestinationAnalysis extends ScopeAnalysis<ClassifierAlert, 
 		super.analyze(root, cfgs);
 
 		/* Look at each function. */
+		this.inspectFunctions(this.dstScope);
 	}
 
 	@Override
@@ -43,6 +48,7 @@ public class PromisesDestinationAnalysis extends ScopeAnalysis<ClassifierAlert, 
 		super.analyze(srcRoot, srcCFGs, dstRoot, dstCFGs);
 
 		/* Look at each function. */
+		this.inspectFunctions(this.dstScope);
 	}
 
 	/**
@@ -53,9 +59,9 @@ public class PromisesDestinationAnalysis extends ScopeAnalysis<ClassifierAlert, 
 		/* Visit the function and look for REF_PROM patterns. */
 		if (scope.scope instanceof FunctionNode) {
 			FunctionNode function = (FunctionNode) scope.scope;
-			this.meetsPostConditions = meetsPostConditions(function);
+			if(meetsPostConditions(function)) this.meetsPostConditions = true;
 		} else {
-			this.meetsPostConditions = meetsPostConditions(scope.scope);
+			if(meetsPostConditions(scope.scope)) this.meetsPostConditions = true;
 		}
 
 		for (Scope child : scope.children) {
@@ -90,9 +96,17 @@ public class PromisesDestinationAnalysis extends ScopeAnalysis<ClassifierAlert, 
 		}
 
 		@Override
-		public boolean visit(AstNode arg0) {
-			// TODO
-			return false;
+		public boolean visit(AstNode node) {
+
+			/* Look for inserted 'new Promise' expressions. */
+			if(node.getType() == Token.NEW && node.getChangeType() == ChangeType.INSERTED) {
+				NewExpression ne = (NewExpression)node;
+				if(ne.getTarget().getType() == Token.NAME && ne.getTarget().toSource().equals("Promise")) {
+					this.meetsPostConditions = true;
+				}
+			}
+
+			return true;
 		}
 
 	}

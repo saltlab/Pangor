@@ -2,9 +2,11 @@ package ca.ubc.ece.salt.pangor.analysis.promises;
 
 import java.util.List;
 
+import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.FunctionNode;
+import org.mozilla.javascript.ast.NewExpression;
 import org.mozilla.javascript.ast.NodeVisitor;
 
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
@@ -22,6 +24,7 @@ public class PromisesSourceAnalysis extends ScopeAnalysis<ClassifierAlert, Class
 	public PromisesSourceAnalysis(ClassifierDataSet dataSet,
 			AnalysisMetaInformation ami) {
 		super(dataSet, ami);
+		this.meetsPreConditions = true;
 	}
 
 	/**
@@ -36,6 +39,7 @@ public class PromisesSourceAnalysis extends ScopeAnalysis<ClassifierAlert, Class
 		super.analyze(root, cfgs);
 
 		/* Look at each function. */
+		this.inspectFunctions(this.dstScope);
 	}
 
 	@Override
@@ -43,6 +47,7 @@ public class PromisesSourceAnalysis extends ScopeAnalysis<ClassifierAlert, Class
 		super.analyze(srcRoot, srcCFGs, dstRoot, dstCFGs);
 
 		/* Look at each function. */
+		this.inspectFunctions(this.dstScope);
 	}
 
 	/**
@@ -53,9 +58,9 @@ public class PromisesSourceAnalysis extends ScopeAnalysis<ClassifierAlert, Class
 		/* Visit the function and look for REF_PROM patterns. */
 		if (scope.scope instanceof FunctionNode) {
 			FunctionNode function = (FunctionNode) scope.scope;
-			this.meetsPreConditions = meetsPreConditions(function);
+			if(!meetsPreConditions(function)) this.meetsPreConditions = false;
 		} else {
-			this.meetsPreConditions = meetsPreConditions(scope.scope);
+			if(!meetsPreConditions(scope.scope)) this.meetsPreConditions = false;
 		}
 
 		for (Scope child : scope.children) {
@@ -86,13 +91,21 @@ public class PromisesSourceAnalysis extends ScopeAnalysis<ClassifierAlert, Class
 		public boolean meetsPreConditions;
 
 		public PromisesDestinationVisitor() {
-			this.meetsPreConditions = false;
+			this.meetsPreConditions = true;
 		}
 
 		@Override
-		public boolean visit(AstNode arg0) {
-			// TODO
-			return false;
+		public boolean visit(AstNode node) {
+
+			/* Look for a 'new Promise' expression. */
+			if(node.getType() == Token.NEW) {
+				NewExpression ne = (NewExpression)node;
+				if(ne.getTarget().getType() == Token.NAME && ne.toSource().equals("Promise")) {
+					this.meetsPreConditions = false;
+				}
+			}
+
+			return true;
 		}
 
 	}
