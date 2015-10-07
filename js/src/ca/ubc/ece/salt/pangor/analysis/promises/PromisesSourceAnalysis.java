@@ -76,9 +76,9 @@ public class PromisesSourceAnalysis extends ScopeAnalysis<ClassifierAlert, Class
 	 * @return True if this function meets the pre-conditions for a
 	 * 		   callback to promise refactoring.
 	 */
-	private boolean meetsPreConditions(AstNode body) {
-		PromisesDestinationVisitor visitor = new PromisesDestinationVisitor();
-		body.visit(visitor);
+	private boolean meetsPreConditions(AstNode function) {
+		PromisesDestinationVisitor visitor = new PromisesDestinationVisitor(function);
+		function.visit(visitor);
 		return visitor.meetsPreConditions;
 	}
 
@@ -89,9 +89,11 @@ public class PromisesSourceAnalysis extends ScopeAnalysis<ClassifierAlert, Class
 	private class PromisesDestinationVisitor implements NodeVisitor {
 
 		public boolean meetsPreConditions;
+		private AstNode function;
 
-		public PromisesDestinationVisitor() {
+		public PromisesDestinationVisitor(AstNode function) {
 			this.meetsPreConditions = true;
+			this.function = function;
 		}
 
 		@Override
@@ -103,6 +105,9 @@ public class PromisesSourceAnalysis extends ScopeAnalysis<ClassifierAlert, Class
 				if(ne.getTarget().getType() == Token.NAME && ne.toSource().equals("Promise")) {
 					this.meetsPreConditions = false;
 				}
+			}
+			else if(node.getType() == Token.FUNCTION && node != this.function) {
+				return false;
 			}
 
 			return true;

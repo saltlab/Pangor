@@ -30,4 +30,13 @@ public class TestCallbackToPromises extends TestAnalysis {
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 
+	@Test
+	public void testNewFunction() throws Exception{
+		String src = "./test/input/promises/new.js";
+		String dst = "./test/input/promises/new-human.js";
+		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
+		//expectedAlerts.add(new PromisesAlert(AMI, "UNKNOWN", "REF", "PROM"));
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
 }

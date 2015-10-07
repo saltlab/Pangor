@@ -59,7 +59,7 @@ public class PromisesDestinationAnalysis extends ScopeAnalysis<ClassifierAlert, 
 		/* Visit the function and look for REF_PROM patterns. */
 		if (scope.scope instanceof FunctionNode) {
 			FunctionNode function = (FunctionNode) scope.scope;
-			if(meetsPostConditions(function)) this.meetsPostConditions = true;
+			if(function.getChangeType() != ChangeType.INSERTED && meetsPostConditions(function)) this.meetsPostConditions = true;
 		} else {
 			if(meetsPostConditions(scope.scope)) this.meetsPostConditions = true;
 		}
@@ -77,9 +77,9 @@ public class PromisesDestinationAnalysis extends ScopeAnalysis<ClassifierAlert, 
 	 * @return True if this function meets the pre-conditions for a
 	 * 		   callback to promise refactoring.
 	 */
-	private boolean meetsPostConditions(AstNode body) {
-		PromisesDestinationVisitor visitor = new PromisesDestinationVisitor();
-		body.visit(visitor);
+	private boolean meetsPostConditions(AstNode function) {
+		PromisesDestinationVisitor visitor = new PromisesDestinationVisitor(function);
+		function.visit(visitor);
 		return visitor.meetsPostConditions;
 	}
 
@@ -90,9 +90,11 @@ public class PromisesDestinationAnalysis extends ScopeAnalysis<ClassifierAlert, 
 	private class PromisesDestinationVisitor implements NodeVisitor {
 
 		public boolean meetsPostConditions;
+		private AstNode function;
 
-		public PromisesDestinationVisitor() {
+		public PromisesDestinationVisitor(AstNode function) {
 			this.meetsPostConditions = false;
+			this.function = function;
 		}
 
 		@Override
@@ -104,6 +106,9 @@ public class PromisesDestinationAnalysis extends ScopeAnalysis<ClassifierAlert, 
 				if(ne.getTarget().getType() == Token.NAME && ne.getTarget().toSource().equals("Promise")) {
 					this.meetsPostConditions = true;
 				}
+			}
+			else if(node.getType() == Token.FUNCTION && node != this.function) {
+				return false;
 			}
 
 			return true;
