@@ -4,7 +4,7 @@ import org.kohsuke.args4j.Option;
 
 public class ClassifyAnalysisOptions {
 
-	@Option(name="-u", aliases={"--uri"}, usage="The uri of the public repository (e.g., https://github.com/qhanam/JSRepairClass.git).")
+	@Option(name="-u", aliases={"--uri"}, usage="The uri of the public repository (e.g., https://github.com/Unitech/pm2).")
 	private String host = null;
 
 	@Option(name="-h", aliases={"--help"}, usage="Display the help file.")

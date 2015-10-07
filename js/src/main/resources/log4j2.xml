@@ -33,7 +33,7 @@
     </Appenders>
     
     <Loggers>    
-        <Logger name="ca.ubc.ece.salt.sdjsb" level="ALL" additivity="true">
+        <Logger name="ca.ubc.ece.salt.pangor" level="ALL" additivity="true">
         	<AppenderRef ref="console" level="INFO" />
        		<AppenderRef ref="infoFile" level="INFO" />
             

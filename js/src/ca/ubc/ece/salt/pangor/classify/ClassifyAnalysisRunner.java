@@ -1,9 +1,7 @@
 package ca.ubc.ece.salt.pangor.classify;
 
-import ca.ubc.ece.salt.pangor.analysis.callbackparam.CallbackParamAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
-import ca.ubc.ece.salt.pangor.analysis.globaltolocal.GlobalToLocalAnalysis;
-import ca.ubc.ece.salt.pangor.analysis.thistothat.ThisToThatAnalysis;
+import ca.ubc.ece.salt.pangor.analysis.promises.PromisesAnalysis;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.batch.AnalysisRunner;
 import ca.ubc.ece.salt.pangor.cfd.ControlFlowDifferencing;
@@ -49,14 +47,17 @@ public class ClassifyAnalysisRunner extends AnalysisRunner {
 //		CallbackErrorHandlingAnalysis cbeh_analysis = new CallbackErrorHandlingAnalysis(this.dataset, ami);
 //		cfd.analyze(cbeh_analysis);
 
-		GlobalToLocalAnalysis gtl_analysis = new GlobalToLocalAnalysis(this.dataset, ami);
-		cfd.analyze(gtl_analysis);
+//		GlobalToLocalAnalysis gtl_analysis = new GlobalToLocalAnalysis(this.dataset, ami);
+//		cfd.analyze(gtl_analysis);
 
-		CallbackParamAnalysis cbp_analysis = new CallbackParamAnalysis(this.dataset, ami);
-		cfd.analyze(cbp_analysis);
+//		CallbackParamAnalysis cbp_analysis = new CallbackParamAnalysis(this.dataset, ami);
+//		cfd.analyze(cbp_analysis);
 
-		ThisToThatAnalysis tth_analysis = new ThisToThatAnalysis(this.dataset, ami);
-		cfd.analyze(tth_analysis);
+//		ThisToThatAnalysis tth_analysis = new ThisToThatAnalysis(this.dataset, ami);
+//		cfd.analyze(tth_analysis);
+
+		PromisesAnalysis ctp_analysis = new PromisesAnalysis(this.dataset, ami);
+		cfd.analyze(ctp_analysis);
 
 	}
 

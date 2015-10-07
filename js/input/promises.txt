@@ -1,0 +1,7 @@
+https://github.com/cgrossde/Pullover.git
+https://github.com/npm/newww.git
+https://github.com/tagspaces/tagspaces.git
+https://github.com/remy/nodemon.git
+https://github.com/petkaantonov/bluebird.git
+https://github.com/less/less.js.git
+https://github.com/Automattic/mongoose.git
