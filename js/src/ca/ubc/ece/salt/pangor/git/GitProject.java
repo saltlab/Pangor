@@ -273,7 +273,8 @@ public class GitProject {
 			authorsEmails.add(authorIdent.getEmailAddress());
 
 			String message = commit.getFullMessage();
-			Pattern p = Pattern.compile("fix|repair", Pattern.CASE_INSENSITIVE);
+			/* TODO: Make this an option. */
+			Pattern p = Pattern.compile(/*"fix|repair"*/".*", Pattern.CASE_INSENSITIVE);
 			Matcher m = p.matcher(message);
 			commitCounter++;
 

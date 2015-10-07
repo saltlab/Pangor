@@ -35,7 +35,20 @@ public class TestCallbackToPromises extends TestAnalysis {
 		String src = "./test/input/promises/new.js";
 		String dst = "./test/input/promises/new-human.js";
 		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
-		//expectedAlerts.add(new PromisesAlert(AMI, "UNKNOWN", "REF", "PROM"));
+		this.runTest(new String[] {src, dst}, expectedAlerts, false);
+	}
+
+	/**
+	 * Test a case where a promise exists in another function. Should not
+	 * generate an alert. Doing the analysis at a function level instead of
+	 * a script level will make this test generate an alert.
+	 * @throws Exception
+	 */
+	@Test
+	public void testPromisesPresent() throws Exception{
+		String src = "./test/input/promises/added.js";
+		String dst = "./test/input/promises/added-human.js";
+		List<ClassifierAlert> expectedAlerts = new LinkedList<ClassifierAlert>();
 		this.runTest(new String[] {src, dst}, expectedAlerts, false);
 	}
 

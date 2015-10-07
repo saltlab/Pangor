@@ -102,7 +102,7 @@ public class PromisesSourceAnalysis extends ScopeAnalysis<ClassifierAlert, Class
 			/* Look for a 'new Promise' expression. */
 			if(node.getType() == Token.NEW) {
 				NewExpression ne = (NewExpression)node;
-				if(ne.getTarget().getType() == Token.NAME && ne.toSource().equals("Promise")) {
+				if(ne.getTarget().getType() == Token.NAME && ne.getTarget().toSource().equals("Promise")) {
 					this.meetsPreConditions = false;
 				}
 			}
@@ -114,5 +114,4 @@ public class PromisesSourceAnalysis extends ScopeAnalysis<ClassifierAlert, Class
 		}
 
 	}
-
 }
