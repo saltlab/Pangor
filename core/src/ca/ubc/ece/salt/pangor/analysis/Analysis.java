@@ -2,8 +2,7 @@ package ca.ubc.ece.salt.pangor.analysis;
 
 import java.util.List;
 
-import org.mozilla.javascript.ast.AstRoot;
-
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 
@@ -41,7 +40,7 @@ public abstract class Analysis<U extends Alert, T extends DataSet<U>> {
 	 * @param cfgs The list of CFGs in the script (one for each function plus
 	 * 			   one for the script).
 	 */
-	public abstract void analyze(AstRoot root, List<CFG> cfgs) throws Exception;
+	public abstract void analyze(ClassifiedASTNode root, List<CFG> cfgs) throws Exception;
 
 	/**
 	 * Perform a source/destination analysis.
@@ -50,7 +49,7 @@ public abstract class Analysis<U extends Alert, T extends DataSet<U>> {
 	 * @param dstRoot The destination script.
 	 * @param dstCFGs The list of destination CFGs in the script.
 	 */
-	public abstract void analyze(AstRoot srcRoot, List<CFG> srcCFGs, AstRoot dstRoot, List<CFG> dstCFGs) throws Exception;
+	public abstract void analyze(ClassifiedASTNode srcRoot, List<CFG> srcCFGs, ClassifiedASTNode dstRoot, List<CFG> dstCFGs) throws Exception;
 
 	/**
 	 * Complete the meta information for the alert and register it with the

@@ -2,9 +2,9 @@ package ca.ubc.ece.salt.pangor.analysis.flow;
 
 import java.util.List;
 
-import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.ScriptNode;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.pangor.analysis.Alert;
 import ca.ubc.ece.salt.pangor.analysis.DataSet;
 import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
@@ -20,6 +20,9 @@ import ca.ubc.ece.salt.pangor.cfg.CFGNode;
  * This framework provides the analysis framework and the current scope.
  *
  * Loops are executed once.
+ *
+ * NOTE: This class only works with the Mozilla Rhino AST.
+ * TODO: We can probably make this generic.
  *
  * @param <LE> The lattice element type that stores the analysis information.
  */
@@ -40,7 +43,7 @@ public abstract class FlowAnalysis<U extends Alert, T extends DataSet<U>, LE ext
 	 * @throws Exception
 	 */
 	@Override
-	public void analyze(AstRoot root, List<CFG> cfgs) throws Exception {
+	public void analyze(ClassifiedASTNode root, List<CFG> cfgs) throws Exception {
 
 		/* Build the scope. */
 		super.analyze(root, cfgs);
@@ -61,7 +64,7 @@ public abstract class FlowAnalysis<U extends Alert, T extends DataSet<U>, LE ext
 	 * @throws Exception
 	 */
 	@Override
-	public void analyze(AstRoot srcRoot, List<CFG> srcCFGs, AstRoot dstRoot, List<CFG> dstCFGs) throws Exception {
+	public void analyze(ClassifiedASTNode srcRoot, List<CFG> srcCFGs, ClassifiedASTNode dstRoot, List<CFG> dstCFGs) throws Exception {
 
 		/* Build the scope. */
 		super.analyze(srcRoot, srcCFGs, dstRoot, dstCFGs);
@@ -133,7 +136,7 @@ public abstract class FlowAnalysis<U extends Alert, T extends DataSet<U>, LE ext
 	 * @param node a AstRoot or FunctionNode
 	 * @return the CFG for the script or function.
 	 */
-	private CFG getFunctionCFG(ScriptNode node, List<CFG> cfgs) {
+	private CFG getFunctionCFG(ClassifiedASTNode node, List<CFG> cfgs) {
 
 		for(CFG cfg : cfgs) {
 			if(cfg.getEntryNode().getStatement() == node) return cfg;

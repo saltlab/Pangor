@@ -2,6 +2,7 @@ package ca.ubc.ece.salt.pangor.test.learning;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.mozilla.javascript.ast.AstRoot;
 
 import ca.ubc.ece.salt.pangor.analysis.learning.ChangeComplexityVisitor;
 import ca.ubc.ece.salt.pangor.cfd.CFDContext;
@@ -20,8 +21,8 @@ public class TestChangeComplexityVisitor {
 		CFDContext context = ControlFlowDifferencing.setup(args);
 
 		/* Compute the change complexity score. */
-		int actualSrcScore = ChangeComplexityVisitor.getChangeComplexity(context.srcScript);
-		int actualDstScore = ChangeComplexityVisitor.getChangeComplexity(context.dstScript);
+		int actualSrcScore = ChangeComplexityVisitor.getChangeComplexity((AstRoot)context.srcScript);
+		int actualDstScore = ChangeComplexityVisitor.getChangeComplexity((AstRoot)context.dstScript);
 
 		Assert.assertEquals(expectedSrcScore, actualSrcScore);
 		Assert.assertEquals(expectedDstScore, actualDstScore);

@@ -2,8 +2,7 @@ package ca.ubc.ece.salt.pangor.analysis.meta;
 
 import java.util.List;
 
-import org.mozilla.javascript.ast.AstRoot;
-
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.pangor.analysis.Alert;
 import ca.ubc.ece.salt.pangor.analysis.Analysis;
 import ca.ubc.ece.salt.pangor.analysis.DataSet;
@@ -35,7 +34,7 @@ public abstract class MetaAnalysis<U extends Alert, T extends DataSet<U>,
 	}
 
 	@Override
-	public void analyze(AstRoot srcRoot, List<CFG> srcCFGs, AstRoot dstRoot, List<CFG> dstCFGs) throws Exception {
+	public void analyze(ClassifiedASTNode srcRoot, List<CFG> srcCFGs, ClassifiedASTNode dstRoot, List<CFG> dstCFGs) throws Exception {
 
 		/* Analyze the two files. */
 		this.srcAnalysis.analyze(srcRoot, srcCFGs);
@@ -47,7 +46,7 @@ public abstract class MetaAnalysis<U extends Alert, T extends DataSet<U>,
 	}
 
 	@Override
-	public void analyze(AstRoot root, List<CFG> cfgs) throws Exception {
+	public void analyze(ClassifiedASTNode root, List<CFG> cfgs) throws Exception {
 
 		/* Analyze the destination file only. */
 		this.dstAnalysis.analyze(root, cfgs);

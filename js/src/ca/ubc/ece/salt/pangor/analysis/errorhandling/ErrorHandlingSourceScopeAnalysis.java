@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import org.mozilla.javascript.ast.AstNode;
-import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.NodeVisitor;
 import org.mozilla.javascript.ast.TryStatement;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.pangor.analysis.AnalysisUtilities;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
@@ -46,7 +46,7 @@ public class ErrorHandlingSourceScopeAnalysis extends ScopeAnalysis<ClassifierAl
 	}
 
 	@Override
-	public void analyze(AstRoot root, List<CFG> cfgs) throws Exception {
+	public void analyze(ClassifiedASTNode root, List<CFG> cfgs) throws Exception {
 
 		super.analyze(root, cfgs);
 
@@ -56,7 +56,7 @@ public class ErrorHandlingSourceScopeAnalysis extends ScopeAnalysis<ClassifierAl
 	}
 
 	@Override
-	public void analyze(AstRoot srcRoot, List<CFG> srcCFGs, AstRoot dstRoot,
+	public void analyze(ClassifiedASTNode srcRoot, List<CFG> srcCFGs, ClassifiedASTNode dstRoot,
 			List<CFG> dstCFGs) throws Exception {
 
 		super.analyze(srcRoot, srcCFGs, dstRoot, dstCFGs);

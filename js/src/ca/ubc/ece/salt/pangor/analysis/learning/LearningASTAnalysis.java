@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.mozilla.javascript.ast.AstRoot;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.analysis.scope.ScopeAnalysis;
@@ -17,6 +18,8 @@ import ca.ubc.ece.salt.pangor.learning.pointsto.PointsToPrediction;
 /**
  * Creates a feature vector for a function by visiting its AST node and
  * recording features from modified child nodes.
+ *
+ * NOTE: This class only works with the Mozilla Rhino AST.
  */
 public class LearningASTAnalysis extends ScopeAnalysis<FeatureVector, LearningDataSet> {
 
@@ -63,12 +66,16 @@ public class LearningASTAnalysis extends ScopeAnalysis<FeatureVector, LearningDa
 	}
 
 	@Override
-	public void analyze(AstRoot root, List<CFG> cfgs) throws Exception {
+	public void analyze(ClassifiedASTNode root, List<CFG> cfgs) throws Exception {
+
+		/* Check we are working with the correct AST type. */
+		if(!(root instanceof AstRoot)) throw new IllegalArgumentException("The AST must be parsed from Apache Rhino.");
+		AstRoot script = (AstRoot) root;
 
 		super.analyze(root, cfgs);
 
 		/* Check the change complexity. */
-		this.changeComplexity = ChangeComplexityVisitor.getChangeComplexity(root);
+		this.changeComplexity = ChangeComplexityVisitor.getChangeComplexity(script);
 
 		if(this.changeComplexity <= this.maxChangeComplexity) {
 
@@ -80,14 +87,19 @@ public class LearningASTAnalysis extends ScopeAnalysis<FeatureVector, LearningDa
 	}
 
 	@Override
-	public void analyze(AstRoot srcRoot, List<CFG> srcCFGs, AstRoot dstRoot,
+	public void analyze(ClassifiedASTNode srcRoot, List<CFG> srcCFGs, ClassifiedASTNode dstRoot,
 			List<CFG> dstCFGs) throws Exception {
+
+		/* Check we are working with the correct AST type. */
+		if(!(srcRoot instanceof AstRoot) || !(dstRoot instanceof AstRoot)) throw new IllegalArgumentException("The AST must be parsed from Apache Rhino.");
+		AstRoot srcScript = (AstRoot) srcRoot;
+		AstRoot dstScript = (AstRoot) dstRoot;
 
 		super.analyze(srcRoot, srcCFGs, dstRoot, dstCFGs);
 
 		/* Check the change complexity. */
-		int sourceChangeComplexityScore = ChangeComplexityVisitor.getChangeComplexity(srcRoot);
-		int destinationChangeComplexityScore = ChangeComplexityVisitor.getChangeComplexity(dstRoot);
+		int sourceChangeComplexityScore = ChangeComplexityVisitor.getChangeComplexity(srcScript);
+		int destinationChangeComplexityScore = ChangeComplexityVisitor.getChangeComplexity(dstScript);
 
 		if(sourceChangeComplexityScore > destinationChangeComplexityScore) {
 			this.changeComplexity = sourceChangeComplexityScore;

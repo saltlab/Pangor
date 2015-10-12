@@ -1,7 +1,5 @@
 package ca.ubc.ece.salt.pangor.cfg;
 
-import org.mozilla.javascript.ast.AstNode;
-
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 

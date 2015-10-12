@@ -13,10 +13,10 @@ import org.mozilla.javascript.Parser;
 import org.mozilla.javascript.ast.AstRoot;
 
 import ca.ubc.ece.salt.pangor.cfg.CFG;
-import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 import ca.ubc.ece.salt.pangor.cfg.CFGPrinter;
 import ca.ubc.ece.salt.pangor.cfg.CFGPrinter.Output;
+import ca.ubc.ece.salt.pangor.js.cfg.CFGFactory;
 
 @Ignore
 public class TestCFG extends TestCase {

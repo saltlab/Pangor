@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.cfg;
+package ca.ubc.ece.salt.pangor.js.cfg;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -36,6 +36,9 @@ import org.mozilla.javascript.ast.WhileLoop;
 import org.mozilla.javascript.ast.WithStatement;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+import ca.ubc.ece.salt.pangor.cfg.CFG;
+import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
+import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 
 /**
  * Builds a control flow graph.

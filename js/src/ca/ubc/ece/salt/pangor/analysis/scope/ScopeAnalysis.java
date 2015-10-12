@@ -10,6 +10,7 @@ import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.ScriptNode;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.pangor.analysis.Alert;
 import ca.ubc.ece.salt.pangor.analysis.Analysis;
 import ca.ubc.ece.salt.pangor.analysis.DataSet;
@@ -22,6 +23,8 @@ import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
  * Builds a scope tree for the source and destination ASTs. This is used
  * as the basis for performing flow analysis, but can also be used stand-alone
  * if only scope is needed.
+ *
+ * NOTE: This class only works with the Mozilla Rhino AST.
  *
  * @param <U> The type of alert the data set stores.
  * @param <T> The type of data set that stores the analysis results.
@@ -94,24 +97,33 @@ public class ScopeAnalysis<U extends Alert, T extends DataSet<U>> extends Analys
 	}
 
 	@Override
-	public void analyze(AstRoot root, List<CFG> cfgs) throws Exception {
+	public void analyze(ClassifiedASTNode root, List<CFG> cfgs) throws Exception {
+
+		/* Check we are working with the correct AST type. */
+		if(!(root instanceof AstRoot)) throw new IllegalArgumentException("The AST must be parsed from Apache Rhino.");
+		AstRoot script = (AstRoot) root;
 
 		this.dstScopeMap = new HashMap<ScriptNode, Scope>();
 		this.dstCFGs = cfgs;
-		this.dstScope = this.buildScopeTree(root, null, this.dstScopeMap, null);
+		this.dstScope = this.buildScopeTree(script, null, this.dstScopeMap, null);
 
 	}
 
 	@Override
-	public void analyze(AstRoot srcRoot, List<CFG> srcCFGs, AstRoot dstRoot,
+	public void analyze(ClassifiedASTNode srcRoot, List<CFG> srcCFGs, ClassifiedASTNode dstRoot,
 			List<CFG> dstCFGs) throws Exception {
+
+		/* Check we are working with the correct AST type. */
+		if(!(srcRoot instanceof AstRoot) || !(dstRoot instanceof AstRoot)) throw new IllegalArgumentException("The AST must be parsed from Apache Rhino.");
+		AstRoot srcScript = (AstRoot) srcRoot;
+		AstRoot dstScript = (AstRoot) dstRoot;
 
 		this.srcScopeMap = new HashMap<ScriptNode, Scope>();
 		this.dstScopeMap = new HashMap<ScriptNode, Scope>();
 		this.srcCFGs = srcCFGs;
 		this.dstCFGs = dstCFGs;
-		this.srcScope = this.buildScopeTree(srcRoot, null, this.srcScopeMap, null);
-		this.dstScope = this.buildScopeTree(dstRoot, null, this.dstScopeMap, null);
+		this.srcScope = this.buildScopeTree(srcScript, null, this.srcScopeMap, null);
+		this.dstScope = this.buildScopeTree(dstScript, null, this.dstScopeMap, null);
 
 	}
 

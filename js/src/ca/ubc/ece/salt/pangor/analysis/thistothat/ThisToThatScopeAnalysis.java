@@ -4,9 +4,9 @@ import java.util.List;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.FunctionNode;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.analysis.scope.ScopeAnalysis;
@@ -24,7 +24,7 @@ public class ThisToThatScopeAnalysis extends ScopeAnalysis<ClassifierAlert, Clas
 	}
 
 	@Override
-	public void analyze(AstRoot root, List<CFG> cfgs) throws Exception {
+	public void analyze(ClassifiedASTNode root, List<CFG> cfgs) throws Exception {
 		super.analyze(root, cfgs);
 
 		/*
@@ -40,7 +40,7 @@ public class ThisToThatScopeAnalysis extends ScopeAnalysis<ClassifierAlert, Clas
 	}
 
 	@Override
-	public void analyze(AstRoot srcRoot, List<CFG> srcCFGs, AstRoot dstRoot, List<CFG> dstCFGs) throws Exception {
+	public void analyze(ClassifiedASTNode srcRoot, List<CFG> srcCFGs, ClassifiedASTNode dstRoot, List<CFG> dstCFGs) throws Exception {
 		super.analyze(srcRoot, srcCFGs, dstRoot, dstCFGs);
 
 		/* Look at each function. */

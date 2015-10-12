@@ -4,11 +4,11 @@ import java.util.List;
 
 import org.mozilla.javascript.Token;
 import org.mozilla.javascript.ast.AstNode;
-import org.mozilla.javascript.ast.AstRoot;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.NewExpression;
 import org.mozilla.javascript.ast.NodeVisitor;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
@@ -36,7 +36,7 @@ public class PromisesDestinationAnalysis extends ScopeAnalysis<ClassifierAlert, 
 	}
 
 	@Override
-	public void analyze(AstRoot root, List<CFG> cfgs) throws Exception {
+	public void analyze(ClassifiedASTNode root, List<CFG> cfgs) throws Exception {
 		super.analyze(root, cfgs);
 
 		/* Look at each function. */
@@ -44,7 +44,7 @@ public class PromisesDestinationAnalysis extends ScopeAnalysis<ClassifierAlert, 
 	}
 
 	@Override
-	public void analyze(AstRoot srcRoot, List<CFG> srcCFGs, AstRoot dstRoot, List<CFG> dstCFGs) throws Exception {
+	public void analyze(ClassifiedASTNode srcRoot, List<CFG> srcCFGs, ClassifiedASTNode dstRoot, List<CFG> dstCFGs) throws Exception {
 		super.analyze(srcRoot, srcCFGs, dstRoot, dstCFGs);
 
 		/* Look at each function. */
