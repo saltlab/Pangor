@@ -11,15 +11,15 @@ import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.pangor.analysis.AnalysisUtilities;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.analysis.flow.PathSensitiveFlowAnalysis;
-import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
 import ca.ubc.ece.salt.pangor.classify.alert.SpecialTypeAlert.SpecialType;
+import ca.ubc.ece.salt.pangor.js.analysis.AnalysisUtilities;
+import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
 
 /**
  * A change-sensitive analysis that finds special type repairs in JavaScript.

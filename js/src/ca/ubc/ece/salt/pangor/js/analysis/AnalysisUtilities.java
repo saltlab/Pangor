@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.analysis;
+package ca.ubc.ece.salt.pangor.js.analysis;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -8,10 +8,10 @@ import org.mozilla.javascript.ast.AstRoot;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
-import ca.ubc.ece.salt.pangor.analysis.scope.ScopeAnalysis;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
+import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
+import ca.ubc.ece.salt.pangor.js.analysis.scope.ScopeAnalysis;
 import ca.ubc.ece.salt.pangor.learning.apis.APIFactory;
 import ca.ubc.ece.salt.pangor.learning.pointsto.PointsToPrediction;
 

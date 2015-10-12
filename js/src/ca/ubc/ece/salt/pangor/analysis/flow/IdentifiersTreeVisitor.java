@@ -8,7 +8,7 @@ import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.NodeVisitor;
 
-import ca.ubc.ece.salt.pangor.analysis.AnalysisUtilities;
+import ca.ubc.ece.salt.pangor.js.analysis.AnalysisUtilities;
 
 /**
  * Generates a set of identifiers from an "OR" conditional expression. 

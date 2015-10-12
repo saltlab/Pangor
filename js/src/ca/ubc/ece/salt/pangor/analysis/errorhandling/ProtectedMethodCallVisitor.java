@@ -8,7 +8,7 @@ import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.NodeVisitor;
 
-import ca.ubc.ece.salt.pangor.analysis.AnalysisUtilities;
+import ca.ubc.ece.salt.pangor.js.analysis.AnalysisUtilities;
 
 /**
  * Checks if a block has any changed nodes (inserted or removed).

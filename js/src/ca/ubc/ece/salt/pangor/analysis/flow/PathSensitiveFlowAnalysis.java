@@ -6,10 +6,10 @@ import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.pangor.analysis.Alert;
 import ca.ubc.ece.salt.pangor.analysis.DataSet;
-import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
+import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
 
 /**
  * A path sensitive flow analysis.

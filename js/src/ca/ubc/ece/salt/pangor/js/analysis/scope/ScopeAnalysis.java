@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.analysis.scope;
+package ca.ubc.ece.salt.pangor.js.analysis.scope;
 
 import java.util.HashMap;
 import java.util.LinkedList;

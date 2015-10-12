@@ -20,9 +20,9 @@ import org.mozilla.javascript.ast.UnaryExpression;
 import org.mozilla.javascript.ast.VariableDeclaration;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.pangor.analysis.AnalysisUtilities;
 import ca.ubc.ece.salt.pangor.analysis.specialtype.SpecialTypeAnalysisUtilities;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
+import ca.ubc.ece.salt.pangor.js.analysis.AnalysisUtilities;
 import ca.ubc.ece.salt.pangor.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.pangor.learning.apis.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.pangor.learning.apis.KeywordUse.KeywordContext;

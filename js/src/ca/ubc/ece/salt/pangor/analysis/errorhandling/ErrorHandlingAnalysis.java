@@ -5,12 +5,12 @@ import java.util.Map;
 
 import org.mozilla.javascript.ast.AstNode;
 
-import ca.ubc.ece.salt.pangor.analysis.AnalysisUtilities;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.analysis.meta.MetaAnalysis;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
 import ca.ubc.ece.salt.pangor.classify.alert.ErrorHandlingAlert;
+import ca.ubc.ece.salt.pangor.js.analysis.AnalysisUtilities;
 
 /**
  * Classifies repairs that fix an uncaught error by surrounding the

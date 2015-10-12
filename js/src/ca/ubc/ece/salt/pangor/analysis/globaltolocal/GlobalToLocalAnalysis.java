@@ -9,11 +9,11 @@ import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.analysis.globaltolocal.GlobalToLocalFlowAnalysis.GlobalToLocal;
 import ca.ubc.ece.salt.pangor.analysis.meta.MetaAnalysis;
-import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
-import ca.ubc.ece.salt.pangor.analysis.scope.ScopeAnalysis;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
 import ca.ubc.ece.salt.pangor.classify.alert.GlobalToLocalAlert;
+import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
+import ca.ubc.ece.salt.pangor.js.analysis.scope.ScopeAnalysis;
 
 public class GlobalToLocalAnalysis extends MetaAnalysis<ClassifierAlert, ClassifierDataSet, ScopeAnalysis<ClassifierAlert, ClassifierDataSet>, GlobalToLocalFlowAnalysis> {
 

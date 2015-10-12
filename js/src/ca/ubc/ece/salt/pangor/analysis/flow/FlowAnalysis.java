@@ -7,12 +7,12 @@ import org.mozilla.javascript.ast.ScriptNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.pangor.analysis.Alert;
 import ca.ubc.ece.salt.pangor.analysis.DataSet;
-import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
-import ca.ubc.ece.salt.pangor.analysis.scope.ScopeAnalysis;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
+import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
+import ca.ubc.ece.salt.pangor.js.analysis.scope.ScopeAnalysis;
 
 /**
  * Performs a change-sensitive, intra-procedural analysis.

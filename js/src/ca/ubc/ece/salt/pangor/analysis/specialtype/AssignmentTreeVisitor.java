@@ -10,7 +10,7 @@ import org.mozilla.javascript.ast.InfixExpression;
 import org.mozilla.javascript.ast.NodeVisitor;
 import org.mozilla.javascript.ast.ObjectProperty;
 
-import ca.ubc.ece.salt.pangor.analysis.AnalysisUtilities;
+import ca.ubc.ece.salt.pangor.js.analysis.AnalysisUtilities;
 
 /**
  * A visitor for finding identifier uses.

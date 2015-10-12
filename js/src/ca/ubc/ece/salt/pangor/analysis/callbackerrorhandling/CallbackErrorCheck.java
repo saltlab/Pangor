@@ -1,7 +1,7 @@
 package ca.ubc.ece.salt.pangor.analysis.callbackerrorhandling;
 
-import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.classify.alert.SpecialTypeAlert.SpecialType;
+import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
 
 /**
  * Stores a parameter that was unchanged and had a special type check

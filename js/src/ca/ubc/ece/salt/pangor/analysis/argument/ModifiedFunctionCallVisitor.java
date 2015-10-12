@@ -8,7 +8,7 @@ import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.NodeVisitor;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.pangor.analysis.AnalysisUtilities;
+import ca.ubc.ece.salt.pangor.js.analysis.AnalysisUtilities;
 
 /**
  * Visitor for storing function calls that had its parameter list changed

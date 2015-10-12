@@ -2,7 +2,7 @@ package ca.ubc.ece.salt.pangor.analysis.errorhandling;
 
 import java.util.List;
 
-import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
+import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
 
 /**
  * Stores the information from a potential exception handling repair.
