@@ -9,12 +9,10 @@ import java.util.Map;
 
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
-import org.mozilla.javascript.ast.AstRoot;
 
 import ca.ubc.ece.salt.gumtree.ast.ASTClassifier;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.pangor.analysis.Analysis;
-import ca.ubc.ece.salt.pangor.analysis.flow.FlowAnalysis;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
 import ca.ubc.ece.salt.pangor.cfg.diff.CFGDifferencing;
@@ -35,8 +33,6 @@ public class ControlFlowDifferencing {
 
 	/** Stores the CFG and AST for analysis. **/
 	private CFDContext context;
-
-	List<FlowAnalysis<?, ?, ?>> analyses;
 
 	/**
 	 * Creates the analysis context by control flow differencing the source
@@ -139,8 +135,8 @@ public class ControlFlowDifferencing {
 		ControlFlowDifferencing.computeCFGChanges(srcCFGs, dstCFGs);
 
 		/* Return the set up results (the context for a CFD analysis) */
-		AstRoot srcRoot = (AstRoot)src.getClassifiedASTNode();
-		AstRoot dstRoot = (AstRoot)dst.getClassifiedASTNode();
+		ClassifiedASTNode srcRoot = src.getClassifiedASTNode();
+		ClassifiedASTNode dstRoot = dst.getClassifiedASTNode();
 		return new CFDContext(srcRoot, dstRoot, srcCFGs, dstCFGs);
 
 	}
