@@ -16,8 +16,8 @@ import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.pangor.analysis.Analysis;
 import ca.ubc.ece.salt.pangor.analysis.flow.FlowAnalysis;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
+import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
 import ca.ubc.ece.salt.pangor.cfg.diff.CFGDifferencing;
-import ca.ubc.ece.salt.pangor.js.cfg.CFGFactory;
 import fr.labri.gumtree.actions.RootAndLeavesClassifier;
 import fr.labri.gumtree.actions.TreeClassifier;
 import fr.labri.gumtree.client.DiffOptions;
@@ -41,29 +41,32 @@ public class ControlFlowDifferencing {
 	/**
 	 * Creates the analysis context by control flow differencing the source
 	 * and destination files (provided as a string).
+	 * @param cfgFactory The factory class that builds the CFGs.
 	 * @param args The command line options (contains the paths to the source
 	 * 			   and destination files to difference).
 	 * @throws Exception thrown when a problem occurs during control flow differencing.
 	 */
-	public ControlFlowDifferencing(String[] args) throws Exception {
-		this(args, null, null);
+	public ControlFlowDifferencing(CFGFactory cfgFactory, String[] args) throws Exception {
+		this(cfgFactory, args, null, null);
 	}
 
 	/**
 	 * Creates the analysis context by control flow differencing the source
 	 * and destination files (provided as a string).
+	 * @param cfgFactory The factory class that builds the CFGs.
+	 * @param args The command line options (contains the paths to the source
 	 * @param args The analysis/differencing options.
 	 * @param srcSourceCode The source file as a string.
 	 * @param dstSourceCode The destination file as a string.
 	 * @throws Exception thrown when a problem occurs during control flow differencing.
 	 */
-	public ControlFlowDifferencing(String[] args, String srcSourceCode, String dstSourceCode) throws Exception {
+	public ControlFlowDifferencing(CFGFactory cfgFactory, String[] args, String srcSourceCode, String dstSourceCode) throws Exception {
 
 		/* Get the analysis options. */
 		DiffOptions options = ControlFlowDifferencing.getAnalysisOptions(args);
 
 		/* Set up the analysis context. */
-		this.context =  ControlFlowDifferencing.setup(options, srcSourceCode, dstSourceCode);
+		this.context =  ControlFlowDifferencing.setup(cfgFactory, options, srcSourceCode, dstSourceCode);
 
 	}
 
@@ -86,13 +89,13 @@ public class ControlFlowDifferencing {
 	 * @return The context for a control flow differencing analysis.
 	 * @throws Exception
 	 */
-	public static CFDContext setup(String[] args) throws Exception {
+	public static CFDContext setup(CFGFactory cfgFactory, String[] args) throws Exception {
 
 		/* Get the analysis options. */
 		DiffOptions options = ControlFlowDifferencing.getAnalysisOptions(args);
 
 		/* Set up the analysis context. */
-		return ControlFlowDifferencing.setup(options);
+		return ControlFlowDifferencing.setup(cfgFactory, options);
 
 	}
 
@@ -102,8 +105,8 @@ public class ControlFlowDifferencing {
 	 * @return The context for a control flow differencing analysis.
 	 * @throws Exception
 	 */
-	public static CFDContext setup(DiffOptions options) throws Exception {
-		return setup(options, null, null);
+	public static CFDContext setup(CFGFactory cfgFactory, DiffOptions options) throws Exception {
+		return setup(cfgFactory, options, null, null);
 	}
 
 	/**
@@ -112,7 +115,7 @@ public class ControlFlowDifferencing {
 	 * @return The context for a control flow differencing analysis.
 	 * @throws Exception
 	 */
-	public static CFDContext setup(DiffOptions options, String srcSourceCode, String dstSourceCode) throws Exception {
+	public static CFDContext setup(CFGFactory cfgFactory, DiffOptions options, String srcSourceCode, String dstSourceCode) throws Exception {
 
         /* Create the abstract GumTree representations of the ASTs. */
         Tree src = null;
@@ -129,8 +132,8 @@ public class ControlFlowDifferencing {
         ControlFlowDifferencing.classifyTreeNodes(src, dst, matcher);
 
 		/* Create the CFGs. */
-		List<CFG> srcCFGs = CFGFactory.createCFGs((AstRoot)src.getClassifiedASTNode());
-		List<CFG> dstCFGs = CFGFactory.createCFGs((AstRoot)dst.getClassifiedASTNode());
+		List<CFG> srcCFGs = cfgFactory.createCFGs(src.getClassifiedASTNode());
+		List<CFG> dstCFGs = cfgFactory.createCFGs(dst.getClassifiedASTNode());
 
 		/* Compute changes to CFG elements (nodes, edges and edge labels). */
 		ControlFlowDifferencing.computeCFGChanges(srcCFGs, dstCFGs);

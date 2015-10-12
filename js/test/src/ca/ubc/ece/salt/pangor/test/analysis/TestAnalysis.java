@@ -2,13 +2,15 @@ package ca.ubc.ece.salt.pangor.test.analysis;
 
 import java.util.List;
 
+import junit.framework.TestCase;
+
 import org.junit.Ignore;
 
-import junit.framework.TestCase;
 import ca.ubc.ece.salt.pangor.analysis.Analysis;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.cfd.ControlFlowDifferencing;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
+import ca.ubc.ece.salt.pangor.js.cfg.JavaScriptCFGFactory;
 
 @Ignore
 public class TestAnalysis extends TestCase {
@@ -25,7 +27,7 @@ public class TestAnalysis extends TestCase {
 	protected void runTest(String[] args, List<ClassifierAlert> expectedAlerts, boolean printAlerts, Analysis<ClassifierAlert, ClassifierDataSet> analysis, ClassifierDataSet dataSet) throws Exception {
 
 		/* Control flow difference the files. */
-		ControlFlowDifferencing cfd = new ControlFlowDifferencing(args);
+		ControlFlowDifferencing cfd = new ControlFlowDifferencing(new JavaScriptCFGFactory(), args);
 
 		/* Run the analysis. */
         cfd.analyze(analysis);

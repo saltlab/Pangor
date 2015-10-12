@@ -35,35 +35,42 @@ import org.mozilla.javascript.ast.VariableDeclaration;
 import org.mozilla.javascript.ast.WhileLoop;
 import org.mozilla.javascript.ast.WithStatement;
 
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
+import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
 
 /**
- * Builds a control flow graph.
+ * NOTE: This class only works with the Mozilla Rhino AST.
  */
-public class CFGFactory {
+public class JavaScriptCFGFactory implements CFGFactory {
 
 	/**
 	 * Builds intra-procedural control flow graphs for the given artifact.
 	 * @param root
 	 * @return
 	 */
-	public static List<CFG> createCFGs(AstRoot root) {
+	@Override
+	public List<CFG> createCFGs(ClassifiedASTNode root) {
+
+		/* Check we are working with the correct AST type. */
+		if(!(root instanceof AstRoot)) throw new IllegalArgumentException("The AST must be parsed from Apache Rhino.");
+		AstRoot script = (AstRoot)root;
 
 		/* Store the CFGs from all the functions. */
 		List<CFG> cfgs = new LinkedList<CFG>();
 
 		/* Start by getting the CFG for the script. */
-        cfgs.add(CFGFactory.buildScriptCFG(root));
+        cfgs.add(JavaScriptCFGFactory.buildScriptCFG(script));
 
 		/* Get the list of functions in the script. */
-		List<FunctionNode> functions = FunctionNodeVisitor.getFunctions(root);
+		List<FunctionNode> functions = FunctionNodeVisitor.getFunctions(script);
 
 		/* For each function, generate its CFG. */
 		for (FunctionNode function : functions) {
-			cfgs.add(CFGFactory.buildScriptCFG(function));
+			cfgs.add(JavaScriptCFGFactory.buildScriptCFG(function));
 		}
 
 		return cfgs;
@@ -90,7 +97,7 @@ public class CFGFactory {
         cfg.addExitNode(scriptExit);
 
         /* Build the CFG subgraph for the script body. */
-        CFG subGraph = CFGFactory.build(scriptNode);
+        CFG subGraph = JavaScriptCFGFactory.build(scriptNode);
 
         if(subGraph == null) {
         	CFGNode empty = new CFGNode(new EmptyStatement());
@@ -120,7 +127,7 @@ public class CFGFactory {
 	 * @param block The block statement.
 	 */
 	private static CFG build(Block block) {
-		return CFGFactory.buildBlock(block);
+		return JavaScriptCFGFactory.buildBlock(block);
 	}
 
 	/**
@@ -128,7 +135,7 @@ public class CFGFactory {
 	 * @param block The block statement.
 	 */
 	private static CFG build(Scope scope) {
-		return CFGFactory.buildBlock(scope);
+		return JavaScriptCFGFactory.buildBlock(scope);
 	}
 
 	/**
@@ -137,9 +144,9 @@ public class CFGFactory {
 	 */
 	private static CFG build(ScriptNode script) {
 		if(script instanceof AstRoot) {
-            return CFGFactory.buildBlock(script);
+            return JavaScriptCFGFactory.buildBlock(script);
 		}
-		return CFGFactory.buildSwitch(((FunctionNode)script).getBody());
+		return JavaScriptCFGFactory.buildSwitch(((FunctionNode)script).getBody());
 	}
 
 	/**
@@ -160,7 +167,7 @@ public class CFGFactory {
 
 			assert(statement instanceof AstNode);
 
-			CFG subGraph = CFGFactory.buildSwitch((AstNode)statement);
+			CFG subGraph = JavaScriptCFGFactory.buildSwitch((AstNode)statement);
 
 			if(subGraph != null) {
 
@@ -210,7 +217,7 @@ public class CFGFactory {
 
 		/* Build the true branch. */
 
-		CFG trueBranch = CFGFactory.buildSwitch(ifStatement.getThenPart());
+		CFG trueBranch = JavaScriptCFGFactory.buildSwitch(ifStatement.getThenPart());
 
 		if(trueBranch == null) {
 			CFGNode empty = new CFGNode(new EmptyStatement());
@@ -229,7 +236,7 @@ public class CFGFactory {
 
         /* Build the false branch. */
 
-		CFG falseBranch = CFGFactory.buildSwitch(ifStatement.getElsePart());
+		CFG falseBranch = JavaScriptCFGFactory.buildSwitch(ifStatement.getElsePart());
 
 		if(falseBranch == null) {
 			CFGNode empty = new CFGNode(new EmptyStatement());
@@ -271,7 +278,7 @@ public class CFGFactory {
 
 		/* Build the true branch. */
 
-		CFG trueBranch = CFGFactory.buildSwitch(whileLoop.getBody());
+		CFG trueBranch = JavaScriptCFGFactory.buildSwitch(whileLoop.getBody());
 
 		if(trueBranch == null) {
 			CFGNode empty = new CFGNode(new EmptyStatement());
@@ -330,7 +337,7 @@ public class CFGFactory {
 
 		/* Build the loop branch. */
 
-		CFG loopBranch = CFGFactory.buildSwitch(doLoop.getBody());
+		CFG loopBranch = JavaScriptCFGFactory.buildSwitch(doLoop.getBody());
 
 		if(loopBranch == null) {
 			CFGNode empty = new CFGNode(new EmptyStatement());
@@ -402,7 +409,7 @@ public class CFGFactory {
 
 		/* Build the true branch. */
 
-		CFG trueBranch = CFGFactory.buildSwitch(forLoop.getBody());
+		CFG trueBranch = JavaScriptCFGFactory.buildSwitch(forLoop.getBody());
 
 		if(trueBranch == null) {
 			CFGNode empty = new CFGNode(new EmptyStatement());
@@ -518,7 +525,7 @@ public class CFGFactory {
 
         /* Create the CFG for the loop body. */
 
-		CFG trueBranch = CFGFactory.buildSwitch(forInLoop.getBody());
+		CFG trueBranch = JavaScriptCFGFactory.buildSwitch(forInLoop.getBody());
 
 		if(trueBranch == null) {
 			CFGNode empty = new CFGNode(new EmptyStatement());
@@ -589,7 +596,7 @@ public class CFGFactory {
             CFG subGraph = null;
 			if(switchCase.getStatements() != null) {
                 List<Node> statements = new LinkedList<Node>(switchCase.getStatements());
-                subGraph = CFGFactory.buildBlock(statements);
+                subGraph = JavaScriptCFGFactory.buildBlock(statements);
 			}
 
 			/* If it is an empty case, make our lives easier by adding an
@@ -704,7 +711,7 @@ public class CFGFactory {
 		CFG cfg = new CFG(withNode);
 		cfg.addExitNode(endWithNode);
 
-		CFG scopeBlock = CFGFactory.buildSwitch(withStatement.getStatement());
+		CFG scopeBlock = JavaScriptCFGFactory.buildSwitch(withStatement.getStatement());
 
         if(scopeBlock == null) {
             CFGNode empty = new CFGNode(new EmptyStatement());
@@ -750,7 +757,7 @@ public class CFGFactory {
 
 		/* Set up the finally block. */
 
-		CFG finallyBlock = CFGFactory.buildSwitch(tryStatement.getFinallyBlock());
+		CFG finallyBlock = JavaScriptCFGFactory.buildSwitch(tryStatement.getFinallyBlock());
 
 		if(finallyBlock == null) {
 			CFGNode empty = new CFGNode(new EmptyStatement());
@@ -774,7 +781,7 @@ public class CFGFactory {
 		List<CatchClause> catchClauses = tryStatement.getCatchClauses();
 		for(CatchClause catchClause : catchClauses) {
 
-			CFG catchBlock = CFGFactory.buildSwitch(catchClause.getBody());
+			CFG catchBlock = JavaScriptCFGFactory.buildSwitch(catchClause.getBody());
 
             /* Create the clause for branching to the catch. */
             AstNode catchCondition = catchClause.getCatchCondition();
@@ -826,7 +833,7 @@ public class CFGFactory {
 
 		/* Set up the try block. */
 
-		CFG tryBlock = CFGFactory.buildSwitch(tryStatement.getTryBlock());
+		CFG tryBlock = JavaScriptCFGFactory.buildSwitch(tryStatement.getTryBlock());
 
 		if(tryBlock == null) {
 			CFGNode empty = new CFGNode(new EmptyStatement());
@@ -989,37 +996,37 @@ public class CFGFactory {
 		if(node == null) return null;
 
 		if (node instanceof Block) {
-			return CFGFactory.build((Block) node);
+			return JavaScriptCFGFactory.build((Block) node);
 		} else if (node instanceof IfStatement) {
-			return CFGFactory.build((IfStatement) node);
+			return JavaScriptCFGFactory.build((IfStatement) node);
 		} else if (node instanceof WhileLoop) {
-			return CFGFactory.build((WhileLoop) node);
+			return JavaScriptCFGFactory.build((WhileLoop) node);
 		} else if (node instanceof DoLoop) {
-			return CFGFactory.build((DoLoop) node);
+			return JavaScriptCFGFactory.build((DoLoop) node);
 		} else if (node instanceof ForLoop) {
-			return CFGFactory.build((ForLoop) node);
+			return JavaScriptCFGFactory.build((ForLoop) node);
 		} else if (node instanceof ForInLoop) {
-			return CFGFactory.build((ForInLoop) node);
+			return JavaScriptCFGFactory.build((ForInLoop) node);
 		} else if (node instanceof SwitchStatement) {
-			return CFGFactory.build((SwitchStatement) node);
+			return JavaScriptCFGFactory.build((SwitchStatement) node);
 		} else if (node instanceof WithStatement) {
-			return CFGFactory.build((WithStatement) node);
+			return JavaScriptCFGFactory.build((WithStatement) node);
 		} else if (node instanceof TryStatement) {
-			return CFGFactory.build((TryStatement) node);
+			return JavaScriptCFGFactory.build((TryStatement) node);
 		} else if (node instanceof BreakStatement) {
-			return CFGFactory.build((BreakStatement) node);
+			return JavaScriptCFGFactory.build((BreakStatement) node);
 		} else if (node instanceof ContinueStatement) {
-			return CFGFactory.build((ContinueStatement) node);
+			return JavaScriptCFGFactory.build((ContinueStatement) node);
 		} else if (node instanceof ReturnStatement) {
-			return CFGFactory.build((ReturnStatement) node);
+			return JavaScriptCFGFactory.build((ReturnStatement) node);
 		} else if (node instanceof ThrowStatement) {
-			return CFGFactory.build((ThrowStatement) node);
+			return JavaScriptCFGFactory.build((ThrowStatement) node);
 		} else if (node instanceof FunctionNode) {
 			return null; // Function declarations shouldn't be part of the CFG.
 		} else if (node instanceof Scope) {
-			return CFGFactory.build((Scope) node);
+			return JavaScriptCFGFactory.build((Scope) node);
 		} else {
-			return CFGFactory.build(node);
+			return JavaScriptCFGFactory.build(node);
 		}
 
 	}

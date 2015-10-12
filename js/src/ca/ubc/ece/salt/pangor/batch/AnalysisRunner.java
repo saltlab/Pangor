@@ -3,6 +3,7 @@ package ca.ubc.ece.salt.pangor.batch;
 import org.mozilla.javascript.EvaluatorException;
 
 import ca.ubc.ece.salt.pangor.cfd.ControlFlowDifferencing;
+import ca.ubc.ece.salt.pangor.cfg.CFGFactory;
 
 /**
  * Runs an analysis on a file within a batch analysis. The batch analysis
@@ -16,15 +17,20 @@ public abstract class AnalysisRunner {
 	/** Set to true to enable AST pre-processing. **/
 	private boolean preProcess;
 
-	public AnalysisRunner() {
+	/** Specifies the CFG factory to use. **/
+	private CFGFactory cfgFactory;
+
+	public AnalysisRunner(CFGFactory cfgFactory) {
 		this.preProcess = false;
+		this.cfgFactory = cfgFactory;
 	}
 
 	/**
 	 * @param preProcess Set to true to enable AST pre-processing.
 	 */
-	public AnalysisRunner(boolean preProcess) {
+	public AnalysisRunner(CFGFactory cfgFactory, boolean preProcess) {
 		this.preProcess = preProcess;
+		this.cfgFactory = cfgFactory;
 	}
 
 	/**
@@ -52,7 +58,7 @@ public abstract class AnalysisRunner {
         ControlFlowDifferencing cfd = null;
         try {
 			String[] args = this.preProcess ? new String[] {"", "", "-pp"} : new String[] {"", ""};
-            cfd = new ControlFlowDifferencing(args, ami.buggyCode, ami.repairedCode);
+            cfd = new ControlFlowDifferencing(this.cfgFactory, args, ami.buggyCode, ami.repairedCode);
         }
         catch(ArrayIndexOutOfBoundsException e) {
         	System.err.println("ArrayIndexOutOfBoundsException: possibly caused by empty file.");

@@ -7,6 +7,7 @@ import org.mozilla.javascript.ast.AstRoot;
 import ca.ubc.ece.salt.pangor.analysis.learning.ChangeComplexityVisitor;
 import ca.ubc.ece.salt.pangor.cfd.CFDContext;
 import ca.ubc.ece.salt.pangor.cfd.ControlFlowDifferencing;
+import ca.ubc.ece.salt.pangor.js.cfg.JavaScriptCFGFactory;
 
 public class TestChangeComplexityVisitor {
 
@@ -18,7 +19,7 @@ public class TestChangeComplexityVisitor {
 	protected void runTest(String[] args, int expectedSrcScore, int expectedDstScore) throws Exception {
 
 		/* Compute the CFG diff. */
-		CFDContext context = ControlFlowDifferencing.setup(args);
+		CFDContext context = ControlFlowDifferencing.setup(new JavaScriptCFGFactory(), args);
 
 		/* Compute the change complexity score. */
 		int actualSrcScore = ChangeComplexityVisitor.getChangeComplexity((AstRoot)context.srcScript);

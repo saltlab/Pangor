@@ -14,12 +14,13 @@ import ca.ubc.ece.salt.pangor.analysis.learning.LearningAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.learning.LearningDataSet;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.cfd.ControlFlowDifferencing;
+import ca.ubc.ece.salt.pangor.js.cfg.JavaScriptCFGFactory;
 import ca.ubc.ece.salt.pangor.learning.apis.APIFactory;
 import ca.ubc.ece.salt.pangor.learning.apis.AbstractAPI;
-import ca.ubc.ece.salt.pangor.learning.apis.KeywordUse;
-import ca.ubc.ece.salt.pangor.learning.apis.TopLevelAPI;
 import ca.ubc.ece.salt.pangor.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.pangor.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.pangor.learning.apis.KeywordUse.KeywordContext;
+import ca.ubc.ece.salt.pangor.learning.apis.TopLevelAPI;
 
 public class TestASTLearning {
 
@@ -47,7 +48,7 @@ public class TestASTLearning {
 		LearningAnalysis analysis = new LearningAnalysis(featureVectorManager, ami, 10);
 
 		/* Control flow difference the files. */
-		ControlFlowDifferencing cfd = new ControlFlowDifferencing(args);
+		ControlFlowDifferencing cfd = new ControlFlowDifferencing(new JavaScriptCFGFactory(), args);
 
 		/* Run the analysis. There are no alerts produced by the
 		 * LearningAnalysis... only FeatureVectors stored in the

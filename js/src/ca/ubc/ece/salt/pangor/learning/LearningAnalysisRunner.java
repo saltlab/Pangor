@@ -5,6 +5,7 @@ import ca.ubc.ece.salt.pangor.analysis.learning.LearningDataSet;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.batch.AnalysisRunner;
 import ca.ubc.ece.salt.pangor.cfd.ControlFlowDifferencing;
+import ca.ubc.ece.salt.pangor.js.cfg.JavaScriptCFGFactory;
 
 public class LearningAnalysisRunner extends AnalysisRunner {
 
@@ -24,6 +25,7 @@ public class LearningAnalysisRunner extends AnalysisRunner {
 	 * 		  files.
 	 */
 	public LearningAnalysisRunner(String dataSetPath, String supplementaryPath, int maxChangeComplexity) {
+		super(new JavaScriptCFGFactory());
 		this.dataset = new LearningDataSet(dataSetPath, supplementaryPath);
 		this.maxChangeComplexity = maxChangeComplexity;
 	}
