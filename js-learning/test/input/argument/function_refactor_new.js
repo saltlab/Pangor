@@ -1,0 +1,1 @@
+jQuery.fn.extend(1, 2);

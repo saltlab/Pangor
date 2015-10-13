@@ -1,0 +1,2 @@
+if (!isHistory) powGlobals.engine.server.on('listening', function() { engage(); powGlobals.serverReady = 1; });
+else if (isHistory) powGlobals.engine.server.on('listening', function() { engage(targetHistory); powGlobals.serverReady = 1; });

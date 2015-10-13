@@ -17,7 +17,6 @@ import org.mozilla.javascript.ast.PropertyGet;
 import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.pangor.analysis.boundedcontext.ChangeTypeFilterVisitor;
 import ca.ubc.ece.salt.pangor.analysis.flow.IdentifiersTreeVisitor;
 
 public class AnalysisUtilities {
