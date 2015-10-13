@@ -11,6 +11,7 @@ import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.analysis.flow.PathInsensitiveFlowAnalysis;
+import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.analysis.specialtype.SpecialTypeCheck;
 import ca.ubc.ece.salt.pangor.analysis.specialtype.SpecialTypeVisitor;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
@@ -18,7 +19,6 @@ import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
 import ca.ubc.ece.salt.pangor.js.analysis.AnalysisUtilities;
-import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
 
 public class CallbackErrorSourceFlowAnalysis extends PathInsensitiveFlowAnalysis<ClassifierAlert, ClassifierDataSet, CallbackErrorLatticeElement> {
 
@@ -85,11 +85,11 @@ public class CallbackErrorSourceFlowAnalysis extends PathInsensitiveFlowAnalysis
 
 	@Override
 	public void transfer(CFGEdge edge, CallbackErrorLatticeElement sourceLE,
-			Scope scope) {
+			Scope<AstNode> scope) {
 
 		AstNode condition = (AstNode) edge.getCondition();
 
-		if(condition == null || !(scope.scope instanceof FunctionNode)) return;
+		if(condition == null || !(scope.getScope() instanceof FunctionNode)) return;
 
 		/* Look for inserted parameter checks. */
         List<SpecialTypeCheck> specialTypeChecks = SpecialTypeVisitor.getSpecialTypeChecks(condition, false);
@@ -97,7 +97,7 @@ public class CallbackErrorSourceFlowAnalysis extends PathInsensitiveFlowAnalysis
         for(SpecialTypeCheck specialTypeCheck : specialTypeChecks) {
         	if(sourceLE.parameters.contains(specialTypeCheck.identifier)) {
 
-        		FunctionNode function = (FunctionNode) scope.scope;
+        		FunctionNode function = (FunctionNode) scope.getScope();
 
                 /* Register an alert. */
                 String signature = AnalysisUtilities.getFunctionSignature(function);
@@ -110,7 +110,7 @@ public class CallbackErrorSourceFlowAnalysis extends PathInsensitiveFlowAnalysis
 
 	@Override
 	public void transfer(CFGNode node, CallbackErrorLatticeElement sourceLE,
-			Scope scope) {
+			Scope<AstNode> scope) {
 		/* Nothing to do. */
 	}
 

@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.mozilla.javascript.ast.AstNode;
+import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.analysis.meta.MetaAnalysis;
@@ -37,9 +38,9 @@ public class ErrorHandlingAnalysis extends MetaAnalysis<ClassifierAlert, Classif
 
 		repairs: for(ErrorHandlingCheck repairPattern : repairPatterns) {
 
-			if(antiPatterns.containsKey(repairPattern.scope.scope.getMapping())) {
+			if(antiPatterns.containsKey(repairPattern.scope.getScope().getMapping())) {
 
-				List<String> unprotectedMethodCalls = antiPatterns.get(repairPattern.scope.scope.getMapping());
+				List<String> unprotectedMethodCalls = antiPatterns.get(repairPattern.scope.getScope().getMapping());
 
 				/* To be a repair, all the function calls need to be unprotected
 				 * in the source file. */
@@ -49,7 +50,7 @@ public class ErrorHandlingAnalysis extends MetaAnalysis<ClassifierAlert, Classif
 
 				/* Register an alert. */
 				this.registerAlert(new ErrorHandlingAlert(this.ami,
-						AnalysisUtilities.getFunctionName(repairPattern.scope.scope), "EH"));
+						AnalysisUtilities.getFunctionName((ScriptNode)repairPattern.scope.getScope()), "EH"));
 
 			}
 

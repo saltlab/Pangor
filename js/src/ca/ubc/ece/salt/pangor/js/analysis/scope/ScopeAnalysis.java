@@ -50,14 +50,14 @@ public class ScopeAnalysis<U extends Alert, T extends DataSet<U>> extends Analys
 	protected List<CFG> srcCFGs;
 	protected List<CFG> dstCFGs;
 
-	protected Scope srcScope;
-	protected Scope dstScope;
+	protected JavaScriptScope srcScope;
+	protected JavaScriptScope dstScope;
 
 	/** Maps function nodes to their scopes. */
-	protected Map<ScriptNode, Scope> srcScopeMap;
+	protected Map<ScriptNode, JavaScriptScope> srcScopeMap;
 
 	/** Maps function nodes to their scopes. */
-	protected Map<ScriptNode, Scope> dstScopeMap;
+	protected Map<ScriptNode, JavaScriptScope> dstScopeMap;
 
 	public ScopeAnalysis(T dataSet, AnalysisMetaInformation ami) {
 		super(dataSet, ami);
@@ -69,14 +69,14 @@ public class ScopeAnalysis<U extends Alert, T extends DataSet<U>> extends Analys
 	/**
 	 * @return the source scope tree.
 	 */
-	public Scope getSrcScope() {
+	public JavaScriptScope getSrcScope() {
 		return this.srcScope;
 	}
 
 	/**
 	 * @return the destination scope tree.
 	 */
-	public Scope getDstScope() {
+	public JavaScriptScope getDstScope() {
 		return this.dstScope;
 	}
 
@@ -84,7 +84,7 @@ public class ScopeAnalysis<U extends Alert, T extends DataSet<U>> extends Analys
 	 * @param node the script or function
 	 * @return the source scope tree.
 	 */
-	public Scope getSrcScope(ScriptNode node) {
+	public JavaScriptScope getSrcScope(ScriptNode node) {
 		return this.srcScopeMap.get(node);
 	}
 
@@ -92,7 +92,7 @@ public class ScopeAnalysis<U extends Alert, T extends DataSet<U>> extends Analys
 	 * @param node the script or function
 	 * @return the destination scope tree.
 	 */
-	public Scope getDstScope(ScriptNode node) {
+	public JavaScriptScope getDstScope(ScriptNode node) {
 		return this.dstScopeMap.get(node);
 	}
 
@@ -103,7 +103,7 @@ public class ScopeAnalysis<U extends Alert, T extends DataSet<U>> extends Analys
 		if(!(root instanceof AstRoot)) throw new IllegalArgumentException("The AST must be parsed from Apache Rhino.");
 		AstRoot script = (AstRoot) root;
 
-		this.dstScopeMap = new HashMap<ScriptNode, Scope>();
+		this.dstScopeMap = new HashMap<ScriptNode, JavaScriptScope>();
 		this.dstCFGs = cfgs;
 		this.dstScope = this.buildScopeTree(script, null, this.dstScopeMap, null);
 
@@ -118,8 +118,8 @@ public class ScopeAnalysis<U extends Alert, T extends DataSet<U>> extends Analys
 		AstRoot srcScript = (AstRoot) srcRoot;
 		AstRoot dstScript = (AstRoot) dstRoot;
 
-		this.srcScopeMap = new HashMap<ScriptNode, Scope>();
-		this.dstScopeMap = new HashMap<ScriptNode, Scope>();
+		this.srcScopeMap = new HashMap<ScriptNode, JavaScriptScope>();
+		this.dstScopeMap = new HashMap<ScriptNode, JavaScriptScope>();
 		this.srcCFGs = srcCFGs;
 		this.dstCFGs = dstCFGs;
 		this.srcScope = this.buildScopeTree(srcScript, null, this.srcScopeMap, null);
@@ -132,7 +132,7 @@ public class ScopeAnalysis<U extends Alert, T extends DataSet<U>> extends Analys
 	 * @return the root of the scope tree.
 	 * @throws Exception
 	 */
-	private Scope buildScopeTree(ScriptNode function, Scope parent, Map<ScriptNode, Scope> scopeMap, String parentIdentity) throws Exception {
+	private JavaScriptScope buildScopeTree(ScriptNode function, JavaScriptScope parent, Map<ScriptNode, JavaScriptScope> scopeMap, String parentIdentity) throws Exception {
 
 		/* Create a unique identity for the function. */
 		String identity = "Script";
@@ -144,7 +144,7 @@ public class ScopeAnalysis<U extends Alert, T extends DataSet<U>> extends Analys
 
         /* Create a new scope for this script or function and add it to the
          * scope tree. */
-		Scope scope = new Scope(parent, function, identity);
+		JavaScriptScope scope = new JavaScriptScope(parent, function, identity);
 		if(parent != null) parent.children.add(scope);
 		ScopeVisitor.getLocalScope(scope);
 

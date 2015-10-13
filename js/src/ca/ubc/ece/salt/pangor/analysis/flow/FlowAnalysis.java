@@ -2,16 +2,17 @@ package ca.ubc.ece.salt.pangor.analysis.flow;
 
 import java.util.List;
 
+import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.pangor.analysis.Alert;
 import ca.ubc.ece.salt.pangor.analysis.DataSet;
+import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
-import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.js.analysis.scope.ScopeAnalysis;
 
 /**
@@ -22,7 +23,6 @@ import ca.ubc.ece.salt.pangor.js.analysis.scope.ScopeAnalysis;
  * Loops are executed once.
  *
  * NOTE: This class only works with the Mozilla Rhino AST.
- * TODO: We can probably make this generic.
  *
  * @param <LE> The lattice element type that stores the analysis information.
  */
@@ -83,7 +83,7 @@ public abstract class FlowAnalysis<U extends Alert, T extends DataSet<U>, LE ext
 	 * @param cfg the control flow graph for the function or script we are analyzing.
 	 * @param scopeStack the scope for the function.
 	 */
-	abstract protected void analyze(CFG cfg, Scope scope);
+	abstract protected void analyze(CFG cfg, Scope<AstNode> scope);
 
 	/**
 	 * @param function The function under analysis.
@@ -95,13 +95,13 @@ public abstract class FlowAnalysis<U extends Alert, T extends DataSet<U>, LE ext
 	 * Transfer the lattice element over the CFGEdge.
 	 * @param edge The edge to transfer over.
 	 */
-	public abstract void transfer(CFGEdge edge, LE sourceLE, Scope scope);
+	public abstract void transfer(CFGEdge edge, LE sourceLE, Scope<AstNode> scope);
 
 	/**
 	 * Transfer the lattice element over the CFGNode.
 	 * @param node The node to transfer over.
 	 */
-	public abstract void transfer(CFGNode node, LE sourceLE, Scope scope);
+	public abstract void transfer(CFGNode node, LE sourceLE, Scope<AstNode> scope);
 
 	/**
 	 * @param le The lattice element to copy.
@@ -114,18 +114,18 @@ public abstract class FlowAnalysis<U extends Alert, T extends DataSet<U>, LE ext
 	 * function scopes to be passed to sub-functions.
 	 * @throws Exception
 	 */
-	private void analyze(Scope scope, List<CFG> cfgs) throws Exception {
+	private void analyze(Scope<AstNode> scope, List<CFG> cfgs) throws Exception {
 
         /* Analyze node. */
 
-        CFG cfg = this.getFunctionCFG(scope.scope, cfgs);
+        CFG cfg = this.getFunctionCFG(scope.getScope(), cfgs);
         if(cfg == null) throw new Exception("CFG not found for function.");
-        this.setCurrentCFGIdentity(scope.identity);
+        this.setCurrentCFGIdentity(scope.getIdentity());
         this.analyze(cfg, scope);
 
         /* Analyze the methods of the function. */
 
-        for(Scope childScope : scope.children){
+        for(Scope<AstNode> childScope : scope.getChildren()){
         	analyze(childScope, cfgs);
         }
 

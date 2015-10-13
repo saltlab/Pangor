@@ -1,20 +1,22 @@
 package ca.ubc.ece.salt.pangor.analysis.callbackerrorhandling;
 
+import org.mozilla.javascript.ast.AstNode;
+
+import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.classify.alert.SpecialTypeAlert.SpecialType;
-import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
 
 /**
  * Stores a parameter that was unchanged and had a special type check
  * inserted.
  */
 public class CallbackErrorCheck {
-	public Scope scope;
+	public Scope<AstNode> scope;
 	public String functionName;
 	public String functionSignature;
 	public String identifier;
 	public SpecialType type;
 
-	public CallbackErrorCheck(Scope scope, String functionName, String functionSignature, String identifier, SpecialType type) {
+	public CallbackErrorCheck(Scope<AstNode> scope, String functionName, String functionSignature, String identifier, SpecialType type) {
 		this.scope = scope;
 		this.functionName = functionName;
 		this.functionSignature = functionSignature;
@@ -29,7 +31,7 @@ public class CallbackErrorCheck {
 
 		CallbackErrorCheck cec = (CallbackErrorCheck) o;
 
-		if(this.scope.scope == cec.scope.scope && this.identifier.equals(cec.identifier)) return true;
+		if(this.scope.getScope() == cec.scope.getScope() && this.identifier.equals(cec.identifier)) return true;
 
 		return false;
 
@@ -37,6 +39,6 @@ public class CallbackErrorCheck {
 
 	@Override
 	public int hashCode() {
-		return this.scope.scope.hashCode();
+		return this.scope.getScope().hashCode();
 	}
 }

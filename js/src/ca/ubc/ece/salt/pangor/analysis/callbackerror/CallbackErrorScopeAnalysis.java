@@ -9,7 +9,7 @@ import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
-import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
+import ca.ubc.ece.salt.pangor.js.analysis.scope.JavaScriptScope;
 import ca.ubc.ece.salt.pangor.js.analysis.scope.ScopeAnalysis;
 
 public class CallbackErrorScopeAnalysis extends ScopeAnalysis<ClassifierAlert, ClassifierDataSet> {
@@ -38,7 +38,7 @@ public class CallbackErrorScopeAnalysis extends ScopeAnalysis<ClassifierAlert, C
 	/**
 	 * @param scope The function to inspect.
 	 */
-	private void inspectFunctions(Scope scope) {
+	private void inspectFunctions(JavaScriptScope scope) {
 		/* Visit the function and look for STH patterns. */
 		if (scope.scope instanceof FunctionNode) {
 			FunctionNode function = (FunctionNode) scope.scope;

@@ -11,10 +11,10 @@ import org.mozilla.javascript.ast.TryStatement;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
+import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
-import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.js.analysis.scope.ScopeAnalysis;
 
 /**
@@ -69,13 +69,13 @@ public class ErrorHandlingDestinationScopeAnalysis extends ScopeAnalysis<Classif
 	 * surrounds an unchanged block.
 	 * @param scope The function to inspect.
 	 */
-	private void inspectFunctions(Scope scope) {
+	private void inspectFunctions(Scope<AstNode> scope) {
 
 		ErrorHandlingDestinationAnalysisVisitor visitor = new ErrorHandlingDestinationAnalysisVisitor(scope);
-		scope.scope.visit(visitor);
+		scope.getScope().visit(visitor);
 
 		/* We still need to inspect the functions declared in this scope. */
-		for(Scope child : scope.children) {
+		for(Scope<AstNode> child : scope.getChildren()) {
 			inspectFunctions(child);
 		}
 
@@ -87,9 +87,9 @@ public class ErrorHandlingDestinationScopeAnalysis extends ScopeAnalysis<Classif
 	 */
 	private class ErrorHandlingDestinationAnalysisVisitor implements NodeVisitor {
 
-		private Scope scope;
+		private Scope<AstNode> scope;
 
-		public ErrorHandlingDestinationAnalysisVisitor(Scope scope) {
+		public ErrorHandlingDestinationAnalysisVisitor(Scope<AstNode> scope) {
 			this.scope = scope;
 		}
 
@@ -115,13 +115,13 @@ public class ErrorHandlingDestinationScopeAnalysis extends ScopeAnalysis<Classif
 
 					/* Register the potential repair. */
 					ErrorHandlingDestinationScopeAnalysis.this.protectedCalls.add(
-							new ErrorHandlingCheck(this.scope,unchangedMethodCalls));
+							new ErrorHandlingCheck(this.scope, unchangedMethodCalls));
 
 				}
 
 			}
 
-			else if(node != this.scope.scope && node instanceof FunctionNode) {
+			else if(node != this.scope.getScope() && node instanceof FunctionNode) {
 				return false;
 			}
 

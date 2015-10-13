@@ -2,11 +2,13 @@ package ca.ubc.ece.salt.pangor.analysis.learning;
 
 import java.util.Map;
 
+import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.pangor.analysis.meta.MetaAnalysis;
+import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
-import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
+import ca.ubc.ece.salt.pangor.js.analysis.scope.JavaScriptScope;
 
 /**
  * Creates a data set for learning bug and repair patterns related to the use
@@ -45,22 +47,22 @@ public class LearningAnalysis extends MetaAnalysis<FeatureVector, LearningDataSe
 	protected void synthesizeAlerts() throws Exception {
 
 		/* Source analysis. */
-		Map<Scope, FeatureVector> srcFeatureVectors = this.srcAnalysis.getFeatureVectors();
+		Map<Scope<AstNode>, FeatureVector> srcFeatureVectors = this.srcAnalysis.getFeatureVectors();
 
 		/* Destination analysis. */
-		Map<Scope, FeatureVector> dstFeatureVectors = this.dstAnalysis.getFeatureVectors();
+		Map<Scope<AstNode>, FeatureVector> dstFeatureVectors = this.dstAnalysis.getFeatureVectors();
 
 		/* Check that the change complexity falls within the max. */
 		if(this.srcAnalysis.getChangeComplexity() <= this.maxChangeComplexity
 				&& this.dstAnalysis.getChangeComplexity() <= this.maxChangeComplexity) {
 
 			/* Synthesize the alerts. */
-			for(Scope dstScope : dstFeatureVectors.keySet()) {
+			for(Scope<AstNode> dstScope : dstFeatureVectors.keySet()) {
 
 				/* Get the source scope that maps to the destination scope. */
-				Scope srcScope;
-				if(dstScope.scope.getMapping() != null) {
-					srcScope = this.srcAnalysis.getDstScope((ScriptNode)dstScope.scope.getMapping());
+				JavaScriptScope srcScope;
+				if(dstScope.getScope().getMapping() != null) {
+					srcScope = this.srcAnalysis.getDstScope((ScriptNode)dstScope.getScope().getMapping());
 				}
 				else {
 					srcScope = this.srcAnalysis.getDstScope();

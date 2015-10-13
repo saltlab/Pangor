@@ -29,17 +29,17 @@ public class CallbackErrorHandlingAnalysis extends MetaAnalysis<ClassifierAlert,
 		for(CallbackErrorCheck repair : repairs) {
 
 			/* Get the (supposedly) buggy function. */
-			FunctionNode buggyFunction = (FunctionNode)repair.scope.scope.getMapping();
+			FunctionNode buggyFunction = (FunctionNode)repair.scope.getScope().getMapping();
 
 			/* Check to see if the buggy function is in our list of anti-patterns. */
 			boolean hasAntiPattern = false;
 			for(CallbackErrorCheck antiPattern : antiPatterns) {
-				if(antiPattern.scope.scope == buggyFunction) hasAntiPattern = true;
+				if(antiPattern.scope.getScope() == buggyFunction) hasAntiPattern = true;
 			}
 
 			/* If there is no anti-pattern and the function signatures match, register an alert. */
 			String buggyFunctionSignature = AnalysisUtilities.getFunctionSignature(buggyFunction);
-			String repairedFunctionSignature = AnalysisUtilities.getFunctionSignature((FunctionNode)repair.scope.scope);
+			String repairedFunctionSignature = AnalysisUtilities.getFunctionSignature((FunctionNode)repair.scope.getScope());
 
 			if(!hasAntiPattern && buggyFunctionSignature.equals(repairedFunctionSignature)) {
 				/* Register an alert. */

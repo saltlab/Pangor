@@ -11,6 +11,7 @@ import org.mozilla.javascript.ast.NodeVisitor;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
+import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.analysis.specialtype.SpecialTypeCheck;
 import ca.ubc.ece.salt.pangor.analysis.specialtype.SpecialTypeVisitor;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
@@ -19,7 +20,6 @@ import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
 import ca.ubc.ece.salt.pangor.classify.alert.SpecialTypeAlert;
 import ca.ubc.ece.salt.pangor.classify.alert.SpecialTypeAlert.SpecialType;
 import ca.ubc.ece.salt.pangor.js.analysis.UseTreeVisitor;
-import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.js.analysis.scope.ScopeAnalysis;
 
 /**
@@ -71,20 +71,20 @@ public class STHScopeAnalysis extends ScopeAnalysis<ClassifierAlert, ClassifierD
 	 *
 	 * @param scope The function to inspect.
 	 */
-	private void inspectFunctions(Scope scope) {
+	private void inspectFunctions(Scope<AstNode> scope) {
 
 		/* Visit the function and look for STH patterns. */
 		STHScopeAnalysisVisitor visitor = new STHScopeAnalysisVisitor();
-		if(scope.scope instanceof FunctionNode) {
-			FunctionNode function = (FunctionNode) scope.scope;
+		if(scope.getScope() instanceof FunctionNode) {
+			FunctionNode function = (FunctionNode) scope.getScope();
             function.getBody().visit(visitor);
 		}
 		else {
-            scope.scope.visit(visitor);
+            scope.getScope().visit(visitor);
 		}
 
 		/* Visit the child functions. */
-		for(Scope child : scope.children) {
+		for(Scope<AstNode> child : scope.getChildren()) {
 			inspectFunctions(child);
 		}
 

@@ -10,11 +10,11 @@ import org.mozilla.javascript.ast.ScriptNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
+import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
 import ca.ubc.ece.salt.pangor.classify.alert.GlobalToLocalAlert;
-import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.js.analysis.scope.ScopeAnalysis;
 
 /**
@@ -54,19 +54,19 @@ public class GTLScopeAnalysis extends ScopeAnalysis<ClassifierAlert, ClassifierD
 	 *
 	 * @param scope The function to inspect.
 	 */
-	private void inspectFunctions(Scope dstScope) {
+	private void inspectFunctions(Scope<AstNode> dstScope) {
 
-		if(dstScope.scope.getMapping() != null) {
+		if(dstScope.getScope().getMapping() != null) {
 
-			Scope srcScope = this.getSrcScope((ScriptNode)dstScope.scope.getMapping());
+			Scope<AstNode> srcScope = this.getSrcScope((ScriptNode)dstScope.getScope().getMapping());
 
-            if(dstScope.scope instanceof FunctionNode) {
+            if(dstScope.getScope() instanceof FunctionNode) {
 
                 /* Check all the new local variables. If they used to be global but
                  * are now local, generate an alert. */
-                for(String localVariable : dstScope.variables.keySet()) {
+                for(String localVariable : dstScope.getVariables().keySet()) {
 
-                    AstNode variableNode = dstScope.variables.get(localVariable);
+                    AstNode variableNode = dstScope.getVariables().get(localVariable);
 
                     if(variableNode.getChangeType() == ChangeType.INSERTED
                     		&& (variableNode instanceof Name)
@@ -74,7 +74,7 @@ public class GTLScopeAnalysis extends ScopeAnalysis<ClassifierAlert, ClassifierD
                     		&& !srcScope.isLocal(localVariable)
                     		&& srcScope.isGlobal(localVariable)
                     		&& !deletedInScope(srcScope, localVariable)) {
-                        this.registerAlert(dstScope.variables.get(localVariable), new GlobalToLocalAlert(this.ami, "[TODO: function name]", "AST_GTL", localVariable));
+                        this.registerAlert(dstScope.getVariables().get(localVariable), new GlobalToLocalAlert(this.ami, "[TODO: function name]", "AST_GTL", localVariable));
                     }
 
                 }
@@ -93,7 +93,7 @@ public class GTLScopeAnalysis extends ScopeAnalysis<ClassifierAlert, ClassifierD
                     		&& ((variableNode.getParent() instanceof FunctionNode))
                     		&& this.srcScope.isGlobal(localVariable)
                     		&& !deletedInScope(srcScope, localVariable)) {
-                        this.registerAlert(dstScope.variables.get(localVariable), new GlobalToLocalAlert(this.ami, "[TODO: function name]", "AST_GTL", localVariable));
+                        this.registerAlert(dstScope.getVariables().get(localVariable), new GlobalToLocalAlert(this.ami, "[TODO: function name]", "AST_GTL", localVariable));
                     }
 
                 }
@@ -103,7 +103,7 @@ public class GTLScopeAnalysis extends ScopeAnalysis<ClassifierAlert, ClassifierD
         }
 
 		/* Visit the child functions. */
-		for(Scope child : dstScope.children) {
+		for(Scope<AstNode> child : dstScope.getChildren()) {
 			inspectFunctions(child);
 		}
 
@@ -115,12 +115,12 @@ public class GTLScopeAnalysis extends ScopeAnalysis<ClassifierAlert, ClassifierD
 	 * @param notDefinedRepairs The list of potential not defined repairs.
 	 * @return true if the identifier was deleted in the scope or a method scope.
 	 */
-	private boolean deletedInScope(Scope scope, String identifier) {
+	private boolean deletedInScope(Scope<AstNode> scope, String identifier) {
 
-		AstNode node = scope.variables.get(identifier);
+		AstNode node = scope.getVariables().get(identifier);
 		if(node != null && node.getChangeType() == ChangeType.REMOVED) return true;
 
-		for(Scope child : scope.children) {
+		for(Scope<AstNode> child : scope.getChildren()) {
 			if(deletedInScope(child, identifier)) return true;
 		}
 

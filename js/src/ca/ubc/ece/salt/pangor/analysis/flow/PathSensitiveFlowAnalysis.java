@@ -2,14 +2,15 @@ package ca.ubc.ece.salt.pangor.analysis.flow;
 
 import java.util.Stack;
 
+import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.pangor.analysis.Alert;
 import ca.ubc.ece.salt.pangor.analysis.DataSet;
+import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
-import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
 
 /**
  * A path sensitive flow analysis.
@@ -33,7 +34,7 @@ public abstract class PathSensitiveFlowAnalysis<U extends Alert, T extends DataS
 	 * @param scopeStack the scope for the function.
 	 */
 	@Override
-	protected void analyze(CFG cfg, Scope scope) {
+	protected void analyze(CFG cfg, Scope<AstNode> scope) {
 
 		long pathsComplete = 0;
 		long edgesVisited = 0;

@@ -9,94 +9,111 @@ import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.ScriptNode;
 
-public final class Scope {
-	
+import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
+import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
+
+public final class JavaScriptScope implements Scope<AstNode> {
+
 	/** The scope above this scope (i.e., the scope for this function's parent). **/
-	public Scope parent;
-	
+	public JavaScriptScope parent;
+
 	/** The AST node of the script or function of this scope. **/
 	public ScriptNode scope;
-	
+
 	/** The variables declared in the scope. **/
 	public Map<String, AstNode> variables;
-	
+
 	/** The globals declared (implicitly if this is not the script scope) in the scope. **/
 	public Map<String, AstNode> globals;
-	
+
 	/** The scopes of the child functions. **/
-	public List<Scope> children;
-	
+	public List<Scope<AstNode>> children;
+
 	/** Uniquely identifies each function. **/
 	public String identity;
-	
-	public Scope(Scope parent, ScriptNode scope, String identity) {
+
+	public JavaScriptScope(JavaScriptScope parent, ScriptNode scope, String identity) {
 		this.parent = parent;
 		this.scope = scope;
 		this.variables = new HashMap<String, AstNode>();
 		this.globals = new HashMap<String, AstNode>();
-		this.children = new LinkedList<Scope>();
+		this.children = new LinkedList<Scope<AstNode>>();
 		this.identity = identity;
 	}
-	
 
-	/**
-	 * Starting with the current scope, search the tree upwards until the
-	 * identifier is found (or not found).
-	 * @param variable The variable to find.
-	 * @return The Name node where the variable is declared.
-	 */
+
+	@Override
+	public Scope<AstNode> getParent() {
+		return this.parent;
+	}
+
+	@Override
+	public AstNode getScope() {
+		return this.scope;
+	}
+
+	@Override
+	public Map<String, AstNode> getVariables() {
+		return this.variables;
+	}
+
+	@Override
+	public Map<String, AstNode> getGlobals() {
+		return this.globals;
+	}
+
+	@Override
+	public List<Scope<AstNode>> getChildren() {
+		return this.children;
+	}
+
+	@Override
+	public String getIdentity() {
+		return this.identity;
+	}
+
+	@Override
 	public AstNode getVariableDeclaration(String variable) {
-		
+
 		if(this.variables.containsKey(variable)) return this.variables.get(variable);
 		if(this.parent == null) return null;
 		return parent.getVariableDeclaration(variable);
-		
+
 	}
-	
-	/**
-	 * @param function The function to find.
-	 * @return The scope for the function, or null if the function is not a
-	 * 		   sub-function of the function/script for this scope.
-	 */
-	public Scope getFunctionScope(FunctionNode function) {
-		
+
+	@Override
+	public Scope<AstNode> getFunctionScope(ClassifiedASTNode function) {
+
+		/* Sanity check. */
+		if(!(function instanceof FunctionNode)) throw new IllegalArgumentException("The AST must be parsed from Apache Rhino.");
+
 		if(this.scope == function) return this;
-		
-		for(Scope child : this.children) {
-			Scope functionScope = child.getFunctionScope(function);
+
+		for(Scope<AstNode> child : this.children) {
+			Scope<AstNode> functionScope = child.getFunctionScope(function);
 			if(functionScope != null) return functionScope;
 		}
-		
+
 		return null;
-		
+
 	}
-	
-	/**
-	 * Checks if a variable is in a local scope by checking the scope tree
-	 * until we get to the global scope.
-	 * @param variable The variable to check.
-	 * @return True if the variable is defined in a local scope.
-	 */
+
+	@Override
 	public boolean isLocal(String variable) {
-		
+
 		if(this.parent == null) return false;
 		if(this.variables.containsKey(variable)) return true;
 		return this.parent.isLocal(variable);
-		
+
 	}
-	
-	/**
-	 * Checks if a variable is in a global scope by checking parents in the
-	 * scope tree until we get to the root. 
-	 * @param variable The variable to check.
-	 * @return True if the variable is defined in a global scope.
-	 */
+
+	@Override
 	public boolean isGlobal(String variable) {
-		
+
 		if(this.globals.containsKey(variable)) return true;
 		if(this.parent == null) return this.variables.containsKey(variable);
 		return this.parent.isGlobal(variable);
-		
+
 	}
 
 }

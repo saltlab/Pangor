@@ -14,11 +14,11 @@ import org.mozilla.javascript.ast.VariableInitializer;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.analysis.flow.PathInsensitiveFlowAnalysis;
+import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
-import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
 
 public class GlobalToLocalFlowAnalysis extends PathInsensitiveFlowAnalysis<ClassifierAlert, ClassifierDataSet, GlobalToLocalLatticeElement> {
 
@@ -36,7 +36,7 @@ public class GlobalToLocalFlowAnalysis extends PathInsensitiveFlowAnalysis<Class
 	}
 
 	@Override
-	public void transfer(CFGEdge edge, GlobalToLocalLatticeElement sourceLE, Scope scope) {
+	public void transfer(CFGEdge edge, GlobalToLocalLatticeElement sourceLE, Scope<AstNode> scope) {
 
 		AstNode statement = (AstNode)edge.getCondition();
 
@@ -59,7 +59,7 @@ public class GlobalToLocalFlowAnalysis extends PathInsensitiveFlowAnalysis<Class
 	}
 
 	@Override
-	public void transfer(CFGNode node, GlobalToLocalLatticeElement sourceLE, Scope scope) {
+	public void transfer(CFGNode node, GlobalToLocalLatticeElement sourceLE, Scope<AstNode> scope) {
 
 		AstNode statement = (AstNode)node.getStatement();
 
@@ -70,9 +70,9 @@ public class GlobalToLocalFlowAnalysis extends PathInsensitiveFlowAnalysis<Class
 			 * declaring new variables for it makes sense and is not considered
 			 * a repair. */
 
-			if(scope.scope instanceof FunctionNode) {
+			if(scope.getScope() instanceof FunctionNode) {
 
-				FunctionNode function = (FunctionNode) scope.scope;
+				FunctionNode function = (FunctionNode) scope.getScope();
 				if(function.getChangeType() == ChangeType.INSERTED) return;
 
 			}
@@ -143,10 +143,10 @@ public class GlobalToLocalFlowAnalysis extends PathInsensitiveFlowAnalysis<Class
 	 * global at a later point.
 	 */
 	 class GlobalToLocal {
-		public Scope scope;
+		public Scope<AstNode> scope;
 		public String identifier;
 
-		public GlobalToLocal(Scope scope, String identifier) {
+		public GlobalToLocal(Scope<AstNode> scope, String identifier) {
 			this.scope = scope;
 			this.identifier = identifier;
 		}

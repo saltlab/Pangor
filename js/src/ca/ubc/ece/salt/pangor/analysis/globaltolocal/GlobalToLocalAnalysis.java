@@ -9,10 +9,11 @@ import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.analysis.globaltolocal.GlobalToLocalFlowAnalysis.GlobalToLocal;
 import ca.ubc.ece.salt.pangor.analysis.meta.MetaAnalysis;
+import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
 import ca.ubc.ece.salt.pangor.classify.alert.GlobalToLocalAlert;
-import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
+import ca.ubc.ece.salt.pangor.js.analysis.scope.JavaScriptScope;
 import ca.ubc.ece.salt.pangor.js.analysis.scope.ScopeAnalysis;
 
 public class GlobalToLocalAnalysis extends MetaAnalysis<ClassifierAlert, ClassifierDataSet, ScopeAnalysis<ClassifierAlert, ClassifierDataSet>, GlobalToLocalFlowAnalysis> {
@@ -35,20 +36,20 @@ public class GlobalToLocalAnalysis extends MetaAnalysis<ClassifierAlert, Classif
 			 * Check the entire scope tree. this reduces false positives from
 			 * methods which are renamed. */
 
-			Scope srcScope = this.srcAnalysis.getDstScope();
+			JavaScriptScope srcScope = this.srcAnalysis.getDstScope();
 
 			if(this.deletedInScope(srcScope, gtl.identifier)) {
 				this.dstAnalysis.notDefinedRepairs.remove(gtl);
 			}
 
-			if(gtl.scope.scope instanceof FunctionNode) {
+			if(gtl.scope.getScope() instanceof FunctionNode) {
 
                 /* Check that the variable was previously in the global scope and not previously in the local scope. */
 
-				FunctionNode sourceFunction = (FunctionNode)gtl.scope.scope.getMapping();
+				FunctionNode sourceFunction = (FunctionNode)gtl.scope.getScope().getMapping();
 				if(sourceFunction != null) {
 
-					Scope sourceFunctionScope = srcScope.getFunctionScope(sourceFunction);
+					Scope<AstNode> sourceFunctionScope = srcScope.getFunctionScope(sourceFunction);
 					if(!sourceFunctionScope.isGlobal(gtl.identifier) || sourceFunctionScope.isLocal(gtl.identifier)) {
 
 						/* The variable was not previously part of the global scope. */
@@ -86,12 +87,12 @@ public class GlobalToLocalAnalysis extends MetaAnalysis<ClassifierAlert, Classif
 	 * @param notDefinedRepairs The list of potential not defined repairs.
 	 * @return true if the identifier was deleted in the scope or a method scope.
 	 */
-	private boolean deletedInScope(Scope scope, String identifier) {
+	private boolean deletedInScope(Scope<AstNode> scope, String identifier) {
 
-		AstNode node = scope.variables.get(identifier);
+		AstNode node = scope.getVariables().get(identifier);
 		if(node != null && node.getChangeType() == ChangeType.REMOVED) return true;
 
-		for(Scope child : scope.children) {
+		for(Scope<AstNode> child : scope.getChildren()) {
 			if(deletedInScope(child, identifier)) return true;
 		}
 

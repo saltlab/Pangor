@@ -4,13 +4,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.AstRoot;
+import org.mozilla.javascript.ast.ScriptNode;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
+import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
-import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.js.analysis.scope.ScopeAnalysis;
 import ca.ubc.ece.salt.pangor.learning.apis.APIFactory;
 import ca.ubc.ece.salt.pangor.learning.pointsto.PointsToPrediction;
@@ -24,7 +26,7 @@ import ca.ubc.ece.salt.pangor.learning.pointsto.PointsToPrediction;
 public class LearningASTAnalysis extends ScopeAnalysis<FeatureVector, LearningDataSet> {
 
 	/** Stores the results for each function. **/
-	private Map<Scope, FeatureVector> featureVectors;
+	private Map<Scope<AstNode>, FeatureVector> featureVectors;
 
 	/** Stores the change complexity. **/
 	private int changeComplexity;
@@ -46,7 +48,7 @@ public class LearningASTAnalysis extends ScopeAnalysis<FeatureVector, LearningDa
 	 */
 	public LearningASTAnalysis(LearningDataSet dataSet, AnalysisMetaInformation ami, int maxChangeComplexity){
 		super(dataSet, ami);
-		this.featureVectors = new HashMap<Scope, FeatureVector>();
+		this.featureVectors = new HashMap<Scope<AstNode>, FeatureVector>();
 		this.maxChangeComplexity = maxChangeComplexity;
 		this.changeComplexity = -1;
 	}
@@ -54,7 +56,7 @@ public class LearningASTAnalysis extends ScopeAnalysis<FeatureVector, LearningDa
 	/**
 	 * @return the list of feature vectors produced by the analysis.
 	 */
-	public Map<Scope, FeatureVector> getFeatureVectors() {
+	public Map<Scope<AstNode>, FeatureVector> getFeatureVectors() {
 		return featureVectors;
 	}
 
@@ -123,7 +125,7 @@ public class LearningASTAnalysis extends ScopeAnalysis<FeatureVector, LearningDa
 	 *
 	 * @param scope The function to inspect.
 	 */
-	private void inspectFunctions(Scope scope) {
+	private void inspectFunctions(Scope<AstNode> scope) {
 
 		/* Initialize the points-to analysis. It may take some time to build the package model.
 		 *
@@ -138,10 +140,10 @@ public class LearningASTAnalysis extends ScopeAnalysis<FeatureVector, LearningDa
 		/* If the function was inserted or deleted, there is nothing to do. We
 		 * only want functions that were repaired. Class-level repairs are left
 		 * for later. */
-		if(scope.scope.getChangeType() != ChangeType.INSERTED && scope.scope.getChangeType() != ChangeType.REMOVED) {
+		if(scope.getScope().getChangeType() != ChangeType.INSERTED && scope.getScope().getChangeType() != ChangeType.REMOVED) {
 
             /* Visit the function to extract features. */
-			FeatureVector featureVector = LearningAnalysisVisitor.getFunctionFeatureVector(this.ami, scope.scope, packageModel);
+			FeatureVector featureVector = LearningAnalysisVisitor.getFunctionFeatureVector(this.ami, (ScriptNode)scope.getScope(), packageModel);
 
 			/* Add it to our list if there are features. */
 			this.featureVectors.put(scope, featureVector);
@@ -149,7 +151,7 @@ public class LearningASTAnalysis extends ScopeAnalysis<FeatureVector, LearningDa
 		}
 
 		/* Visit the child functions. */
-		for(Scope child : scope.children) {
+		for(Scope<AstNode> child : scope.getChildren()) {
 			inspectFunctions(child);
 		}
 

@@ -10,12 +10,12 @@ import org.mozilla.javascript.ast.Name;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
+import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.classify.alert.CallbackParameterAlert;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
 import ca.ubc.ece.salt.pangor.js.analysis.AnalysisUtilities;
-import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.js.analysis.scope.ScopeAnalysis;
 
 /**
@@ -61,11 +61,11 @@ public class CallbackParamAnalysis extends ScopeAnalysis<ClassifierAlert, Classi
 	 * as the first or second parameter respectively.
 	 * @param scope The function to inspect.
 	 */
-	private void inspectFunctions(Scope scope) {
+	private void inspectFunctions(Scope<AstNode> scope) {
 
-		if(scope.scope instanceof FunctionNode) {
+		if(scope.getScope() instanceof FunctionNode) {
 
-			FunctionNode function = (FunctionNode) scope.scope;
+			FunctionNode function = (FunctionNode) scope.getScope();
 			List<AstNode> parameters = function.getParams();
 
 			/* Check for a new error parameter. */
@@ -90,7 +90,7 @@ public class CallbackParamAnalysis extends ScopeAnalysis<ClassifierAlert, Classi
 
 		}
 
-		for(Scope child : scope.children) {
+		for(Scope<AstNode> child : scope.getChildren()) {
 			inspectFunctions(child);
 		}
 

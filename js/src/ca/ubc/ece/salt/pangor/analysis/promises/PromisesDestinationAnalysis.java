@@ -11,10 +11,10 @@ import org.mozilla.javascript.ast.NodeVisitor;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
+import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
-import ca.ubc.ece.salt.pangor.js.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.js.analysis.scope.ScopeAnalysis;
 
 public class PromisesDestinationAnalysis extends ScopeAnalysis<ClassifierAlert, ClassifierDataSet> {
@@ -54,17 +54,17 @@ public class PromisesDestinationAnalysis extends ScopeAnalysis<ClassifierAlert, 
 	/**
 	 * @param scope The function to inspect.
 	 */
-	private void inspectFunctions(Scope scope) {
+	private void inspectFunctions(Scope<AstNode> scope) {
 
 		/* Visit the function and look for REF_PROM patterns. */
-		if (scope.scope instanceof FunctionNode) {
-			FunctionNode function = (FunctionNode) scope.scope;
+		if (scope.getScope() instanceof FunctionNode) {
+			FunctionNode function = (FunctionNode) scope.getScope();
 			if(function.getChangeType() != ChangeType.INSERTED && meetsPostConditions(function)) this.meetsPostConditions = true;
 		} else {
-			if(meetsPostConditions(scope.scope)) this.meetsPostConditions = true;
+			if(meetsPostConditions(scope.getScope())) this.meetsPostConditions = true;
 		}
 
-		for (Scope child : scope.children) {
+		for (Scope<AstNode> child : scope.getChildren()) {
 			inspectFunctions(child);
 		}
 
