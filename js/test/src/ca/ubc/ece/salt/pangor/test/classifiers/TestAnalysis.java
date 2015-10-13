@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.test.analysis;
+package ca.ubc.ece.salt.pangor.test.classifiers;
 
 import java.util.List;
 
