@@ -42,6 +42,7 @@ public abstract class PathInsensitiveFlowAnalysis<U extends Alert, T extends Dat
 	@Override
 	protected void analyze(CFG cfg, Scope<AstNode> scope) {
 
+		@SuppressWarnings("unused")
 		long pathsComplete = 0;
 		long edgesVisited = 0;
 

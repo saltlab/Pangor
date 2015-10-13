@@ -9,9 +9,9 @@ import java.util.Set;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.learning.apis.AbstractAPI;
 import ca.ubc.ece.salt.pangor.learning.apis.KeywordDefinition;
+import ca.ubc.ece.salt.pangor.learning.apis.KeywordDefinition.KeywordType;
 import ca.ubc.ece.salt.pangor.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.pangor.learning.apis.TopLevelAPI;
-import ca.ubc.ece.salt.pangor.learning.apis.KeywordDefinition.KeywordType;
 
 /**
  * Abstract class to model a Predictor
@@ -32,6 +32,7 @@ public abstract class Predictor {
 	 */
 	protected Map<KeywordUse, Integer> keywords;
 
+	@SuppressWarnings("unchecked")
 	public Predictor(TopLevelAPI api, Map<KeywordUse, Integer> keywords) {
 		this.api = api;
 		this.keywords = keywords;
@@ -47,7 +48,7 @@ public abstract class Predictor {
 
 	public abstract PredictionResults predictKeyword(KeywordUse keyword);
 
-	public abstract Set<AbstractAPI> predictKeywords(Map<KeywordUse, Integer>... keywords);
+	public abstract Set<AbstractAPI> predictKeywords(@SuppressWarnings("unchecked") Map<KeywordUse, Integer>... keywords);
 
 	/**
 	 * Return a list of names of required packages
@@ -62,7 +63,7 @@ public abstract class Predictor {
 	/**
 	 * Internal method to look for KeywordType.PACKAGE keywords on the input
 	 */
-	protected Set<String> lookupRequiredPackages(Map<KeywordUse, Integer>... keywordsMaps) {
+	protected Set<String> lookupRequiredPackages(@SuppressWarnings("unchecked") Map<KeywordUse, Integer>... keywordsMaps) {
 		Set<String> outputSet = new HashSet<>();
 
 		/*

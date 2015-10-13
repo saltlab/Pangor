@@ -70,6 +70,7 @@ public class TestCFGDiff extends TestCase {
 	 * @param cfgs The CFGs from either the source or destination file.
 	 * @param output How to display the output (adjacency list or DOT).
 	 */
+	@SuppressWarnings("unused")
 	private void getCFGs(List<CFG> cfgs, Output output) {
 
 		/* Reset the CFGNode id generator value (needed for consistent test cases). */

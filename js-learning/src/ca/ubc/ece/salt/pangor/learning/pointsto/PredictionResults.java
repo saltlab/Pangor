@@ -8,6 +8,9 @@ import java.util.PriorityQueue;
  * reverse order, so the prediction on the top is the most likely to be right.
  */
 public class PredictionResults extends PriorityQueue<PredictionResult> {
+
+	private static final long serialVersionUID = 5707048119553423942L;
+
 	public PredictionResults() {
 		super(new ReversePredictionResultComparator());
 	}

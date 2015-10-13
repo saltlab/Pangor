@@ -5,12 +5,10 @@ import java.util.List;
 
 import org.junit.Test;
 
-import ca.ubc.ece.salt.pangor.analysis.globaltolocal.GlobalToLocalAnalysis;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
-import ca.ubc.ece.salt.pangor.classify.alert.GlobalToLocalAlert;
 
 public class TestMissingCallback extends TestAnalysis {
-	
+
 	private void runTest(String[] args, List<ClassifierAlert> expectedAlerts, boolean printAlerts) throws Exception {
 		//GlobalToLocalAnalysis analysis = new GlobalToLocalAnalysis(); // TODO: Create a MissingCallback analysis.
 		//super.runTest(args, expectedAlerts, printAlerts, analysis);

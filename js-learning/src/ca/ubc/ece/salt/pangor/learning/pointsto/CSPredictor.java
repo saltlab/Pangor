@@ -74,7 +74,7 @@ public class CSPredictor extends Predictor {
 	}
 
 	@Override
-	public Set<AbstractAPI> predictKeywords(Map<KeywordUse, Integer>... keywords) {
+	public Set<AbstractAPI> predictKeywords(@SuppressWarnings("unchecked") Map<KeywordUse, Integer>... keywords) {
 		Set<AbstractAPI> allAPIs = new HashSet<>();
 
 		for (Map<KeywordUse, Integer> keywordMap : keywords) {

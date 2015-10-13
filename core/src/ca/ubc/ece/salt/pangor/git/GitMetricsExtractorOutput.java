@@ -11,11 +11,9 @@ import java.io.PrintStream;
  * closeStream() finalize its execution
  */
 public class GitMetricsExtractorOutput {
-	private String filePath;
 	private PrintStream stream;
 
 	public GitMetricsExtractorOutput(String filePath) {
-		this.filePath = filePath;
 
 		try {
 			/*

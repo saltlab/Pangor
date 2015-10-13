@@ -11,10 +11,10 @@ import org.junit.Test;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.learning.apis.APIFactory;
-import ca.ubc.ece.salt.pangor.learning.apis.KeywordUse;
-import ca.ubc.ece.salt.pangor.learning.apis.TopLevelAPI;
 import ca.ubc.ece.salt.pangor.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.pangor.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.pangor.learning.apis.KeywordUse.KeywordContext;
+import ca.ubc.ece.salt.pangor.learning.apis.TopLevelAPI;
 import ca.ubc.ece.salt.pangor.learning.pointsto.PointsToPrediction;
 
 public class TestPointsToPrediction {
@@ -133,6 +133,7 @@ public class TestPointsToPrediction {
 		TopLevelAPI api = APIFactory.buildTopLevelAPI();
 		PointsToPrediction predictor = new PointsToPrediction(api, null);
 
+		@SuppressWarnings("unused")
 		KeywordUse keyword = predictor.getKeyword(KeywordType.METHOD, "fooMethod");
 	}
 }

@@ -62,7 +62,9 @@ public class APIFactory {
 
 	public static List<PackageAPI> buildTopLevelPackages() {
 
+		@SuppressWarnings("unused")
 		PackageAPI fileSystem = buildFileSystemPackage();
+		@SuppressWarnings("unused")
 		PackageAPI path = buildPathPackage();
 
 		return Arrays.asList(/* fileSystem, path */);

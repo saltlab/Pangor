@@ -1,12 +1,10 @@
 package ca.ubc.ece.salt.pangor.test.learning;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -146,16 +144,4 @@ public class TestAPI {
 		assertTrue(likelihood == 1);
 	}
 
-	/*
-	 * Test helper
-	 */
-	private List<String> extractAPIsFromKeywordList(List<KeywordDefinition> keywordsList) {
-		List<String> APIsNames = new ArrayList<>();
-
-		for (KeywordDefinition keyword : keywordsList) {
-			APIsNames.add(keyword.api.getName());
-		}
-
-		return APIsNames;
-	}
 }

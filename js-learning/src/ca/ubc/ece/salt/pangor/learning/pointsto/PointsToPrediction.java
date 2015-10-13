@@ -5,10 +5,10 @@ import java.util.Set;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.learning.apis.AbstractAPI;
-import ca.ubc.ece.salt.pangor.learning.apis.KeywordUse;
-import ca.ubc.ece.salt.pangor.learning.apis.TopLevelAPI;
 import ca.ubc.ece.salt.pangor.learning.apis.KeywordDefinition.KeywordType;
+import ca.ubc.ece.salt.pangor.learning.apis.KeywordUse;
 import ca.ubc.ece.salt.pangor.learning.apis.KeywordUse.KeywordContext;
+import ca.ubc.ece.salt.pangor.learning.apis.TopLevelAPI;
 
 /**
  * Predicts the points-to relationships for all keywords (methods, fields,
@@ -70,6 +70,7 @@ public class PointsToPrediction {
 
 
 	/** Returns a set of APIs that are likely used in this method. **/
+	@SuppressWarnings("unchecked")
 	public Set<AbstractAPI> getAPIsUsed(Map<KeywordUse, Integer> insertedKeywords,
 			Map<KeywordUse, Integer> removedKeywords, Map<KeywordUse, Integer> updatedKeywords,
 			Map<KeywordUse, Integer> unchangedKeywords) {
@@ -77,6 +78,7 @@ public class PointsToPrediction {
 	}
 
 	/** Returns a set of APIs that are likely used in this method. **/
+	@SuppressWarnings("unchecked")
 	public Set<AbstractAPI> getAPIsUsed(Map<KeywordUse, Integer> keywords) {
 		return predictor
 				.predictKeywords(KeywordUse.filterMapByChangeType(keywords, ChangeType.INSERTED, ChangeType.UNCHANGED));
@@ -85,6 +87,7 @@ public class PointsToPrediction {
 	/**
 	 * Returns a set of APIs that are likely involved in a method's repair.
 	 **/
+	@SuppressWarnings("unchecked")
 	public Set<AbstractAPI> getAPIsInRepair(Map<KeywordUse, Integer> insertedKeywords,
 			Map<KeywordUse, Integer> removedKeywords, Map<KeywordUse, Integer> updatedKeywords,
 			Map<KeywordUse, Integer> unchangedKeywords) {
@@ -92,6 +95,7 @@ public class PointsToPrediction {
 	}
 
 	/** Returns a set of APIs that are likely used in this method. **/
+	@SuppressWarnings("unchecked")
 	public Set<AbstractAPI> getAPIsInRepair(Map<KeywordUse, Integer> keywords) {
 		return predictor
 				.predictKeywords(KeywordUse.filterMapByChangeType(keywords, ChangeType.UPDATED, ChangeType.REMOVED));
