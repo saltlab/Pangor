@@ -7,8 +7,8 @@ import junit.framework.TestCase;
 import org.junit.Ignore;
 
 import ca.ubc.ece.salt.pangor.analysis.Analysis;
-import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.cfd.ControlFlowDifferencing;
+import ca.ubc.ece.salt.pangor.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
 import ca.ubc.ece.salt.pangor.js.cfg.JavaScriptCFGFactory;
 

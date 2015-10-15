@@ -5,9 +5,9 @@ import java.util.List;
 
 import org.junit.Test;
 
-import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.analysis.specialtype.SpecialTypeAnalysis;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
+import ca.ubc.ece.salt.pangor.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
 import ca.ubc.ece.salt.pangor.classify.alert.IncorrectConditionAlert;
 import ca.ubc.ece.salt.pangor.js.analysis.SpecialTypeAnalysisUtilities.SpecialType;

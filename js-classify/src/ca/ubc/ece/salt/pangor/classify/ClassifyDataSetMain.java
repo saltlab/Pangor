@@ -3,8 +3,8 @@ package ca.ubc.ece.salt.pangor.classify;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
-import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
-import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierMetrics;
+import ca.ubc.ece.salt.pangor.classify.ClassifierDataSet;
+import ca.ubc.ece.salt.pangor.classify.ClassifierMetrics;
 
 public class ClassifyDataSetMain {
 

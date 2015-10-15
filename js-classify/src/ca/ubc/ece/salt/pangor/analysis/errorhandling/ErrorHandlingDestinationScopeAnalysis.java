@@ -10,10 +10,10 @@ import org.mozilla.javascript.ast.TryStatement;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
-import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
+import ca.ubc.ece.salt.pangor.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
 import ca.ubc.ece.salt.pangor.js.analysis.scope.ScopeAnalysis;
 

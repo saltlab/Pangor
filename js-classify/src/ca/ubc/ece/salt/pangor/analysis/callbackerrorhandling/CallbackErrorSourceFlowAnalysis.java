@@ -9,13 +9,13 @@ import org.mozilla.javascript.ast.FunctionNode;
 import org.mozilla.javascript.ast.Name;
 import org.mozilla.javascript.ast.ScriptNode;
 
-import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.analysis.flow.PathInsensitiveFlowAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.analysis.specialtype.SpecialTypeVisitor;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.cfg.CFGEdge;
 import ca.ubc.ece.salt.pangor.cfg.CFGNode;
+import ca.ubc.ece.salt.pangor.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
 import ca.ubc.ece.salt.pangor.js.analysis.AnalysisUtilities;
 import ca.ubc.ece.salt.pangor.js.analysis.SpecialTypeCheck;

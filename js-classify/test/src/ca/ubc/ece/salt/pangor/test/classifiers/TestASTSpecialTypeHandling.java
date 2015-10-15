@@ -7,8 +7,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 import ca.ubc.ece.salt.pangor.analysis.ast.STHScopeAnalysis;
-import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
+import ca.ubc.ece.salt.pangor.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
 import ca.ubc.ece.salt.pangor.classify.alert.SpecialTypeAlert;
 import ca.ubc.ece.salt.pangor.js.analysis.SpecialTypeAnalysisUtilities.SpecialType;

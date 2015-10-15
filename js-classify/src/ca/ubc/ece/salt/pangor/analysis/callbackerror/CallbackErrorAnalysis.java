@@ -3,9 +3,9 @@ package ca.ubc.ece.salt.pangor.analysis.callbackerror;
 import org.mozilla.javascript.ast.FunctionCall;
 import org.mozilla.javascript.ast.FunctionNode;
 
-import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
-import ca.ubc.ece.salt.pangor.analysis.meta.MetaAnalysis;
+import ca.ubc.ece.salt.pangor.analysis.MetaAnalysis;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
+import ca.ubc.ece.salt.pangor.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.classify.alert.CallbackErrorAlert;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
 import ca.ubc.ece.salt.pangor.js.analysis.AnalysisUtilities;

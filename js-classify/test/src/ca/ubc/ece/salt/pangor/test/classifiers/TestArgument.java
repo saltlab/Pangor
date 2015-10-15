@@ -8,8 +8,8 @@ import org.junit.Test;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode.ChangeType;
 import ca.ubc.ece.salt.pangor.analysis.argument.ArgumentAnalysis;
-import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
+import ca.ubc.ece.salt.pangor.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.classify.alert.ArgumentAlert;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
 

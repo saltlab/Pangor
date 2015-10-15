@@ -1,11 +1,8 @@
-package ca.ubc.ece.salt.pangor.analysis.meta;
+package ca.ubc.ece.salt.pangor.analysis;
 
 import java.util.List;
 
 import ca.ubc.ece.salt.gumtree.ast.ClassifiedASTNode;
-import ca.ubc.ece.salt.pangor.analysis.Alert;
-import ca.ubc.ece.salt.pangor.analysis.Analysis;
-import ca.ubc.ece.salt.pangor.analysis.DataSet;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.cfg.CFG;
 
@@ -16,6 +13,9 @@ import ca.ubc.ece.salt.pangor.cfg.CFG;
  * @param <T> The type of data set that stores the analysis results.
  * @param <S> The type of the source file analysis.
  * @param <D> Type type of the destination file analysis.
+ *
+ * TODO: Here is where we should create pre and post conditions. When both conditions are met, we register
+ * some alert... which also needs to be defined by the subclass.
  */
 public abstract class MetaAnalysis<U extends Alert, T extends DataSet<U>,
 	S extends Analysis<U, T>, D extends Analysis<U, T>> extends Analysis<U, T> {

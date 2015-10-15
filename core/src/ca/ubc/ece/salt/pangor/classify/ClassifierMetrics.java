@@ -1,4 +1,4 @@
-package ca.ubc.ece.salt.pangor.analysis.classify;
+package ca.ubc.ece.salt.pangor.classify;
 
 import java.util.Comparator;
 import java.util.Map;
