@@ -3,10 +3,10 @@ package ca.ubc.ece.salt.pangor.analysis.specialtype;
 import java.util.List;
 import java.util.Map;
 
-import ca.ubc.ece.salt.pangor.analysis.MetaAnalysis;
+import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
+import ca.ubc.ece.salt.pangor.analysis.meta.MetaAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.specialtype.SpecialTypeFlowAnalysis.SpecialTypeCheckResult;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
-import ca.ubc.ece.salt.pangor.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
 import ca.ubc.ece.salt.pangor.classify.alert.IncorrectConditionAlert;
 import ca.ubc.ece.salt.pangor.classify.alert.SpecialTypeAlert;

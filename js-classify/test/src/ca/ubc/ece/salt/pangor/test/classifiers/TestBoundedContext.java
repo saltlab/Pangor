@@ -6,8 +6,8 @@ import java.util.List;
 import org.junit.Test;
 
 import ca.ubc.ece.salt.pangor.analysis.boundedcontext.BoundedContextAnalysis;
+import ca.ubc.ece.salt.pangor.analysis.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
-import ca.ubc.ece.salt.pangor.classify.ClassifierDataSet;
 import ca.ubc.ece.salt.pangor.classify.alert.BoundedContextAlert;
 import ca.ubc.ece.salt.pangor.classify.alert.ClassifierAlert;
 

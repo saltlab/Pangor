@@ -5,7 +5,7 @@ import java.util.Map;
 import org.mozilla.javascript.ast.AstNode;
 import org.mozilla.javascript.ast.ScriptNode;
 
-import ca.ubc.ece.salt.pangor.analysis.MetaAnalysis;
+import ca.ubc.ece.salt.pangor.analysis.meta.MetaAnalysis;
 import ca.ubc.ece.salt.pangor.analysis.scope.Scope;
 import ca.ubc.ece.salt.pangor.batch.AnalysisMetaInformation;
 import ca.ubc.ece.salt.pangor.js.analysis.scope.JavaScriptScope;

@@ -11,8 +11,6 @@ import ca.ubc.ece.salt.pangor.cfg.CFG;
  *
  * @param <U> The type of alert the data set stores.
  * @param <T> The type of data set that stores the analysis results.
- *
- * TODO: We don't need T extends DataSet<U>, do we? I don't think T is ever used.
  */
 public abstract class Analysis<U extends Alert, T extends DataSet<U>> {
 
